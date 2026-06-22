@@ -1,0 +1,31 @@
+# Task Management
+
+- [x] Research and Planning
+	- [x] Analyze current visibility logic in Firestore and backend
+	- [x] Research `espy_pro` wizard input field styling
+	- [x] Audit store and subscription logic for cumulative elements
+	- [x] Perform visual and operational audit for Wallet transformation
+- [x] UI Adjustments
+	- [x] Update `espy_pro` wizard input field backgrounds
+	- [x] Rename "Vault" to "Espy Wallet" and transform the UI
+- [x] Visibility Algorithm Refactor
+	- [x] Update Firestore rules for default active status
+	- [x] Implement element-specific visibility (pins, slots, announcements)
+	- [x] Update `AuthService` and `UserService` for automatic activation
+- [x] Token System & Wallet Implementation
+	- [x] Update `UserModel` with wallet fields
+	- [x] Refactor Cloud Functions for Token Recharges
+	- [x] Create `token-functions.js` for element spending
+	- [x] Implement `WalletScreen` and `TokenShopScreen`
+	- [x] Integrate Whish Pay for token bundle recharges
+- [x] Admin Dashboard Updates
+	- [x] Implement Token Pricing Control Panel
+	- [x] Add Recharge Card Generator (Minting Terminal)
+- [x] Visitor App Verification
+	- [x] Ensure visitor app correctly filters active elements
+	- [x] Improve UI skin with Glassmorphism and better spacing
+- [/] Build & Deploy
+	- [x] Fix compilation errors (LucideIcons const fix)
+	- [x] Modularize Cloud Functions to prevent timeout
+	- [x] Migrate legacy functions to Gen 2
+	- [ ] Build and deploy all apps
