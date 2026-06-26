@@ -1,0 +1,413 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_core/models/professional_model.dart';
+import 'package:shared_core/models/service_model.dart';
+import 'package:shared_core/models/visitor_model.dart';
+
+final firestoreServiceProvider = Provider((ref) => FirestoreService());
+
+class FirestoreService {
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+
+  // ── Professionals ──────────────────────────────────────────────────────────
+  
+  Stream<List<ProfessionalModel>> watchAllProfessionals() {
+    return _db.collection('directory_professionals')
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snap) => snap.docs.map((doc) => ProfessionalModel.fromJson({...doc.data(), 'id': doc.id})).toList());
+  }
+
+  Future<List<ProfessionalModel>> listAllProfessionals() async {
+    final snap = await _db.collection('directory_professionals')
+        .orderBy('createdAt', descending: true)
+        .get();
+    return snap.docs.map((doc) => ProfessionalModel.fromJson({...doc.data(), 'id': doc.id})).toList();
+  }
+
+  // ── Institutions ───────────────────────────────────────────────────────────
+  
+  Stream<List<ProfessionalModel>> watchAllInstitutions() {
+    return _db.collection('directory_institutions')
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snap) => snap.docs.map((doc) => ProfessionalModel.fromJson({...doc.data(), 'id': doc.id})).toList());
+  }
+
+  Stream<List<ProfessionalModel>> watchNewInstitutions() {
+    return _db.collection('directory_institutions')
+        .snapshots()
+        .map((snap) => snap.docs.map((doc) => ProfessionalModel.fromJson({...doc.data(), 'id': doc.id})).toList());
+  }
+
+  // ── Services ──────────────────────────────────────────────────────────────
+  
+  Stream<List<ServiceModel>> watchAllServices() {
+    return _db.collection('directory_services')
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snap) => snap.docs.map((doc) => ServiceModel.fromJson({...doc.data(), 'id': doc.id})).toList());
+  }
+
+  // ── Visitors ───────────────────────────────────────────────────────────────
+  
+  Stream<List<VisitorModel>> watchAllVisitors() {
+    return _db.collection('directory_visitors')
+        .orderBy('updatedAt', descending: true)
+        .snapshots()
+        .map((snap) => snap.docs.map((doc) => VisitorModel.fromJson({...doc.data(), 'id': doc.id})).toList());
+  }
+
+  // ── Analytics & Transactions ──────────────────────────────────────────────
+
+  Stream<List<Map<String, dynamic>>> watchInteractions() {
+    return _db.collection('directory_interactions')
+        .orderBy('timestamp', descending: true)
+        .limit(1000)
+        .snapshots()
+        .map((snap) => snap.docs.map((doc) => {...(doc.data() as Map<String, dynamic>), 'id': doc.id}).toList());
+  }
+
+  Stream<List<Map<String, dynamic>>> watchMembershipTransactions() {
+    return _db.collection('directory_membership_transactions')
+        .orderBy('createdAt', descending: true)
+        .limit(1000)
+        .snapshots()
+        .map((snap) => snap.docs.map((doc) => {...(doc.data() as Map<String, dynamic>), 'id': doc.id}).toList());
+  }
+
+  Stream<List<Map<String, dynamic>>> watchLogs() {
+    return _db.collection('directory_admin_logs')
+        .orderBy('timestamp', descending: true)
+        .limit(1000)
+        .snapshots()
+        .map((snap) => snap.docs.map((doc) => {...(doc.data() as Map<String, dynamic>), 'id': doc.id}).toList());
+  }
+
+  Stream<List<Map<String, dynamic>>> watchWalletLedger() {
+    return _db.collection('wallet_ledger')
+        .orderBy('timestamp', descending: true)
+        .limit(1000)
+        .snapshots()
+        .map((snap) => snap.docs.map((doc) => {...(doc.data() as Map<String, dynamic>), 'id': doc.id}).toList());
+  }
+
+  // ── Comms Hub ─────────────────────────────────────────────────────────────
+
+  Stream<List<Map<String, dynamic>>> watchUserBroadcasts() {
+    return _db.collection('directory_broadcasts')
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snap) => snap.docs.map((doc) => {...(doc.data() as Map<String, dynamic>), 'id': doc.id}).toList());
+  }
+
+  Future<void> updateBroadcastStatus(String id, String status, {String? adminNotes}) async {
+    await _db.collection('directory_broadcasts').doc(id).update({
+      'status': status,
+      'adminNotes': adminNotes,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Stream<List<Map<String, dynamic>>> watchAdminNotifications() {
+    // Increased limit for history visibility
+    return _db.collection('directory_notifications')
+        .orderBy('timestamp', descending: true)
+        .limit(100)
+        .snapshots()
+        .map((snap) => snap.docs.map((doc) => {...(doc.data() as Map<String, dynamic>), 'id': doc.id}).toList());
+  }
+
+  Stream<List<Map<String, dynamic>>> watchAnnouncements() {
+    return _db.collection('directory_announcements')
+        .orderBy('created_at', descending: true)
+        .snapshots()
+        .map((snap) => snap.docs.map((doc) => {...(doc.data() as Map<String, dynamic>), 'id': doc.id}).toList());
+  }
+
+  Stream<List<Map<String, dynamic>>> watchSupportInbox() {
+    return _db.collection('directory_support_inbox')
+        .orderBy('timestamp', descending: true)
+        .snapshots()
+        .map((snap) => snap.docs.map((doc) => {...(doc.data() as Map<String, dynamic>), 'id': doc.id}).toList());
+  }
+
+  Future<void> updateSupportMessageStatus(String id, String status) async {
+    await _db.collection('directory_support_inbox').doc(id).update({
+      'status': status,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> sendInAppNotification({
+    required String userId,
+    required String title,
+    required String message,
+    required String type,
+    String? actionUrl,
+    Map<String, dynamic>? clusterData,
+  }) async {
+    await _db.collection('directory_notifications').add({
+      'target': userId,
+      'title': title,
+      'message': message,
+      'type': type,
+      'actionUrl': actionUrl,
+      'clusterData': clusterData,
+      'isRead': false,
+      'timestamp': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Stream<List<Map<String, dynamic>>> watchCommunityRequests() {
+    return _db.collection('directory_community_requests')
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snap) => snap.docs.map((doc) => {...(doc.data() as Map<String, dynamic>), 'id': doc.id}).toList());
+  }
+
+  Future<void> approveCommunityRequest(String id, bool isApproved) async {
+    final batch = _db.batch();
+    final timestamp = FieldValue.serverTimestamp();
+    
+    batch.update(_db.collection('directory_community_requests').doc(id), {
+      'is_approved': isApproved,
+      'status': isApproved ? 'active' : 'rejected',
+      'updatedAt': timestamp,
+    });
+
+    // Audit Log
+    batch.set(_db.collection('directory_admin_logs').doc(), {
+      'action': isApproved ? 'COMMUNITY_REQUEST_APPROVED' : 'COMMUNITY_REQUEST_REJECTED',
+      'entityId': id,
+      'entityType': 'community_request',
+      'timestamp': timestamp,
+    });
+
+    await batch.commit();
+  }
+
+  Future<void> toggleCommunityRequestStatus(String id, bool isActive) async {
+    await _db.collection('directory_community_requests').doc(id).update({
+      'status': isActive ? 'active' : 'pending',
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  // ── SOS & Emergency ───────────────────────────────────────────────────────
+
+  Stream<List<Map<String, dynamic>>> watchEmergencySections() {
+    return _db.collection('directory_settings')
+        .doc('app_config')
+        .snapshots()
+        .map((snap) {
+          if (snap.exists && snap.data()!.containsKey('emergency_sections')) {
+            return List<Map<String, dynamic>>.from(snap.data()!['emergency_sections']);
+          }
+          return [];
+        });
+  }
+
+  Future<void> updateEmergencySections(List<Map<String, dynamic>> sections) async {
+    await _db.collection('directory_settings').doc('app_config').set({
+      'emergency_sections': sections,
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
+  // ── Shared Ops ────────────────────────────────────────────────────────────
+
+  Future<List<Map<String, dynamic>>> listCollection(String collection) async {
+    final snap = await _db.collection(collection).get();
+    return snap.docs.map((doc) => {...(doc.data() as Map<String, dynamic>), 'id': doc.id}).toList();
+  }
+
+  Future<void> updateItem(String collection, String id, Map<String, dynamic> data) async {
+    await _db.collection(collection).doc(id).set(
+      {...data, 'updatedAt': FieldValue.serverTimestamp()},
+      SetOptions(merge: true),
+    );
+  }
+
+  Future<void> updateUser(String id, String role, Map<String, dynamic> data) async {
+    final batch = _db.batch();
+    final timestamp = FieldValue.serverTimestamp();
+    
+    final finalData = {...data, 'updatedAt': timestamp};
+    
+    batch.set(_db.collection('users').doc(id), finalData, SetOptions(merge: true));
+    
+    final col = role == 'institution' ? 'directory_institutions' : 
+                (role == 'professional' ? 'directory_professionals' : 'directory_visitors');
+    batch.set(_db.collection(col).doc(id), finalData, SetOptions(merge: true));
+
+    // Audit Log
+    final logRef = _db.collection('directory_admin_logs').doc();
+    batch.set(logRef, {
+      'action': 'USER_UPDATE',
+      'entityId': id,
+      'entityType': 'user',
+      'details': 'Admin modified parameters for $id',
+      'timestamp': timestamp,
+    });
+    
+    await batch.commit();
+  }
+
+  Future<void> deleteItem(String collection, String id) async {
+    await _db.collection(collection).doc(id).delete();
+  }
+
+  Future<void> approveProfessional(String id, bool isApproved, String role) async {
+    final col = role == 'institution' ? 'directory_institutions' : 'directory_professionals';
+    final batch = _db.batch();
+    final timestamp = FieldValue.serverTimestamp();
+    
+    final data = {
+      'isApproved': isApproved,
+      'verificationStatus': isApproved ? 'verified' : 'rejected',
+      'updatedAt': timestamp,
+    };
+
+    batch.update(_db.collection(col).doc(id), data);
+    batch.update(_db.collection('users').doc(id), data);
+
+    // Audit Log
+    final logRef = _db.collection('directory_admin_logs').doc();
+    batch.set(logRef, {
+      'action': isApproved ? 'NODE_APPROVED' : 'NODE_REJECTED',
+      'entityId': id,
+      'entityType': 'node',
+      'timestamp': timestamp,
+    });
+    
+    await batch.commit();
+  }
+
+  Future<void> toggleHonorBadge(String id, bool current, String role) async {
+    final col = role == 'institution' ? 'directory_institutions' : 'directory_professionals';
+    final batch = _db.batch();
+    final timestamp = FieldValue.serverTimestamp();
+    
+    final data = {
+      'isHonorVerified': !current,
+      'updatedAt': timestamp,
+    };
+
+    batch.update(_db.collection(col).doc(id), data);
+    batch.update(_db.collection('users').doc(id), data);
+    
+    await batch.commit();
+  }
+
+  // ── Metadata ───────────────────────────────────────────────────────────────
+
+  Future<List<Map<String, dynamic>>> getCountries() async {
+    final snap = await _db.collection('directory_countries').orderBy('name_en').get();
+    return snap.docs.map((doc) => {...(doc.data() as Map<String, dynamic>), 'id': doc.id}).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> getGovernorates({String? countryId}) async {
+    Query query = _db.collection('directory_governorates').orderBy('name_en');
+    if (countryId != null) {
+      query = query.where('country_id', isEqualTo: countryId);
+    }
+    final snap = await query.get();
+    return snap.docs.map((doc) => {...(doc.data() as Map<String, dynamic>), 'id': doc.id}).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> getCities({String? governorateId}) async {
+    Query query = _db.collection('directory_cities').orderBy('name_en');
+    if (governorateId != null) {
+      query = query.where('governorate_id', isEqualTo: governorateId);
+    }
+    final snap = await query.get();
+    return snap.docs.map((doc) => {...(doc.data() as Map<String, dynamic>), 'id': doc.id}).toList();
+  }
+
+  Stream<Map<String, dynamic>> watchUnitPricing() {
+    return _db.collection('directory_settings')
+        .doc('unit_pricing')
+        .snapshots()
+        .map((snap) => snap.exists ? snap.data()! : {});
+  }
+
+  Future<void> updateUnitPricing(Map<String, dynamic> data) async {
+    await _db.collection('directory_settings').doc('unit_pricing').set(
+      {...data, 'updatedAt': FieldValue.serverTimestamp()},
+      SetOptions(merge: true),
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> getSectors() async {
+    final snap = await _db.collection('directory_sectors').get();
+    return snap.docs.map((doc) => {...(doc.data() as Map<String, dynamic>), 'id': doc.id}).toList();
+  }
+
+  // ── Token System ──────────────────────────────────────────────────────────
+
+  Stream<Map<String, dynamic>> watchTokenPricing() {
+    return _db.collection('directory_settings')
+        .doc('token_pricing')
+        .snapshots()
+        .map((snap) => snap.exists ? snap.data()! : {});
+  }
+
+  Future<void> updateTokenPricing(Map<String, dynamic> data) async {
+    await _db.collection('directory_settings').doc('token_pricing').set(
+      {...data, 'updatedAt': FieldValue.serverTimestamp()},
+      SetOptions(merge: true),
+    );
+  }
+
+  Stream<Map<String, dynamic>> watchTokenAnalytics() {
+    return _db.collection('directory_settings').doc('token_analytics').snapshots().map((snap) => snap.exists ? snap.data()! : {});
+  }
+
+  Future<void> updateTokenAnalytics(Map<String, dynamic> data) async {
+    await _db.collection('directory_settings').doc('token_analytics').set(
+      {...data, 'updatedAt': FieldValue.serverTimestamp()},
+      SetOptions(merge: true),
+    );
+  }
+
+  Future<void> mintRechargeCards({
+    required String batchLabel,
+    required int count,
+    required int tokenValue,
+    required String targetRole,
+    int extraPins = 0,
+    int extraSlots = 0,
+    int broadcasts = 0,
+  }) async {
+    final batch = _db.batch();
+    final timestamp = FieldValue.serverTimestamp();
+
+    for (int i = 0; i < count; i++) {
+      // Generate a simple unique 12-digit code
+      final code = 'ESPY-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}-${(1000 + i).toString()}';
+      final ref = _db.collection('recharge_cards').doc(code);
+      
+      batch.set(ref, {
+        'code': code,
+        'batchLabel': batchLabel,
+        'tokenValue': tokenValue,
+        'extraPins': extraPins,
+        'extraSlots': extraSlots,
+        'broadcasts': broadcasts,
+        'targetRole': targetRole,
+        'status': 'active',
+        'createdAt': timestamp,
+      });
+    }
+
+    // Audit Log
+    batch.set(_db.collection('directory_admin_logs').doc(), {
+      'action': 'CARDS_MINTED',
+      'details': 'Generated $count cards ($tokenValue \$E, $extraPins PINs, $extraSlots SLOTs) for $targetRole ($batchLabel)',
+      'timestamp': timestamp,
+    });
+
+    await batch.commit();
+  }
+}

@@ -1,0 +1,32 @@
+[versions]
+agp = "8.13.2"
+kotlin = "2.1.0"
+googleServices = "4.4.2"
+flutterPluginLoader = "1.0.0"
+# Forced dependency versions
+androidxActivity = "1.9.3"
+androidxCore = "1.13.1"
+androidxCredentials = "1.3.0"
+androidxBrowser = "1.8.0"
+firebaseAuth = "24.1.0"
+googleid = "1.2.0"
+
+[libraries]
+kotlinLibraryStdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
+# Forced dependencies from app build script
+androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "androidxActivity" }
+androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "androidxActivity" }
+androidx-core = { group = "androidx.core", name = "core", version.ref = "androidxCore" }
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidxCore" }
+androidx-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "androidxCredentials" }
+androidx-credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "androidxCredentials" }
+androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "androidxBrowser" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
+googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
+flutter-plugin-loader = { id = "dev.flutter.flutter-plugin-loader", version.ref = "flutterPluginLoader" }

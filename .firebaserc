@@ -1,0 +1,21 @@
+{
+  "projects": {
+    "default": "hope-bearer-award"
+  },
+  "targets": {
+    "hope-bearer-award": {
+      "hosting": {
+        "admin-dashboard": [
+          "hope-bearer-award-admin"
+        ],
+        "visitor-app": [
+          "hope-bearer-award-visitor"
+        ],
+        "pro-app": [
+          "hope-bearer-award-pro"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

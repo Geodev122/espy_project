@@ -1,0 +1,578 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ═══════════════════════════════════════════════════════════════
+    // ESPY PROTOCOL COLLECTIONS
+    // ═══════════════════════════════════════════════════════════════
+
+    // --- Global Helper Functions ---
+    function isAdmin() {
+      return request.auth != null
+        && (request.auth.token.role == 'admin' 
+            || request.auth.token.admin == true 
+            || request.auth.token.isAdmin == true
+            || request.auth.token.superAdmin == true
+            || request.auth.token.email == 'geo.elnajjar@gmail.com');
+    }
+
+    // PUBLIC-FACING DATA: Allow anyone to read.
+    match /honorees/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+    
+    // COMMITTEE MEMBERS: Public read access for homepage display
+    match /committeeMembers/{docId} {
+      allow read: if true;
+      allow create: if request.auth != null && (
+        isAdmin() ||
+        (request.resource.data.authUid == request.auth.uid) ||
+        (!request.resource.data.keys().hasAny(['authUid']))
+      );
+      allow update: if request.auth != null && (
+        isAdmin() ||
+        (
+          resource.data.authUid == request.auth.uid &&
+          request.resource.data.authUid == resource.data.authUid
+        )
+      );
+      allow delete: if isAdmin();
+    }
+    
+    match /committee/{docId} {
+      allow read: if true;
+      allow create: if request.auth != null && (
+        isAdmin() ||
+        (request.resource.data.authUid == request.auth.uid) ||
+        (!request.resource.data.keys().hasAny(['authUid']))
+      );
+      allow update: if request.auth != null && (
+        isAdmin() ||
+        (
+          resource.data.authUid == request.auth.uid &&
+          request.resource.data.authUid == resource.data.authUid
+        )
+      );
+      allow delete: if isAdmin();
+    }
+    match /sponsors/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+    match /sponsorshipTiers/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+    match /nominationCategories/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+    match /programActivities/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /submissions/{docId} {
+      function isSubmissionValid() {
+        let data = request.resource.data;
+        return data.name is string && data.name.size() > 0 && data.name.size() < 100
+          && data.email is string && data.email.matches('.+@.+\\..+')
+          && data.message is string && data.message.size() > 0 && data.message.size() < 5000
+          && data.inquiry_type is string
+          && data.keys().hasAll(['name', 'email', 'message', 'inquiry_type', 'createdAt']);
+      }
+      allow create: if isSubmissionValid();
+      allow read, delete: if request.auth != null;
+      allow update: if request.auth != null && isAdmin();
+    }
+    
+    match /nominations/{docId} {
+      allow create: if request.resource.data.keys().hasAll(['name', 'email', 'createdAt'])
+        && request.resource.data.name is string && request.resource.data.name.size() > 0
+        && request.resource.data.email is string && request.resource.data.email.matches('.+@.+\\..+');
+      allow read, update, delete: if request.auth != null;
+    }
+
+    match /tierInquiries/{inquiryId} {
+      allow create: if request.resource.data.keys().hasAll(['email', 'createdAt'])
+        && request.resource.data.email is string && request.resource.data.email.matches('.+@.+\\..+');
+      allow read, update, delete: if request.auth != null;
+    }
+
+    match /contacts/{docId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /contactMessages/{docId} {
+      function isContactMessageValid() {
+        let data = request.resource.data;
+        return data.name is string && data.name.size() > 0 && data.name.size() < 100
+          && data.email is string && data.email.matches('.+@.+\\..+')
+          && data.message is string && data.message.size() > 0 && data.message.size() < 5000
+          && data.keys().hasAll(['name', 'email', 'message', 'createdAt', 'status', 'read']);
+      }
+      allow create: if isContactMessageValid();
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /emailTemplates/{docId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
+    match /bulkEmailJobs/{docId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
+    match /enhancedContacts/{contactId} {
+      allow read: if isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /mailingLists/{listId} {
+      allow read: if isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /emailCampaigns/{campaignId} {
+      allow read: if request.auth != null;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /eventDetails/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /seatingLevels/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /seatBookings/{docId} {
+      allow read: if true;
+      allow create: if true;
+      allow update: if isAdmin() ||
+        (request.auth != null && (
+          resource.data.uid == request.auth.uid || 
+          resource.data.email == request.auth.token.email
+        ));
+      allow delete: if isAdmin();
+    }
+
+    match /budgetCategories/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+      match /transactions/{transactionId} {
+        allow read: if true;
+        allow write: if isAdmin();
+      }
+    }
+
+    match /incomeStreams/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /budgetSnapshots/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /settings/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+    
+    match /selectiveTierPromoCodes/{promoId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+    
+    match /emailQueue/{emailId} {
+      allow read: if isAdmin();
+      allow create: if request.auth != null;
+      allow update, delete: if false;
+    }
+    
+    match /socialMediaPosts/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+    
+    match /translations/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /mediaGallery/{mediaId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /socialMediaTemplates/{templateId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /activityLogs/{logId} {
+      allow read: if isAdmin();
+      allow create: if request.auth != null;
+      allow update, delete: if isAdmin();
+    }
+
+    match /venues/{venueId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /ceremonies/{ceremonyId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /events/{eventId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /eventBookings/{bookingId} {
+      function isValidEventBooking() {
+        let data = request.resource.data;
+        return data.eventId is string && data.eventId.size() > 0
+          && data.primaryAttendee.email is string && data.primaryAttendee.email.matches('.+@.+\\..+')
+          && data.primaryAttendee.firstName is string && data.primaryAttendee.firstName.size() > 0
+          && data.primaryAttendee.lastName is string && data.primaryAttendee.lastName.size() > 0
+          && data.totalAmount is number && data.totalAmount >= 0
+          && data.status is string
+          && data.createdAt is string;
+      }
+      allow create: if isValidEventBooking();
+      allow read: if request.auth != null && (
+        isAdmin() ||
+        resource.data.primaryAttendee.email == request.auth.token.email
+      );
+      allow update, delete: if isAdmin();
+    }
+
+    match /paymentTransactions/{transactionId} {
+      allow read: if request.auth != null && (isAdmin() || resource.data.userId == request.auth.uid);
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && (isAdmin() || resource.data.userId == request.auth.uid);
+      allow delete: if isAdmin();
+    }
+
+    match /membershipTransactions/{transactionId} {
+      allow read: if request.auth != null && (isAdmin() || resource.data.userId == request.auth.uid);
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && (isAdmin() || resource.data.userId == request.auth.uid);
+      allow delete: if isAdmin();
+    }
+
+    match /paymentHistory/{paymentId} {
+      allow read: if request.auth != null && (
+        isAdmin() ||
+        resource.data.membershipId == request.auth.uid ||
+        resource.data.customerEmail == request.auth.token.email
+      );
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && (
+        isAdmin() ||
+        resource.data.membershipId == request.auth.uid
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /directory_membership_transactions/{transactionId} {
+      allow read: if request.auth != null && (
+        isAdmin() ||
+        resource.data.userId == request.auth.uid ||
+        resource.data.membershipId == request.auth.uid ||
+        resource.data.customerEmail == request.auth.token.email ||
+        resource.data.professional_id == request.auth.uid ||
+        resource.data.institution_id == request.auth.uid
+      );
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && (
+        isAdmin() ||
+        resource.data.userId == request.auth.uid ||
+        resource.data.membershipId == request.auth.uid
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /directory_memberships/{membershipId} {
+      allow read: if request.auth != null && (
+        isAdmin() ||
+        resource.data.userId == request.auth.uid ||
+        membershipId == request.auth.uid ||
+        resource.data.professional_id == request.auth.uid ||
+        resource.data.institution_id == request.auth.uid
+      );
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && (
+        isAdmin() ||
+        resource.data.userId == request.auth.uid ||
+        membershipId == request.auth.uid
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /directory_active_memberships/{membershipId} {
+      allow read: if request.auth != null && (
+        isAdmin() ||
+        resource.data.userId == request.auth.uid ||
+        membershipId == request.auth.uid ||
+        resource.data.user_id == request.auth.uid
+      );
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && (
+        isAdmin() ||
+        resource.data.userId == request.auth.uid ||
+        membershipId == request.auth.uid
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /directory_professionals/{docId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && (
+        isAdmin() ||
+        (resource.data.uid == request.auth.uid &&
+         !request.resource.data.diff(resource.data).affectedKeys().hasAny(['admin_status', 'is_approved', 'is_active', 'uid', 'registration_id', 'registered_at']))
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /directory_institutions/{docId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && (
+        isAdmin() ||
+        (resource.data.uid == request.auth.uid &&
+         !request.resource.data.diff(resource.data).affectedKeys().hasAny(['admin_status', 'is_approved', 'is_active', 'uid', 'registration_id', 'registered_at']))
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /directory_services/{docId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && (
+        isAdmin() ||
+        ((resource.data.uid == request.auth.uid || resource.data.professional_id == request.auth.uid) &&
+         !request.resource.data.diff(resource.data).affectedKeys().hasAny(['is_approved', 'uid', 'professional_id', 'parent_provider_id', 'created_at']))
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /directory_visitors/{docId} {
+      allow create: if true;
+      allow read: if request.auth != null && (
+        isAdmin() ||
+        resource.data.uid == request.auth.uid
+      );
+      allow update: if request.auth != null && (
+        isAdmin() ||
+        resource.data.uid == request.auth.uid
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /directory_interactions/{docId} {
+      allow create: if true;
+      allow read: if isAdmin();
+      allow update, delete: if isAdmin();
+    }
+
+    match /directory_sectors/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /directory_categories/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /directory_governorates/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /directory_cities/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /directory_packages/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /directory_purchases/{docId} {
+      allow create: if request.auth != null;
+      allow read: if request.auth != null && (
+        isAdmin() ||
+        resource.data.userId == request.auth.uid ||
+        resource.data.user_id == request.auth.uid ||
+        resource.data.membershipId == request.auth.uid ||
+        resource.data.membership_id == request.auth.uid ||
+        resource.data.professional_id == request.auth.uid ||
+        resource.data.institution_id == request.auth.uid
+      );
+      allow update, delete: if isAdmin();
+    }
+
+    match /directory_reviews/{docId} {
+      allow read: if true;
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasAll(['professional_id', 'rating'])
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5;
+      allow update, delete: if isAdmin();
+    }
+
+    match /directory_favorites/{docId} {
+      allow read: if request.auth != null && (
+        isAdmin() ||
+        resource.data.userId == request.auth.uid
+      );
+      allow create: if request.auth != null
+        && request.resource.data.userId == request.auth.uid;
+      allow delete: if request.auth != null && (
+        isAdmin() ||
+        resource.data.userId == request.auth.uid
+      );
+      allow update: if false;
+    }
+
+    match /directory_messages/{docId} {
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasAll(['sender_id', 'recipient_id', 'content']);
+      allow read: if request.auth != null && (
+        isAdmin() ||
+        resource.data.sender_id == request.auth.uid ||
+        resource.data.recipient_id == request.auth.uid
+      );
+      allow update, delete: if isAdmin();
+    }
+
+    match /directory_admin_logs/{docId} {
+      allow read: if isAdmin();
+      allow create: if request.auth != null;
+      allow update, delete: if false;
+    }
+
+    match /directory_notifications/{docId} {
+      allow read: if request.auth != null && (
+        isAdmin() ||
+        resource.data.target == 'all' ||
+        resource.data.target == request.auth.uid ||
+        resource.data.target == 'visitor' ||
+        resource.data.target == 'professional' ||
+        resource.data.target == 'institution'
+      );
+      allow create: if isAdmin() || request.auth != null;
+      allow update: if request.auth != null && (isAdmin() || resource.data.target == request.auth.uid);
+      allow delete: if isAdmin();
+    }
+
+    match /directory_community_requests/{docId} {
+      allow create: if request.auth != null;
+      allow read: if request.auth != null;
+      allow update: if isAdmin() || resource.data.requester_id == request.auth.uid;
+      allow delete: if isAdmin() || resource.data.requester_id == request.auth.uid;
+    }
+
+    match /directory_matches/{docId} {
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasAll(['professionalId', 'visitorId']);
+      allow read: if request.auth != null && (
+        isAdmin() ||
+        resource.data.visitorId == request.auth.uid ||
+        resource.data.professionalId == request.auth.uid
+      );
+      allow update, delete: if isAdmin();
+    }
+
+    match /directory_settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /directory_service_pricing_tags/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /app_config/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /users/{userId} {
+      allow read: if request.auth != null && (
+        isAdmin() || request.auth.uid == userId
+      );
+      allow create: if request.auth != null && (
+        request.auth.uid == userId || isAdmin()
+      );
+      allow update: if request.auth != null && (
+        isAdmin() || request.auth.uid == userId
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /file_uploads/{docId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if isAdmin();
+    }
+
+    match /directory_receipts/{receiptId} {
+      allow read: if request.auth != null && (isAdmin() || resource.data.user_id == request.auth.uid || resource.data.userId == request.auth.uid);
+      allow create: if request.auth != null && (request.resource.data.user_id == request.auth.uid || request.resource.data.userId == request.auth.uid);
+      allow update, delete: if isAdmin();
+    }
+
+    match /directory_announcements/{announcementId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update: if isAdmin() || (request.auth.uid == resource.data.uid && resource.data.status == 'pending');
+      allow delete: if isAdmin();
+    }
+
+    match /directory_support_inbox/{docId} {
+      allow create: if request.auth != null;
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /directory_broadcasts/{docId} {
+      allow create: if request.auth != null;
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /wallet_ledger/{ledgerId} {
+      allow read: if request.auth != null && (isAdmin() || resource.data.userId == request.auth.uid);
+      allow create, update, delete: if false;
+    }
+
+    match /recharge_cards/{code} {
+      allow read: if request.auth != null && isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /directory_visitor_notifications/{visitorId} {
+      allow read, write: if request.auth != null && (isAdmin() || request.auth.uid == visitorId);
+      match /notifications/{notifId} {
+        allow read: if request.auth != null && (isAdmin() || request.auth.uid == visitorId);
+        allow update: if request.auth != null && request.auth.uid == visitorId;
+        allow create, delete: if isAdmin() || request.auth != null;
+      }
+    }
+  }
+}

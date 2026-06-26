@@ -1,0 +1,273 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_card_swiper/flutter_card_swiper.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:provider/provider.dart';
+import 'package:animate_do/animate_do.dart';
+
+import '../../l10n/app_localizations.dart';
+import 'package:shared_core/services/auth_service.dart';
+import 'package:shared_core/theme/espy_theme.dart';
+import 'package:shared_core/services/firestore_service.dart';
+import 'package:shared_core/models/user_model.dart';
+
+class SwipeRequestsScreen extends StatefulWidget {
+  const SwipeRequestsScreen({super.key});
+
+  @override
+  State<SwipeRequestsScreen> createState() => _SwipeRequestsScreenState();
+}
+
+class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
+  final FirestoreService _firestore = FirestoreService();
+  final CardSwiperController _controller = CardSwiperController();
+
+  String _selectedFilterSectionId = 'All';
+  String _selectedFilterCountry = 'ALL';
+  bool _newestFirst = true;
+
+  @override
+  Widget build(BuildContext context) {
+    final auth = Provider.of<AuthService>(context, listen: false);
+    final user = auth.userData;
+    final l10n = AppLocalizations.of(context)!;
+
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "REQUESTS POOL",
+                  style: GoogleFonts.cinzel(fontSize: 12, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep, letterSpacing: 2),
+                ),
+                const SizedBox(width: 48),
+              ],
+            ),
+          ),
+          Expanded(
+            child: StreamBuilder<List<Map<String, dynamic>>>(
+              stream: _firestore.getCommunityRequests(sectionId: _selectedFilterSectionId, newestFirst: _newestFirst),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator(color: EspyTheme.gold));
+                }
+
+                List<Map<String, dynamic>> allRequests = snapshot.data ?? [];
+
+                if (_selectedFilterCountry != 'ALL') {
+                  allRequests = allRequests.where((r) => (r['location'] ?? 'LEBANON').toString().toUpperCase().contains(_selectedFilterCountry)).toList();
+                }
+
+                if (allRequests.isEmpty) {
+                  return Center(
+                    child: Text(
+                      l10n.noPendingRequests.toUpperCase(),
+                      style: GoogleFonts.cinzel(color: EspyTheme.navyDeep.withValues(alpha: 0.3), fontSize: 12, fontWeight: FontWeight.w900),
+                    ),
+                  );
+                }
+
+              _displayCards = [
+                ...allRequests,
+                {
+                  'id': 'end_card',
+                  'isEnd': true,
+                },
+              ];
+
+              return Stack(
+                children: [
+                  Column(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(8, 20, 8, 120),
+                          child: CardSwiper(
+                            controller: _controller,
+                            cardsCount: _displayCards.length,
+                            numberOfCardsDisplayed: _displayCards.length > 3 ? 3 : _displayCards.length,
+                            backCardOffset: const Offset(0, 40),
+                            padding: EdgeInsets.zero,
+                            cardBuilder: (context, index, horizontalThreshold, verticalThreshold) {
+                              final data = _displayCards[index];
+                              if (data['isEnd'] == true) return _buildEndCard();
+                              return _buildRequestCard(data);
+                            },
+                            onSwipe: (previousIndex, currentIndex, direction) async {
+                              final target = _displayCards[previousIndex];
+                              if (target['isEnd'] == true) return false;
+                              final uid = _firestore.getCurrentUserId;
+
+                              if (direction == CardSwiperDirection.right) {
+                                await _firestore.recordInteraction(
+                                  userId: uid,
+                                  targetId: target['id'],
+                                  type: 'request_match',
+                                );
+
+                                final userName = user?.name ?? "User";
+                                final userRole = (user?.role.name ?? "Provider").toUpperCase();
+                                final appName = l10n.appTitle;
+
+                                String org = userRole;
+                                if (user?.role == UserRole.institution) {
+                                  org = user?['fullNameEn'] ?? user?.name ?? "Hope Institution";
+                                } else if (user?.role == UserRole.professional) {
+                                  org = user?['specialization'] ?? "Hope Specialist";
+                                }
+
+                                final reqTitle = target['title'] ?? "Care Request";
+                                final targetWhatsapp = target['whatsapp']?.toString().replaceAll(RegExp(r'\D'), '');
+
+                                if (targetWhatsapp != null && targetWhatsapp.isNotEmpty) {
+                                  final msg = "Hello, I am $userName from $org, responding to your request: '$reqTitle' on $appName. I'd like to offer my assistance. How can I best support you?";
+                                  final url = "https://wa.me/$targetWhatsapp?text=${Uri.encodeComponent(msg)}";
+                                  if (await canLaunchUrl(Uri.parse(url))) {
+                                    await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+                                  }
+                                }
+                              }
+                              return true;
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Positioned(bottom: 110, left: 0, right: 0, child: _buildActionButtons()),
+                ],
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  List<Map<String, dynamic>> _displayCards = [];
+
+  Widget _buildEndCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.9),
+        borderRadius: BorderRadius.circular(36),
+        border: Border.all(color: EspyTheme.navyDeep.withOpacity(0.1)),
+      ),
+      padding: const EdgeInsets.all(40),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.check_circle_outline_rounded, size: 80, color: EspyTheme.success),
+          const SizedBox(height: 24),
+          Text("QUEUE CLEARED", style: GoogleFonts.cinzel(fontSize: 22, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep)),
+          const SizedBox(height: 16),
+          Text("You have reviewed all active community requests in this sector.", textAlign: TextAlign.center, style: GoogleFonts.lora(fontSize: 14, color: Colors.black45)),
+        ],
+      ),
+    );
+  }
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRequestCard(Map<String, dynamic> request) {
+    final bool isEmergency = request['isSOS'] == true;
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(36),
+        border: Border.all(color: isEmergency ? EspyTheme.error : EspyTheme.gold.withValues(alpha: 0.15), width: 2),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 30, offset: const Offset(0, 20))],
+      ),
+      padding: const EdgeInsets.all(32),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                decoration: BoxDecoration(color: isEmergency ? EspyTheme.error.withValues(alpha: 0.1) : EspyTheme.gold.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(30)),
+                child: Text(
+                  (request['section'] ?? request['category'] ?? 'CARE').toString().toUpperCase(),
+                  style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.w900, color: isEmergency ? EspyTheme.error : EspyTheme.goldDark, letterSpacing: 2),
+                ),
+              ),
+              if (isEmergency) Pulse(infinite: true, child: const Icon(Icons.emergency_rounded, color: EspyTheme.error, size: 24)),
+            ],
+          ),
+          const SizedBox(height: 32),
+          Text(request['title'] ?? 'Help Request', style: GoogleFonts.cinzel(fontSize: 26, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep, height: 1.1)),
+          const SizedBox(height: 24),
+          Expanded(child: SingleChildScrollView(child: Text(request['description'] ?? '', style: GoogleFonts.lora(fontSize: 15, color: EspyTheme.navyDeep.withValues(alpha: 0.7), height: 1.7, fontStyle: FontStyle.italic)))),
+          const SizedBox(height: 32),
+          Row(
+            children: [
+              const Icon(Icons.location_on_rounded, color: EspyTheme.gold, size: 20),
+              const SizedBox(width: 16),
+              Expanded(child: Text(request['location'] ?? 'Beirut, Lebanon', style: GoogleFonts.lora(color: EspyTheme.navyDeep, fontSize: 13, fontWeight: FontWeight.bold))),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButtons() {
+    final l10n = AppLocalizations.of(context)!;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _buildCircleBtn(icon: Icons.tune_rounded, color: EspyTheme.gold, onTap: () => _showFilterModal(l10n), isSmall: true),
+        const SizedBox(width: 20),
+        _buildCircleBtn(icon: Icons.close_rounded, color: EspyTheme.error, onTap: () => _controller.swipe(CardSwiperDirection.left)),
+        const SizedBox(width: 20),
+        _buildCircleBtn(icon: Icons.chat_bubble_outline_rounded, color: Colors.green, onTap: () => _controller.swipe(CardSwiperDirection.right), isLarge: true),
+      ],
+    );
+  }
+
+  void _showFilterModal(AppLocalizations l10n) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) => Container(
+          padding: const EdgeInsets.fromLTRB(32, 24, 32, 48),
+          decoration: const BoxDecoration(color: EspyTheme.platinum, borderRadius: BorderRadius.vertical(top: Radius.circular(40))),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("REQUEST FILTERS", style: GoogleFonts.cinzel(fontSize: 22, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep)),
+              const SizedBox(height: 32),
+              ChoiceChip(label: const Text("NEWEST FIRST"), selected: _newestFirst, onSelected: (v) { setModalState(() => _newestFirst = v); setState(() => _newestFirst = v); }),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCircleBtn({required IconData icon, required Color color, required VoidCallback onTap, bool isLarge = false, bool isSmall = false}) {
+    double size = isLarge ? 64 : (isSmall ? 44 : 54);
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: size, height: size,
+        decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white, border: Border.all(color: color.withValues(alpha: 0.2), width: 2)),
+        child: Icon(icon, color: color, size: isLarge ? 28 : (isSmall ? 18 : 22)),
+      ),
+    );
+  }
+}

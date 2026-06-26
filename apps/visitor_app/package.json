@@ -1,0 +1,12 @@
+{
+  "name": "@award/mobile-flutter",
+  "version": "2.3.3",
+  "private": true,
+  "description": "Hope Support Suite - Flutter Android App",
+  "scripts": {
+    "mobile:run": "flutter run",
+    "mobile:build": "flutter build apk",
+    "mobile:clean": "flutter clean",
+    "build": "flutter build web --release --web-renderer canvaskit"
+  }
+}
