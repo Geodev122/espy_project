@@ -4,7 +4,17 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0e1d1981-2c6b-49c0-8970-10699b435438" name="Changes" comment="test" />
+    <list default="true" id="0e1d1981-2c6b-49c0-8970-10699b435438" name="Changes" comment="test">
+      <change afterPath="$PROJECT_DIR$/../admin_pwa/.idea/caches/deviceStreaming.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../admin_pwa/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../pro_app/.idea/caches/deviceStreaming.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../pro_app/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../.idea/Espy-Project.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../../.idea/Espy-Project.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../.idea/caches/deviceStreaming.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../admin_pwa/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../admin_pwa/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../pro_app/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../pro_app/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
