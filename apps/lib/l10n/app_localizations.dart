@@ -155,13 +155,13 @@ abstract class AppLocalizations {
   /// No description provided for @nodesOfPresence.
   ///
   /// In en, this message translates to:
-  /// **'NODES OF\nPRESENCE'**
+  /// **'PINS OF\nPRESENCE'**
   String get nodesOfPresence;
 
   /// No description provided for @mainHub.
   ///
   /// In en, this message translates to:
-  /// **'MAIN HUB (PRIMARY LOCATION)'**
+  /// **'MAIN HUB (PRIMARY PIN)'**
   String get mainHub;
 
   /// No description provided for @setPin.
@@ -173,7 +173,7 @@ abstract class AppLocalizations {
   /// No description provided for @secondaryPresenceNodes.
   ///
   /// In en, this message translates to:
-  /// **'SECONDARY PRESENCE NODES'**
+  /// **'SECONDARY PINS'**
   String get secondaryPresenceNodes;
 
   /// No description provided for @membershipTier.
@@ -335,7 +335,7 @@ abstract class AppLocalizations {
   /// No description provided for @profileSet.
   ///
   /// In en, this message translates to:
-  /// **'Your profile is set. You can now access verified nodes and care protocols.'**
+  /// **'Your profile is set. You can now access verified PINs and care protocols.'**
   String get profileSet;
 
   /// No description provided for @enterSuite.
@@ -371,7 +371,7 @@ abstract class AppLocalizations {
   /// No description provided for @professionalDesc.
   ///
   /// In en, this message translates to:
-  /// **'Verified specialist offering care nodes.'**
+  /// **'Verified specialist offering care PINs.'**
   String get professionalDesc;
 
   /// No description provided for @institution.
@@ -539,7 +539,7 @@ abstract class AppLocalizations {
   /// No description provided for @searchVerifiedNodes.
   ///
   /// In en, this message translates to:
-  /// **'Search verified nodes...'**
+  /// **'Search verified PINs...'**
   String get searchVerifiedNodes;
 
   /// No description provided for @all.
@@ -653,7 +653,7 @@ abstract class AppLocalizations {
   /// No description provided for @activeMemberDesc.
   ///
   /// In en, this message translates to:
-  /// **'Your care nodes are visible to the entire Lebanese network.'**
+  /// **'Your care PINs are visible to the entire network.'**
   String get activeMemberDesc;
 
   /// No description provided for @pendingActivationDesc.
@@ -791,7 +791,7 @@ abstract class AppLocalizations {
   /// No description provided for @profileHiddenDesc.
   ///
   /// In en, this message translates to:
-  /// **'Your profile visibility or extra nodes may be limited. Recharge your wallet.'**
+  /// **'Your profile visibility or extra PINs may be limited. Recharge your wallet.'**
   String get profileHiddenDesc;
 
   /// No description provided for @fundNow.
@@ -809,7 +809,7 @@ abstract class AppLocalizations {
   /// No description provided for @exploreNodes.
   ///
   /// In en, this message translates to:
-  /// **'EXPLORE NODES'**
+  /// **'EXPLORE PINS'**
   String get exploreNodes;
 
   /// No description provided for @mapFilters.
@@ -875,7 +875,7 @@ abstract class AppLocalizations {
   /// No description provided for @visibilityNodes.
   ///
   /// In en, this message translates to:
-  /// **'VISIBILITY NODES'**
+  /// **'VISIBILITY PINS'**
   String get visibilityNodes;
 
   /// No description provided for @serviceSlots.
@@ -905,13 +905,13 @@ abstract class AppLocalizations {
   /// No description provided for @practicePinsDesc.
   ///
   /// In en, this message translates to:
-  /// **'Unlock additional geographic nodes for added practice locations.'**
+  /// **'Unlock additional geographic PINs for added practice locations.'**
   String get practicePinsDesc;
 
   /// No description provided for @additionalNodesDesc.
   ///
   /// In en, this message translates to:
-  /// **'Additional practice area nodes can be unlocked via the Espy Store using tokens.'**
+  /// **'Additional practice area PINs can be unlocked via the Espy Store using tokens.'**
   String get additionalNodesDesc;
 
   /// No description provided for @institutionCategory.
@@ -965,7 +965,7 @@ abstract class AppLocalizations {
   /// No description provided for @institutionPinsDesc.
   ///
   /// In en, this message translates to:
-  /// **'Unlock additional geographic nodes for clinical branches or facility locations.'**
+  /// **'Unlock additional geographic PINs for clinical branches or facility locations.'**
   String get institutionPinsDesc;
 
   /// No description provided for @paymentRequired.
@@ -1031,7 +1031,7 @@ abstract class AppLocalizations {
   /// No description provided for @networkTagline.
   ///
   /// In en, this message translates to:
-  /// **'CONNECT WITH VERIFIED CARE NODES IN THE LEBANESE NETWORK.'**
+  /// **'CONNECT WITH VERIFIED CARE PINS IN THE NETWORK.'**
   String get networkTagline;
 
   /// No description provided for @editProfileTitle.
@@ -1085,7 +1085,7 @@ abstract class AppLocalizations {
   /// No description provided for @noNewNodesFound.
   ///
   /// In en, this message translates to:
-  /// **'NO NEW NODES FOUND'**
+  /// **'NO NEW PINS FOUND'**
   String get noNewNodesFound;
 
   /// No description provided for @professionalLabel.
@@ -1157,7 +1157,7 @@ abstract class AppLocalizations {
   /// No description provided for @nodeBroadcasts.
   ///
   /// In en, this message translates to:
-  /// **'NODE BROADCASTS'**
+  /// **'PIN BROADCASTS'**
   String get nodeBroadcasts;
 
   /// No description provided for @dispatchAnnouncement.
@@ -1391,7 +1391,7 @@ abstract class AppLocalizations {
   /// No description provided for @slotNode.
   ///
   /// In en, this message translates to:
-  /// **'SLOT NODE'**
+  /// **'SLOT PIN'**
   String get slotNode;
 
   /// No description provided for @listing.
@@ -1415,7 +1415,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutTheNode.
   ///
   /// In en, this message translates to:
-  /// **'ABOUT THE NODE'**
+  /// **'ABOUT THE PIN'**
   String get aboutTheNode;
 
   /// No description provided for @expertiseAndServices.
@@ -1433,7 +1433,7 @@ abstract class AppLocalizations {
   /// No description provided for @defaultBioLong.
   ///
   /// In en, this message translates to:
-  /// **'Dedicated to providing exceptional care and expertise within the Espy Protocol. This verified node has undergone rigorous vetting to ensure quality of service.'**
+  /// **'Dedicated to providing exceptional care and expertise within the Espy Protocol. This verified PIN has undergone rigorous vetting to ensure quality of service.'**
   String get defaultBioLong;
 
   /// No description provided for @secureWhatsappContact.
@@ -1469,7 +1469,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacyPolicyDesc.
   ///
   /// In en, this message translates to:
-  /// **'Your data is protected under our secondary encryption layer. By using Espy, you agree to make your clinical expertise and node presence public to the Lebanese care network. We do not sell or trade your data with third-party advertising algorithms.'**
+  /// **'Your data is protected under our secondary encryption layer. By using Espy, you agree to make your clinical expertise and PIN presence public to the care network. We do not sell or trade your data with third-party advertising algorithms.'**
   String get privacyPolicyDesc;
 
   /// No description provided for @contactAdmin.
@@ -1553,7 +1553,7 @@ abstract class AppLocalizations {
   /// No description provided for @primaryNodeInfo.
   ///
   /// In en, this message translates to:
-  /// **'Your profile registration includes 1 free primary node. Additional nodes can be managed in your Wallet Store.'**
+  /// **'Your profile registration includes 1 free primary PIN. Additional PINs can be managed in your Wallet Store.'**
   String get primaryNodeInfo;
 
   /// No description provided for @professionalDashboardRedir.

@@ -10,7 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   shared_core:
-    path: ../../packages/shared_core
+    path: ../packages/shared_core
   firebase_core: ^4.9.0
   cloud_firestore: ^6.4.1
   firebase_auth: ^6.5.1

@@ -36,16 +36,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tellNetworkAboutYou => 'TELL THE NETWORK ABOUT YOU';
 
   @override
-  String get nodesOfPresence => 'NODES OF\nPRESENCE';
+  String get nodesOfPresence => 'PINS OF\nPRESENCE';
 
   @override
-  String get mainHub => 'MAIN HUB (PRIMARY LOCATION)';
+  String get mainHub => 'MAIN HUB (PRIMARY PIN)';
 
   @override
   String get setPin => 'SET PIN';
 
   @override
-  String get secondaryPresenceNodes => 'SECONDARY PRESENCE NODES';
+  String get secondaryPresenceNodes => 'SECONDARY PINS';
 
   @override
   String get membershipTier => 'MEMBERSHIP\nTIER';
@@ -146,7 +146,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get professional => 'PROFESSIONAL';
 
   @override
-  String get professionalDesc => 'Verified specialist offering care nodes.';
+  String get professionalDesc => 'Verified specialist offering care PINs.';
 
   @override
   String get institution => 'INSTITUTION';
@@ -230,7 +230,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get map => 'MAP';
 
   @override
-  String get searchVerifiedNodes => 'Search verified nodes...';
+  String get searchVerifiedNodes => 'Search verified PINs...';
 
   @override
   String get all => 'ALL';
@@ -289,7 +289,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get activeMemberDesc =>
-      'Your care nodes are visible to the entire Lebanese network.';
+      'Your care PINs are visible to the entire network.';
 
   @override
   String get pendingActivationDesc =>
@@ -362,7 +362,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileHiddenDesc =>
-      'Your profile is hidden until the registration protocol is funded.';
+      'Your profile visibility or extra PINs may be limited. Recharge your wallet.';
 
   @override
   String get fundNow => 'FUND NOW';
@@ -371,7 +371,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get broadcast => 'BROADCAST';
 
   @override
-  String get exploreNodes => 'EXPLORE NODES';
+  String get exploreNodes => 'EXPLORE PINS';
 
   @override
   String get mapFilters => 'MAP FILTERS';
@@ -404,7 +404,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get totalEstimate => 'TOTAL ESTIMATE';
 
   @override
-  String get visibilityNodes => 'VISIBILITY NODES';
+  String get visibilityNodes => 'VISIBILITY PINS';
 
   @override
   String get serviceSlots => 'SERVICE SLOTS';
@@ -422,11 +422,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get practicePinsDesc =>
-      'Unlock additional geographic nodes for added practice locations.';
+      'Unlock additional geographic PINs for added practice locations.';
 
   @override
   String get additionalNodesDesc =>
-      'Additional practice area nodes are subject to membership fees and can be unlocked after initial registration.';
+      'Additional practice area PINs can be unlocked via the Espy Store using tokens.';
 
   @override
   String get institutionCategory => 'INSTITUTION CATEGORY';
@@ -457,7 +457,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get institutionPinsDesc =>
-      'Unlock additional geographic nodes for clinical branches or facility locations.';
+      'Unlock additional geographic PINs for clinical branches or facility locations.';
 
   @override
   String get paymentRequired => 'PAYMENT REQUIRED TO PROCEED';
@@ -492,7 +492,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get networkTagline =>
-      'CONNECT WITH VERIFIED CARE NODES IN THE LEBANESE NETWORK.';
+      'CONNECT WITH VERIFIED CARE PINS IN THE NETWORK.';
 
   @override
   String get editProfileTitle => 'EDIT PROFILE';
@@ -519,7 +519,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get smartMatch => 'SMART MATCH';
 
   @override
-  String get noNewNodesFound => 'NO NEW NODES FOUND';
+  String get noNewNodesFound => 'NO NEW PINS FOUND';
 
   @override
   String get professionalLabel => 'Professional';
@@ -559,7 +559,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get saving => 'SAVING...';
 
   @override
-  String get nodeBroadcasts => 'NODE BROADCASTS';
+  String get nodeBroadcasts => 'PIN BROADCASTS';
 
   @override
   String get dispatchAnnouncement => 'DISPATCH ANNOUNCEMENT';
@@ -678,7 +678,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'No available slots. Purchase more in the Vault.';
 
   @override
-  String get slotNode => 'SLOT NODE';
+  String get slotNode => 'SLOT PIN';
 
   @override
   String get listing => 'LISTING...';
@@ -690,7 +690,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get selectSlotError => 'Please select a slot.';
 
   @override
-  String get aboutTheNode => 'ABOUT THE NODE';
+  String get aboutTheNode => 'ABOUT THE PIN';
 
   @override
   String get expertiseAndServices => 'EXPERTISE & SERVICES';
@@ -700,7 +700,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get defaultBioLong =>
-      'Dedicated to providing exceptional care and expertise within the Espy Protocol. This verified node has undergone rigorous vetting to ensure quality of service.';
+      'Dedicated to providing exceptional care and expertise within the Espy Protocol. This verified PIN has undergone rigorous vetting to ensure quality of service.';
 
   @override
   String get secureWhatsappContact => 'SECURE WHATSAPP CONTACT';
@@ -719,7 +719,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacyPolicyDesc =>
-      'Your data is protected under our secondary encryption layer. By using Espy, you agree to make your clinical expertise and node presence public to the Lebanese care network. We do not sell or trade your data with third-party advertising algorithms.';
+      'Your data is protected under our secondary encryption layer. By using Espy, you agree to make your clinical expertise and PIN presence public to the care network. We do not sell or trade your data with third-party advertising algorithms.';
 
   @override
   String get contactAdmin => 'CONTACT ADMIN';
@@ -763,7 +763,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get primaryNodeInfo =>
-      'Your profile registration includes 1 free primary node. Additional nodes can be managed later in your professional dashboard.';
+      'Your profile registration includes 1 free primary PIN. Additional PINs can be managed later in your professional dashboard.';
 
   @override
   String get professionalDashboardRedir =>
@@ -774,7 +774,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get welcomeMessage =>
-      'Congratulations! Your profile is initialized. Note: It is currently HIDDEN from the public directory. To activate your visibility, list services, and manage your pins, please visit the Vault to finalize your subscription.';
+      'Congratulations! Your profile is initialized. Note: It is currently HIDDEN from the public directory. To activate your visibility, list services, and manage your PINs, please visit the Wallet to finalize your subscription.';
 
   @override
   String get submissionError => 'Submission Error';
@@ -793,12 +793,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get institutionDashboardRedir =>
-      'Your institutional profile is ready for activation. You will now be redirected to your dashboard where you can manage your hub, service slots, and specialized node visibility.';
+      'Your institutional profile is ready for activation. You will now be redirected to your dashboard where you can manage your hub, service slots, and specialized PIN visibility.';
 
   @override
   String get instWelcomeTitle => 'INSTITUTIONAL INITIALIZATION';
 
   @override
   String get instWelcomeMessage =>
-      'Congratulations! Your institution is registered. Note: Your hub is currently HIDDEN from the public map. To activate visibility and list medical services, please visit the Vault to finalize your subscription.';
+      'Congratulations! Your institution is registered. Note: Your hub is currently HIDDEN from the public map. To activate visibility and list medical services, please visit the Wallet to finalize your subscription.';
 }

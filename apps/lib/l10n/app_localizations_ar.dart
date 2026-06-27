@@ -36,16 +36,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get tellNetworkAboutYou => 'أخبر الشبكة عنك';
 
   @override
-  String get nodesOfPresence => 'عقد\nالتواجد';
+  String get nodesOfPresence => 'دبابيس\nالتواجد';
 
   @override
-  String get mainHub => 'المركز الرئيسي (الموقع الأساسي)';
+  String get mainHub => 'المركز الرئيسي (الدبوس الأساسي)';
 
   @override
-  String get setPin => 'تحديد الموقع';
+  String get setPin => 'تحديد الدبوس';
 
   @override
-  String get secondaryPresenceNodes => 'عقد التواجد الثانوية';
+  String get secondaryPresenceNodes => 'الدبابيس الثانوية';
 
   @override
   String get membershipTier => 'فئة\nالعضوية';
@@ -146,7 +146,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get professional => 'مهني';
 
   @override
-  String get professionalDesc => 'أخصائي معتمد يقدم عقد الرعاية.';
+  String get professionalDesc => 'أخصائي معتمد يقدم دبابيس الرعاية.';
 
   @override
   String get institution => 'مؤسسة';
@@ -230,7 +230,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get map => 'خريطة';
 
   @override
-  String get searchVerifiedNodes => 'البحث في العقد الموثقة...';
+  String get searchVerifiedNodes => 'البحث في الدبابيس الموثقة...';
 
   @override
   String get all => 'الكل';
@@ -289,7 +289,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get activeMemberDesc =>
-      'عقد الرعاية الخاصة بك مرئية للشبكة اللبنانية بأكملها.';
+      'دبابيس الرعاية الخاصة بك مرئية للشبكة بأكملها.';
 
   @override
   String get pendingActivationDesc => 'في انتظار التحقق من الدفع لتفعيل ظهورك.';
@@ -359,7 +359,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get profileHiddenDesc =>
-      'قد يكون ظهور ملفك الشخصي أو العقد الإضافية محدوداً. يرجى شحن محفظتك.';
+      'قد يكون ظهور ملفك الشخصي أو الدبابيس الإضافية محدوداً. يرجى شحن محفظتك.';
 
   @override
   String get fundNow => 'شحن الرصيد';
@@ -368,7 +368,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get broadcast => 'بث';
 
   @override
-  String get exploreNodes => 'استكشاف العقد';
+  String get exploreNodes => 'استكشاف الدبابيس';
 
   @override
   String get mapFilters => 'فلاتر الخريطة';
@@ -401,7 +401,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get totalEstimate => 'التقدير الإجمالي';
 
   @override
-  String get visibilityNodes => 'عقد الظهور';
+  String get visibilityNodes => 'دبابيس الظهور';
 
   @override
   String get serviceSlots => 'فتحات الخدمة';
@@ -418,11 +418,12 @@ class AppLocalizationsAr extends AppLocalizations {
       'يمكنك من إدراج بروتوكول رعاية أو خدمة محددة. كل فتحة تستضيف قائمة واحدة.';
 
   @override
-  String get practicePinsDesc => 'فتح عقد جغرافية إضافية لمواقع ممارسة إضافية.';
+  String get practicePinsDesc =>
+      'فتح دبابيس جغرافية إضافية لمواقع ممارسة إضافية.';
 
   @override
   String get additionalNodesDesc =>
-      'تخضع عقد منطقة الممارسة الإضافية لرسوم عضوية ويمكن فتحها بعد التسجيل الأولي.';
+      'يمكن فتح دبابيس منطقة الممارسة الإضافية عبر متجر Espy باستخدام الرموز.';
 
   @override
   String get institutionCategory => 'فئة المؤسسة';
@@ -452,7 +453,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get institutionPinsDesc =>
-      'فتح عقد جغرافية إضافية للفروع السريرية أو مواقع المرافق.';
+      'فتح دبابيس جغرافية إضافية للفروع السريرية أو مواقع المرافق.';
 
   @override
   String get paymentRequired => 'الدفع مطلوب للمتابعة';
@@ -485,8 +486,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get registerInstitution => 'تسجيل مؤسسة';
 
   @override
-  String get networkTagline =>
-      'تواصل مع عقد الرعاية الموثقة في الشبكة اللبنانية.';
+  String get networkTagline => 'تواصل مع دبابيس الرعاية الموثقة في الشبكة.';
 
   @override
   String get editProfileTitle => 'تعديل الملف الشخصي';
@@ -513,7 +513,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get smartMatch => 'مطابقة ذكية';
 
   @override
-  String get noNewNodesFound => 'لم يتم العثور على عقد جديدة';
+  String get noNewNodesFound => 'لم يتم العثور على دبابيس جديدة';
 
   @override
   String get professionalLabel => 'مهني';
@@ -553,7 +553,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get saving => 'جاري الحفظ...';
 
   @override
-  String get nodeBroadcasts => 'بث العقد';
+  String get nodeBroadcasts => 'بث الدبابيس';
 
   @override
   String get dispatchAnnouncement => 'إرسال إعلان';
@@ -672,7 +672,7 @@ class AppLocalizationsAr extends AppLocalizations {
       'لا توجد فتحات متاحة. اشترِ المزيد من متجر المحفظة.';
 
   @override
-  String get slotNode => 'عقدة الفتحة';
+  String get slotNode => 'دبوس الفتحة';
 
   @override
   String get listing => 'جاري الإدراج...';
@@ -684,7 +684,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get selectSlotError => 'يرجى اختيار فتحة.';
 
   @override
-  String get aboutTheNode => 'عن العقدة';
+  String get aboutTheNode => 'عن الدبوس';
 
   @override
   String get expertiseAndServices => 'الخبرة والخدمات';
@@ -694,7 +694,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get defaultBioLong =>
-      'مخصص لتقديم رعاية وخبرة استثنائية ضمن بروتوكول الأمل. خضعت هذه العقدة الموثقة لعملية تدقيق صارمة لضمان جودة الخدمة.';
+      'مخصص لتقديم رعاية وخبرة استثنائية ضمن بروتوكول Espy. خضع هذا الدبوس الموثق لعملية تدقيق صارمة لضمان جودة الخدمة.';
 
   @override
   String get secureWhatsappContact => 'اتصال واتساب آمن';
@@ -713,7 +713,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get privacyPolicyDesc =>
-      'بياناتك محمية بموجب طبقة التشفير الثانوية الخاصة بنا. باستخدام مجموعة دعم الأمل، فإنك توافق على جعل خبرتك السريرية وتواجد العقدة متاحاً للجمهور لشبكة الرعاية اللبنانية. نحن لا نبيع أو نتاجر ببياناتك مع خوارزميات إعلانية لجهات خارجية.';
+      'بياناتك محمية بموجب طبقة التشفير الثانوية الخاصة بنا. باستخدام Espy، فإنك توافق على جعل خبرتك السريرية وتواجد الدبوس متاحاً للجمهور لشبكة الرعاية. نحن لا نبيع أو نتاجر ببياناتك مع خوارزميات إعلانية لجهات خارجية.';
 
   @override
   String get contactAdmin => 'الاتصال بالمسؤول';
@@ -756,7 +756,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get primaryNodeInfo =>
-      'يتضمن تسجيل ملفك الشخصي عقدة أساسية مجانية واحدة. يمكن إضافة دبابيس إضافية عبر متجر المحفظة.';
+      'يتضمن تسجيل ملفك الشخصي دبوساً أساسياً مجانياً واحداً. يمكن إضافة دبابيس إضافية عبر متجر المحفظة.';
 
   @override
   String get professionalDashboardRedir =>
@@ -767,7 +767,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get welcomeMessage =>
-      'تهانينا! تم تهيئة ملفك الشخصي. مركزك الأساسي نشط الآن على الخريطة. لإضافة المزيد من الدبابيس أو إدراج الخدمات، يرجى زيارة محفظة Espy.';
+      'تهانينا! تم تهيئة ملفك الشخصي. دبوسك الأساسي نشط الآن على الخريطة. لإضافة المزيد من الدبابيس أو إدراج الخدمات، يرجى زيارة محفظة Espy.';
 
   @override
   String get submissionError => 'خطأ في الإرسال';
