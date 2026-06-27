@@ -9,5 +9,10 @@ final authStateProvider = StreamProvider<User?>((ref) {
 });
 
 final isAdminProvider = FutureProvider<bool>((ref) async {
-  return ref.read(authServiceProvider).checkIsAdmin();
+  try {
+    return await ref.read(authServiceProvider).checkIsAdmin();
+  } catch (e) {
+    debugPrint('isAdmin check failed: $e');
+    return false;
+  }
 });

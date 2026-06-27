@@ -116,8 +116,12 @@ class _SystemPageState extends ConsumerState<SystemPage> with SingleTickerProvid
             columns: const ['Name EN', 'Name AR', 'Code', 'Currency'],
             data: data,
           ),
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, s) => Text('Error: $e'),
+          loading: () => const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator())),
+          error: (e, s) => Container(
+            padding: const EdgeInsets.all(20),
+            color: Colors.redAccent.withOpacity(0.1),
+            child: Text('ACCESS RESTRICTED OR NETWORK ERROR: $e', style: const TextStyle(color: Colors.redAccent, fontSize: 10)),
+          ),
         ),
         const SizedBox(height: 32),
         asyncSectors.when(
@@ -127,8 +131,8 @@ class _SystemPageState extends ConsumerState<SystemPage> with SingleTickerProvid
             columns: const ['Name EN', 'Name AR'],
             data: data,
           ),
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, s) => Text('Error: $e'),
+          loading: () => const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator())),
+          error: (e, s) => Text('Error loading sectors: $e', style: const TextStyle(color: Colors.redAccent, fontSize: 10)),
         ),
         const SizedBox(height: 32),
         asyncGovernorates.when(
@@ -138,8 +142,8 @@ class _SystemPageState extends ConsumerState<SystemPage> with SingleTickerProvid
             columns: const ['Name EN', 'Name AR', 'Country ID'],
             data: data,
           ),
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, s) => Text('Error: $e'),
+          loading: () => const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator())),
+          error: (e, s) => Text('Error loading governorates: $e', style: const TextStyle(color: Colors.redAccent, fontSize: 10)),
         ),
         const SizedBox(height: 32),
         asyncCities.when(
@@ -149,8 +153,8 @@ class _SystemPageState extends ConsumerState<SystemPage> with SingleTickerProvid
             columns: const ['Name EN', 'Name AR', 'Country ID', 'Governorate ID'],
             data: data,
           ),
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, s) => Text('Error: $e'),
+          loading: () => const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator())),
+          error: (e, s) => Text('Error loading cities: $e', style: const TextStyle(color: Colors.redAccent, fontSize: 10)),
         ),
         const SizedBox(height: 32),
         AdminSettingsTable(

@@ -49,6 +49,22 @@ class AdminSettingsTable extends ConsumerWidget {
   }
 
   Widget _buildTable(BuildContext context, WidgetRef ref) {
+    if (data.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.all(40),
+        child: Center(child: Text('NO DATA AVAILABLE', style: TextStyle(color: Colors.white24, fontSize: 10))),
+      );
+    }
+
+    // Deduplicate data by ID to prevent crash
+    final uniqueData = <Map<String, dynamic>>[];
+    final ids = <String>{};
+    for (var item in data) {
+      if (ids.add(item['id']?.toString() ?? '')) {
+        uniqueData.add(item);
+      }
+    }
+
     return SizedBox(
       width: double.infinity,
       child: DataTable(
@@ -58,20 +74,44 @@ class AdminSettingsTable extends ConsumerWidget {
           ...columns.map((c) => DataColumn(label: Text(c.toUpperCase()))),
           const DataColumn(label: Text('ACTIONS')),
         ],
-        rows: data.map((item) => _buildRow(context, ref, item)).toList(),
+        rows: uniqueData.map((item) {
+          try {
+            return _buildRow(context, ref, item);
+          } catch (e) {
+            return DataRow(cells: [
+              ...columns.map((_) => const DataCell(Text('ERR'))),
+              DataCell(Text(e.toString().substring(0, 10))),
+            ]);
+          }
+        }).toList(),
       ),
     );
   }
 
   DataRow _buildRow(BuildContext context, WidgetRef ref, Map<String, dynamic> item) {
     return DataRow(
+      key: ValueKey(item['id'] ?? DateTime.now().toString()),
       cells: [
         ...columns.map((c) {
           final key = c.toLowerCase().replaceAll(' ', '_');
-          return DataCell(Text(item[key]?.toString() ?? '—'));
+          var value = item[key];
+          if (value is Timestamp) {
+            value = DateFormat('dd MMM yyyy').format(value.toDate());
+          }
+          return DataCell(
+            SizedBox(
+              width: 150,
+              child: Text(
+                value?.toString() ?? '—',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          );
         }),
         DataCell(
           Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(
                 icon: Icon(LucideIcons.edit, size: 14, color: Colors.white24),

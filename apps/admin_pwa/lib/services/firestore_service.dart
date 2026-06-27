@@ -341,12 +341,11 @@ class FirestoreService {
   // ── Anchor Management & Migration ──────────────────────────────────────────
 
   Future<void> setupGlobalAnchors() async {
-    final batch = _db.batch();
     final timestamp = FieldValue.serverTimestamp();
 
     // 1. Ensure Lebanon exists as the Global Anchor
     final lebanonRef = _db.collection('directory_countries').doc('lebanon');
-    batch.set(lebanonRef, {
+    await lebanonRef.set({
       'name_en': 'Lebanon',
       'name_ar': 'لبنان',
       'code': 'LB',
@@ -356,44 +355,87 @@ class FirestoreService {
       'updatedAt': timestamp,
     }, SetOptions(merge: true));
 
+    // Helper for large batching
+    Future<void> runBatchedDeletes(List<DocumentReference> refs) async {
+      if (refs.isEmpty) return;
+      var batch = _db.batch();
+      int count = 0;
+      for (var ref in refs) {
+        batch.delete(ref);
+        count++;
+        if (count >= 400) {
+          await batch.commit();
+          batch = _db.batch();
+          count = 0;
+        }
+      }
+      if (count > 0) await batch.commit();
+    }
+
+    Future<void> runBatchedUpdates(List<DocumentReference> refs, Map<String, dynamic> data) async {
+      if (refs.isEmpty) return;
+      var batch = _db.batch();
+      int count = 0;
+      for (var ref in refs) {
+        batch.update(ref, data);
+        count++;
+        if (count >= 400) {
+          await batch.commit();
+          batch = _db.batch();
+          count = 0;
+        }
+      }
+      if (count > 0) await batch.commit();
+    }
+
     // 2. Audit and fix governorates (Regions)
     final govSnap = await _db.collection('directory_governorates').get();
     final seenGovs = <String>{};
+    final govDeletes = <DocumentReference>[];
+    final govUpdateRefs = <DocumentReference>[];
+
     for (var doc in govSnap.docs) {
-      final data = doc.data() as Map<String, dynamic>;
-      final nameEn = data['name_en']?.toString().trim().toLowerCase();
+      final data = doc.data();
+      final nameEn = (data['name_en']?.toString() ?? data['name']?.toString() ?? '').trim().toLowerCase();
       
-      if (nameEn == null || seenGovs.contains(nameEn)) {
-        batch.delete(doc.reference); // Remove duplicates
+      if (nameEn.isEmpty || seenGovs.contains(nameEn)) {
+        govDeletes.add(doc.reference);
       } else {
         seenGovs.add(nameEn);
-        // Ensure linked to Lebanon
         if (data['country_id'] != 'lebanon') {
-          batch.update(doc.reference, {'country_id': 'lebanon', 'updatedAt': timestamp});
+          govUpdateRefs.add(doc.reference);
         }
       }
     }
+    await runBatchedDeletes(govDeletes);
+    await runBatchedUpdates(govUpdateRefs, {'country_id': 'lebanon', 'updatedAt': timestamp});
 
     // 3. Audit and fix cities
     final citySnap = await _db.collection('directory_cities').get();
     final seenCities = <String>{};
+    final cityDeletes = <DocumentReference>[];
+    final cityUpdateRefs = <DocumentReference>[];
+
     for (var doc in citySnap.docs) {
-      final data = doc.data() as Map<String, dynamic>;
-      final nameEn = data['name_en']?.toString().trim().toLowerCase();
+      final data = doc.data();
+      final nameEn = (data['name_en']?.toString() ?? data['name']?.toString() ?? '').trim().toLowerCase();
       final govId = data['governorate_id'];
       
+      // Some entries might use 'country' instead of 'country_id'
+      final countryId = data['country_id'] ?? data['country'];
+
       final compositeKey = '$nameEn-$govId';
-      if (nameEn == null || seenCities.contains(compositeKey)) {
-        batch.delete(doc.reference);
+      if (nameEn.isEmpty || seenCities.contains(compositeKey)) {
+        cityDeletes.add(doc.reference);
       } else {
         seenCities.add(compositeKey);
-        if (data['country_id'] != 'lebanon') {
-          batch.update(doc.reference, {'country_id': 'lebanon', 'updatedAt': timestamp});
+        if (countryId != 'lebanon') {
+          cityUpdateRefs.add(doc.reference);
         }
       }
     }
-
-    await batch.commit();
+    await runBatchedDeletes(cityDeletes);
+    await runBatchedUpdates(cityUpdateRefs, {'country_id': 'lebanon', 'updatedAt': timestamp});
   }
 
   // ── Token System ──────────────────────────────────────────────────────────

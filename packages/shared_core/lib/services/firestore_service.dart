@@ -59,8 +59,11 @@ class FirestoreService {
 
   Stream<List<Map<String, dynamic>>> getGovernorates({String? countryId}) {
     Query query = _db.collection('directory_governorates');
-    if (countryId != null) {
+    if (countryId != null && countryId != 'ALL' && countryId != 'lebanon_all') {
       query = query.where('country_id', isEqualTo: countryId);
+    } else {
+      // Default to Lebanon if nothing specified and multiple countries exist
+      // query = query.where('country_id', isEqualTo: 'lebanon');
     }
     return query.snapshots()
         .map((snap) =>
@@ -71,7 +74,7 @@ class FirestoreService {
 
   Stream<List<Map<String, dynamic>>> getCities({String? governorateId}) {
     Query query = _db.collection('directory_cities');
-    if (governorateId != null) {
+    if (governorateId != null && governorateId != 'ALL') {
       query = query.where('governorate_id', isEqualTo: governorateId);
     }
     return query.snapshots()
