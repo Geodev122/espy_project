@@ -11,13 +11,13 @@ dependencies:
     sdk: flutter
   shared_core:
     path: ../packages/shared_core
-  firebase_core: ^3.10.1
-  cloud_firestore: ^5.6.0
-  firebase_auth: ^5.4.1
-  firebase_storage: ^11.7.0
-  cloud_functions: ^5.2.1
-  firebase_analytics: ^11.3.1
-  firebase_crashlytics: ^4.2.2
+  firebase_core: ^4.11.0
+  cloud_firestore: ^6.4.1
+  firebase_auth: ^6.5.1
+  firebase_storage: ^13.4.1
+  cloud_functions: ^6.3.1
+  firebase_analytics: ^12.4.1
+  firebase_crashlytics: ^5.2.2
   provider: ^6.1.2
   google_fonts: ^8.1.0
   shared_preferences: ^2.5.5
