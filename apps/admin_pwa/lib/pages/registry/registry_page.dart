@@ -13,6 +13,7 @@ import '../../services/export_service.dart';
 import '../../widgets/common/admin_badge.dart';
 import '../../widgets/common/admin_doc_modal.dart';
 import '../../widgets/common/admin_edit_user_modal.dart';
+import '../../providers/system_providers.dart';
 
 class RegistryPage extends ConsumerStatefulWidget {
   const RegistryPage({super.key});

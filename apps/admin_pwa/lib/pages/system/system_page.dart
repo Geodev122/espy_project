@@ -4,6 +4,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../core/theme.dart';
 import '../../services/firestore_service.dart';
 import '../../widgets/common/admin_settings_table.dart';
+import '../../providers/system_providers.dart';
 import 'sync_debugger_page.dart';
 import 'token_management_page.dart';
 
@@ -33,7 +34,7 @@ class _SystemPageState extends ConsumerState<SystemPage> with SingleTickerProvid
             controller: _tabController,
             children: [
               _buildInfrastructureView(),
-              const TokenManagementPage(),
+              TokenManagementPage(),
               const SyncDebuggerPage(),
             ],
           ),
@@ -296,7 +297,7 @@ class _SystemPageState extends ConsumerState<SystemPage> with SingleTickerProvid
                     labelCtrl.clear();
                   }
                 },
-                icon: Icon(LucideIcons.zap, size: 16),
+                icon: const Icon(LucideIcons.zap, size: 16),
                 label: const Text('GENERATE CODES'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: EspyTheme.gold,
@@ -311,28 +312,3 @@ class _SystemPageState extends ConsumerState<SystemPage> with SingleTickerProvid
     );
   }
 }
-
-final tokenPricingStreamProvider = StreamProvider<Map<String, dynamic>>((ref) {
-  return ref.watch(firestoreServiceProvider).watchTokenPricing();
-});
-
-
-final countriesFutureProvider = FutureProvider<List<Map<String, dynamic>>>((ref) {
-  return ref.watch(firestoreServiceProvider).getCountries();
-});
-
-final sectorsFutureProvider = FutureProvider<List<Map<String, dynamic>>>((ref) {
-  return ref.watch(firestoreServiceProvider).getSectors();
-});
-
-final governoratesFutureProvider = FutureProvider<List<Map<String, dynamic>>>((ref) {
-  return ref.watch(firestoreServiceProvider).getGovernorates();
-});
-
-final citiesFutureProvider = FutureProvider<List<Map<String, dynamic>>>((ref) {
-  return ref.watch(firestoreServiceProvider).getCities();
-});
-
-final categoriesFutureProvider = FutureProvider<List<Map<String, dynamic>>>((ref) {
-  return ref.watch(firestoreServiceProvider).listCollection('directory_categories');
-});

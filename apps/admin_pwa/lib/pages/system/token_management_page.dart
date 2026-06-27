@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../core/theme.dart';
 import '../../services/firestore_service.dart';
+import '../../providers/system_providers.dart';
 
 class TokenManagementPage extends ConsumerStatefulWidget {
   const TokenManagementPage({super.key});
@@ -56,7 +57,7 @@ class _TokenManagementPageState extends ConsumerState<TokenManagementPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('GLOBAL PRICING (\$E)', style: EspyTheme.cinzelStyle.copyWith(fontSize: 10, color: EspyTheme.gold)),
+              Text(r'GLOBAL PRICING ($E)', style: EspyTheme.cinzelStyle.copyWith(fontSize: 10, color: EspyTheme.gold)),
               const SizedBox(height: 24),
               _buildPricingField('new_pin', 'NEW PIN', pricing),
               _buildPricingField('renew_pin', 'RENEW PIN', pricing),
@@ -189,10 +190,10 @@ class _TokenManagementPageState extends ConsumerState<TokenManagementPage> {
       mainAxisSpacing: 20,
       childAspectRatio: 2.5,
       children: [
-        _buildStatCard('TOTAL MINTED', '450,000 \$E', LucideIcons.layers, EspyTheme.gold),
-        _buildStatCard('TOTAL REDEEMED', '125,400 \$E', LucideIcons.checkCircle, Colors.green),
+        _buildStatCard('TOTAL MINTED', r'450,000 $E', LucideIcons.layers, EspyTheme.gold),
+        _buildStatCard('TOTAL REDEEMED', r'125,400 $E', LucideIcons.checkCircle, Colors.green),
         _buildStatCard('REDEMPTION RATE', '27.8%', LucideIcons.trendingUp, EspyTheme.cyan),
-        _buildStatCard('AVG COST / TOKEN', '\$0.008', LucideIcons.dollarSign, Colors.orange),
+        _buildStatCard('AVG COST / TOKEN', r'$0.008', LucideIcons.dollarSign, Colors.orange),
       ],
     );
   }
@@ -220,7 +221,3 @@ class _TokenManagementPageState extends ConsumerState<TokenManagementPage> {
     );
   }
 }
-
-final tokenPricingStreamProvider = StreamProvider<Map<String, dynamic>>((ref) {
-  return ref.watch(firestoreServiceProvider).watchTokenPricing();
-});

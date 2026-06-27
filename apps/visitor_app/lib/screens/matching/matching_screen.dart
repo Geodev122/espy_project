@@ -187,12 +187,6 @@ class _MatchingScreenState extends State<MatchingScreen> {
       ),
     );
   }
-            },
-          ),
-        ),
-      ],
-    );
-  }
 
   Widget _buildInfoCard(bool hasResults) {
     return Container(

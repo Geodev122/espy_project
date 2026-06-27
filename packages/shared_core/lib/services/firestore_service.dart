@@ -21,8 +21,8 @@ class FirestoreService {
         .collection('directory_sectors')
         .snapshots()
         .map((snap) {
-          final sectors = snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList();
-          return sectors.where((s) => s['isActive'] == true || s['is_active'] == true).toList()
+          final sectors = snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList().cast<Map<String, dynamic>>();
+          return sectors.where((s) => s['isActive'] == true || s['is_active'] == true).toList().cast<Map<String, dynamic>>()
             ..sort((a, b) => (a['displayOrder'] ?? 999).compareTo(b['displayOrder'] ?? 999));
         });
   }
@@ -43,7 +43,7 @@ class FirestoreService {
               };
             })
             .where((c) => c['isActive'] == true || c['is_active'] == true)
-            .toList()
+            .toList().cast<Map<String, dynamic>>()
             ..sort((a, b) => (a['displayOrder'] ?? 999).compareTo(b['displayOrder'] ?? 999)));
   }
 
@@ -52,8 +52,8 @@ class FirestoreService {
         .collection('directory_countries')
         .snapshots()
         .map((snap) =>
-            snap.docs.map((doc) => {'id': doc.id, ...doc.data()})
-            .toList()
+            snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>})
+            .toList().cast<Map<String, dynamic>>()
             ..sort((a, b) => (a['name_en'] ?? '').compareTo(b['name_en'] ?? '')));
   }
 
@@ -64,8 +64,8 @@ class FirestoreService {
     }
     return query.snapshots()
         .map((snap) =>
-            snap.docs.map((doc) => {'id': doc.id, ...doc.data()})
-            .toList()
+            snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>})
+            .toList().cast<Map<String, dynamic>>()
             ..sort((a, b) => (a['name_en'] ?? '').compareTo(b['name_en'] ?? '')));
   }
 
@@ -76,8 +76,8 @@ class FirestoreService {
     }
     return query.snapshots()
         .map((snap) =>
-            snap.docs.map((doc) => {'id': doc.id, ...doc.data()})
-            .toList()
+            snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>})
+            .toList().cast<Map<String, dynamic>>()
             ..sort((a, b) => (a['name_en'] ?? '').compareTo(b['name_en'] ?? '')));
   }
 
@@ -85,7 +85,7 @@ class FirestoreService {
     return _db
         .collection('directory_service_pricing_tags')
         .snapshots()
-        .map((snap) => snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList());
+        .map((snap) => snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList().cast<Map<String, dynamic>>());
   }
 
   // ─── 2. User & Roles ──────────────────────────────────────────────────────
@@ -100,7 +100,7 @@ class FirestoreService {
         .where('target', whereIn: targets)
         .snapshots()
         .map((snap) {
-          final items = snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList();
+          final items = snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList().cast<Map<String, dynamic>>();
           items.sort((a, b) {
             final t1 = (a['timestamp'] as Timestamp?)?.millisecondsSinceEpoch ?? 0;
             final t2 = (b['timestamp'] as Timestamp?)?.millisecondsSinceEpoch ?? 0;
@@ -171,7 +171,7 @@ class FirestoreService {
               
               return true;
             })
-            .toList();
+            .toList().cast<Map<String, dynamic>>();
       },
     );
   }
@@ -210,7 +210,7 @@ class FirestoreService {
         .collection('directory_favorites')
         .where('userId', isEqualTo: userId)
         .snapshots()
-        .map((snap) => snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList());
+        .map((snap) => snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList().cast<Map<String, dynamic>>());
   }
 
   // ─── 4. Transactions ──────────────────────────────────────────────────────
@@ -222,7 +222,7 @@ class FirestoreService {
         .where('userId', isEqualTo: userId)
         .snapshots()
         .map((snap) {
-           final items = snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList();
+           final items = snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList().cast<Map<String, dynamic>>();
            items.sort((a, b) {
              final t1 = (a['createdAt'] as Timestamp?)?.millisecondsSinceEpoch ?? 0;
              final t2 = (b['createdAt'] as Timestamp?)?.millisecondsSinceEpoch ?? 0;
@@ -239,7 +239,7 @@ class FirestoreService {
         .collection('directory_services')
         .where('professionalId', isEqualTo: professionalId)
         .snapshots()
-        .map((snap) => snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList());
+        .map((snap) => snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList().cast<Map<String, dynamic>>());
   }
 
   Future<void> createService(Map<String, dynamic> data) async {
@@ -265,7 +265,7 @@ class FirestoreService {
         .collection('directory_slots')
         .where('userId', isEqualTo: userId)
         .snapshots()
-        .map((snap) => snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList());
+        .map((snap) => snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList().cast<Map<String, dynamic>>());
   }
 
   Future<void> createBroadcast(Map<String, dynamic> data) async {
@@ -281,7 +281,7 @@ class FirestoreService {
         .where('status', isEqualTo: 'approved')
         .snapshots()
         .map((snap) {
-          final items = snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList();
+          final items = snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList().cast<Map<String, dynamic>>();
           // Note: Full filtering (isActive author) should ideally be done server-side or here
           // For now, we'll return items, and the UI can check if author is suspended if data is available
           return items;
@@ -371,7 +371,7 @@ class FirestoreService {
 
   Future<List<Map<String, dynamic>>> listCollection(String collection) async {
     final snap = await _db.collection(collection).get();
-    return snap.docs.map((doc) => {...doc.data(), 'id': doc.id}).toList();
+    return snap.docs.map((doc) => {...doc.data(), 'id': doc.id}).toList().cast<Map<String, dynamic>>();
   }
 
   Future<void> toggleCommunityRequestStatus(String id, bool isActive) async {
@@ -386,7 +386,7 @@ class FirestoreService {
 
   Stream<List<Map<String, dynamic>>> watchCommunityRequests() {
     return _db.collection('directory_community_requests').orderBy('createdAt', descending: true).snapshots()
-        .map((snap) => snap.docs.map((doc) => {...doc.data(), 'id': doc.id}).toList());
+        .map((snap) => snap.docs.map((doc) => {...doc.data(), 'id': doc.id}).toList().cast<Map<String, dynamic>>());
   }
 
   Future<void> createCommunityRequest(Map<String, dynamic> data) async {
@@ -406,7 +406,7 @@ class FirestoreService {
     }
 
     return query.snapshots().map((snapshot) {
-       final items = snapshot.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList();
+       final items = snapshot.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList().cast<Map<String, dynamic>>();
        items.sort((a, b) {
          final t1 = (a['createdAt'] as Timestamp?)?.millisecondsSinceEpoch ?? 0;
          final t2 = (b['createdAt'] as Timestamp?)?.millisecondsSinceEpoch ?? 0;

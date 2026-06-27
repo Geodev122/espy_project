@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../widgets/common/admin_badge.dart';
 import '../../services/firestore_service.dart';
 import '../../services/export_service.dart';
+import '../../providers/system_providers.dart';
 
 class FinancePage extends ConsumerStatefulWidget {
   const FinancePage({super.key});
@@ -189,7 +190,7 @@ class _FinancePageState extends ConsumerState<FinancePage> with SingleTickerProv
                 );
                 if (picked != null) setState(() => _analyticsDateRange = picked);
               },
-              icon: Icon(LucideIcons.calendar, size: 14),
+              icon: const Icon(LucideIcons.calendar, size: 14),
               label: Text(_analyticsDateRange == null ? 'SELECT PERIOD' : '${DateFormat('dd MMM').format(_analyticsDateRange!.start)} - ${DateFormat('dd MMM').format(_analyticsDateRange!.end)}'),
             ),
             const SizedBox(width: 16),
@@ -326,109 +327,6 @@ class _FinancePageState extends ConsumerState<FinancePage> with SingleTickerProv
     );
   }
 
-  // ─── TAB 2: UNIT PRICING ───────────────────────────────────────────────────
-
-  Widget _buildUnitPricingTab() {
-    final asyncUnitPricing = ref.watch(unitPricingStreamProvider);
-
-    return asyncUnitPricing.when(
-      data: (data) => SingleChildScrollView(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          children: [
-            _buildUnitRoleSection('PROFESSIONAL BASELINES', 'professional', data),
-            const SizedBox(height: 48),
-            _buildUnitRoleSection('INSTITUTION BASELINES', 'institution', data),
-          ],
-        ),
-      ),
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, s) => Center(child: Text('Error: $e')),
-    );
-  }
-
-  Widget _buildUnitRoleSection(String title, String role, Map<String, dynamic> data) {
-    final prefix = role == 'professional' ? 'pro_' : 'inst_';
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildUnitSectionHeader(title, 'Configure unit costs for $role expansion'),
-        const SizedBox(height: 24),
-        Wrap(
-          spacing: 24,
-          runSpacing: 24,
-          children: [
-            _buildPricingCard('VISIBILITY (30 DAYS)', '${prefix}visibility_30d', data['${prefix}visibility_30d']),
-            _buildPricingCard('SERVICE SLOT (UNIT)', '${prefix}slot_unit', data['${prefix}slot_unit']),
-            _buildPricingCard('MAP PIN (UNIT)', '${prefix}pin_unit', data['${prefix}pin_unit']),
-            _buildPricingCard('BROADCAST (UNIT)', '${prefix}broadcast_unit', data['${prefix}broadcast_unit']),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildUnitSectionHeader(String title, String subtitle) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title, style: EspyTheme.cinzelStyle.copyWith(fontSize: 14, color: EspyTheme.gold)),
-        const SizedBox(height: 4),
-        Text(subtitle, style: EspyTheme.loraStyle.copyWith(fontSize: 12, color: Colors.white24)),
-      ],
-    );
-  }
-
-  Widget _buildPricingCard(String label, String key, dynamic value) {
-    final controller = TextEditingController(text: value?.toString() ?? '0');
-    return Container(
-      width: 280,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.02),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: EspyTheme.cinzelStyle.copyWith(fontSize: 10, color: Colors.white38)),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              const Text('\$', style: TextStyle(fontSize: 18, color: Colors.white70)),
-              const SizedBox(width: 12),
-              Expanded(
-                child: TextField(
-                  controller: controller,
-                  keyboardType: TextInputType.number,
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  decoration: const InputDecoration(border: InputBorder.none, filled: false),
-                ),
-              ),
-              IconButton(
-                onPressed: () => _updateUnitValue(key, controller.text),
-                icon: Icon(LucideIcons.check, color: Colors.green, size: 20),
-                style: IconButton.styleFrom(backgroundColor: Colors.green.withOpacity(0.1)),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _updateUnitValue(String key, String value) async {
-    final numValue = double.tryParse(value);
-    if (numValue == null) return;
-    try {
-      await ref.read(firestoreServiceProvider).updateUnitPricing({key: numValue});
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Baseline updated')));
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
-    }
-  }
-
   // ─── TAB 3: TRANSACTIONS ───────────────────────────────────────────────────
 
   Widget _buildTransactionsTab() {
@@ -457,13 +355,13 @@ class _FinancePageState extends ConsumerState<FinancePage> with SingleTickerProv
                   Expanded(
                     child: TextField(
                       onChanged: (v) => setState(() => _searchUserId = v),
-                      decoration: InputDecoration(hintText: 'SEARCH BY USER ID...', prefixIcon: Icon(LucideIcons.search, size: 14)),
+                      decoration: const InputDecoration(hintText: 'SEARCH BY USER ID...', prefixIcon: Icon(LucideIcons.search, size: 14)),
                     ),
                   ),
                   const SizedBox(width: 24),
                   ElevatedButton.icon(
                     onPressed: () => _exportTransactions(filtered),
-                    icon: Icon(LucideIcons.download, size: 16),
+                    icon: const Icon(LucideIcons.download, size: 16),
                     label: const Text('EXPORT LOG'),
                     style: ElevatedButton.styleFrom(backgroundColor: EspyTheme.electricBlue, padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20)),
                   ),
@@ -536,11 +434,11 @@ class _FinancePageState extends ConsumerState<FinancePage> with SingleTickerProv
             children: [
               if (status == 'pending')
                 IconButton(
-                  icon: Icon(LucideIcons.checkCircle, size: 16, color: Colors.green),
+                  icon: const Icon(LucideIcons.checkCircle, size: 16, color: Colors.green),
                   onPressed: () => _updateTransactionStatus(tx['id'], 'completed'),
                 ),
               IconButton(
-                icon: Icon(LucideIcons.trash2, size: 16, color: Colors.redAccent),
+                icon: const Icon(LucideIcons.trash2, size: 16, color: Colors.redAccent),
                 onPressed: () => _deleteTransaction(tx['id']),
               ),
             ],
@@ -590,11 +488,6 @@ class _FinancePageState extends ConsumerState<FinancePage> with SingleTickerProv
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Transaction log exported')));
   }
 
-  Future<void> _launchUrl(String url) async {
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) await launchUrl(uri);
-  }
-
   Widget _buildStatCard(String title, String value, IconData icon, Color color) {
     return Card(
       child: Padding(
@@ -618,19 +511,6 @@ class _FinancePageState extends ConsumerState<FinancePage> with SingleTickerProv
   }
 }
 
-final countriesFutureProvider = FutureProvider<List<Map<String, dynamic>>>((ref) {
-  return ref.watch(firestoreServiceProvider).getCountries();
-});
-
-final sectorsFutureProvider = FutureProvider<List<Map<String, dynamic>>>((ref) {
-  return ref.watch(firestoreServiceProvider).getSectors();
-});
-
-final regionsFutureProvider = FutureProvider.family<List<Map<String, dynamic>>, String>((ref, countryId) {
-  if (countryId == 'ALL') return [];
-  return ref.watch(firestoreServiceProvider).getGovernorates(countryId: countryId);
-});
-
 final interactionsStreamProvider = StreamProvider<List<Map<String, dynamic>>>((ref) {
   return ref.watch(firestoreServiceProvider).watchInteractions();
 });
@@ -646,4 +526,3 @@ final membershipTransactionsStreamProvider = StreamProvider<List<Map<String, dyn
 final walletLedgerStreamProvider = StreamProvider<List<Map<String, dynamic>>>((ref) {
   return ref.watch(firestoreServiceProvider).watchWalletLedger();
 });
-
