@@ -99,6 +99,7 @@ class FirestoreService {
         .collection('directory_notifications')
         .where('target', whereIn: targets)
         .snapshots()
+        .handleError((e) => _debug.log('FIRESTORE', 'Error in notifications: $e'))
         .map((snap) {
           final items = snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList().cast<Map<String, dynamic>>();
           items.sort((a, b) {
@@ -146,7 +147,8 @@ class FirestoreService {
     _debug.log('FIRESTORE', 'Watch: directory_services (Active Join + Expiry)');
     final now = DateTime.now();
     return Rx.combineLatest2(
-      _db.collection('directory_services').where('isActive', isEqualTo: true).snapshots(),
+      _db.collection('directory_services').where('isActive', isEqualTo: true).snapshots()
+          .handleError((e) => _debug.log('FIRESTORE', 'Error in active services snap: $e')),
       getAllProviders(),
       (QuerySnapshot serviceSnap, List<Map<String, dynamic>> providers) {
         final providerIds = providers.map((p) => p['id']).toSet();
@@ -173,7 +175,7 @@ class FirestoreService {
             })
             .toList().cast<Map<String, dynamic>>();
       },
-    );
+    ).handleError((e) => _debug.log('FIRESTORE', 'Error in combineLatest services: $e'));
   }
 
   Future<void> recordInteraction({
@@ -275,6 +277,15 @@ class FirestoreService {
     });
   }
 
+  Stream<List<Map<String, dynamic>>> getBroadcasts({String? country}) {
+    Query query = _db.collection('directory_broadcasts');
+    if (country != null && country != 'GLOBAL') {
+      // Logic for targeting: include global and specific country
+    }
+    return query.orderBy('createdAt', descending: true).snapshots()
+        .map((snap) => snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList().cast<Map<String, dynamic>>());
+  }
+
   Stream<List<Map<String, dynamic>>> getAnnouncements() {
     return _db
         .collection('directory_announcements')
@@ -336,15 +347,17 @@ class FirestoreService {
 
   Stream<List<Map<String, dynamic>>> getAllProviders() {
     return Rx.combineLatest2(
-      _db.collection('directory_professionals').snapshots(),
-      _db.collection('directory_institutions').snapshots(),
+      _db.collection('directory_professionals').snapshots()
+          .handleError((e) => _debug.log('FIRESTORE', 'Error in professionals snap: $e')),
+      _db.collection('directory_institutions').snapshots()
+          .handleError((e) => _debug.log('FIRESTORE', 'Error in institutions snap: $e')),
       (QuerySnapshot profs, QuerySnapshot insts) {
         final List<Map<String, dynamic>> all = [];
         all.addAll(profs.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).where((p) => p['isActive'] != false));
         all.addAll(insts.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).where((p) => p['isActive'] != false));
         return all;
       },
-    );
+    ).handleError((e) => _debug.log('FIRESTORE', 'Error in combineLatest providers: $e'));
   }
 
   // ─── 7. Admin Ops ─────────────────────────────────────────────────────────

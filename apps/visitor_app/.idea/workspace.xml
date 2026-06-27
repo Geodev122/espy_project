@@ -5,7 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0e1d1981-2c6b-49c0-8970-10699b435438" name="Changes" comment="test">
-      <change beforePath="$PROJECT_DIR$/../../Espy-Project-Apps" beforeDir="false" afterPath="$PROJECT_DIR$/../../Espy-Project-Apps" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/screens/profile/broadcasts_and_notifications_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../.idea/Espy-Project.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../../.idea/Espy-Project.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../admin_pwa/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../admin_pwa/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../android/app/src/main/res/values/colors.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../android/app/src/main/res/values/colors.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../deploy_pwa.ps1" beforeDir="false" afterPath="$PROJECT_DIR$/../deploy_pwa.ps1" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/screens/app_shell.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/screens/app_shell.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/widgets/common/espy_side_menu.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/widgets/common/espy_side_menu.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../pro_app/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../pro_app/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screens/app_shell.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screens/app_shell.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screens/directory/directory_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screens/directory/directory_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/screens/matching/matching_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/screens/matching/matching_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../web/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/../web/manifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../packages/shared_core/lib/services/firestore_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../../packages/shared_core/lib/services/firestore_service.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

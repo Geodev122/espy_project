@@ -83,7 +83,31 @@ class _SystemPageState extends ConsumerState<SystemPage> with SingleTickerProvid
           ],
         ),
         const SizedBox(height: 48),
-        _buildSectionHeader('GLOBAL ANCHORS'),
+        _buildSectionHeader('GLOBAL ANCHORS', subtitle: 'Manage geographical hierarchy and system sectors'),
+        const SizedBox(height: 24),
+        Row(
+          children: [
+            ElevatedButton.icon(
+              onPressed: () async {
+                await ref.read(firestoreServiceProvider).setupGlobalAnchors();
+                ref.invalidate(countriesFutureProvider);
+                ref.invalidate(governoratesFutureProvider);
+                ref.invalidate(citiesFutureProvider);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Anchors synchronized. Duplicates removed. Lebanon set as Global Anchor.'))
+                  );
+                }
+              },
+              icon: const Icon(LucideIcons.refreshCcw, size: 16),
+              label: const Text('SYNC & DEDUPLICATE ANCHORS'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: EspyTheme.electricBlue.withOpacity(0.1),
+                foregroundColor: EspyTheme.electricBlue,
+              ),
+            ),
+          ],
+        ),
         const SizedBox(height: 24),
         asyncCountries.when(
           data: (data) => AdminSettingsTable(
@@ -122,7 +146,7 @@ class _SystemPageState extends ConsumerState<SystemPage> with SingleTickerProvid
           data: (data) => AdminSettingsTable(
             title: 'DIRECTORY CITIES',
             collection: 'directory_cities',
-            columns: const ['Name EN', 'Name AR', 'Gov ID'],
+            columns: const ['Name EN', 'Name AR', 'Country ID', 'Governorate ID'],
             data: data,
           ),
           loading: () => const Center(child: CircularProgressIndicator()),

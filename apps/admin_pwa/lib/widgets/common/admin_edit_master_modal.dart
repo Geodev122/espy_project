@@ -37,6 +37,10 @@ class _AdminEditMasterModalState extends ConsumerState<AdminEditMasterModal> {
     for (var field in fields) {
       if (field.endsWith('_id')) {
         _selectedIds[field] = widget.item?[field]?.toString();
+        // Default to Lebanon for new entries if it's a country_id field
+        if (_selectedIds[field] == null && field == 'country_id') {
+          _selectedIds[field] = 'lebanon';
+        }
       } else {
         _controllers[field] = TextEditingController(text: widget.item?[field]?.toString() ?? '');
       }

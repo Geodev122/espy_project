@@ -23,7 +23,6 @@ import 'matching/swipe_requests_screen.dart';
 import 'services/broadcast_screen.dart';
 import 'community/community_feed_screen.dart';
 import 'community/announcements_screen.dart';
-import 'profile/wallet_screen.dart';
 import 'profile/notifications_screen.dart';
 import 'map/map_explore_screen.dart';
 import 'services/service_manager_screen.dart';
@@ -103,11 +102,7 @@ class _AppShellState extends State<AppShell> {
             fullWidth: true,
             onPressed: () {
               Navigator.pop(context);
-              setState(() {
-                final auth = Provider.of<AuthService>(context, listen: false);
-                final user = auth.userData;
-                _selectedIndex = (user?.role == UserRole.visitor) ? 0 : 3; 
-              });
+              _scaffoldKey.currentState?.openDrawer();
             },
           ),
         ],
@@ -200,9 +195,9 @@ class _AppShellState extends State<AppShell> {
     }
     return [
       Padding(padding: EdgeInsets.only(top: topPadding), child: const DashboardScreen()),
+      const MapExploreScreen(),
       Padding(padding: EdgeInsets.only(top: topPadding), child: const SwipeRequestsScreen()),
       Padding(padding: EdgeInsets.only(top: topPadding), child: const ServiceManagerScreen()),
-      Padding(padding: EdgeInsets.only(top: topPadding), child: const WalletScreen()),
     ];
   }
 
@@ -217,9 +212,9 @@ class _AppShellState extends State<AppShell> {
     }
     return [
       NavItem(index: 0, icon: Icons.dashboard_rounded, label: 'DASHBOARD'),
-      NavItem(index: 1, icon: Icons.swipe_rounded, label: l10n.requests.toUpperCase()),
-      NavItem(index: 2, icon: Icons.medical_services_rounded, label: l10n.services.toUpperCase()),
-      NavItem(index: 3, icon: LucideIcons.wallet, label: 'WALLET'),
+      NavItem(index: 1, icon: Icons.map_rounded, label: 'EXPLORE'),
+      NavItem(index: 2, icon: Icons.swipe_rounded, label: l10n.requests.toUpperCase()),
+      NavItem(index: 3, icon: Icons.medical_services_rounded, label: l10n.services.toUpperCase()),
     ];
   }
 

@@ -24,7 +24,7 @@ class _FinancePageState extends ConsumerState<FinancePage> with SingleTickerProv
   // Filters
   DateTimeRange? _analyticsDateRange;
   String _roleFilter = 'both'; // 'professional', 'institution', 'both'
-  String _countryFilter = 'ALL';
+  String _countryFilter = 'lebanon';
   String _regionFilter = 'ALL';
   String _cityFilter = 'ALL';
   String _sectorFilter = 'ALL';
@@ -208,17 +208,20 @@ class _FinancePageState extends ConsumerState<FinancePage> with SingleTickerProv
             ),
             const SizedBox(width: 16),
             asyncCountries.when(
-              data: (countries) => DropdownButton<String>(
-                value: _countryFilter,
-                underline: const SizedBox(),
-                dropdownColor: const Color(0xFF061226),
-                style: EspyTheme.cinzelStyle.copyWith(fontSize: 11, color: Colors.white),
-                items: [
-                  const DropdownMenuItem(value: 'ALL', child: Text('ALL COUNTRIES')),
-                  ...countries.map((c) => DropdownMenuItem(value: c['id'], child: Text(c['name_en'].toString().toUpperCase()))),
-                ],
-                onChanged: (v) => setState(() { _countryFilter = v!; _regionFilter = 'ALL'; _cityFilter = 'ALL'; }),
-              ),
+              data: (countries) {
+                final effectiveValue = (countries.any((c) => c['id'] == _countryFilter) || _countryFilter == 'ALL') ? _countryFilter : 'ALL';
+                return DropdownButton<String>(
+                  value: effectiveValue,
+                  underline: const SizedBox(),
+                  dropdownColor: const Color(0xFF061226),
+                  style: EspyTheme.cinzelStyle.copyWith(fontSize: 11, color: Colors.white),
+                  items: [
+                    const DropdownMenuItem(value: 'ALL', child: Text('ALL COUNTRIES')),
+                    ...countries.map((c) => DropdownMenuItem(value: c['id'], child: Text(c['name_en'].toString().toUpperCase()))),
+                  ],
+                  onChanged: (v) => setState(() { _countryFilter = v!; _regionFilter = 'ALL'; _cityFilter = 'ALL'; }),
+                );
+              },
               loading: () => const SizedBox(),
               error: (e, s) => const SizedBox(),
             ),

@@ -19,6 +19,9 @@ class _AdminEditUserModalState extends ConsumerState<AdminEditUserModal> {
   late TextEditingController _phoneCtrl;
   late TextEditingController _bioCtrl;
   late bool _isActive;
+  String? _selectedCountryId;
+  String? _selectedGovId;
+  String? _selectedCityId;
   bool _isSaving = false;
 
   @override
@@ -29,6 +32,9 @@ class _AdminEditUserModalState extends ConsumerState<AdminEditUserModal> {
     _phoneCtrl = TextEditingController(text: widget.user.phone);
     _bioCtrl = TextEditingController(text: widget.user.bioEn);
     _isActive = widget.user.isActive;
+    _selectedCountryId = widget.user.countryId ?? 'lebanon';
+    _selectedGovId = widget.user.governorateId;
+    _selectedCityId = widget.user.cityId;
   }
 
   Future<void> _save() async {
@@ -40,6 +46,9 @@ class _AdminEditUserModalState extends ConsumerState<AdminEditUserModal> {
         'phone': _phoneCtrl.text,
         'bioEn': _bioCtrl.text,
         'isActive': _isActive,
+        'countryId': _selectedCountryId,
+        'governorateId': _selectedGovId,
+        'cityId': _selectedCityId,
       };
       
       await ref.read(firestoreServiceProvider).updateUser(widget.user.id, widget.user.role, data);
@@ -57,7 +66,7 @@ class _AdminEditUserModalState extends ConsumerState<AdminEditUserModal> {
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Container(
-        width: 600,
+        width: 700,
         decoration: BoxDecoration(
           color: const Color(0xFF061226),
           borderRadius: BorderRadius.circular(28),
@@ -76,6 +85,10 @@ class _AdminEditUserModalState extends ConsumerState<AdminEditUserModal> {
                     _buildSectionTitle('CORE IDENTITY'),
                     const SizedBox(height: 16),
                     _buildTextField('FULL NAME', _nameCtrl),
+                    const SizedBox(height: 24),
+                    _buildSectionTitle('GEOGRAPHICAL ANCHORS'),
+                    const SizedBox(height: 16),
+                    _buildAnchorSelectors(),
                     const SizedBox(height: 24),
                     _buildSectionTitle('COMMUNICATION'),
                     const SizedBox(height: 16),
@@ -102,6 +115,76 @@ class _AdminEditUserModalState extends ConsumerState<AdminEditUserModal> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildAnchorSelectors() {
+    final asyncCountries = ref.watch(countriesFutureProvider);
+    final asyncGovs = ref.watch(governoratesFutureProvider);
+    final asyncCities = ref.watch(citiesFutureProvider);
+
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: asyncCountries.when(
+                data: (list) => _buildDropdown('COUNTRY', _selectedCountryId, list, (v) => setState(() {
+                  _selectedCountryId = v;
+                  _selectedGovId = null;
+                  _selectedCityId = null;
+                })),
+                loading: () => const LinearProgressIndicator(),
+                error: (_, __) => const Text('Error'),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: asyncGovs.when(
+                data: (list) {
+                  final filtered = list.where((g) => g['country_id'] == _selectedCountryId).toList();
+                  return _buildDropdown('GOVERNORATE', _selectedGovId, filtered, (v) => setState(() {
+                    _selectedGovId = v;
+                    _selectedCityId = null;
+                  }));
+                },
+                loading: () => const LinearProgressIndicator(),
+                error: (_, __) => const Text('Error'),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        asyncCities.when(
+          data: (list) {
+            final filtered = list.where((c) => c['governorate_id'] == _selectedGovId).toList();
+            return _buildDropdown('CITY', _selectedCityId, filtered, (v) => setState(() => _selectedCityId = v));
+          },
+          loading: () => const LinearProgressIndicator(),
+          error: (_, __) => const Text('Error'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDropdown(String label, String? value, List<Map<String, dynamic>> items, Function(String?) onChanged) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white24)),
+        const SizedBox(height: 8),
+        DropdownButtonFormField<String>(
+          value: items.any((i) => i['id'] == value) ? value : null,
+          dropdownColor: const Color(0xFF061226),
+          style: const TextStyle(color: Colors.white, fontSize: 13),
+          decoration: InputDecoration(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            fillColor: Colors.white.withOpacity(0.02),
+          ),
+          items: items.map((i) => DropdownMenuItem(value: i['id'].toString(), child: Text(i['name_en'] ?? 'Unnamed'))).toList(),
+          onChanged: onChanged,
+        ),
+      ],
     );
   }
 

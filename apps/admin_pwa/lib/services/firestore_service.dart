@@ -344,6 +344,64 @@ class FirestoreService {
     return snap.docs.map((doc) => {...(doc.data() as Map<String, dynamic>), 'id': doc.id}).toList();
   }
 
+  // ── Anchor Management & Migration ──────────────────────────────────────────
+
+  Future<void> setupGlobalAnchors() async {
+    final batch = _db.batch();
+    final timestamp = FieldValue.serverTimestamp();
+
+    // 1. Ensure Lebanon exists as the Global Anchor
+    final lebanonRef = _db.collection('directory_countries').doc('lebanon');
+    batch.set(lebanonRef, {
+      'name_en': 'Lebanon',
+      'name_ar': 'لبنان',
+      'code': 'LB',
+      'currency': 'LBP',
+      'phone_code': '+961',
+      'isActive': true,
+      'updatedAt': timestamp,
+    }, SetOptions(merge: true));
+
+    // 2. Audit and fix governorates (Regions)
+    final govSnap = await _db.collection('directory_governorates').get();
+    final seenGovs = <String>{};
+    for (var doc in govSnap.docs) {
+      final data = doc.data() as Map<String, dynamic>;
+      final nameEn = data['name_en']?.toString().trim().toLowerCase();
+      
+      if (nameEn == null || seenGovs.contains(nameEn)) {
+        batch.delete(doc.reference); // Remove duplicates
+      } else {
+        seenGovs.add(nameEn);
+        // Ensure linked to Lebanon
+        if (data['country_id'] != 'lebanon') {
+          batch.update(doc.reference, {'country_id': 'lebanon', 'updatedAt': timestamp});
+        }
+      }
+    }
+
+    // 3. Audit and fix cities
+    final citySnap = await _db.collection('directory_cities').get();
+    final seenCities = <String>{};
+    for (var doc in citySnap.docs) {
+      final data = doc.data() as Map<String, dynamic>;
+      final nameEn = data['name_en']?.toString().trim().toLowerCase();
+      final govId = data['governorate_id'];
+      
+      final compositeKey = '$nameEn-$govId';
+      if (nameEn == null || seenCities.contains(compositeKey)) {
+        batch.delete(doc.reference);
+      } else {
+        seenCities.add(compositeKey);
+        if (data['country_id'] != 'lebanon') {
+          batch.update(doc.reference, {'country_id': 'lebanon', 'updatedAt': timestamp});
+        }
+      }
+    }
+
+    await batch.commit();
+  }
+
   // ── Token System ──────────────────────────────────────────────────────────
 
   Stream<Map<String, dynamic>> watchTokenPricing() {

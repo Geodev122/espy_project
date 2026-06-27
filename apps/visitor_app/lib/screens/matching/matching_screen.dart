@@ -81,72 +81,93 @@ class _MatchingScreenState extends State<MatchingScreen> {
                   Column(
                     children: [
                       Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(8, 0, 8, 120),
-                          child: CardSwiper(
-                            controller: _controller,
-                            cardsCount: _displayCards.length,
-                            numberOfCardsDisplayed: _displayCards.length > 3 ? 3 : _displayCards.length,
-                            backCardOffset: const Offset(0, 40),
-                            padding: EdgeInsets.zero,
-                            cardBuilder: (context, index, horizontalThreshold,
-                                verticalThreshold) {
-                              final cardData = _displayCards[index];
-                              if (cardData['isInfo'] == true) {
-                                return _buildInfoCard(cardData['hasResults']);
-                              }
-                              if (cardData['isEnd'] == true) {
-                                return _buildEndCard();
-                              }
-                              return _buildSwipeCard(cardData);
-                            },
-                            onSwipe: (previousIndex, currentIndex, direction) async {
-                              setState(() => _currentIndex = currentIndex ?? 0);
-                              final target = _displayCards[previousIndex];
-                              if (target['isInfo'] == true) return true;
-                              if (target['isEnd'] == true) return false;
+                        child: Center(
+                          child: Container(
+                            constraints: const BoxConstraints(maxWidth: 400), // Prevent over-stretching on web
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 120),
+                            child: CardSwiper(
+                              controller: _controller,
+                              cardsCount: _displayCards.length,
+                              numberOfCardsDisplayed: _displayCards.length > 3 ? 3 : _displayCards.length,
+                              backCardOffset: const Offset(0, 40),
+                              padding: EdgeInsets.zero,
+                              cardBuilder: (context, index, horizontalThreshold,
+                                  verticalThreshold) {
+                                final cardData = _displayCards[index];
+                                if (cardData['isInfo'] == true) {
+                                  return _buildInfoCard(cardData['hasResults']);
+                                }
+                                if (cardData['isEnd'] == true) {
+                                  return _buildEndCard();
+                                }
+                                return _buildSwipeCard(cardData);
+                              },
+                              onSwipe: (previousIndex, currentIndex, direction) async {
+                                setState(() => _currentIndex = currentIndex ?? 0);
+                                final target = _displayCards[previousIndex];
+                                if (target['isInfo'] == true) return true;
+                                if (target['isEnd'] == true) return false;
 
-                              final userId = _firestore.getCurrentUserId;
+                                final userId = _firestore.getCurrentUserId;
 
-                              if (direction == CardSwiperDirection.right) {
-                                await _firestore.recordInteraction(
-                                  userId: userId,
-                                  targetId: target['id'],
-                                  type: 'like',
-                                );
+                                if (direction == CardSwiperDirection.left) {
+                                  // SKIP / DISLIKE
+                                  await _firestore.recordInteraction(
+                                    userId: userId,
+                                    targetId: target['id'],
+                                    type: 'dislike',
+                                  );
+                                } else if (direction == CardSwiperDirection.right) {
+                                  // SAVE TO FAVORITES
+                                  await _firestore.toggleFavorite(userId, target['id'], true);
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text("Service saved to favorites"),
+                                        behavior: SnackBarBehavior.floating,
+                                        duration: Duration(seconds: 1),
+                                      ),
+                                    );
+                                  }
+                                } else if (direction == CardSwiperDirection.top) {
+                                  // CONNECT VIA WHATSAPP
+                                  await _firestore.recordInteraction(
+                                    userId: userId,
+                                    targetId: target['id'],
+                                    type: 'connect',
+                                  );
 
-                                final user = auth.userData;
-                                final userName = user?.name ?? "User";
-                                final userRole = (user?.role.name ?? "Visitor").toUpperCase();
-                                final appName = l10n.appTitle;
+                                  final user = auth.userData;
+                                  final userName = user?.name ?? "Visitor";
+                                  final userRole = (user?.role.name ?? "visitor").toUpperCase();
+                                  
+                                  final serviceId = target['id'] ?? 'N/A';
+                                  final providerId = target['professionalId'] ?? target['institutionId'] ?? 'N/A';
+                                  final serviceTitle = target['title'] ?? 'Care Protocol';
+                                  final serviceDesc = target['description'] ?? 'No description provided';
+                                  final targetWhatsapp = target['whatsapp']?.toString().replaceAll(RegExp(r'\D'), '');
 
-                                final targetName = target['fullNameEn'] ?? target['name'] ?? "Specialist";
-                                final targetWhatsapp = target['whatsapp']?.toString().replaceAll(RegExp(r'\D'), '');
+                                  if (targetWhatsapp != null && targetWhatsapp.isNotEmpty) {
+                                    final msg = "ESPY PROTOCOL: CONNECT REQUEST\n"
+                                        "--------------------------------\n"
+                                        "Visitor: $userName ($userRole)\n"
+                                        "Service ID: $serviceId\n"
+                                        "Provider ID: $providerId\n"
+                                        "Protocol: $serviceTitle\n"
+                                        "Details: $serviceDesc\n"
+                                        "--------------------------------\n"
+                                        "Hello, I found your service on Espy and would like to proceed with this care protocol.";
+                                    
+                                    final url = "https://wa.me/$targetWhatsapp?text=${Uri.encodeComponent(msg)}";
 
-                                if (targetWhatsapp != null && targetWhatsapp.isNotEmpty) {
-                                  final msg = "Hello $targetName, I am $userName, a $userRole. I found your professional profile on $appName. Would you be open to discussing a potential care collaboration?";
-                                  final url = "https://wa.me/$targetWhatsapp?text=${Uri.encodeComponent(msg)}";
-
-                                  if (await canLaunchUrl(Uri.parse(url))) {
-                                    await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+                                    if (await canLaunchUrl(Uri.parse(url))) {
+                                      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+                                    }
                                   }
                                 }
-                              } else if (direction == CardSwiperDirection.left) {
-                                await _firestore.recordInteraction(
-                                  userId: userId,
-                                  targetId: target['id'],
-                                  type: 'dislike',
-                                );
-                              } else if (direction == CardSwiperDirection.top) {
-                                await _firestore.toggleFavorite(userId, target['id'], true);
-                                if (mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text("Protocol saved to favorites"), behavior: SnackBarBehavior.floating),
-                                  );
-                                }
-                              }
-                              return true;
-                            },
+                                return true;
+                              },
+                            ),
                           ),
                         ),
                       ),
@@ -213,7 +234,7 @@ class _MatchingScreenState extends State<MatchingScreen> {
           const SizedBox(height: 16),
           Text(
             hasResults
-              ? "• Swipe LEFT to skip\n• Swipe RIGHT to contact via WhatsApp\n• Swipe UP to save to favorites"
+              ? "• Swipe LEFT to skip\n• Swipe RIGHT to save favorite\n• Swipe UP to connect (WhatsApp)"
               : "Adjust filters to capture more or wait until providers publish more services.",
             textAlign: TextAlign.center,
             style: GoogleFonts.lora(fontSize: 14, color: Colors.black54, height: 1.6),
@@ -424,6 +445,31 @@ class _MatchingScreenState extends State<MatchingScreen> {
     );
   }
 
+  void _shareCurrentCard() {
+    if (_currentIndex < 0 || _currentIndex >= _displayCards.length) return;
+    final target = _displayCards[_currentIndex];
+    if (target['isInfo'] == true || target['isEnd'] == true) return;
+
+    final String serviceId = target['id'] ?? 'N/A';
+    final String providerId = target['professionalId'] ?? target['institutionId'] ?? 'N/A';
+    final String name = target['fullNameEn'] ?? target['name'] ?? target['title'] ?? "Specialist";
+    final String category = target['category'] ?? "General Care";
+    final String contact = target['whatsapp'] ?? "N/A";
+    final String details = target['description'] ?? "Verified Care Protocol";
+
+    final String shareText = "ESPY CARE PROTOCOL DISCOVERY\n"
+        "--------------------------------\n"
+        "Service: $name\n"
+        "Category: $category\n"
+        "Details: $details\n"
+        "Contact: $contact\n\n"
+        "Service ID: $serviceId\n"
+        "Provider ID: $providerId\n\n"
+        "Download the Espy App to view this protocol and more: https://hope-bearer-award-visitor.web.app";
+
+    Share.share(shareText);
+  }
+
   Widget _buildActionButtons(AppLocalizations l10n) {
     final bool filtersActive = _filterSectorId != null || _filterPriceTagId != null || _filterCountry != 'ALL';
 
@@ -440,22 +486,13 @@ class _MatchingScreenState extends State<MatchingScreen> {
         const SizedBox(width: 16),
         _buildCircleBtn(icon: Icons.block_rounded, color: EspyTheme.error, onTap: () => _controller.swipe(CardSwiperDirection.left)),
         const SizedBox(width: 16),
-        _buildCircleBtn(icon: Icons.chat_bubble_outline_rounded, color: EspyTheme.royalBlue, onTap: () => _controller.swipe(CardSwiperDirection.right), isLarge: true),
+        _buildCircleBtn(icon: Icons.chat_bubble_outline_rounded, color: EspyTheme.royalBlue, onTap: () => _controller.swipe(CardSwiperDirection.top), isLarge: true),
         const SizedBox(width: 16),
-        _buildCircleBtn(icon: Icons.bookmark_border_rounded, color: EspyTheme.gold, onTap: () => _controller.swipe(CardSwiperDirection.top)),
+        _buildCircleBtn(icon: Icons.bookmark_border_rounded, color: EspyTheme.gold, onTap: () => _controller.swipe(CardSwiperDirection.right)),
         const SizedBox(width: 16),
         _buildCircleBtn(icon: Icons.share_rounded, color: EspyTheme.cyan, onTap: _shareCurrentCard, isSmall: true),
       ],
     );
-  }
-
-  void _shareCurrentCard() {
-    if (_currentIndex < 0 || _currentIndex >= _displayCards.length) return;
-    final target = _displayCards[_currentIndex];
-    if (target['isInfo'] == true) return;
-    final String name = target['fullNameEn'] ?? target['name'] ?? "Specialist";
-    final String text = "Check out this verified protocol on Espy: $name\nConnect via: https://hope-bearer-award-support.web.app/#/directory/professional/${target['id']}";
-    Share.share(text);
   }
 
   Widget _buildCircleBtn({required IconData icon, required Color color, required VoidCallback onTap, bool isLarge = false, bool isSmall = false}) {

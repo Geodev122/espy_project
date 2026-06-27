@@ -37,7 +37,7 @@ flutter build web --release --pwa-strategy=offline-first
 # 3. Deploy to Firebase Hosting
 Write-Host "Step 3: Deploying to Firebase Hosting (pro-app)..." -ForegroundColor Cyan
 # Need to run from the root directory where firebase.json is located
-Push-Location ../../
+Push-Location ..
 if ($FirebaseCmd -eq "npx firebase") {
     Invoke-Expression "$FirebaseCmd deploy --only hosting:pro-app"
 } else {

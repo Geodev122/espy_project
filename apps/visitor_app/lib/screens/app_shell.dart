@@ -15,11 +15,10 @@ import 'package:shared_core/services/sound_service.dart';
 import 'package:shared_core/services/locale_service.dart';
 import 'package:shared_core/models/user_model.dart';
 
-import 'community/community_feed_screen.dart';
-import 'profile/notifications_screen.dart';
-import 'map/map_explore_screen.dart';
-import 'matching/matching_screen.dart';
-import 'emergency/sos_hub_screen.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'directory/directory_screen.dart';
+import 'services/broadcast_screen.dart';
+import 'profile/broadcasts_and_notifications_screen.dart';
 import '../widgets/common/espy_side_menu.dart';
 import '../widgets/common/premium_button.dart';
 
@@ -59,12 +58,15 @@ class _AppShellState extends State<AppShell> {
     final uid = auth.user?.uid;
     final user = auth.userData;
     if (uid != null) {
-      _notificationSubscription = firestore.getNotifications(uid, role: user?.role.name).listen((notifications) {
-        final unread = notifications.where((n) => n['isRead'] == false).toList();
-        if (unread.isNotEmpty && mounted) {
-          _showNotificationPrompt(unread.first);
-        }
-      });
+      _notificationSubscription = firestore.getNotifications(uid, role: user?.role.name).listen(
+        (notifications) {
+          final unread = notifications.where((n) => n['isRead'] == false).toList();
+          if (unread.isNotEmpty && mounted) {
+            _showNotificationPrompt(unread.first);
+          }
+        },
+        onError: (e) => debugPrint('Notification Listener Error: $e'),
+      );
     }
   }
 
@@ -105,6 +107,7 @@ class _AppShellState extends State<AppShell> {
     return [
       const MapExploreScreen(),
       Padding(padding: EdgeInsets.only(top: topPadding), child: const MatchingScreen()),
+      Padding(padding: EdgeInsets.only(top: topPadding), child: const DirectoryScreen()),
       Padding(padding: EdgeInsets.only(top: topPadding), child: const CommunityFeedScreen()),
     ];
   }
@@ -114,7 +117,8 @@ class _AppShellState extends State<AppShell> {
     return [
       NavItem(index: 0, icon: Icons.map_rounded, label: l10n.explore.toUpperCase()),
       NavItem(index: 1, icon: Icons.favorite_rounded, label: l10n.match.toUpperCase()),
-      NavItem(index: 2, icon: Icons.forum_rounded, label: l10n.requests.toUpperCase()),
+      NavItem(index: 2, icon: LucideIcons.briefcase, label: l10n.services.toUpperCase()),
+      NavItem(index: 3, icon: Icons.forum_rounded, label: l10n.requests.toUpperCase()),
     ];
   }
 
@@ -186,9 +190,11 @@ class _AppShellState extends State<AppShell> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _buildSOSButton(),
-            const SizedBox(width: 24),
+            const SizedBox(width: 16),
             _buildMapMatchToggle(),
-            const SizedBox(width: 24),
+            const SizedBox(width: 12),
+            _buildServiceAction(),
+            const SizedBox(width: 12),
             _buildRequestAction(),
           ],
         ),
@@ -306,7 +312,7 @@ class _AppShellState extends State<AppShell> {
     );
   }
 
-  Widget _buildRequestAction() {
+  Widget _buildServiceAction() {
     final bool isActive = _selectedIndex == 2;
     return GestureDetector(
       onTap: () {
@@ -315,7 +321,34 @@ class _AppShellState extends State<AppShell> {
         setState(() => _selectedIndex = 2);
       },
       child: Container(
-        width: 48, height: 48,
+        width: 44, height: 44,
+        decoration: BoxDecoration(
+          color: isActive ? EspyTheme.gold : Colors.white.withOpacity(0.1),
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: isActive ? EspyTheme.gold : Colors.white.withOpacity(0.1),
+            width: 1.5,
+          ),
+        ),
+        child: Icon(
+          LucideIcons.briefcase,
+          color: isActive ? EspyTheme.navyDeep : Colors.white70,
+          size: 18,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRequestAction() {
+    final bool isActive = _selectedIndex == 3;
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.mediumImpact();
+        SoundService.playPop();
+        setState(() => _selectedIndex = 3);
+      },
+      child: Container(
+        width: 44, height: 44,
         decoration: BoxDecoration(
           color: isActive ? EspyTheme.gold : Colors.white.withOpacity(0.1),
           shape: BoxShape.circle,
@@ -327,7 +360,7 @@ class _AppShellState extends State<AppShell> {
         child: Icon(
           Icons.forum_rounded,
           color: isActive ? EspyTheme.navyDeep : Colors.white70,
-          size: 22,
+          size: 18,
         ),
       ),
     );
@@ -358,13 +391,30 @@ class _AppShellState extends State<AppShell> {
       borderGradient: LinearGradient(
         colors: [Colors.white.withOpacity(0.2), Colors.white.withOpacity(0.05)],
       ),
-      padding: EdgeInsets.fromLTRB(12, MediaQuery.of(context).padding.top, 12, 0),
+      padding: EdgeInsets.fromLTRB(16, MediaQuery.of(context).padding.top, 16, 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          IconButton(
-            icon: const Icon(Icons.menu_rounded, color: EspyTheme.royalBlue, size: 26),
-            onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+          GestureDetector(
+            onTap: () => _scaffoldKey.currentState?.openDrawer(),
+            child: Hero(
+              tag: 'header-profile-avatar',
+              child: Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: EspyTheme.gold.withOpacity(0.5), width: 2),
+                  boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8)],
+                  image: profile['photoUrl'] != null
+                      ? DecorationImage(image: CachedNetworkImageProvider(profile['photoUrl']), fit: BoxFit.cover)
+                      : null,
+                ),
+                child: profile['photoUrl'] == null
+                    ? const Icon(Icons.person_rounded, color: EspyTheme.royalBlue, size: 20)
+                    : null,
+              ),
+            ),
           ),
           const Spacer(),
           Column(
@@ -372,7 +422,7 @@ class _AppShellState extends State<AppShell> {
             children: [
               Text(
                 currentLabel,
-                style: GoogleFonts.cinzel(fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 2, color: EspyTheme.navyDeep),
+                style: GoogleFonts.cinzel(fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 2, color: EspyTheme.navyDeep),
               ),
               if (profile['name'] != null)
                 Text(
@@ -383,37 +433,29 @@ class _AppShellState extends State<AppShell> {
           ),
           const Spacer(),
           IconButton(
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BroadcastsAndNotificationsScreen())),
+            icon: Stack(
+              children: [
+                const Icon(LucideIcons.megaphone, color: EspyTheme.royalBlue, size: 22),
+                Positioned(
+                  right: 0, top: 0,
+                  child: Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.redAccent, shape: BoxShape.circle)),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
             onPressed: () => localeService.toggleLocale(),
             icon: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
                 color: EspyTheme.gold.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: EspyTheme.gold.withOpacity(0.2)),
               ),
               child: Text(
                 localeService.locale.languageCode.toUpperCase(),
-                style: GoogleFonts.montserrat(fontSize: 9, fontWeight: FontWeight.w900, color: EspyTheme.gold, letterSpacing: 1),
-              ),
-            ),
-          ),
-          GestureDetector(
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const NotificationsScreen())),
-            child: Hero(
-              tag: 'header-profile-avatar',
-              child: Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: EspyTheme.royalBlue.withOpacity(0.2), width: 1.5),
-                  image: profile['photoUrl'] != null
-                      ? DecorationImage(image: CachedNetworkImageProvider(profile['photoUrl']), fit: BoxFit.cover)
-                      : null,
-                ),
-                child: profile['photoUrl'] == null
-                    ? const Icon(Icons.person_rounded, color: EspyTheme.royalBlue, size: 18)
-                    : null,
+                style: GoogleFonts.montserrat(fontSize: 9, fontWeight: FontWeight.w900, color: EspyTheme.gold),
               ),
             ),
           ),

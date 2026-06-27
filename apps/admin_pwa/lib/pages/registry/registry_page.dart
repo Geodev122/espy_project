@@ -27,7 +27,7 @@ class _RegistryPageState extends ConsumerState<RegistryPage> with SingleTickerPr
   DateTimeRange? _dateRange;
   bool _ascending = false;
   String _statusFilter = 'all';
-  String _countryFilter = 'ALL';
+  String _countryFilter = 'lebanon';
 
   @override
   void initState() {
@@ -40,7 +40,7 @@ class _RegistryPageState extends ConsumerState<RegistryPage> with SingleTickerPr
       _dateRange = null;
       _ascending = false;
       _statusFilter = 'all';
-      _countryFilter = 'ALL';
+      _countryFilter = 'lebanon';
     });
   }
 
@@ -204,17 +204,22 @@ class _RegistryPageState extends ConsumerState<RegistryPage> with SingleTickerPr
         ),
         const SizedBox(width: 16),
         asyncCountries.when(
-          data: (countries) => DropdownButton<String>(
-            value: _countryFilter,
-            underline: const SizedBox(),
-            dropdownColor: const Color(0xFF061226),
-            style: EspyTheme.cinzelStyle.copyWith(fontSize: 11, color: Colors.white),
-            items: [
-              const DropdownMenuItem(value: 'ALL', child: Text('ALL COUNTRIES')),
-              ...countries.map((c) => DropdownMenuItem(value: c['id'], child: Text(c['name_en'].toString().toUpperCase()))),
-            ],
-            onChanged: (v) => setState(() => _countryFilter = v!),
-          ),
+          data: (countries) {
+            final hasLebanon = countries.any((c) => c['id'] == 'lebanon');
+            final effectiveValue = (countries.any((c) => c['id'] == _countryFilter) || _countryFilter == 'ALL') ? _countryFilter : 'ALL';
+            
+            return DropdownButton<String>(
+              value: effectiveValue,
+              underline: const SizedBox(),
+              dropdownColor: const Color(0xFF061226),
+              style: EspyTheme.cinzelStyle.copyWith(fontSize: 11, color: Colors.white),
+              items: [
+                const DropdownMenuItem(value: 'ALL', child: Text('ALL COUNTRIES')),
+                ...countries.map((c) => DropdownMenuItem(value: c['id'], child: Text(c['name_en'].toString().toUpperCase()))),
+              ],
+              onChanged: (v) => setState(() => _countryFilter = v!),
+            );
+          },
           loading: () => const SizedBox(),
           error: (e, s) => const SizedBox(),
         ),
