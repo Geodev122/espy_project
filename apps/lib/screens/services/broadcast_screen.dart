@@ -54,7 +54,7 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
               FadeInDown(
                 child: Text(
                   l10n.dispatchAnnouncement.toUpperCase(),
-                  style: GoogleFonts.cinzel(fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 4, color: EspyTheme.royalBlue),
+                  style: GoogleFonts.montserrat(fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 2, color: EspyTheme.royalBlue),
                 ),
               ),
               const SizedBox(height: 12),
@@ -62,7 +62,7 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
                 delay: const Duration(milliseconds: 200),
                 child: Text(
                   l10n.broadcastDesc,
-                  style: GoogleFonts.lora(fontSize: 14, color: EspyTheme.navyDeep.withValues(alpha: 0.6), height: 1.6),
+                  style: GoogleFonts.montserrat(fontSize: 13, color: EspyTheme.navyDeep.withValues(alpha: 0.6), height: 1.5, fontWeight: FontWeight.w500),
                 ),
               ),
               const SizedBox(height: 40),
@@ -73,7 +73,7 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(l10n.targetAudience.toUpperCase(), style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.w900, color: EspyTheme.gold, letterSpacing: 2)),
+                      Text(l10n.targetAudience.toUpperCase(), style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.w900, color: EspyTheme.gold, letterSpacing: 1)),
                       const SizedBox(height: 12),
                       StreamBuilder<List<Map<String, dynamic>>>(
                         stream: _firestore.getCountries(),
@@ -82,7 +82,7 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
                           return DropdownButtonFormField<String>(
                             value: _targetCountry,
                             dropdownColor: EspyTheme.platinum,
-                            style: GoogleFonts.cinzel(color: EspyTheme.navyDeep, fontWeight: FontWeight.w900, fontSize: 12),
+                            style: GoogleFonts.montserrat(color: EspyTheme.navyDeep, fontWeight: FontWeight.w900, fontSize: 12),
                             items: [
                               const DropdownMenuItem(value: 'GLOBAL', child: Text('GLOBAL')),
                               ...countries.map((c) => DropdownMenuItem(value: c['id'].toString(), child: Text(c['name_en'].toString().toUpperCase()))),
@@ -103,7 +103,7 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
                         style: const TextStyle(color: EspyTheme.navyDeep),
                         decoration: InputDecoration(
                           labelText: l10n.broadcastTitle.toUpperCase(),
-                          labelStyle: GoogleFonts.cinzel(color: EspyTheme.royalBlue, fontSize: 10, fontWeight: FontWeight.bold),
+                          labelStyle: GoogleFonts.montserrat(color: EspyTheme.royalBlue, fontSize: 10, fontWeight: FontWeight.bold),
                           hintText: 'e.g. Free Health Clinic Opening',
                           hintStyle: TextStyle(color: EspyTheme.navyDeep.withValues(alpha: 0.2))
                         ),
@@ -115,7 +115,7 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
                         style: const TextStyle(color: EspyTheme.navyDeep),
                         decoration: InputDecoration(
                           labelText: l10n.messageContent.toUpperCase(),
-                          labelStyle: GoogleFonts.cinzel(color: EspyTheme.royalBlue, fontSize: 10, fontWeight: FontWeight.bold),
+                          labelStyle: GoogleFonts.montserrat(color: EspyTheme.royalBlue, fontSize: 10, fontWeight: FontWeight.bold),
                           hintText: 'Detailed announcement for the community...',
                           hintStyle: TextStyle(color: EspyTheme.navyDeep.withValues(alpha: 0.2))
                         ),
@@ -161,8 +161,8 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
     return Expanded(
       child: Column(
         children: [
-          Text(value, style: GoogleFonts.cinzel(fontSize: 20, fontWeight: FontWeight.w900, color: color)),
-          Text(label, style: GoogleFonts.cinzel(fontSize: 8, color: EspyTheme.navyDeep.withValues(alpha: 0.4), fontWeight: FontWeight.bold)),
+          Text(value, style: GoogleFonts.montserrat(fontSize: 20, fontWeight: FontWeight.w900, color: color)),
+          Text(label, style: GoogleFonts.montserrat(fontSize: 8, color: EspyTheme.navyDeep.withValues(alpha: 0.4), fontWeight: FontWeight.bold)),
         ],
       ),
     );

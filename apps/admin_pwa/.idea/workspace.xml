@@ -5,15 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="baa01f8f-2d7d-4d01-a4bc-275ecc73775d" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../pro_app/.idea/caches/deviceStreaming.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../pro_app/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../.idea/Espy-Project.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../../.idea/Espy-Project.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../.idea/caches/deviceStreaming.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pro_app/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../pro_app/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../visitor_app/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../visitor_app/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Espy-Project-Apps" beforeDir="false" afterPath="$PROJECT_DIR$/../../Espy-Project-Apps" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

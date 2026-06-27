@@ -183,10 +183,12 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> with SingleTi
                                 'requester_name': userData?['fullNameEn'] ?? userData?['name'] ?? "User",
                                 'whatsapp': userData?['whatsapp'],
                                 'whatsapp_number': userData?['whatsapp'], // For admin dashboard
-                                'governorate_id': 'BEIRUT',
-                                'location': 'Beirut, Lebanon',
-                                'city_name': 'Beirut', // For admin dashboard
-                                'governorate_name': 'Beirut', // For admin dashboard
+                                'countryId': userData?['countryId'] ?? 'LEBANON',
+                                'governorateId': userData?['governorateId'] ?? 'BEIRUT',
+                                'cityId': userData?['cityId'] ?? 'BEIRUT',
+                                'location': userData?['location'] ?? 'Beirut, Lebanon',
+                                'city_name': userData?['cityName'] ?? 'Beirut', // For admin dashboard
+                                'governorate_name': userData?['governorateName'] ?? 'Beirut', // For admin dashboard
                               });
 
                               navigator.pop();

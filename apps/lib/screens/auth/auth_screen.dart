@@ -130,7 +130,7 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
               style: EspyTheme.taglineStyle.copyWith(
                 fontSize: 9,
                 fontWeight: FontWeight.w700,
-                letterSpacing: 3,
+                letterSpacing: 2,
                 color: EspyTheme.textOnDarkMuted,
               ),
             ),
@@ -377,7 +377,7 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
       child: RichText(
         textAlign: TextAlign.center,
         text: TextSpan(
-          style: GoogleFonts.lora(fontSize: 13, color: EspyTheme.textSecondary),
+          style: GoogleFonts.montserrat(fontSize: 13, color: EspyTheme.textSecondary, fontWeight: FontWeight.w500),
           children: [
             TextSpan(text: _isSignUp ? '${l10n.alreadyPartOfNetwork} ' : '${l10n.newToProtocol} '),
             TextSpan(

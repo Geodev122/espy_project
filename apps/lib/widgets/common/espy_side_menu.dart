@@ -98,7 +98,7 @@ class EspySideMenu extends StatelessWidget {
           Text(
             profile['name']?.toString().toUpperCase() ?? role.toUpperCase(),
             textAlign: TextAlign.center,
-            style: GoogleFonts.cinzel(fontSize: 16, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep, letterSpacing: 1.5),
+            style: GoogleFonts.montserrat(fontSize: 14, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep, letterSpacing: 1),
           ),
           const SizedBox(height: 4),
           Container(
@@ -110,7 +110,7 @@ class EspySideMenu extends StatelessWidget {
             ),
             child: Text(
               role.toUpperCase(),
-              style: GoogleFonts.cinzel(fontSize: 8, fontWeight: FontWeight.w900, color: EspyTheme.royalBlue, letterSpacing: 2),
+              style: GoogleFonts.montserrat(fontSize: 8, fontWeight: FontWeight.w900, color: EspyTheme.royalBlue, letterSpacing: 1),
             ),
           ),
         ],
@@ -140,7 +140,7 @@ class EspySideMenu extends StatelessWidget {
                 Expanded(
                   child: Text(
                     label,
-                    style: GoogleFonts.cinzel(fontSize: 11, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep, letterSpacing: 1),
+                    style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.w800, color: EspyTheme.navyDeep, letterSpacing: 0.5),
                   ),
                 ),
                 const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: Colors.black12),
@@ -174,7 +174,7 @@ class EspySideMenu extends StatelessWidget {
             const SizedBox(width: 12),
             Text(
               'TERMINATE PROTOCOL',
-              style: GoogleFonts.cinzel(color: EspyTheme.error, fontWeight: FontWeight.w900, fontSize: 10, letterSpacing: 1.5),
+              style: GoogleFonts.montserrat(color: EspyTheme.error, fontWeight: FontWeight.w900, fontSize: 10, letterSpacing: 1),
             ),
           ],
         ),
@@ -187,7 +187,7 @@ class EspySideMenu extends StatelessWidget {
       children: [
         Text(
           'ESPY PROTOCOL V2.3.4',
-          style: GoogleFonts.cinzel(color: Colors.white10, fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 2),
+          style: GoogleFonts.montserrat(color: Colors.white10, fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 1),
         ),
         const SizedBox(height: 8),
       ],

@@ -25,6 +25,7 @@ class ServiceListingWizard extends StatefulWidget {
 }
 
 class _ServiceListingWizardState extends State<ServiceListingWizard> {
+  final FirestoreService _firestore = FirestoreService();
   int _currentStep = 0;
   XFile? _imageFile;
   Uint8List? _webImageBytes;
@@ -33,7 +34,12 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
   final _descController = TextEditingController();
   
   String? _selectedPricingTagId;
-  String _locationType = 'online'; 
+  String _allocationType = 'main'; // 'main', 'secondary', 'slot', 'both'
+  String? _selectedSecondaryPinId;
+
+  String? _manualCountryId;
+  String? _manualGovernorateId;
+  String? _manualCityId;
   
   String _whatsappCode = '+961';
   String _whatsappNumber = '';
@@ -122,7 +128,7 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
   Widget _buildCurrentStep(AppLocalizations l10n) {
     switch (_currentStep) {
       case 0: return _stepIdentity(l10n);
-      case 1: return _stepPresence(l10n);
+      case 1: return _stepAllocation(l10n);
       default: return const SizedBox();
     }
   }
@@ -133,12 +139,12 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l10n.identityAndContent.toUpperCase(), style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, fontSize: 16, color: EspyTheme.navyDeep, letterSpacing: 2)),
+          Text(l10n.identityAndContent.toUpperCase(), style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, fontSize: 16, color: EspyTheme.navyDeep, letterSpacing: 1.5)),
           const SizedBox(height: 32),
-          Text(l10n.pricingProtocolHint.toUpperCase(), style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.bold, color: EspyTheme.royalBlue, letterSpacing: 2)),
+          Text(l10n.pricingProtocolHint.toUpperCase(), style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.bold, color: EspyTheme.royalBlue, letterSpacing: 1)),
           const SizedBox(height: 12),
           StreamBuilder<List<Map<String, dynamic>>>(
-            stream: FirestoreService().getServicePricingTags(),
+            stream: _firestore.getServicePricingTags(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const LinearProgressIndicator(color: EspyTheme.royalBlue);
@@ -155,12 +161,13 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
                   final label = (locale == 'ar' ? t['label_ar'] : t['label_en']) ?? t['label_en'] ?? 'NONE';
                   return DropdownMenuItem<String>(
                     value: t['id'] as String,
-                    child: Text(label.toString().toUpperCase(), style: GoogleFonts.cinzel(fontSize: 12, fontWeight: FontWeight.w900)),
+                    child: Text(label.toString().toUpperCase(), style: GoogleFonts.montserrat(fontSize: 11, fontWeight: FontWeight.w800)),
                   );
                 }).toList(),
                 onChanged: (val) => setState(() => _selectedPricingTagId = val),
                 decoration: InputDecoration(
                   hintText: l10n.selectPricingHint.toUpperCase(),
+                  hintStyle: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.w700),
                   filled: true,
                   fillColor: Colors.white,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none)
@@ -168,29 +175,6 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
               );
             },
           ),
-          if (_selectedPricingTagId != null) ...[
-            const SizedBox(height: 12),
-            StreamBuilder<List<Map<String, dynamic>>>(
-              stream: FirestoreService().getServicePricingTags(),
-              builder: (context, snapshot) {
-                final tag = (snapshot.data ?? []).firstWhere((t) => t['id'] == _selectedPricingTagId, orElse: () => {});
-                final locale = Localizations.localeOf(context).languageCode;
-                final hint = (locale == 'ar' ? tag['hint_ar'] : tag['hint_en']) ?? tag['hint_en'];
-                if (hint == null) return const SizedBox();
-                return Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(color: EspyTheme.royalBlue.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(12)),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.info_outline_rounded, color: EspyTheme.royalBlue, size: 16),
-                      const SizedBox(width: 8),
-                      Expanded(child: Text(hint, style: GoogleFonts.lora(fontSize: 12, fontStyle: FontStyle.italic, color: EspyTheme.navyDeep))),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ],
           const SizedBox(height: 32),
           GestureDetector(
             onTap: _pickAndCropImage,
@@ -216,7 +200,7 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
                     children: [
                       const Icon(Icons.add_a_photo_rounded, color: EspyTheme.royalBlue, size: 40),
                       const SizedBox(height: 16),
-                      Text(l10n.uploadPreview.toUpperCase(), style: GoogleFonts.cinzel(fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 2, color: EspyTheme.royalBlue)),
+                      Text(l10n.uploadPreview.toUpperCase(), style: GoogleFonts.montserrat(fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.5, color: EspyTheme.royalBlue)),
                     ],
                   )
                 : const SizedBox(),
@@ -228,7 +212,7 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
             style: GoogleFonts.montserrat(color: EspyTheme.navyDeep, fontSize: 14),
             decoration: InputDecoration(
               labelText: l10n.serviceTitle.toUpperCase(),
-              labelStyle: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep.withValues(alpha: 0.5)),
+              labelStyle: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep.withValues(alpha: 0.5)),
             )
           ),
           const SizedBox(height: 24),
@@ -238,7 +222,7 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
             style: GoogleFonts.lora(color: EspyTheme.navyDeep, fontSize: 14),
             decoration: InputDecoration(
               labelText: l10n.description.toUpperCase(),
-              labelStyle: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep.withValues(alpha: 0.5)),
+              labelStyle: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep.withValues(alpha: 0.5)),
             )
           ),
         ],
@@ -246,41 +230,77 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
     );
   }
 
-  Widget _stepPresence(AppLocalizations l10n) {
+  Widget _stepAllocation(AppLocalizations l10n) {
     final userService = Provider.of<UserService>(context);
     final profile = userService.profile ?? {};
+    final secondaryPins = profile['secondaryLocations'] as List? ?? [];
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l10n.reachAndContact.toUpperCase(), style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, fontSize: 16, color: EspyTheme.navyDeep, letterSpacing: 2)),
-          const SizedBox(height: 32),
-          Text(l10n.locationAttachment.toUpperCase(), style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.bold, color: EspyTheme.royalBlue, letterSpacing: 2)),
+          Text('ALLOCATION & ANCHORS', style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, fontSize: 16, color: EspyTheme.navyDeep, letterSpacing: 1.5)),
+          const SizedBox(height: 24),
+
+          Text('WHERE SHOULD THIS SERVICE APPEAR?', style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.bold, color: EspyTheme.royalBlue)),
           const SizedBox(height: 12),
           Container(
             decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
             child: Column(
               children: [
                 RadioListTile<String>(
-                  value: 'online', groupValue: _locationType,
+                  value: 'main', groupValue: _allocationType,
                   activeColor: EspyTheme.royalBlue,
-                  title: Text(l10n.onlineDelivery, style: GoogleFonts.lora(fontSize: 14, fontWeight: FontWeight.bold)),
-                  onChanged: (val) => setState(() => _locationType = val!)
+                  title: Text('PRIMARY HUB PIN', style: GoogleFonts.lora(fontSize: 14, fontWeight: FontWeight.bold)),
+                  subtitle: Text(profile['mainLocation']?['cityName'] ?? 'Global', style: const TextStyle(fontSize: 11)),
+                  onChanged: (val) => setState(() => _allocationType = val!)
                 ),
+                if (secondaryPins.isNotEmpty) ...[
+                  Divider(height: 1, color: EspyTheme.navyDeep.withValues(alpha: 0.05), indent: 16, endIndent: 16),
+                  RadioListTile<String>(
+                    value: 'secondary', groupValue: _allocationType,
+                    activeColor: EspyTheme.royalBlue,
+                    title: Text('SPECIFIC PRACTICE PIN', style: GoogleFonts.lora(fontSize: 14, fontWeight: FontWeight.bold)),
+                    onChanged: (val) => setState(() => _allocationType = val!)
+                  ),
+                ],
                 Divider(height: 1, color: EspyTheme.navyDeep.withValues(alpha: 0.05), indent: 16, endIndent: 16),
                 RadioListTile<String>(
-                  value: 'main', groupValue: _locationType,
+                  value: 'slot', groupValue: _allocationType,
                   activeColor: EspyTheme.royalBlue,
-                  title: Text('${l10n.primaryHub} (${profile['mainLocation']?['cityName'] ?? 'Beirut'})', style: GoogleFonts.lora(fontSize: 14, fontWeight: FontWeight.bold)),
-                  onChanged: (val) => setState(() => _locationType = val!)
+                  title: Text('EMPTY SERVICE SLOT (MANUAL ANCHORS)', style: GoogleFonts.lora(fontSize: 14, fontWeight: FontWeight.bold)),
+                  onChanged: (val) => setState(() => _allocationType = val!)
                 ),
               ],
             ),
           ),
+
+          if (_allocationType == 'secondary') ...[
+            const SizedBox(height: 24),
+            Text('SELECT PIN', style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.bold, color: EspyTheme.royalBlue)),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              value: _selectedSecondaryPinId,
+              dropdownColor: EspyTheme.platinum,
+              items: secondaryPins.map((p) => DropdownMenuItem(
+                value: p['id']?.toString() ?? p['lat'].toString(),
+                child: Text(p['cityName'] ?? 'Unnamed PIN')
+              )).toList(),
+              onChanged: (v) => setState(() => _selectedSecondaryPinId = v),
+              decoration: InputDecoration(fillColor: Colors.white, filled: true, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
+            ),
+          ],
+
+          if (_allocationType == 'slot') ...[
+            const SizedBox(height: 24),
+            Text('MANUAL GEOGRAPHICAL ANCHORS', style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.bold, color: EspyTheme.royalBlue)),
+            const SizedBox(height: 12),
+            _buildManualAnchors(),
+          ],
+
           const SizedBox(height: 32),
-          Text(l10n.whatsappConfig.toUpperCase(), style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.bold, color: EspyTheme.royalBlue, letterSpacing: 2)),
+          Text(l10n.whatsappConfig.toUpperCase(), style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.bold, color: EspyTheme.royalBlue, letterSpacing: 1)),
           const SizedBox(height: 12),
           SwitchListTile(
             title: Text(l10n.useProfileDefault, style: GoogleFonts.lora(fontSize: 14, fontWeight: FontWeight.bold)),
@@ -298,6 +318,54 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
             ),
         ],
       ),
+    );
+  }
+
+  Widget _buildManualAnchors() {
+    return Column(
+      children: [
+        StreamBuilder<List<Map<String, dynamic>>>(
+          stream: _firestore.getCountries(),
+          builder: (context, snapshot) {
+            final items = snapshot.data ?? [];
+            return DropdownButtonFormField<String>(
+              value: _manualCountryId,
+              hint: const Text('SELECT COUNTRY'),
+              items: items.map((i) => DropdownMenuItem(value: i['id'].toString(), child: Text(i['name_en']))).toList(),
+              onChanged: (v) => setState(() { _manualCountryId = v; _manualGovernorateId = null; _manualCityId = null; }),
+              decoration: InputDecoration(fillColor: Colors.white, filled: true, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
+            );
+          }
+        ),
+        const SizedBox(height: 12),
+        StreamBuilder<List<Map<String, dynamic>>>(
+          stream: _firestore.getGovernorates(countryId: _manualCountryId),
+          builder: (context, snapshot) {
+            final items = snapshot.data ?? [];
+            return DropdownButtonFormField<String>(
+              value: _manualGovernorateId,
+              hint: const Text('SELECT REGION'),
+              items: items.map((i) => DropdownMenuItem(value: i['id'].toString(), child: Text(i['name_en']))).toList(),
+              onChanged: (v) => setState(() { _manualGovernorateId = v; _manualCityId = null; }),
+              decoration: InputDecoration(fillColor: Colors.white, filled: true, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
+            );
+          }
+        ),
+        const SizedBox(height: 12),
+        StreamBuilder<List<Map<String, dynamic>>>(
+          stream: _firestore.getCities(governorateId: _manualGovernorateId),
+          builder: (context, snapshot) {
+            final items = snapshot.data ?? [];
+            return DropdownButtonFormField<String>(
+              value: _manualCityId,
+              hint: const Text('SELECT CITY'),
+              items: items.map((i) => DropdownMenuItem(value: i['id'].toString(), child: Text(i['name_en']))).toList(),
+              onChanged: (v) => setState(() => _manualCityId = v),
+              decoration: InputDecoration(fillColor: Colors.white, filled: true, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
+            );
+          }
+        ),
+      ],
     );
   }
 
@@ -334,15 +402,20 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
   }
 
   Future<void> _finalizeListing(AppLocalizations l10n) async {
-    final firestore = Provider.of<FirestoreService>(context, listen: false);
     final userService = Provider.of<UserService>(context, listen: false);
     final storage = StorageService();
+    final profile = userService.profile ?? {};
+
+    if (_allocationType == 'slot' && (_manualCountryId == null || _manualGovernorateId == null || _manualCityId == null)) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please specify all anchors for SLOT allocation')));
+      return;
+    }
 
     setState(() => _isSubmitting = true);
 
     try {
       String? imageUrl;
-      final userId = userService.profile?['uid'];
+      final userId = profile['uid'];
       
       if (kIsWeb && _webImageBytes != null) {
         imageUrl = await storage.uploadServiceImageWeb(userId: userId, bytes: _webImageBytes!);
@@ -350,17 +423,36 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
         imageUrl = await storage.uploadServiceImage(userId: userId, file: io.File(_imageFile!.path));
       }
 
-      await firestore.createService({
+      final Map<String, dynamic> serviceData = {
         'title': _titleController.text,
         'description': _descController.text,
-        'locationType': _locationType,
+        'allocationType': _allocationType,
         'pricingTagId': _selectedPricingTagId,
         'professionalId': userId,
         'whatsapp': _useDefaultWhatsapp ? null : {'code': _whatsappCode, 'number': _whatsappNumber},
-        'isAllocated': false,
+        'isAllocated': true, // Auto allocate since they chose a target
         'isActive': true,
         'imageUrl': imageUrl, 
-      });
+      };
+
+      if (_allocationType == 'main') {
+        serviceData['countryId'] = profile['countryId'];
+        serviceData['governorateId'] = profile['governorateId'];
+        serviceData['cityId'] = profile['cityId'];
+        serviceData['location'] = profile['mainLocation'];
+      } else if (_allocationType == 'secondary') {
+        final pin = (profile['secondaryLocations'] as List).firstWhere((p) => (p['id']?.toString() ?? p['lat'].toString()) == _selectedSecondaryPinId);
+        serviceData['countryId'] = pin['countryId'];
+        serviceData['governorateId'] = pin['governorateId'];
+        serviceData['cityId'] = pin['cityId'];
+        serviceData['location'] = pin;
+      } else {
+        serviceData['countryId'] = _manualCountryId;
+        serviceData['governorateId'] = _manualGovernorateId;
+        serviceData['cityId'] = _manualCityId;
+      }
+
+      await _firestore.createService(serviceData);
 
       SoundService.playSuccess();
       if (mounted) Navigator.pop(context);

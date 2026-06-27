@@ -97,11 +97,11 @@ class WalletScreen extends StatelessWidget {
                   const SizedBox(height: 12),
                   Text(
                     profile['name']?.toString().toUpperCase() ?? 'MEMBER',
-                    style: GoogleFonts.cinzel(
+                    style: GoogleFonts.montserrat(
                       color: EspyTheme.navyDeep,
                       fontSize: 16,
                       fontWeight: FontWeight.w900,
-                      letterSpacing: 2,
+                      letterSpacing: 1.5,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -139,15 +139,15 @@ class WalletScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('CURRENT BALANCE', 
-                      style: GoogleFonts.cinzel(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 2)),
+                      style: GoogleFonts.montserrat(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
                     const SizedBox(height: 8),
                     Row(
                       children: [
                         Text('${user.walletBalance}', 
-                          style: GoogleFonts.cinzel(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900)),
+                          style: GoogleFonts.montserrat(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900)),
                         const SizedBox(width: 8),
                         Text('\$E', 
-                          style: GoogleFonts.cinzel(color: EspyTheme.gold, fontSize: 24, fontWeight: FontWeight.w900)),
+                          style: GoogleFonts.montserrat(color: EspyTheme.gold, fontSize: 24, fontWeight: FontWeight.w900)),
                       ],
                     ),
                   ],
@@ -176,7 +176,7 @@ class WalletScreen extends StatelessWidget {
                       backgroundColor: EspyTheme.gold,
                       foregroundColor: EspyTheme.navyDeep,
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      textStyle: GoogleFonts.cinzel(fontWeight: FontWeight.w900, fontSize: 11),
+                      textStyle: GoogleFonts.montserrat(fontWeight: FontWeight.w900, fontSize: 11, letterSpacing: 0.5),
                     ),
                   ),
                 ),
@@ -192,7 +192,7 @@ class WalletScreen extends StatelessWidget {
                       foregroundColor: Colors.white,
                       side: const BorderSide(color: Colors.white38),
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      textStyle: GoogleFonts.cinzel(fontWeight: FontWeight.w900, fontSize: 11),
+                      textStyle: GoogleFonts.montserrat(fontWeight: FontWeight.w900, fontSize: 11, letterSpacing: 0.5),
                     ),
                   ),
                 ),
@@ -266,7 +266,7 @@ class WalletScreen extends StatelessWidget {
             children: [
               Icon(icon, color: EspyTheme.royalBlue, size: 28),
               const SizedBox(height: 12),
-              Text(label, style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep, letterSpacing: 1)),
+              Text(label, style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep, letterSpacing: 1)),
             ],
           ),
         ),
@@ -282,7 +282,7 @@ class WalletScreen extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: BorderSide(color: Colors.black.withValues(alpha: 0.05))),
         contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
         leading: Icon(icon, color: EspyTheme.royalBlue, size: 24),
-        title: Text(label, style: GoogleFonts.cinzel(fontSize: 12, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep, letterSpacing: 1)),
+        title: Text(label, style: GoogleFonts.montserrat(fontSize: 12, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep, letterSpacing: 1)),
         trailing: const Icon(Icons.chevron_right_rounded, color: EspyTheme.gold),
       ),
     );
@@ -294,11 +294,11 @@ class WalletScreen extends StatelessWidget {
         onPressed: () => auth.signOut(),
         child: Text(
           'SIGN OUT PROTOCOL',
-          style: GoogleFonts.cinzel(
+          style: GoogleFonts.montserrat(
             color: EspyTheme.error,
             fontWeight: FontWeight.w900,
             fontSize: 11,
-            letterSpacing: 2,
+            letterSpacing: 1,
           ),
         ),
       ),

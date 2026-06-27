@@ -11,6 +11,7 @@ import 'package:shared_core/services/storage_service.dart';
 import '../../widgets/common/premium_button.dart';
 import '../../widgets/common/premium_card.dart';
 import '../../widgets/common/profile_image_picker.dart';
+import '../../widgets/common/location_picker_modal.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -114,6 +115,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ],
                   ),
                 ),
+                const SizedBox(height: 24),
+                PremiumButton(
+                  label: 'UPDATE LOCATION ANCHORS',
+                  variant: PremiumButtonVariant.outline,
+                  fullWidth: true,
+                  icon: Icons.location_on_rounded,
+                  onPressed: _updateLocation,
+                ),
                 const SizedBox(height: 32),
                 PremiumButton(
                   label: _isSaving ? l10n.syncing.toUpperCase() : l10n.saveChanges.toUpperCase(),
@@ -148,6 +157,33 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
       ],
     );
+  }
+
+  Future<void> _updateLocation() async {
+    final result = await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const LocationPickerModal(title: 'UPDATE LOCATION'),
+    );
+    if (result != null) {
+      final userService = Provider.of<UserService>(context, listen: false);
+      setState(() => _isSaving = true);
+      try {
+        await userService.updateProfile({
+          'mainLocation': result,
+          'countryId': result['countryId'],
+          'governorateId': result['governorateId'],
+          'cityId': result['cityId'],
+        });
+        SoundService.playSuccess();
+        if (mounted) {
+           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Location anchors synchronized')));
+        }
+      } finally {
+        if (mounted) setState(() => _isSaving = false);
+      }
+    }
   }
 
   Future<void> _saveProfile() async {

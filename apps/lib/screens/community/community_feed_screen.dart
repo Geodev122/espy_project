@@ -52,7 +52,7 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> with SingleTi
                   indicatorWeight: 3,
                   labelColor: EspyTheme.navyDeep,
                   unselectedLabelColor: EspyTheme.navyDeep.withValues(alpha: 0.3),
-                  labelStyle: GoogleFonts.cinzel(fontWeight: FontWeight.w900, fontSize: 10, letterSpacing: 1.5),
+                  labelStyle: GoogleFonts.montserrat(fontWeight: FontWeight.w900, fontSize: 10, letterSpacing: 1),
                   tabs: [
                     Tab(text: l10n.communityFeed.toUpperCase()),
                     Tab(text: l10n.myRequests.toUpperCase()),
@@ -130,11 +130,11 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> with SingleTi
                           dropdownColor: EspyTheme.platinum,
                           decoration: InputDecoration(
                             labelText: l10n.sector.toUpperCase(),
-                            labelStyle: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.bold),
+                            labelStyle: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.bold),
                           ),
                           items: sectors.map((s) => DropdownMenuItem(
                             value: s['id'] as String, 
-                            child: Text(s['name_en']?.toString().toUpperCase() ?? 'OTHER', style: GoogleFonts.cinzel(fontSize: 12))
+                            child: Text(s['name_en']?.toString().toUpperCase() ?? 'OTHER', style: GoogleFonts.montserrat(fontSize: 11, fontWeight: FontWeight.w700))
                           )).toList(),
                           onChanged: (v) => setModalState(() => selectedSectionId = v),
                         ),
@@ -262,23 +262,28 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> with SingleTi
                   ),
                   child: Text(
                     (request['section'] ?? request['category'] ?? 'CARE').toString().toUpperCase(),
-                    style: GoogleFonts.cinzel(fontSize: 9, fontWeight: FontWeight.w900, color: EspyTheme.royalBlue, letterSpacing: 1),
+                    style: GoogleFonts.montserrat(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w900,
+                      color: EspyTheme.royalBlue,
+                      letterSpacing: 0.5,
+                    ),
                   ),
                 ),
                 const Spacer(),
-                Text(l10n.active.toUpperCase(), style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.w900, color: EspyTheme.success, letterSpacing: 2)),
+                Text(l10n.active.toUpperCase(), style: GoogleFonts.montserrat(fontSize: 9, fontWeight: FontWeight.w900, color: EspyTheme.success, letterSpacing: 1.5)),
               ],
             ),
             const SizedBox(height: 20),
-            Text(request['title'] ?? 'Care Request', style: GoogleFonts.cinzel(fontSize: 18, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep, height: 1.2)),
+            Text(request['title'] ?? 'Care Request', style: GoogleFonts.montserrat(fontSize: 16, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep, height: 1.2)),
             const SizedBox(height: 12),
-            Text(request['description'] ?? '', style: GoogleFonts.lora(fontSize: 13, color: EspyTheme.navyDeep.withValues(alpha: 0.6), height: 1.6)),
+            Text(request['description'] ?? '', style: GoogleFonts.montserrat(fontSize: 13, color: EspyTheme.navyDeep.withValues(alpha: 0.6), height: 1.5, fontWeight: FontWeight.w500)),
             const SizedBox(height: 24),
             Row(
               children: [
                 const Icon(Icons.location_on_outlined, size: 14, color: EspyTheme.gold),
                 const SizedBox(width: 6),
-                Text(request['location'] ?? 'Lebanon', style: GoogleFonts.lora(fontSize: 11, color: EspyTheme.navyDeep.withValues(alpha: 0.4), fontWeight: FontWeight.bold)),
+                Text(request['location'] ?? 'Lebanon', style: GoogleFonts.montserrat(fontSize: 11, color: EspyTheme.navyDeep.withValues(alpha: 0.4), fontWeight: FontWeight.bold)),
                 const Spacer(),
                 if (request['userId'] != _firestore.getCurrentUserId)
                   PremiumButton(

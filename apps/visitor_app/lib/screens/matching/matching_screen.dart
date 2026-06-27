@@ -37,19 +37,6 @@ class _MatchingScreenState extends State<MatchingScreen> {
 
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "CARE PROTOCOLS",
-                style: GoogleFonts.cinzel(fontSize: 12, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep, letterSpacing: 2),
-              ),
-              const SizedBox(width: 48),
-            ],
-          ),
-        ),
         Expanded(
           child: StreamBuilder<List<Map<String, dynamic>>>(
             stream: _firestore.getAllActiveServices(),
@@ -193,7 +180,7 @@ class _MatchingScreenState extends State<MatchingScreen> {
         children: [
           const Icon(Icons.check_circle_outline_rounded, size: 80, color: EspyTheme.success),
           const SizedBox(height: 24),
-          Text("PROTOCOL END", style: GoogleFonts.cinzel(fontSize: 22, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep)),
+          Text("PROTOCOL END", style: GoogleFonts.montserrat(fontSize: 20, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep)),
           const SizedBox(height: 16),
           Text("You have reviewed all active protocols in this category.", textAlign: TextAlign.center, style: GoogleFonts.lora(fontSize: 14, color: Colors.black45)),
         ],
@@ -227,7 +214,7 @@ class _MatchingScreenState extends State<MatchingScreen> {
           const SizedBox(height: 24),
           Text(
             hasResults ? "PROTOCOL GUIDE" : "NO SERVICES FOUND",
-            style: GoogleFonts.cinzel(fontSize: 20, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep),
+            style: GoogleFonts.montserrat(fontSize: 18, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep),
           ),
           const SizedBox(height: 16),
           Text(
@@ -240,7 +227,7 @@ class _MatchingScreenState extends State<MatchingScreen> {
           const SizedBox(height: 32),
           Text(
             "SWIPE TO BEGIN",
-            style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.bold, color: EspyTheme.gold, letterSpacing: 2),
+            style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.bold, color: EspyTheme.gold, letterSpacing: 2),
           ),
         ],
       ),
@@ -274,7 +261,7 @@ class _MatchingScreenState extends State<MatchingScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("MATCH FILTERS", style: GoogleFonts.cinzel(fontSize: 22, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep, letterSpacing: 2)),
+                  Text("MATCH FILTERS", style: GoogleFonts.montserrat(fontSize: 20, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep, letterSpacing: 1)),
                   IconButton(
                     icon: Icon(_newestFirst ? Icons.south_rounded : Icons.north_rounded, color: EspyTheme.gold),
                     onPressed: () {
@@ -285,7 +272,7 @@ class _MatchingScreenState extends State<MatchingScreen> {
                 ],
               ),
               const SizedBox(height: 32),
-              Text("USER LOCATION", style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.bold, color: EspyTheme.royalBlue, letterSpacing: 2)),
+              Text("USER LOCATION", style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.bold, color: EspyTheme.royalBlue, letterSpacing: 1)),
               const SizedBox(height: 12),
               StreamBuilder<List<Map<String, dynamic>>>(
                 stream: _firestore.getCountries(),
@@ -315,7 +302,7 @@ class _MatchingScreenState extends State<MatchingScreen> {
                 }
               ),
               const SizedBox(height: 24),
-              Text("CARE SECTOR", style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.bold, color: EspyTheme.royalBlue, letterSpacing: 2)),
+              Text("CARE SECTOR", style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.bold, color: EspyTheme.royalBlue, letterSpacing: 1)),
               const SizedBox(height: 12),
               StreamBuilder<List<Map<String, dynamic>>>(
                 stream: _firestore.getSectors(),
@@ -412,7 +399,7 @@ class _MatchingScreenState extends State<MatchingScreen> {
                           Expanded(
                             child: Text(
                               prof['fullNameEn'] ?? prof['name'] ?? l10n.professionalLabel,
-                              style: GoogleFonts.cinzel(fontSize: 28, fontWeight: FontWeight.w900, color: Colors.white, height: 1.1),
+                              style: GoogleFonts.montserrat(fontSize: 26, fontWeight: FontWeight.w900, color: Colors.white, height: 1.1),
                             ),
                           ),
                           if (prof['isVerified'] == true)
@@ -422,7 +409,7 @@ class _MatchingScreenState extends State<MatchingScreen> {
                       const SizedBox(height: 8),
                       Text(
                         prof['specialization']?.toString().toUpperCase() ?? l10n.specialist.toUpperCase(),
-                        style: GoogleFonts.cinzel(fontSize: 13, fontWeight: FontWeight.bold, color: EspyTheme.gold, letterSpacing: 2),
+                        style: GoogleFonts.montserrat(fontSize: 12, fontWeight: FontWeight.w800, color: EspyTheme.gold, letterSpacing: 1),
                       ),
                       const SizedBox(height: 16),
                       Row(

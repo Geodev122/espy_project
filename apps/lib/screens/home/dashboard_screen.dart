@@ -38,11 +38,11 @@ class DashboardScreen extends StatelessWidget {
             FadeInDown(
               child: Text(
                 'PROTOCOL DASHBOARD',
-                style: GoogleFonts.cinzel(
-                  fontSize: 18,
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
                   fontWeight: FontWeight.w900,
                   color: EspyTheme.navyDeep,
-                  letterSpacing: 2,
+                  letterSpacing: 1.5,
                 ),
               ),
             ),
@@ -51,10 +51,11 @@ class DashboardScreen extends StatelessWidget {
               delay: const Duration(milliseconds: 100),
               child: Text(
                 'LIVE MISSION STATUS',
-                style: GoogleFonts.lora(
-                  fontSize: 12,
+                style: GoogleFonts.montserrat(
+                  fontSize: 11,
                   color: EspyTheme.navyDeep.withOpacity(0.5),
-                  letterSpacing: 1,
+                  letterSpacing: 0.5,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),
@@ -131,13 +132,13 @@ class DashboardScreen extends StatelessWidget {
                 Icon(icon, color: EspyTheme.royalBlue, size: 20),
                 Text(
                   value,
-                  style: GoogleFonts.cinzel(fontSize: 18, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep),
+                  style: GoogleFonts.montserrat(fontSize: 20, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep),
                 ),
               ],
             ),
             const Spacer(),
-            Text(title, style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.w900, color: EspyTheme.gold, letterSpacing: 1)),
-            Text(status, style: GoogleFonts.lora(fontSize: 8, color: Colors.black38)),
+            Text(title, style: GoogleFonts.montserrat(fontSize: 9, fontWeight: FontWeight.w900, color: EspyTheme.gold, letterSpacing: 1)),
+            Text(status, style: GoogleFonts.montserrat(fontSize: 8, color: Colors.black38, fontWeight: FontWeight.w600)),
             const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
@@ -150,7 +151,7 @@ class DashboardScreen extends StatelessWidget {
                 ),
                 child: Text(
                   buttonLabel,
-                  style: GoogleFonts.cinzel(fontSize: 8, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep),
+                  style: GoogleFonts.montserrat(fontSize: 8, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep, letterSpacing: 1),
                 ),
               ),
             ),
@@ -227,13 +228,13 @@ class DashboardScreen extends StatelessWidget {
                 Icon(LucideIcons.eye, color: isExpired ? Colors.redAccent : EspyTheme.gold, size: 20),
                 Text(
                   '${daysRemaining < 0 ? 0 : daysRemaining}',
-                  style: GoogleFonts.cinzel(fontSize: 18, fontWeight: FontWeight.w900, color: Colors.white),
+                  style: GoogleFonts.montserrat(fontSize: 20, fontWeight: FontWeight.w900, color: Colors.white),
                 ),
               ],
             ),
             const Spacer(),
-            Text('VISIBILITY', style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.w900, color: isExpired ? Colors.redAccent : EspyTheme.gold, letterSpacing: 1)),
-            Text('DAYS REMAINING', style: GoogleFonts.lora(fontSize: 8, color: Colors.white38)),
+            Text('VISIBILITY', style: GoogleFonts.montserrat(fontSize: 9, fontWeight: FontWeight.w900, color: isExpired ? Colors.redAccent : EspyTheme.gold, letterSpacing: 1)),
+            Text('DAYS REMAINING', style: GoogleFonts.montserrat(fontSize: 8, color: Colors.white38, fontWeight: FontWeight.w600)),
             const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
@@ -247,7 +248,7 @@ class DashboardScreen extends StatelessWidget {
                 ),
                 child: Text(
                   'QUICK RENEW',
-                  style: GoogleFonts.cinzel(fontSize: 8, fontWeight: FontWeight.w900),
+                  style: GoogleFonts.montserrat(fontSize: 8, fontWeight: FontWeight.w900, letterSpacing: 1),
                 ),
               ),
             ),

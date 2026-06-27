@@ -13,7 +13,10 @@ service cloud.firestore {
             || request.auth.token.admin == true 
             || request.auth.token.isAdmin == true
             || request.auth.token.superAdmin == true
-            || request.auth.token.email == 'geo.elnajjar@gmail.com');
+            || request.auth.token.email == 'geo.elnajjar@gmail.com'
+            || request.auth.token.email == 'geodev122@gmail.com'
+            || request.auth.token.email == 'admin@espy.com'
+            || request.auth.token.email == 'committee@hope-bearer.org');
     }
 
     // PUBLIC-FACING DATA: Allow anyone to read.
@@ -397,12 +400,22 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    match /directory_countries/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     match /directory_governorates/{docId} {
       allow read: if true;
       allow write: if isAdmin();
     }
 
     match /directory_cities/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /emergency_hotlines/{docId} {
       allow read: if true;
       allow write: if isAdmin();
     }

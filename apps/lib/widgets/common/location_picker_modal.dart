@@ -86,11 +86,17 @@ class _LocationPickerModalState extends State<LocationPickerModal> {
           // Selection Hierarchy
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Row(
+            child: Column(
               children: [
-                Expanded(child: _buildCountrySelector()),
-                const SizedBox(width: 12),
-                Expanded(child: _buildGovernorateSelector()),
+                Row(
+                  children: [
+                    Expanded(child: _buildCountrySelector()),
+                    const SizedBox(width: 12),
+                    Expanded(child: _buildGovernorateSelector()),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                _buildCitySelector(),
               ],
             ),
           ),
@@ -179,8 +185,8 @@ class _LocationPickerModalState extends State<LocationPickerModal> {
                           fullWidth: true,
                           isLoading: _isResolving,
                           onPressed: () {
-                            if (_selectedCountryId == null) {
-                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select Country')));
+                            if (_selectedCountryId == null || _selectedGovernorateId == null || _selectedCityId == null) {
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please specify Country, Region, and City')));
                               return;
                             }
                             HapticFeedback.heavyImpact();
@@ -229,9 +235,9 @@ class _LocationPickerModalState extends State<LocationPickerModal> {
           value: _selectedCountryId,
           hint: Text('COUNTRY', style: GoogleFonts.cinzel(fontSize: 10, color: Colors.white38)),
           dropdownColor: EspyTheme.navy,
-          style: GoogleFonts.cinzel(fontSize: 12, color: Colors.white),
+          style: GoogleFonts.cinzel(fontSize: 11, color: Colors.white),
           items: countries.map((c) => DropdownMenuItem(value: c['id'].toString(), child: Text(c['name_en'].toString().toUpperCase()))).toList(),
-          onChanged: (v) => setState(() { _selectedCountryId = v; _selectedGovernorateId = null; }),
+          onChanged: (v) => setState(() { _selectedCountryId = v; _selectedGovernorateId = null; _selectedCityId = null; }),
           decoration: InputDecoration(
             contentPadding: const EdgeInsets.symmetric(horizontal: 16),
             filled: true,
@@ -252,9 +258,32 @@ class _LocationPickerModalState extends State<LocationPickerModal> {
           value: _selectedGovernorateId,
           hint: Text('REGION', style: GoogleFonts.cinzel(fontSize: 10, color: Colors.white38)),
           dropdownColor: EspyTheme.navy,
-          style: GoogleFonts.cinzel(fontSize: 12, color: Colors.white),
+          style: GoogleFonts.cinzel(fontSize: 11, color: Colors.white),
           items: items.map((c) => DropdownMenuItem(value: c['id'].toString(), child: Text(c['name_en'].toString().toUpperCase()))).toList(),
-          onChanged: (v) => setState(() => _selectedGovernorateId = v),
+          onChanged: (v) => setState(() { _selectedGovernorateId = v; _selectedCityId = null; }),
+          decoration: InputDecoration(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+            filled: true,
+            fillColor: Colors.white.withOpacity(0.05),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildCitySelector() {
+    return StreamBuilder<List<Map<String, dynamic>>>(
+      stream: _firestore.getCities(governorateId: _selectedGovernorateId),
+      builder: (context, snapshot) {
+        final items = snapshot.data ?? [];
+        return DropdownButtonFormField<String>(
+          value: _selectedCityId,
+          hint: Text('CITY', style: GoogleFonts.cinzel(fontSize: 10, color: Colors.white38)),
+          dropdownColor: EspyTheme.navy,
+          style: GoogleFonts.cinzel(fontSize: 11, color: Colors.white),
+          items: items.map((c) => DropdownMenuItem(value: c['id'].toString(), child: Text(c['name_en'].toString().toUpperCase()))).toList(),
+          onChanged: (v) => setState(() => _selectedCityId = v),
           decoration: InputDecoration(
             contentPadding: const EdgeInsets.symmetric(horizontal: 16),
             filled: true,

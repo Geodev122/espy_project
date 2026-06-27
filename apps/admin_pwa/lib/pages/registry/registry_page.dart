@@ -26,6 +26,7 @@ class _RegistryPageState extends ConsumerState<RegistryPage> with SingleTickerPr
   DateTimeRange? _dateRange;
   bool _ascending = false;
   String _statusFilter = 'all';
+  String _countryFilter = 'ALL';
 
   @override
   void initState() {
@@ -38,10 +39,11 @@ class _RegistryPageState extends ConsumerState<RegistryPage> with SingleTickerPr
       _dateRange = null;
       _ascending = false;
       _statusFilter = 'all';
+      _countryFilter = 'ALL';
     });
   }
 
-  List<T> _filterData<T>(List<T> data, DateTime? Function(T) getDate, bool Function(T, String) filterByStatus) {
+  List<T> _filterData<T>(List<T> data, DateTime? Function(T) getDate, bool Function(T, String) filterByStatus, String? Function(T) getCountryId) {
     var filtered = data;
     
     if (_dateRange != null) {
@@ -54,6 +56,10 @@ class _RegistryPageState extends ConsumerState<RegistryPage> with SingleTickerPr
 
     if (_statusFilter != 'all') {
       filtered = filtered.where((item) => filterByStatus(item, _statusFilter)).toList();
+    }
+
+    if (_countryFilter != 'ALL') {
+      filtered = filtered.where((item) => getCountryId(item) == _countryFilter).toList();
     }
 
     filtered.sort((a, b) {
@@ -152,6 +158,8 @@ class _RegistryPageState extends ConsumerState<RegistryPage> with SingleTickerPr
   }
 
   Widget _buildFilterBar() {
+    final asyncCountries = ref.watch(countriesFutureProvider);
+
     return Row(
       children: [
         OutlinedButton.icon(
@@ -194,13 +202,29 @@ class _RegistryPageState extends ConsumerState<RegistryPage> with SingleTickerPr
           onChanged: (val) => setState(() => _statusFilter = val!),
         ),
         const SizedBox(width: 16),
+        asyncCountries.when(
+          data: (countries) => DropdownButton<String>(
+            value: _countryFilter,
+            underline: const SizedBox(),
+            dropdownColor: const Color(0xFF061226),
+            style: EspyTheme.cinzelStyle.copyWith(fontSize: 11, color: Colors.white),
+            items: [
+              const DropdownMenuItem(value: 'ALL', child: Text('ALL COUNTRIES')),
+              ...countries.map((c) => DropdownMenuItem(value: c['id'], child: Text(c['name_en'].toString().toUpperCase()))),
+            ],
+            onChanged: (v) => setState(() => _countryFilter = v!),
+          ),
+          loading: () => const SizedBox(),
+          error: (e, s) => const SizedBox(),
+        ),
+        const SizedBox(width: 16),
         IconButton(
           onPressed: () => setState(() => _ascending = !_ascending),
           icon: Icon(_ascending ? LucideIcons.sortAsc : LucideIcons.sortDesc, size: 16, color: EspyTheme.gold),
           tooltip: 'Sort by Date',
         ),
         const Spacer(),
-        if (_dateRange != null || _statusFilter != 'all')
+        if (_dateRange != null || _statusFilter != 'all' || _countryFilter != 'ALL')
           TextButton(onPressed: _resetFilters, child: const Text('RESET FILTERS', style: TextStyle(fontSize: 10, color: Colors.redAccent))),
       ],
     );
@@ -234,7 +258,7 @@ class _RegistryPageState extends ConsumerState<RegistryPage> with SingleTickerPr
     final asyncProfs = ref.watch(professionalsStreamProvider);
     return asyncProfs.when(
       data: (profs) {
-        final filtered = _filterData<ProfessionalModel>(profs, (u) => u.createdAt, (u, s) => s == 'active' ? u.isApproved : !u.isApproved);
+        final filtered = _filterData<ProfessionalModel>(profs, (u) => u.createdAt, (u, s) => s == 'active' ? u.isApproved : !u.isApproved, (u) => u.countryId);
         return _buildUserTable(filtered);
       },
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -246,7 +270,7 @@ class _RegistryPageState extends ConsumerState<RegistryPage> with SingleTickerPr
     final asyncInsts = ref.watch(institutionsStreamProvider);
     return asyncInsts.when(
       data: (insts) {
-        final filtered = _filterData<ProfessionalModel>(insts, (u) => u.createdAt, (u, s) => s == 'active' ? u.isApproved : !u.isApproved);
+        final filtered = _filterData<ProfessionalModel>(insts, (u) => u.createdAt, (u, s) => s == 'active' ? u.isApproved : !u.isApproved, (u) => u.countryId);
         return _buildUserTable(filtered);
       },
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -258,7 +282,7 @@ class _RegistryPageState extends ConsumerState<RegistryPage> with SingleTickerPr
     final asyncVisitors = ref.watch(visitorsStreamProvider);
     return asyncVisitors.when(
       data: (visitors) {
-        final filtered = _filterData<VisitorModel>(visitors, (v) => v.createdAt, (v, s) => true);
+        final filtered = _filterData<VisitorModel>(visitors, (v) => v.createdAt, (v, s) => true, (v) => v.countryId);
         return _buildVisitorTable(filtered);
       },
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -443,7 +467,7 @@ class _RegistryPageState extends ConsumerState<RegistryPage> with SingleTickerPr
     final asyncServices = ref.watch(servicesStreamProvider);
     return asyncServices.when(
       data: (services) {
-        final filtered = _filterData<ServiceModel>(services, (s) => s.createdAt, (s, st) => st == 'active' ? s.isActive : !s.isActive);
+        final filtered = _filterData<ServiceModel>(services, (s) => s.createdAt, (s, st) => st == 'active' ? s.isActive : !s.isActive, (s) => s.countryId);
         return _buildServicesTable(filtered);
       },
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -517,7 +541,7 @@ class _RegistryPageState extends ConsumerState<RegistryPage> with SingleTickerPr
     final asyncRequests = ref.watch(communityRequestsStreamProvider);
     return asyncRequests.when(
       data: (data) {
-        final filtered = _filterData<Map<String, dynamic>>(data, (r) => (r['createdAt'] as Timestamp?)?.toDate(), (r, st) => r['status'] == st);
+        final filtered = _filterData<Map<String, dynamic>>(data, (r) => (r['createdAt'] as Timestamp?)?.toDate(), (r, st) => r['status'] == st, (r) => r['countryId']);
         return _buildCommunityTable(filtered);
       },
       loading: () => const Center(child: CircularProgressIndicator()),

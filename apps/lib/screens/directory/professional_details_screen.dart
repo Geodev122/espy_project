@@ -116,7 +116,7 @@ class ProfessionalDetailsScreen extends StatelessWidget {
                   professional['fullNameEn'] ??
                       professional['name'] ??
                       l10n.verified,
-                  style: GoogleFonts.cinzel(
+                  style: GoogleFonts.montserrat(
                     fontSize: 34,
                     fontWeight: FontWeight.w900,
                     color: EspyTheme.navyDeep,
@@ -135,11 +135,11 @@ class ProfessionalDetailsScreen extends StatelessWidget {
         Text(
           professional['specialization']?.toString().toUpperCase() ??
               'CARE PROVIDER',
-          style: GoogleFonts.cinzel(
+          style: GoogleFonts.montserrat(
             fontSize: 14,
             fontWeight: FontWeight.w800,
             color: EspyTheme.gold,
-            letterSpacing: 4,
+            letterSpacing: 2,
           ),
         ),
         const SizedBox(height: 24),
@@ -149,8 +149,8 @@ class ProfessionalDetailsScreen extends StatelessWidget {
                 size: 18, color: EspyTheme.royalBlue),
             const SizedBox(width: 8),
             Text(
-              professional['mainLocation']?['cityName'] ?? 'Lebanon',
-              style: GoogleFonts.lora(
+              professional['mainLocation']?['cityName'] ?? 'GLOBAL',
+              style: GoogleFonts.montserrat(
                   fontSize: 15, color: EspyTheme.navyDeep.withValues(alpha: 0.6), fontWeight: FontWeight.bold),
             ),
             const Spacer(),
@@ -159,7 +159,7 @@ class ProfessionalDetailsScreen extends StatelessWidget {
             Text(
               '4.9',
               style:
-                  GoogleFonts.lora(fontWeight: FontWeight.w900, fontSize: 16, color: EspyTheme.navyDeep),
+                  GoogleFonts.montserrat(fontWeight: FontWeight.w900, fontSize: 16, color: EspyTheme.navyDeep),
             ),
           ],
         ),
@@ -170,10 +170,10 @@ class ProfessionalDetailsScreen extends StatelessWidget {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: GoogleFonts.cinzel(
+      style: GoogleFonts.montserrat(
         fontSize: 11,
         fontWeight: FontWeight.w900,
-        letterSpacing: 3,
+        letterSpacing: 2,
         color: EspyTheme.royalBlue.withValues(alpha: 0.6),
       ),
     );
@@ -183,10 +183,11 @@ class ProfessionalDetailsScreen extends StatelessWidget {
     return FadeInUp(
       child: Text(
         professional['bio'] ?? l10n.defaultBioLong,
-        style: GoogleFonts.lora(
-          fontSize: 16,
-          height: 1.8,
+        style: GoogleFonts.montserrat(
+          fontSize: 15,
+          height: 1.6,
           color: EspyTheme.navyDeep.withValues(alpha: 0.8),
+          fontWeight: FontWeight.w500,
         ),
       ),
     );
@@ -210,7 +211,7 @@ class ProfessionalDetailsScreen extends StatelessWidget {
                 ),
                 child: Text(
                   tag.toString().toUpperCase(),
-                  style: GoogleFonts.cinzel(
+                  style: GoogleFonts.montserrat(
                       fontSize: 10,
                       fontWeight: FontWeight.w800,
                       color: EspyTheme.royalBlue),

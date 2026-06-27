@@ -77,12 +77,12 @@ class EspyTheme {
     systemNavigationBarIconBrightness: Brightness.dark,
   );
 
-  static TextStyle get cinzelStyle => GoogleFonts.cinzel(
+  static TextStyle get cinzelStyle => GoogleFonts.montserrat(
     fontWeight: FontWeight.w900,
     letterSpacing: 1.5,
   );
 
-  static TextStyle get loraStyle => GoogleFonts.lora(
+  static TextStyle get loraStyle => GoogleFonts.montserrat(
     fontWeight: FontWeight.w400,
   );
 
@@ -101,17 +101,17 @@ class EspyTheme {
         centerTitle: true,
         surfaceTintColor: Colors.transparent,
         iconTheme: const IconThemeData(color: navyDeep, size: 20),
-        titleTextStyle: GoogleFonts.cinzel(
-          fontSize: 12, fontWeight: FontWeight.w900,
-          letterSpacing: 2.5, color: navyDeep,
+        titleTextStyle: GoogleFonts.montserrat(
+          fontSize: 13, fontWeight: FontWeight.w900,
+          letterSpacing: 2, color: navyDeep,
         ),
         systemOverlayStyle: SystemUiOverlayStyle.dark,
       ),
       textTheme: TextTheme(
-        displayLarge: GoogleFonts.cinzel(fontSize: 24, fontWeight: FontWeight.w900, color: navyDeep, letterSpacing: 3),
-        displayMedium: GoogleFonts.cinzel(fontSize: 18, fontWeight: FontWeight.w900, color: navyDeep, letterSpacing: 1.5),
-        bodyLarge: GoogleFonts.lora(fontSize: 14, color: textPrimary),
-        bodyMedium: GoogleFonts.lora(fontSize: 12, color: textSecondary),
+        displayLarge: GoogleFonts.montserrat(fontSize: 24, fontWeight: FontWeight.w900, color: navyDeep, letterSpacing: 1),
+        displayMedium: GoogleFonts.montserrat(fontSize: 18, fontWeight: FontWeight.w900, color: navyDeep, letterSpacing: 1),
+        bodyLarge: GoogleFonts.montserrat(fontSize: 14, color: textPrimary, fontWeight: FontWeight.w500),
+        bodyMedium: GoogleFonts.montserrat(fontSize: 12, color: textSecondary, fontWeight: FontWeight.w400),
         labelLarge: GoogleFonts.montserrat(fontSize: 9, fontWeight: FontWeight.w900, color: gold, letterSpacing: 1.5),
       ),
     );

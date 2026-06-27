@@ -99,6 +99,9 @@ class _InstitutionWizardState extends State<InstitutionWizard> {
       'registrationNumber': _registrationController.text,
       'categoryId': _selectedCategoryId,
       'mainLocation': _mainLocation,
+      'countryId': _mainLocation?['countryId'],
+      'governorateId': _mainLocation?['governorateId'],
+      'cityId': _mainLocation?['cityId'],
     });
   }
 
@@ -506,6 +509,9 @@ class _InstitutionWizardState extends State<InstitutionWizard> {
         'photoUrl': photoUrl ?? auth.user?.photoURL,
         'proofUrl': proofUrl,
         'mainLocation': _mainLocation,
+        'countryId': _mainLocation?['countryId'],
+        'governorateId': _mainLocation?['governorateId'],
+        'cityId': _mainLocation?['cityId'],
         'secondaryLocations': _secondaryLocations,
         'role': 'institution',
       });

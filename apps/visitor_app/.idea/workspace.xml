@@ -5,10 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0e1d1981-2c6b-49c0-8970-10699b435438" name="Changes" comment="test">
-      <change beforePath="$PROJECT_DIR$/../../.idea/Espy-Project.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../../.idea/Espy-Project.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../.idea/caches/deviceStreaming.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../admin_pwa/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../admin_pwa/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pro_app/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../pro_app/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Espy-Project-Apps" beforeDir="false" afterPath="$PROJECT_DIR$/../../Espy-Project-Apps" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

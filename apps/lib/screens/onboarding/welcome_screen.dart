@@ -53,7 +53,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               ),
               const SizedBox(height: 32),
               Text(l10n.selectMission.toUpperCase(), 
-                  style: GoogleFonts.cinzel(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 2)),
+                  style: GoogleFonts.montserrat(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 1)),
               const SizedBox(height: 32),
               _roleOption(
                 icon: Icons.person_search_rounded,
@@ -114,9 +114,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title.toUpperCase(), style: GoogleFonts.cinzel(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w900)),
+                  Text(title.toUpperCase(), style: GoogleFonts.montserrat(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 0.5)),
                   const SizedBox(height: 4),
-                  Text(subtitle, style: GoogleFonts.lora(color: Colors.white38, fontSize: 10)),
+                  Text(subtitle, style: GoogleFonts.montserrat(color: Colors.white38, fontSize: 10, fontWeight: FontWeight.w500)),
                 ],
               ),
             ),
@@ -143,7 +143,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   return TextButton(
                     onPressed: () => localeService.toggleLocale(),
                     style: TextButton.styleFrom(backgroundColor: Colors.white.withValues(alpha: 0.1), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                    child: Text(localeService.locale.languageCode == 'en' ? 'AR' : 'EN', style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, color: EspyTheme.gold, letterSpacing: 2)),
+                    child: Text(localeService.locale.languageCode == 'en' ? 'AR' : 'EN', style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, color: EspyTheme.gold, letterSpacing: 1)),
                   );
                 },
               ),

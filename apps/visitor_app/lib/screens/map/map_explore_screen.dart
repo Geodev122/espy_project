@@ -313,57 +313,61 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
           ],
         ),
 
+        // Redesigned Visibility Bar
         Positioned(
-          top: 60,
-          left: 0, right: 0,
-          child: Center(
-            child: FadeInDown(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.9),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: EspyTheme.navyDeep.withValues(alpha: 0.1)),
-                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.radar_rounded, size: 14, color: EspyTheme.gold),
-                    const SizedBox(width: 10),
-                    Text(
-                      !_radiusFilterActive ? "SURROUNDING NETWORK (10KM)" : (_searchRadiusKm >= 100 ? "GLOBAL NETWORK VIEW" : "${_searchRadiusKm.toInt()} KM SCAN RADIUS"),
-                      style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep, letterSpacing: 1),
-                    ),
-                  ],
+          top: MediaQuery.of(context).padding.top + 80,
+          left: 20, right: 20,
+          child: Column(
+            children: [
+              FadeInDown(
+                duration: const Duration(milliseconds: 600),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.95),
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 20, offset: const Offset(0, 4))],
+                    border: Border.all(color: EspyTheme.navyDeep.withOpacity(0.05)),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(LucideIcons.radar, size: 16, color: EspyTheme.royalBlue),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          !_radiusFilterActive
+                            ? "SCANNING 10KM RADIUS"
+                            : (_searchRadiusKm >= 100 ? "GLOBAL VIEW: ALL PINs VISIBLE" : "FILTER: PINs WITHIN ${_searchRadiusKm.toInt()}KM VISIBLE"),
+                          style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.w800, color: EspyTheme.navyDeep, letterSpacing: 0.5),
+                        ),
+                      ),
+                      if (_radiusFilterActive)
+                         const Icon(Icons.check_circle_rounded, size: 14, color: EspyTheme.success),
+                    ],
+                  ),
                 ),
               ),
-            ),
+              if (_showBrowseButton) ...[
+                const SizedBox(height: 12),
+                FadeInUp(
+                  duration: const Duration(milliseconds: 300),
+                  child: PremiumButton(
+                    label: "BROWSE THIS AREA",
+                    size: PremiumButtonSize.small,
+                    variant: PremiumButtonVariant.gold,
+                    onPressed: () {
+                      setState(() {
+                        _lastBrowsePosition = _mapController.camera.center;
+                        _showBrowseButton = false;
+                      });
+                      _loadNodeMarkers();
+                    },
+                  ),
+                ),
+              ],
+            ],
           ),
         ),
-
-        if (_showBrowseButton)
-          Positioned(
-            top: 110,
-            left: 0, right: 0,
-            child: Center(
-              child: FadeInUp(
-                duration: const Duration(milliseconds: 300),
-                child: PremiumButton(
-                  label: "BROWSE THIS AREA",
-                  size: PremiumButtonSize.small,
-                  variant: PremiumButtonVariant.platinum,
-                  onPressed: () {
-                    setState(() {
-                      _lastBrowsePosition = _mapController.camera.center;
-                      _showBrowseButton = false;
-                    });
-                    _loadNodeMarkers();
-                  },
-                ),
-              ),
-            ),
-          ),
 
         Positioned(
           bottom: 120,

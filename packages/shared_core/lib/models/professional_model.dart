@@ -14,6 +14,7 @@ class ProfessionalModel {
   final String? photoUrl;
   final String? sectorId;
   final String? categoryId;
+  final String? countryId;
   final String? governorateId;
   final String? cityId;
   final bool isActive;
@@ -53,6 +54,7 @@ class ProfessionalModel {
     this.photoUrl,
     this.sectorId,
     this.categoryId,
+    this.countryId,
     this.governorateId,
     this.cityId,
     this.isActive = true,
@@ -94,6 +96,7 @@ class ProfessionalModel {
       photoUrl: json['photoUrl'] as String?,
       sectorId: json['sectorId'] as String?,
       categoryId: json['categoryId'] as String?,
+      countryId: (json['countryId'] ?? json['country']) as String?,
       governorateId: json['governorateId'] as String?,
       cityId: json['cityId'] as String?,
       isActive: json['isActive'] ?? json['is_active'] ?? true,

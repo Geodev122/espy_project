@@ -6,6 +6,7 @@ class ServiceModel {
   final String? descriptionAr;
   final String? categoryId;
   final String? sectorId;
+  final String? countryId;
   final String professionalId;
   final String? institutionId;
   final String? photoUrl;
@@ -23,6 +24,7 @@ class ServiceModel {
     this.descriptionAr,
     this.categoryId,
     this.sectorId,
+    this.countryId,
     required this.professionalId,
     this.institutionId,
     this.photoUrl,
@@ -42,6 +44,7 @@ class ServiceModel {
       descriptionAr: json['descriptionAr'] as String?,
       categoryId: json['categoryId'] as String?,
       sectorId: json['sectorId'] as String?,
+      countryId: (json['countryId'] ?? json['country']) as String?,
       professionalId: json['professionalId'] as String? ?? '',
       institutionId: json['institutionId'] as String?,
       photoUrl: json['photoUrl'] as String?,

@@ -105,6 +105,9 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
       'sectorId': _selectedSectorId,
       'categoryId': _selectedCategoryId,
       'mainLocation': _mainLocation,
+      'countryId': _mainLocation?['countryId'],
+      'governorateId': _mainLocation?['governorateId'],
+      'cityId': _mainLocation?['cityId'],
     });
   }
 
@@ -118,7 +121,7 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
         elevation: 0,
         title: Text(
           l10n.protocolRegistration,
-          style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, letterSpacing: 2, color: EspyTheme.platinum, fontSize: 14),
+          style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, letterSpacing: 1, color: EspyTheme.platinum, fontSize: 13),
         ),
         iconTheme: const IconThemeData(color: EspyTheme.platinum),
       ),
@@ -415,7 +418,7 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
                     TextButton(
                       onPressed: () => _openMainLocationPicker(l10n),
                       child: Text(l10n.setPin,
-                          style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, color: EspyTheme.mahogany)),
+                          style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, color: EspyTheme.mahogany, fontSize: 12)),
                     ),
                   ],
                 ),
@@ -451,7 +454,7 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
                   children: [
                     const Icon(Icons.verified_user_rounded, size: 64, color: EspyTheme.success),
                     const SizedBox(height: 32),
-                    Text(l10n.almostThere, style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, fontSize: 18)),
+                    Text(l10n.almostThere, style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: 1)),
                     const SizedBox(height: 16),
                     Text(
                       l10n.professionalDashboardRedir,
@@ -486,7 +489,7 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
   }
 
   Widget _buildStepTitle(String title) {
-    return Text(title, style: GoogleFonts.cinzel(fontSize: 18, fontWeight: FontWeight.w900, color: EspyTheme.platinum, height: 1.1, letterSpacing: 1.5));
+    return Text(title, style: GoogleFonts.montserrat(fontSize: 18, fontWeight: FontWeight.w900, color: EspyTheme.platinum, height: 1.1, letterSpacing: 1));
   }
 
   Widget _buildFieldLabel(String label) {
@@ -583,6 +586,9 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
         'photoUrl': photoUrl ?? auth.user?.photoURL,
         'proofUrl': proofUrl,
         'mainLocation': _mainLocation,
+        'countryId': _mainLocation?['countryId'],
+        'governorateId': _mainLocation?['governorateId'],
+        'cityId': _mainLocation?['cityId'],
         'secondaryLocations': _secondaryLocations,
         'role': 'professional',
       });

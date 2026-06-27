@@ -6,6 +6,7 @@ class VisitorModel {
   final String source;
   final DateTime? createdAt;
   final DateTime? updatedAt;
+  final String? countryId;
   final bool isVerified;
 
   VisitorModel({
@@ -16,6 +17,7 @@ class VisitorModel {
     this.source = 'pwa',
     this.createdAt,
     this.updatedAt,
+    this.countryId,
     this.isVerified = false,
   });
 
@@ -28,6 +30,7 @@ class VisitorModel {
       source: json['source'] as String? ?? 'pwa',
       createdAt: json['createdAt'] != null ? DateTime.tryParse(json['createdAt'].toString()) : null,
       updatedAt: json['updatedAt'] != null ? DateTime.tryParse(json['updatedAt'].toString()) : null,
+      countryId: (json['countryId'] ?? json['country']) as String?,
       isVerified: json['isVerified'] as bool? ?? false,
     );
   }

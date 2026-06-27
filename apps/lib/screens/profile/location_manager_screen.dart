@@ -82,9 +82,10 @@ class _LocationManagerScreenState extends State<LocationManagerScreen> {
                         TextButton(
                           onPressed: _openMainLocationPicker,
                           child: Text('UPDATE',
-                              style: GoogleFonts.cinzel(
+                              style: GoogleFonts.montserrat(
                                   fontWeight: FontWeight.w900,
-                                  color: EspyTheme.mahogany)),
+                                  color: EspyTheme.mahogany,
+                                  fontSize: 12)),
                         ),
                       ],
                     ),
@@ -146,8 +147,8 @@ class _LocationManagerScreenState extends State<LocationManagerScreen> {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16)),
                         title: Text(loc['cityName'],
-                            style: GoogleFonts.cinzel(
-                                fontWeight: FontWeight.bold, fontSize: 12, color: isExpired ? EspyTheme.error : null)),
+                            style: GoogleFonts.montserrat(
+                                fontWeight: FontWeight.w900, fontSize: 13, color: isExpired ? EspyTheme.error : null, letterSpacing: 0.5)),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -190,10 +191,11 @@ class _LocationManagerScreenState extends State<LocationManagerScreen> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Text(title,
-          style: GoogleFonts.cinzel(
+          style: GoogleFonts.montserrat(
               fontWeight: FontWeight.w900,
               fontSize: 14,
-              color: EspyTheme.noir)),
+              color: EspyTheme.noir,
+              letterSpacing: 1)),
     );
   }
 
@@ -202,7 +204,7 @@ class _LocationManagerScreenState extends State<LocationManagerScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: EspyTheme.platinum,
-        title: Text('LIMIT REACHED', style: GoogleFonts.cinzel(fontWeight: FontWeight.w900)),
+        title: Text('LIMIT REACHED', style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, letterSpacing: 1)),
         content: const Text('You have utilized all your allocated presence PINs. Please visit your Espy Wallet to purchase additional PINs.'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('CANCEL')),
@@ -212,7 +214,7 @@ class _LocationManagerScreenState extends State<LocationManagerScreen> {
               // Navigate to wallet shop
               Navigator.push(context, MaterialPageRoute(builder: (_) => const TokenShopScreen(initialTab: 1)));
             },
-            child: Text('VISIT STORE', style: GoogleFonts.cinzel(fontWeight: FontWeight.bold, color: EspyTheme.gold)),
+            child: Text('VISIT STORE', style: GoogleFonts.montserrat(fontWeight: FontWeight.bold, color: EspyTheme.gold)),
           ),
         ],
       ),
@@ -248,7 +250,7 @@ class _LocationManagerScreenState extends State<LocationManagerScreen> {
         builder: (context) => AlertDialog(
           backgroundColor: EspyTheme.platinum,
           title: Text('PIN DETAILS',
-              style: GoogleFonts.cinzel(fontWeight: FontWeight.w900)),
+              style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, letterSpacing: 1)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -259,8 +261,8 @@ class _LocationManagerScreenState extends State<LocationManagerScreen> {
               ),
               const SizedBox(height: 20),
               Text('Presence Days',
-                  style: GoogleFonts.cinzel(
-                      fontSize: 10, fontWeight: FontWeight.bold)),
+                  style: GoogleFonts.montserrat(
+                      fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
               StatefulBuilder(
                 builder: (context, setDialogState) => Wrap(
                   spacing: 4,

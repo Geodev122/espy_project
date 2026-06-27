@@ -246,7 +246,7 @@ class _AppShellState extends State<AppShell> {
       value: EspyTheme.systemUIOverlayDark,
       child: Scaffold(
         key: _scaffoldKey,
-        drawer: isVisitor ? const EspySideMenu() : null,
+        drawer: const EspySideMenu(),
         extendBody: true,
         backgroundColor: isVisitor ? EspyTheme.platinum : Colors.white,
         body: Stack(
@@ -259,7 +259,7 @@ class _AppShellState extends State<AppShell> {
               top: 0,
               left: 0,
               right: 0,
-              child: _buildCustomHeader(context, role),
+              child: _buildCustomHeader(context, user, role),
             ),
           ],
         ),
@@ -388,24 +388,24 @@ class _AppShellState extends State<AppShell> {
     final bool isMatch = _selectedIndex == 1;
 
     return Container(
-      height: 50,
-      padding: const EdgeInsets.all(4),
+      height: 54,
+      padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(25),
+        color: Colors.black.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(30),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _buildToggleBtn(0, Icons.map_rounded, 'EXPLORE', isMap),
-          const SizedBox(width: 4),
-          _buildToggleBtn(1, Icons.favorite_rounded, 'MATCH', isMatch),
+          _buildToggleBtn(0, Icons.map_rounded, isMap),
+          const SizedBox(width: 6),
+          _buildToggleBtn(1, Icons.favorite_rounded, isMatch),
         ],
       ),
     );
   }
 
-  Widget _buildToggleBtn(int index, IconData icon, String label, bool active) {
+  Widget _buildToggleBtn(int index, IconData icon, bool active) {
     return GestureDetector(
       onTap: () {
         if (!active) {
@@ -416,32 +416,17 @@ class _AppShellState extends State<AppShell> {
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 400),
-        curve: Curves.elasticOut,
-        padding: EdgeInsets.symmetric(horizontal: active ? 16 : 12, vertical: 8),
+        curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
           color: active ? EspyTheme.gold : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(25),
+          boxShadow: active ? [BoxShadow(color: EspyTheme.gold.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4))] : null,
         ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              size: 18,
-              color: active ? EspyTheme.navyDeep : Colors.white38,
-            ),
-            if (active) ...[
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: GoogleFonts.cinzel(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w900,
-                  color: EspyTheme.navyDeep,
-                  letterSpacing: 1,
-                ),
-              ),
-            ],
-          ],
+        child: Icon(
+          icon,
+          size: 20,
+          color: active ? EspyTheme.navyDeep : Colors.white38,
         ),
       ),
     );
@@ -500,18 +485,15 @@ class _AppShellState extends State<AppShell> {
     );
   }
 
-  Widget _buildCustomHeader(BuildContext context, UserRole role) {
+  Widget _buildCustomHeader(BuildContext context, UserModel user, UserRole role) {
     final localeService = Provider.of<LocaleService>(context);
-    final userService = Provider.of<UserService>(context);
-    final profile = userService.profile ?? {};
     final navItems = _getNavItems(context, role);
     final currentLabel = (_selectedIndex < navItems.length) ? navItems[_selectedIndex].label : 'ESPY';
-    final bool isProOrInst = role == UserRole.professional || role == UserRole.institution;
     final bool isVisitor = role == UserRole.visitor;
 
     return GlassmorphicContainer(
       width: double.infinity,
-      height: MediaQuery.of(context).padding.top + 60,
+      height: MediaQuery.of(context).padding.top + 70,
       borderRadius: 0,
       blur: 20,
       alignment: Alignment.bottomCenter,
@@ -520,82 +502,90 @@ class _AppShellState extends State<AppShell> {
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
         colors: [
-          (isVisitor ? EspyTheme.platinum : Colors.white).withOpacity(0.9),
-          (isVisitor ? EspyTheme.platinum : Colors.white).withOpacity(0.8),
+          (isVisitor ? EspyTheme.platinum : Colors.white).withOpacity(0.95),
+          (isVisitor ? EspyTheme.platinum : Colors.white).withOpacity(0.85),
         ],
       ),
       borderGradient: LinearGradient(
         colors: [Colors.white.withOpacity(0.2), Colors.white.withOpacity(0.05)],
       ),
-      padding: EdgeInsets.fromLTRB(12, MediaQuery.of(context).padding.top, 12, 0),
+      padding: EdgeInsets.fromLTRB(16, MediaQuery.of(context).padding.top, 16, 8),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          if (isVisitor) 
-            IconButton(
-              icon: const Icon(Icons.menu_rounded, color: EspyTheme.royalBlue, size: 26),
-              onPressed: () => _scaffoldKey.currentState?.openDrawer(),
-            )
-          else
-            const SizedBox(width: 48),
-
-          if (isProOrInst)
-            IconButton(
-              icon: const Icon(Icons.campaign_rounded, color: EspyTheme.gold, size: 22),
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BroadcastScreen())),
-            ),
-          const Spacer(),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                currentLabel,
-                style: GoogleFonts.cinzel(fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 2, color: EspyTheme.navyDeep),
-              ),
-              if (profile['name'] != null)
-                Text(
-                  profile['name'].toString().toUpperCase(),
-                  style: GoogleFonts.cinzel(fontSize: 7, fontWeight: FontWeight.bold, letterSpacing: 1, color: EspyTheme.gold),
-                ),
-            ],
-          ),
-          const Spacer(),
-          IconButton(
-            onPressed: () => localeService.toggleLocale(),
-            icon: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: EspyTheme.gold.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: EspyTheme.gold.withOpacity(0.2)),
-              ),
-              child: Text(
-                localeService.locale.languageCode.toUpperCase(),
-                style: GoogleFonts.montserrat(fontSize: 9, fontWeight: FontWeight.w900, color: EspyTheme.gold, letterSpacing: 1),
-              ),
-            ),
-          ),
+          // Left: User Avatar -> Opens Drawer
           GestureDetector(
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const NotificationsScreen())),
+            onTap: () => _scaffoldKey.currentState?.openDrawer(),
             child: Hero(
               tag: 'header-profile-avatar',
               child: Container(
-                width: 32,
-                height: 32,
+                width: 38,
+                height: 38,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: EspyTheme.royalBlue.withOpacity(0.2), width: 1.5),
-                  image: profile['photoUrl'] != null
-                      ? DecorationImage(image: CachedNetworkImageProvider(profile['photoUrl']), fit: BoxFit.cover)
+                  border: Border.all(color: EspyTheme.royalBlue.withOpacity(0.15), width: 1.5),
+                  image: user.photoUrl != null
+                      ? DecorationImage(image: CachedNetworkImageProvider(user.photoUrl!), fit: BoxFit.cover)
                       : null,
                 ),
-                child: profile['photoUrl'] == null
-                    ? const Icon(Icons.person_rounded, color: EspyTheme.royalBlue, size: 18)
+                child: user.photoUrl == null
+                    ? const Icon(Icons.person_rounded, color: EspyTheme.royalBlue, size: 20)
                     : null,
               ),
             ),
           ),
+          const SizedBox(width: 16),
+          // Center: Label & Name
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  currentLabel,
+                  style: GoogleFonts.montserrat(fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 1.5, color: EspyTheme.navyDeep),
+                ),
+                if (user.name != null)
+                  Text(
+                    user.name!.toUpperCase(),
+                    style: GoogleFonts.montserrat(fontSize: 8, fontWeight: FontWeight.w700, letterSpacing: 0.5, color: EspyTheme.gold),
+                  ),
+              ],
+            ),
+          ),
+          // Right: Actions
+          if (isVisitor)
+            IconButton(
+              icon: const Icon(Icons.campaign_rounded, color: EspyTheme.navyDeep, size: 22),
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AnnouncementsScreen())),
+              tooltip: 'Broadcasts',
+            ),
+          IconButton(
+            icon: const Icon(Icons.notifications_none_rounded, color: EspyTheme.navyDeep, size: 22),
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const NotificationsScreen())),
+            tooltip: 'Notifications',
+          ),
+          const SizedBox(width: 4),
+          _buildLocaleToggle(localeService),
         ],
+      ),
+    );
+  }
+
+  Widget _buildLocaleToggle(LocaleService localeService) {
+    return InkWell(
+      onTap: () => localeService.toggleLocale(),
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: EspyTheme.gold.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: EspyTheme.gold.withOpacity(0.15)),
+        ),
+        child: Text(
+          localeService.locale.languageCode.toUpperCase(),
+          style: GoogleFonts.montserrat(fontSize: 9, fontWeight: FontWeight.w900, color: EspyTheme.gold, letterSpacing: 0.5),
+        ),
       ),
     );
   }
