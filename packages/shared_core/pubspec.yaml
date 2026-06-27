@@ -28,6 +28,4 @@ dependencies:
   geoflutterfire_plus: ^0.0.34
   rxdart: ^0.28.0
 
-dependency_overrides:
-  xml: 6.3.0
-  image: 4.2.0
+dependency_overrides: {}

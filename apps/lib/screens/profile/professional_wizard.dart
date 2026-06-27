@@ -29,6 +29,7 @@ class ProfessionalWizard extends StatefulWidget {
 class _ProfessionalWizardState extends State<ProfessionalWizard> {
   int _currentStep = 0;
   final _formKey = GlobalKey<FormState>();
+  bool get isAr => Localizations.localeOf(context).languageCode == 'ar';
 
   final _nameController = TextEditingController();
   final _bioController = TextEditingController();
@@ -399,7 +400,7 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildStepTitle(l10n.pinsOfPresence),
+              _buildStepTitle('SERVICE COVERAGE'),
               const SizedBox(height: 32),
               _buildFieldLabel(l10n.mainHub),
               PremiumCard(

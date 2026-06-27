@@ -9,6 +9,7 @@ import '../../l10n/app_localizations.dart';
 import '../../core/theme.dart';
 import 'package:shared_core/services/emergency_service.dart';
 import 'package:shared_core/services/locale_service.dart';
+import 'package:shared_core/services/firestore_service.dart';
 
 class SOSHubScreen extends StatefulWidget {
   const SOSHubScreen({super.key});

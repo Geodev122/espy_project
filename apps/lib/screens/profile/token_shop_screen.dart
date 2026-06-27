@@ -289,7 +289,7 @@ class _TokenShopScreenState extends State<TokenShopScreen> with SingleTickerProv
             ),
             const SizedBox(height: 12),
             _buildPaymentMethodOption(
-              icon: Icons.google,
+              icon: Icons.payment_rounded,
               label: 'G-PAY',
               onTap: () => Navigator.pop(context, 'gpay'),
             ),

@@ -11,13 +11,13 @@ dependencies:
     sdk: flutter
   shared_core:
     path: ../../packages/shared_core
-  firebase_core: ^3.10.1
-  cloud_firestore: ^5.6.0
-  firebase_auth: ^5.4.1
-  firebase_storage: ^11.7.0
-  cloud_functions: ^5.2.1
-  firebase_analytics: ^11.3.1
-  firebase_crashlytics: ^4.2.2
+  firebase_core: ^4.11.0
+  cloud_firestore: ^6.6.0
+  firebase_auth: ^6.5.4
+  firebase_storage: ^13.4.3
+  cloud_functions: ^6.3.3
+  firebase_analytics: ^12.4.3
+  firebase_crashlytics: ^5.2.4
   provider: ^6.1.2
   google_fonts: ^8.1.0
   shared_preferences: ^2.5.5
@@ -26,7 +26,7 @@ dependencies:
   cupertino_icons: ^1.0.6
   intl: 0.20.2
   geolocator: ^14.0.1
-  flutter_map: ^7.0.2
+  flutter_map: ^8.3.0
   latlong2: ^0.9.1
   geocoding: ^4.0.0
   geoflutterfire_plus: ^0.0.34
@@ -54,7 +54,7 @@ dependencies:
   printing: ^5.13.3
 
 dev_dependencies:
-  intl_utils: 2.8.14
+  intl_utils: ^2.8.16
   flutter_test:
     sdk: flutter
   integration_test:

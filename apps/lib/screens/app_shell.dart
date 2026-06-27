@@ -22,6 +22,7 @@ import 'matching/matching_screen.dart';
 import 'matching/swipe_requests_screen.dart';
 import 'services/broadcast_screen.dart';
 import 'community/community_feed_screen.dart';
+import 'community/announcements_screen.dart';
 import 'profile/wallet_screen.dart';
 import 'profile/notifications_screen.dart';
 import 'map/map_explore_screen.dart';
@@ -556,12 +557,12 @@ class _AppShellState extends State<AppShell> {
           if (isVisitor)
             IconButton(
               icon: const Icon(Icons.campaign_rounded, color: EspyTheme.navyDeep, size: 22),
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AnnouncementsScreen())),
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => AnnouncementsScreen())),
               tooltip: 'Broadcasts',
             ),
           IconButton(
             icon: const Icon(Icons.notifications_none_rounded, color: EspyTheme.navyDeep, size: 22),
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const NotificationsScreen())),
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => NotificationsScreen())),
             tooltip: 'Notifications',
           ),
           const SizedBox(width: 4),

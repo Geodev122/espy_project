@@ -5,7 +5,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:shared_core/theme/espy_theme.dart';
 import 'package:shared_core/services/user_service.dart';
 import 'package:shared_core/services/auth_service.dart';
@@ -199,6 +199,8 @@ class DashboardScreen extends StatelessWidget {
       }
     }
   }
+
+  Widget _buildVisibilityBox(BuildContext context, Map<String, dynamic> user, AppLocalizations l10n) {
     final expiry = user['visibilityExpiresAt'] != null
         ? (user['visibilityExpiresAt'] is Timestamp
             ? (user['visibilityExpiresAt'] as Timestamp).toDate()
@@ -209,6 +211,7 @@ class DashboardScreen extends StatelessWidget {
     final bool isExpired = daysRemaining <= 0;
 
     return FadeInUp(
+      duration: const Duration(milliseconds: 500),
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(

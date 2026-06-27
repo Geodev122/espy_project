@@ -73,80 +73,81 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
                   );
                 }
 
-              _displayCards = [
-                ...allRequests,
-                {
-                  'id': 'end_card',
-                  'isEnd': true,
-                },
-              ];
+                _displayCards = [
+                  ...allRequests,
+                  {
+                    'id': 'end_card',
+                    'isEnd': true,
+                  },
+                ];
 
-              return Stack(
-                children: [
-                  Column(
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(8, 20, 8, 120),
-                          child: CardSwiper(
-                            controller: _controller,
-                            cardsCount: _displayCards.length,
-                            numberOfCardsDisplayed: _displayCards.length > 3 ? 3 : _displayCards.length,
-                            backCardOffset: const Offset(0, 40),
-                            padding: EdgeInsets.zero,
-                            cardBuilder: (context, index, horizontalThreshold, verticalThreshold) {
-                              final data = _displayCards[index];
-                              if (data['isEnd'] == true) return _buildEndCard();
-                              return _buildRequestCard(data);
-                            },
-                            onSwipe: (previousIndex, currentIndex, direction) async {
-                              final target = _displayCards[previousIndex];
-                              if (target['isEnd'] == true) return false;
-                              final uid = _firestore.getCurrentUserId;
+                return Stack(
+                  children: [
+                    Column(
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 20, 8, 120),
+                            child: CardSwiper(
+                              controller: _controller,
+                              cardsCount: _displayCards.length,
+                              numberOfCardsDisplayed: _displayCards.length > 3 ? 3 : _displayCards.length,
+                              backCardOffset: const Offset(0, 40),
+                              padding: EdgeInsets.zero,
+                              cardBuilder: (context, index, horizontalThreshold, verticalThreshold) {
+                                final data = _displayCards[index];
+                                if (data['isEnd'] == true) return _buildEndCard();
+                                return _buildRequestCard(data);
+                              },
+                              onSwipe: (previousIndex, currentIndex, direction) async {
+                                final target = _displayCards[previousIndex];
+                                if (target['isEnd'] == true) return false;
+                                final uid = _firestore.getCurrentUserId;
 
-                              if (direction == CardSwiperDirection.right) {
-                                await _firestore.recordInteraction(
-                                  userId: uid,
-                                  targetId: target['id'],
-                                  type: 'request_match',
-                                );
+                                if (direction == CardSwiperDirection.right) {
+                                  await _firestore.recordInteraction(
+                                    userId: uid,
+                                    targetId: target['id'],
+                                    type: 'request_match',
+                                  );
 
-                                final userName = user?.name ?? "User";
-                                final userRole = (user?.role.name ?? "Provider").toUpperCase();
-                                final appName = l10n.appTitle;
+                                  final userName = user?.name ?? "User";
+                                  final userRole = (user?.role.name ?? "Provider").toUpperCase();
+                                  final appName = l10n.appTitle;
 
-                                String org = userRole;
-                                if (user?.role == UserRole.institution) {
-                                  org = user?['fullNameEn'] ?? user?.name ?? "Hope Institution";
-                                } else if (user?.role == UserRole.professional) {
-                                  org = user?['specialization'] ?? "Hope Specialist";
-                                }
+                                  String org = userRole;
+                                  if (user?.role == UserRole.institution) {
+                                    org = user?['fullNameEn'] ?? user?.name ?? "Hope Institution";
+                                  } else if (user?.role == UserRole.professional) {
+                                    org = user?['specialization'] ?? "Hope Specialist";
+                                  }
 
-                                final reqTitle = target['title'] ?? "Care Request";
-                                final targetWhatsapp = target['whatsapp']?.toString().replaceAll(RegExp(r'\D'), '');
+                                  final reqTitle = target['title'] ?? "Care Request";
+                                  final targetWhatsapp = target['whatsapp']?.toString().replaceAll(RegExp(r'\D'), '');
 
-                                if (targetWhatsapp != null && targetWhatsapp.isNotEmpty) {
-                                  final msg = "Hello, I am $userName from $org, responding to your request: '$reqTitle' on $appName. I'd like to offer my assistance. How can I best support you?";
-                                  final url = "https://wa.me/$targetWhatsapp?text=${Uri.encodeComponent(msg)}";
-                                  if (await canLaunchUrl(Uri.parse(url))) {
-                                    await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+                                  if (targetWhatsapp != null && targetWhatsapp.isNotEmpty) {
+                                    final msg = "Hello, I am $userName from $org, responding to your request: '$reqTitle' on $appName. I'd like to offer my assistance. How can I best support you?";
+                                    final url = "https://wa.me/$targetWhatsapp?text=${Uri.encodeComponent(msg)}";
+                                    if (await canLaunchUrl(Uri.parse(url))) {
+                                      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+                                    }
                                   }
                                 }
-                              }
-                              return true;
-                            },
+                                return true;
+                              },
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  Positioned(bottom: 110, left: 0, right: 0, child: _buildActionButtons()),
-                ],
-              );
-            },
+                      ],
+                    ),
+                    Positioned(bottom: 110, left: 0, right: 0, child: _buildActionButtons()),
+                  ],
+                );
+              },
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -168,13 +169,6 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
           Text("QUEUE CLEARED", style: GoogleFonts.cinzel(fontSize: 22, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep)),
           const SizedBox(height: 16),
           Text("You have reviewed all active community requests in this sector.", textAlign: TextAlign.center, style: GoogleFonts.lora(fontSize: 14, color: Colors.black45)),
-        ],
-      ),
-    );
-  }
-              },
-            ),
-          ),
         ],
       ),
     );
