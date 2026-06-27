@@ -43,11 +43,11 @@ class VaultFavoritesScreen extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.favorite_border_rounded, size: 64, color: EspyTheme.gold.withValues(alpha: 0.1)),
+                        Icon(Icons.favorite_border_rounded, size: 64, color: EspyTheme.gold.withOpacity(0.1)),
                         const SizedBox(height: 16),
                         Text(
                           "NO FAVORITES SAVED",
-                          style: GoogleFonts.cinzel(color: EspyTheme.navyDeep.withValues(alpha: 0.3), fontWeight: FontWeight.bold),
+                          style: GoogleFonts.cinzel(color: EspyTheme.navyDeep.withOpacity(0.3), fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),

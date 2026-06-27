@@ -41,11 +41,11 @@ class NotificationsScreen extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.notifications_none_rounded, size: 64, color: EspyTheme.gold.withValues(alpha: 0.1)),
+                        Icon(Icons.notifications_none_rounded, size: 64, color: EspyTheme.gold.withOpacity(0.1)),
                         const SizedBox(height: 16),
                         Text(
                           l10n.noNewProtocols.toUpperCase(),
-                          style: GoogleFonts.cinzel(color: EspyTheme.gold.withValues(alpha: 0.3), fontWeight: FontWeight.bold),
+                          style: GoogleFonts.cinzel(color: EspyTheme.gold.withOpacity(0.3), fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
@@ -71,7 +71,7 @@ class NotificationsScreen extends StatelessWidget {
                               Container(
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
-                                  color: isGlobal ? EspyTheme.gold.withValues(alpha: 0.1) : EspyTheme.royalBlue.withValues(alpha: 0.1),
+                                  color: isGlobal ? EspyTheme.gold.withOpacity(0.1) : EspyTheme.royalBlue.withOpacity(0.1),
                                   shape: BoxShape.circle,
                                 ),
                                 child: Icon(
@@ -102,12 +102,12 @@ class NotificationsScreen extends StatelessWidget {
                                     const SizedBox(height: 8),
                                     Text(
                                       n['message'] ?? n['content'] ?? '',
-                                      style: GoogleFonts.lora(fontSize: 12, color: EspyTheme.navyDeep.withValues(alpha: 0.6), height: 1.5),
+                                      style: GoogleFonts.lora(fontSize: 12, color: EspyTheme.navyDeep.withOpacity(0.6), height: 1.5),
                                     ),
                                     const SizedBox(height: 12),
                                     Text(
                                       l10n.receivedByProtocol.toUpperCase(),
-                                      style: GoogleFonts.cinzel(fontSize: 7, fontWeight: FontWeight.bold, color: EspyTheme.navyDeep.withValues(alpha: 0.3), letterSpacing: 1),
+                                      style: GoogleFonts.cinzel(fontSize: 7, fontWeight: FontWeight.bold, color: EspyTheme.navyDeep.withOpacity(0.3), letterSpacing: 1),
                                     ),
                                   ],
                                 ),

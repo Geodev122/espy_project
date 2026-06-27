@@ -53,7 +53,7 @@ class _ServiceManagerScreenState extends State<ServiceManagerScreen> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30),
             boxShadow: [
-              BoxShadow(color: EspyTheme.gold.withValues(alpha: 0.3), blurRadius: 20, offset: const Offset(0, 10))
+              BoxShadow(color: EspyTheme.gold.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 10))
             ],
           ),
           child: FloatingActionButton.extended(
@@ -82,11 +82,11 @@ class _ServiceManagerScreenState extends State<ServiceManagerScreen> {
                 const SizedBox(width: 12),
                 _statNode(l10n.used.toUpperCase(), used.toString(), EspyTheme.royalBlue),
                 const SizedBox(width: 12),
-                _statNode(l10n.available.toUpperCase(), (total - used).toString(), EspyTheme.navyDeep.withValues(alpha: 0.3)),
+                _statNode(l10n.available.toUpperCase(), (total - used).toString(), EspyTheme.navyDeep.withOpacity(0.3)),
               ],
             ),
             const SizedBox(height: 24),
-            Divider(color: EspyTheme.navyDeep.withValues(alpha: 0.05)),
+            Divider(color: EspyTheme.navyDeep.withOpacity(0.05)),
           ],
         ),
       ),
@@ -98,14 +98,14 @@ class _ServiceManagerScreenState extends State<ServiceManagerScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.9),
+          color: Colors.white.withOpacity(0.9),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withValues(alpha: 0.1)),
+          border: Border.all(color: color.withOpacity(0.1)),
         ),
         child: Column(
           children: [
             Text(value, style: GoogleFonts.cinzel(fontSize: 16, fontWeight: FontWeight.w900, color: color)),
-            Text(label, style: GoogleFonts.cinzel(fontSize: 8, fontWeight: FontWeight.bold, color: EspyTheme.navyDeep.withValues(alpha: 0.5))),
+            Text(label, style: GoogleFonts.cinzel(fontSize: 8, fontWeight: FontWeight.bold, color: EspyTheme.navyDeep.withOpacity(0.5))),
           ],
         ),
       ),
@@ -116,7 +116,7 @@ class _ServiceManagerScreenState extends State<ServiceManagerScreen> {
     if (services.isEmpty) {
       return SliverToBoxAdapter(child: Center(child: Padding(
         padding: const EdgeInsets.only(top: 40),
-        child: Text(l10n.noActiveListings.toUpperCase(), style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.bold, color: EspyTheme.navyDeep.withValues(alpha: 0.2))),
+        child: Text(l10n.noActiveListings.toUpperCase(), style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.bold, color: EspyTheme.navyDeep.withOpacity(0.2))),
       )));
     }
 
@@ -145,7 +145,7 @@ class _ServiceManagerScreenState extends State<ServiceManagerScreen> {
               width: 80, height: 60,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
-                color: EspyTheme.navyDeep.withValues(alpha: 0.05),
+                color: EspyTheme.navyDeep.withOpacity(0.05),
                 image: service['imageUrl'] != null 
                   ? DecorationImage(image: CachedNetworkImageProvider(service['imageUrl']), fit: BoxFit.cover)
                   : null,
@@ -164,13 +164,13 @@ class _ServiceManagerScreenState extends State<ServiceManagerScreen> {
                   if (isAllocated)
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(color: EspyTheme.success.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
+                      decoration: BoxDecoration(color: EspyTheme.success.withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
                       child: Text("ACTIVE PROTOCOL", style: GoogleFonts.cinzel(fontSize: 7, fontWeight: FontWeight.bold, color: EspyTheme.success)),
                     )
                   else
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(color: EspyTheme.error.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
+                      decoration: BoxDecoration(color: EspyTheme.error.withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
                       child: Text("HIDDEN - NO SLOT ALLOCATED", style: GoogleFonts.cinzel(fontSize: 7, fontWeight: FontWeight.bold, color: EspyTheme.error)),
                     ),
                 ],

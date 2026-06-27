@@ -140,7 +140,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           textAlign: isRtl ? TextAlign.right : TextAlign.left,
           textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
           decoration: InputDecoration(
-            fillColor: EspyTheme.cognac.withValues(alpha: 0.03),
+            fillColor: EspyTheme.cognac.withOpacity(0.03),
             filled: true,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
           ),

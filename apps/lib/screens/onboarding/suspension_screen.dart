@@ -86,9 +86,9 @@ class _SuspensionScreenState extends State<SuspensionScreen> {
                 Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.05),
+                    color: Colors.white.withOpacity(0.05),
                     borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                    border: Border.all(color: Colors.white.withOpacity(0.1)),
                   ),
                   child: Column(
                     children: [
@@ -103,8 +103,8 @@ class _SuspensionScreenState extends State<SuspensionScreen> {
                         style: const TextStyle(color: Colors.white, fontSize: 14),
                         decoration: InputDecoration(
                           hintText: 'Describe your inquiry...',
-                          hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3)),
-                          fillColor: Colors.black.withValues(alpha: 0.2),
+                          hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
+                          fillColor: Colors.black.withOpacity(0.2),
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                         ),
                       ),

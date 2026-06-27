@@ -50,7 +50,7 @@ class _PrivacyVaultScreenState extends State<PrivacyVaultScreen> {
                 style: GoogleFonts.lora(
                     fontSize: 13,
                     height: 1.6,
-                    color: EspyTheme.noir.withValues(alpha: 0.7)),
+                    color: EspyTheme.noir.withOpacity(0.7)),
               ),
               const SizedBox(height: 48),
               Text(l10n.contactAdmin.toUpperCase(),

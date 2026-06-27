@@ -82,9 +82,9 @@ class EspySideMenu extends StatelessWidget {
             height: 80,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: EspyTheme.royalBlue.withValues(alpha: 0.2), width: 3),
+              border: Border.all(color: EspyTheme.royalBlue.withOpacity(0.2), width: 3),
               boxShadow: [
-                BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 20)
+                BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20)
               ],
               image: profile['photoUrl'] != null
                   ? DecorationImage(image: CachedNetworkImageProvider(profile['photoUrl']), fit: BoxFit.cover)
@@ -104,9 +104,9 @@ class EspySideMenu extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
             decoration: BoxDecoration(
-              color: EspyTheme.royalBlue.withValues(alpha: 0.05),
+              color: EspyTheme.royalBlue.withOpacity(0.05),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: EspyTheme.royalBlue.withValues(alpha: 0.1)),
+              border: Border.all(color: EspyTheme.royalBlue.withOpacity(0.1)),
             ),
             child: Text(
               role.toUpperCase(),
@@ -122,7 +122,7 @@ class EspySideMenu extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       child: Material(
-        color: Colors.white.withValues(alpha: 0.5),
+        color: Colors.white.withOpacity(0.5),
         borderRadius: BorderRadius.circular(20),
         child: InkWell(
           onTap: () {
@@ -135,7 +135,7 @@ class EspySideMenu extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             child: Row(
               children: [
-                Icon(icon, color: EspyTheme.navyDeep.withValues(alpha: 0.6), size: 22),
+                Icon(icon, color: EspyTheme.navyDeep.withOpacity(0.6), size: 22),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Text(
@@ -164,7 +164,7 @@ class EspySideMenu extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
-            side: BorderSide(color: EspyTheme.error.withValues(alpha: 0.3)),
+            side: BorderSide(color: EspyTheme.error.withOpacity(0.3)),
           ),
         ),
         child: Row(

@@ -74,7 +74,7 @@ class _AppShellState extends State<AppShell> {
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         backgroundColor: EspyTheme.platinum,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32), side: BorderSide(color: EspyTheme.royalBlue.withValues(alpha: 0.1))),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32), side: BorderSide(color: EspyTheme.royalBlue.withOpacity(0.1))),
         title: Column(
           children: [
             const Icon(Icons.auto_awesome_rounded, color: EspyTheme.gold, size: 48),
@@ -88,7 +88,7 @@ class _AppShellState extends State<AppShell> {
             Text(
               'Your profile is active. You can now use your Espy Wallet to expand your reach, manage nodes, and dispatch broadcasts.',
               textAlign: TextAlign.center,
-              style: GoogleFonts.lora(color: EspyTheme.navyDeep.withValues(alpha: 0.7), fontSize: 13),
+              style: GoogleFonts.lora(color: EspyTheme.navyDeep.withOpacity(0.7), fontSize: 13),
             ),
             const SizedBox(height: 24),
             _buildTutorialItem(Icons.wallet_rounded, 'TOKENS', 'Recharge tokens to unlock premium network signals.'),
@@ -126,7 +126,7 @@ class _AppShellState extends State<AppShell> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title, style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, color: EspyTheme.gold, fontSize: 10)),
-                Text(desc, style: GoogleFonts.lora(color: EspyTheme.navyDeep.withValues(alpha: 0.4), fontSize: 10)),
+                Text(desc, style: GoogleFonts.lora(color: EspyTheme.navyDeep.withOpacity(0.4), fontSize: 10)),
               ],
             ),
           ),
@@ -421,7 +421,7 @@ class _AppShellState extends State<AppShell> {
         decoration: BoxDecoration(
           color: active ? EspyTheme.gold : Colors.transparent,
           borderRadius: BorderRadius.circular(25),
-          boxShadow: active ? [BoxShadow(color: EspyTheme.gold.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4))] : null,
+          boxShadow: active ? [BoxShadow(color: EspyTheme.gold.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 4))] : null,
         ),
         child: Icon(
           icon,

@@ -148,7 +148,7 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 24),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: Colors.white.withOpacity(0.05),
         border: Border(bottom: BorderSide(color: Colors.white10)),
       ),
       child: Row(
@@ -166,7 +166,7 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
               color: isActive
                   ? EspyTheme.cyan
                   : (isDone ? EspyTheme.electricBlue : Colors.white12),
-              boxShadow: isActive ? [BoxShadow(color: EspyTheme.cyan.withValues(alpha: 0.3), blurRadius: 10)] : null,
+              boxShadow: isActive ? [BoxShadow(color: EspyTheme.cyan.withOpacity(0.3), blurRadius: 10)] : null,
             ),
           );
         }),
@@ -218,7 +218,7 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
                     decoration: BoxDecoration(
                       color: EspyTheme.platinum,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: EspyTheme.skyBlue.withValues(alpha: 0.2)),
+                      border: Border.all(color: EspyTheme.skyBlue.withOpacity(0.2)),
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: DropdownButtonHideUnderline(
@@ -277,7 +277,7 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
                       decoration: BoxDecoration(
                         color: EspyTheme.platinum,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: EspyTheme.skyBlue.withValues(alpha: 0.2)),
+                        border: Border.all(color: EspyTheme.skyBlue.withOpacity(0.2)),
                       ),
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: DropdownButtonHideUnderline(
@@ -426,7 +426,7 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.03),
+                  color: Colors.black.withOpacity(0.03),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Colors.black12),
                 ),
@@ -456,7 +456,7 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
                     Text(
                       l10n.professionalDashboardRedir,
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.lora(color: EspyTheme.noir.withValues(alpha: 0.6), height: 1.6),
+                      style: GoogleFonts.lora(color: EspyTheme.noir.withOpacity(0.6), height: 1.6),
                     ),
                   ],
                 ),

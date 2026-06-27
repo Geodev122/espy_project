@@ -56,7 +56,7 @@ class _CinematicBackgroundState extends State<CinematicBackground>
                       shape: BoxShape.circle,
                       gradient: RadialGradient(
                         colors: [
-                          EspyTheme.cyan.withValues(alpha: 0.6),
+                          EspyTheme.cyan.withOpacity(0.6),
                           Colors.transparent
                         ],
                       ),
@@ -76,7 +76,7 @@ class _CinematicBackgroundState extends State<CinematicBackground>
                       shape: BoxShape.circle,
                       gradient: RadialGradient(
                         colors: [
-                          EspyTheme.electricBlue.withValues(alpha: 0.5),
+                          EspyTheme.electricBlue.withOpacity(0.5),
                           Colors.transparent
                         ],
                       ),

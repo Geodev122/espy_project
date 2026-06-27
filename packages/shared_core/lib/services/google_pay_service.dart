@@ -17,7 +17,7 @@ class GooglePayService {
   static const String _defaultGooglePayConfig = '''{
     "provider": "google_pay",
     "data": {
-      "environment": "TEST",
+      "environment": "PRODUCTION",
       "apiVersion": 2,
       "apiVersionMinor": 0,
       "allowedPaymentMethods": [

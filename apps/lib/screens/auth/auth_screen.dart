@@ -76,7 +76,7 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
               const SizedBox(height: 12),
               Container(
                 width: 40, height: 4,
-                decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.25), borderRadius: BorderRadius.circular(2)),
+                decoration: BoxDecoration(color: Colors.white.withOpacity(0.25), borderRadius: BorderRadius.circular(2)),
               ),
               if (!isKeyboardOpen) _buildBrandingZone(),
               Flexible(
@@ -311,8 +311,8 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
         decoration: BoxDecoration(
           color: isActive ? EspyTheme.royalBlue : EspyTheme.platinum,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: isActive ? EspyTheme.royalBlue : EspyTheme.skyBlue.withValues(alpha: 0.3)),
-          boxShadow: isActive ? [BoxShadow(color: EspyTheme.royalBlue.withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 4))] : null,
+          border: Border.all(color: isActive ? EspyTheme.royalBlue : EspyTheme.skyBlue.withOpacity(0.3)),
+          boxShadow: isActive ? [BoxShadow(color: EspyTheme.royalBlue.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))] : null,
         ),
         child: Center(
           child: Text(
@@ -337,11 +337,11 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
       style: GoogleFonts.montserrat(fontSize: 14, fontWeight: FontWeight.w500, color: EspyTheme.navyDeep),
       decoration: InputDecoration(
         hintText: hint,
-        prefixIcon: Icon(icon, size: 20, color: EspyTheme.royalBlue.withValues(alpha: 0.5)),
+        prefixIcon: Icon(icon, size: 20, color: EspyTheme.royalBlue.withOpacity(0.5)),
         filled: true,
         fillColor: EspyTheme.platinum,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: EspyTheme.skyBlue.withValues(alpha: 0.2))),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: EspyTheme.skyBlue.withOpacity(0.2))),
         focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: EspyTheme.royalBlue, width: 1.5)),
       ),
       validator: validator,
@@ -356,7 +356,7 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
       style: GoogleFonts.montserrat(fontSize: 14, fontWeight: FontWeight.w500, color: EspyTheme.navyDeep),
       decoration: InputDecoration(
         hintText: l10n.securePassword.toUpperCase(),
-        prefixIcon: Icon(Icons.lock_outline_rounded, size: 20, color: EspyTheme.royalBlue.withValues(alpha: 0.5)),
+        prefixIcon: Icon(Icons.lock_outline_rounded, size: 20, color: EspyTheme.royalBlue.withOpacity(0.5)),
         suffixIcon: IconButton(
           icon: Icon(_obscurePass ? Icons.visibility_off_outlined : Icons.visibility_outlined, size: 18, color: EspyTheme.textSecondary),
           onPressed: () => setState(() => _obscurePass = !_obscurePass),
@@ -364,7 +364,7 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
         filled: true,
         fillColor: EspyTheme.platinum,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: EspyTheme.skyBlue.withValues(alpha: 0.2))),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: EspyTheme.skyBlue.withOpacity(0.2))),
         focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: EspyTheme.royalBlue, width: 1.5)),
       ),
       validator: (v) => (v == null || v.length < 6) ? 'Minimum 6 characters' : null,

@@ -90,8 +90,8 @@ class ProfessionalDetailsScreen extends StatelessWidget {
                     end: Alignment.topCenter,
                     stops: const [0.0, 0.4, 1.0],
                     colors: [
-                      EspyTheme.platinum.withValues(alpha: 0.95),
-                      EspyTheme.platinum.withValues(alpha: 0.2),
+                      EspyTheme.platinum.withOpacity(0.95),
+                      EspyTheme.platinum.withOpacity(0.2),
                       Colors.transparent,
                     ],
                   ),
@@ -151,7 +151,7 @@ class ProfessionalDetailsScreen extends StatelessWidget {
             Text(
               professional['mainLocation']?['cityName'] ?? 'Lebanon',
               style: GoogleFonts.lora(
-                  fontSize: 15, color: EspyTheme.navyDeep.withValues(alpha: 0.6), fontWeight: FontWeight.bold),
+                  fontSize: 15, color: EspyTheme.navyDeep.withOpacity(0.6), fontWeight: FontWeight.bold),
             ),
             const Spacer(),
             const Icon(Icons.star_rounded, size: 20, color: EspyTheme.gold),
@@ -174,7 +174,7 @@ class ProfessionalDetailsScreen extends StatelessWidget {
         fontSize: 11,
         fontWeight: FontWeight.w900,
         letterSpacing: 3,
-        color: EspyTheme.royalBlue.withValues(alpha: 0.6),
+        color: EspyTheme.royalBlue.withOpacity(0.6),
       ),
     );
   }
@@ -186,7 +186,7 @@ class ProfessionalDetailsScreen extends StatelessWidget {
         style: GoogleFonts.lora(
           fontSize: 16,
           height: 1.8,
-          color: EspyTheme.navyDeep.withValues(alpha: 0.8),
+          color: EspyTheme.navyDeep.withOpacity(0.8),
         ),
       ),
     );
@@ -203,10 +203,10 @@ class ProfessionalDetailsScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(
                     horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: EspyTheme.royalBlue.withValues(alpha: 0.05),
+                  color: EspyTheme.royalBlue.withOpacity(0.05),
                   borderRadius: BorderRadius.circular(12),
                   border:
-                      Border.all(color: EspyTheme.royalBlue.withValues(alpha: 0.2)),
+                      Border.all(color: EspyTheme.royalBlue.withOpacity(0.2)),
                 ),
                 child: Text(
                   tag.toString().toUpperCase(),

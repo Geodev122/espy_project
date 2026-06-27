@@ -83,9 +83,9 @@ class VaultScreen extends StatelessWidget {
                       height: 90,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: EspyTheme.royalBlue.withValues(alpha: 0.2), width: 3),
+                        border: Border.all(color: EspyTheme.royalBlue.withOpacity(0.2), width: 3),
                         boxShadow: [
-                          BoxShadow(color: EspyTheme.royalBlue.withValues(alpha: 0.1), blurRadius: 20)
+                          BoxShadow(color: EspyTheme.royalBlue.withOpacity(0.1), blurRadius: 20)
                         ],
                         image: profile['photoUrl'] != null
                             ? DecorationImage(
@@ -114,9 +114,9 @@ class VaultScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
                     decoration: BoxDecoration(
-                      color: EspyTheme.royalBlue.withValues(alpha: 0.05),
+                      color: EspyTheme.royalBlue.withOpacity(0.05),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: EspyTheme.royalBlue.withValues(alpha: 0.1)),
+                      border: Border.all(color: EspyTheme.royalBlue.withOpacity(0.1)),
                     ),
                     child: Text(
                       isVisitor ? 'VISITOR' : (profile['verificationStatus'] == 'verified' || profile['isApproved'] == true ? 'VERIFIED NODE' : 'PENDING VERIFICATION'),
@@ -131,9 +131,9 @@ class VaultScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                     decoration: BoxDecoration(
-                      color: EspyTheme.gold.withValues(alpha: 0.1),
+                      color: EspyTheme.gold.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: EspyTheme.gold.withValues(alpha: 0.2)),
+                      border: Border.all(color: EspyTheme.gold.withOpacity(0.2)),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -176,9 +176,9 @@ class VaultScreen extends StatelessWidget {
               margin: const EdgeInsets.only(bottom: 16),
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: EspyTheme.error.withValues(alpha: 0.05),
+                color: EspyTheme.error.withOpacity(0.05),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: EspyTheme.error.withValues(alpha: 0.1)),
+                border: Border.all(color: EspyTheme.error.withOpacity(0.1)),
               ),
               child: Row(
                 children: [
@@ -210,12 +210,12 @@ class VaultScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(24),
               color: Colors.white,
               border: Border.all(
-                color: isPaid ? EspyTheme.success.withValues(alpha: 0.2) : EspyTheme.gold.withValues(alpha: 0.2),
+                color: isPaid ? EspyTheme.success.withOpacity(0.2) : EspyTheme.gold.withOpacity(0.2),
                 width: 1,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
+                  color: Colors.black.withOpacity(0.05),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 )
@@ -308,15 +308,15 @@ class VaultScreen extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           color: Colors.white,
-          border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
+          border: Border.all(color: Colors.black.withOpacity(0.05)),
           boxShadow: [
-            BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4))
+            BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))
           ]
         ),
         child: ListTile(
           onTap: onTap,
           leading: Icon(icon,
-              color: EspyTheme.navyDeep.withValues(alpha: 0.6), size: 24),
+              color: EspyTheme.navyDeep.withOpacity(0.6), size: 24),
           title: Text(
             label,
             style: GoogleFonts.cinzel(

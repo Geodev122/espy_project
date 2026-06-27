@@ -147,7 +147,7 @@ class _SubscriptionHubScreenState extends State<SubscriptionHubScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: GoogleFonts.cinzel(fontSize: 9, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep.withValues(alpha: 0.5))),
+              Text(label, style: GoogleFonts.cinzel(fontSize: 9, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep.withOpacity(0.5))),
               Text('\$${price.toStringAsFixed(0)} / UNIT', style: GoogleFonts.montserrat(fontSize: 12, fontWeight: FontWeight.bold, color: EspyTheme.navyDeep)),
             ],
           ),
@@ -171,7 +171,7 @@ class _SubscriptionHubScreenState extends State<SubscriptionHubScreen> {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(color: EspyTheme.navyDeep.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(10)),
+        decoration: BoxDecoration(color: EspyTheme.navyDeep.withOpacity(0.05), borderRadius: BorderRadius.circular(10)),
         child: Icon(icon, size: 14, color: EspyTheme.navyDeep),
       ),
     );
@@ -185,7 +185,7 @@ class _SubscriptionHubScreenState extends State<SubscriptionHubScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('TOTAL PROTOCOL COST', style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep.withValues(alpha: 0.4))),
+              Text('TOTAL PROTOCOL COST', style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep.withOpacity(0.4))),
               Text('\$${total.toStringAsFixed(2)}', style: GoogleFonts.cinzel(fontSize: 24, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep)),
             ],
           ),
@@ -369,7 +369,7 @@ class _SubscriptionHubScreenState extends State<SubscriptionHubScreen> {
                 child: Text(
                   "ENCRYPTED PROTOCOL INTERFACE",
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.cinzel(fontSize: 8, color: Colors.black26, letterSpacing: 1),
+                  style: GoogleFonts.montserrat(fontSize: 8, color: Colors.black26, letterSpacing: 1, fontWeight: FontWeight.bold),
                 ),
               ),
             ],
@@ -477,7 +477,7 @@ class _SubscriptionHubScreenState extends State<SubscriptionHubScreen> {
       children: [
         Container(
           padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
+          decoration: BoxDecoration(color: statusColor.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
           child: Icon(icon, color: statusColor, size: 20),
         ),
         const SizedBox(width: 16),
@@ -485,7 +485,7 @@ class _SubscriptionHubScreenState extends State<SubscriptionHubScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: GoogleFonts.cinzel(fontSize: 8, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep.withValues(alpha: 0.4), letterSpacing: 1.5)),
+              Text(label, style: GoogleFonts.cinzel(fontSize: 8, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep.withOpacity(0.4), letterSpacing: 1.5)),
               Text(value, style: GoogleFonts.montserrat(fontSize: 13, fontWeight: FontWeight.w800, color: statusColor)),
               if (subtitle != null)
                 Text(subtitle, style: GoogleFonts.lora(fontSize: 10, color: Colors.black38, fontStyle: FontStyle.italic)),
@@ -536,9 +536,9 @@ class _SubscriptionHubScreenState extends State<SubscriptionHubScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isFailed ? EspyTheme.error.withValues(alpha: 0.05) : Colors.white.withValues(alpha: 0.3),
+        color: isFailed ? EspyTheme.error.withOpacity(0.05) : Colors.white.withOpacity(0.3),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: isFailed ? EspyTheme.error.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05)),
+        border: Border.all(color: isFailed ? EspyTheme.error.withOpacity(0.1) : Colors.black.withOpacity(0.05)),
       ),
       child: Row(
         children: [

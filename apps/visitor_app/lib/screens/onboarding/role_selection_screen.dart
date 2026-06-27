@@ -134,14 +134,14 @@ class RoleSelectionScreen extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Colors.white.withValues(alpha: 0.1),
-              Colors.white.withValues(alpha: 0.05),
+              Colors.white.withOpacity(0.1),
+              Colors.white.withOpacity(0.05),
             ],
           ),
-          border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
+          border: Border.all(color: color.withOpacity(0.3), width: 1),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.2),
+              color: Colors.black.withOpacity(0.2),
               blurRadius: 15,
               offset: const Offset(0, 8),
             ),
@@ -157,7 +157,7 @@ class RoleSelectionScreen extends StatelessWidget {
                 child: Icon(
                   icon,
                   size: 120,
-                  color: color.withValues(alpha: 0.05),
+                  color: color.withOpacity(0.05),
                 ),
               ),
               Padding(
@@ -167,9 +167,9 @@ class RoleSelectionScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: color.withValues(alpha: 0.1),
+                        color: color.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: color.withValues(alpha: 0.3)),
+                        border: Border.all(color: color.withOpacity(0.3)),
                       ),
                       child: Icon(icon, color: color, size: 32),
                     ),
@@ -192,14 +192,14 @@ class RoleSelectionScreen extends StatelessWidget {
                             subtitle,
                             style: GoogleFonts.lora(
                               fontSize: 13,
-                              color: EspyTheme.platinum.withValues(alpha: 0.7),
+                              color: EspyTheme.platinum.withOpacity(0.7),
                               height: 1.4,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    Icon(Icons.chevron_right_rounded, color: color.withValues(alpha: 0.5)),
+                    Icon(Icons.chevron_right_rounded, color: color.withOpacity(0.5)),
                   ],
                 ),
               ),

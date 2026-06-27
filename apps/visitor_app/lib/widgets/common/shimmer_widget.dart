@@ -66,21 +66,21 @@ class _ShimmerWidgetState extends State<ShimmerWidget>
     switch (widget.variant) {
       case ShimmerVariant.blue:
         return [
-          EspyTheme.electricBlue.withValues(alpha: 0.2),
+          EspyTheme.electricBlue.withOpacity(0.2),
           EspyTheme.cyan,
-          EspyTheme.electricBlue.withValues(alpha: 0.2),
+          EspyTheme.electricBlue.withOpacity(0.2),
         ];
       case ShimmerVariant.dark:
         return [
-          Colors.white.withValues(alpha: 0.05),
-          Colors.white.withValues(alpha: 0.2),
-          Colors.white.withValues(alpha: 0.05),
+          Colors.white.withOpacity(0.05),
+          Colors.white.withOpacity(0.2),
+          Colors.white.withOpacity(0.05),
         ];
       case ShimmerVariant.light:
         return [
-          Colors.white.withValues(alpha: 0.1),
-          Colors.white.withValues(alpha: 0.8),
-          Colors.white.withValues(alpha: 0.1),
+          Colors.white.withOpacity(0.1),
+          Colors.white.withOpacity(0.8),
+          Colors.white.withOpacity(0.1),
         ];
     }
   }

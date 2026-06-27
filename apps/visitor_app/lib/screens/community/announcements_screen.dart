@@ -30,7 +30,7 @@ class AnnouncementsScreen extends StatelessWidget {
             return Center(
               child: Text(
                 'NO RECENT ANNOUNCEMENTS',
-                style: GoogleFonts.cinzel(color: EspyTheme.cognac.withValues(alpha: 0.3), fontWeight: FontWeight.bold),
+                style: GoogleFonts.cinzel(color: EspyTheme.cognac.withOpacity(0.3), fontWeight: FontWeight.bold),
               ),
             );
           }
@@ -54,7 +54,7 @@ class AnnouncementsScreen extends StatelessWidget {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(
-                                color: EspyTheme.gold.withValues(alpha: 0.1),
+                                color: EspyTheme.gold.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
@@ -77,7 +77,7 @@ class AnnouncementsScreen extends StatelessWidget {
                         const SizedBox(height: 12),
                         Text(
                           ann['content'] ?? ann['message'] ?? '',
-                          style: GoogleFonts.lora(fontSize: 14, color: EspyTheme.cognac.withValues(alpha: 0.7), height: 1.6),
+                          style: GoogleFonts.lora(fontSize: 14, color: EspyTheme.cognac.withOpacity(0.7), height: 1.6),
                         ),
                         const SizedBox(height: 20),
                         Row(
@@ -86,7 +86,7 @@ class AnnouncementsScreen extends StatelessWidget {
                             const SizedBox(width: 8),
                             Text(
                               'PUBLISHED BYCare Node',
-                              style: GoogleFonts.lora(fontSize: 11, fontWeight: FontWeight.bold, color: EspyTheme.cognac.withValues(alpha: 0.5)),
+                              style: GoogleFonts.lora(fontSize: 11, fontWeight: FontWeight.bold, color: EspyTheme.cognac.withOpacity(0.5)),
                             ),
                           ],
                         ),

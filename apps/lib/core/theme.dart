@@ -133,7 +133,7 @@ class EspyTheme {
     borderRadius: BorderRadius.circular(24),
     boxShadow: [
       BoxShadow(
-        color: navyDeep.withValues(alpha: 0.08),
+        color: navyDeep.withOpacity(0.08),
         blurRadius: 24,
         offset: const Offset(0, 8),
       ),
@@ -145,7 +145,7 @@ class EspyTheme {
     borderRadius: BorderRadius.circular(28),
     boxShadow: [
       BoxShadow(
-        color: navyDeep.withValues(alpha: 0.3),
+        color: navyDeep.withOpacity(0.3),
         blurRadius: 30,
         offset: const Offset(0, 15),
       ),
@@ -154,7 +154,7 @@ class EspyTheme {
 
   static List<BoxShadow> get premiumShadow => [
     BoxShadow(
-      color: navyDeep.withValues(alpha: 0.12),
+      color: navyDeep.withOpacity(0.12),
       blurRadius: 32,
       offset: const Offset(0, 12),
     ),
@@ -205,11 +205,11 @@ class EspyTheme {
         fillColor: Colors.white,
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: skyBlue.withValues(alpha: 0.3))),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: skyBlue.withOpacity(0.3))),
         focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: royalBlue, width: 1.5)),
         labelStyle: GoogleFonts.montserrat(fontSize: 12, fontWeight: FontWeight.w600, color: navyDeep),
-        hintStyle: GoogleFonts.montserrat(fontSize: 14, color: navyDeep.withValues(alpha: 0.3)),
-        prefixIconColor: navyDeep.withValues(alpha: 0.5),
+        hintStyle: GoogleFonts.montserrat(fontSize: 14, color: navyDeep.withOpacity(0.3)),
+        prefixIconColor: navyDeep.withOpacity(0.5),
       ),
     );
   }

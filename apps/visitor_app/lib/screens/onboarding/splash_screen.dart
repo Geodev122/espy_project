@@ -330,7 +330,7 @@ class _SplashScreenState extends State<SplashScreen>
             padding: const EdgeInsets.all(32), // Deep padding to ensure no "square" clipping occurs
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.white.withValues(alpha: 0.02),
+              color: Colors.white.withOpacity(0.02),
             ),
             child: Image.asset(
               'assets/images/espy_icon.png',
@@ -427,7 +427,7 @@ class _SplashScreenState extends State<SplashScreen>
                 height: 2,
                 child: LinearProgressIndicator(
                   value: _progressValue.value,
-                  backgroundColor: EspyTheme.skyBlue.withValues(alpha: 0.2),
+                  backgroundColor: EspyTheme.skyBlue.withOpacity(0.2),
                   valueColor: AlwaysStoppedAnimation<Color>(
                     // Interpolate from skyBlue → gold as it fills
                     Color.lerp(

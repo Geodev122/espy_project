@@ -49,7 +49,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             children: [
               Container(
                 width: 40, height: 4,
-                decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(2)),
+                decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(2)),
               ),
               const SizedBox(height: 32),
               Text(l10n.selectMission.toUpperCase(), 
@@ -98,15 +98,15 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.05),
+          color: Colors.white.withOpacity(0.05),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+          border: Border.all(color: Colors.white.withOpacity(0.1)),
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: EspyTheme.gold.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(color: EspyTheme.gold.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
               child: Icon(icon, color: EspyTheme.gold, size: 24),
             ),
             const SizedBox(width: 20),
@@ -142,7 +142,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 builder: (context, localeService, _) {
                   return TextButton(
                     onPressed: () => localeService.toggleLocale(),
-                    style: TextButton.styleFrom(backgroundColor: Colors.white.withValues(alpha: 0.1), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                    style: TextButton.styleFrom(backgroundColor: Colors.white.withOpacity(0.1), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
                     child: Text(localeService.locale.languageCode == 'en' ? 'AR' : 'EN', style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, color: EspyTheme.gold, letterSpacing: 2)),
                   );
                 },

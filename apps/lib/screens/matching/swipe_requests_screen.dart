@@ -68,7 +68,7 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
                   return Center(
                     child: Text(
                       l10n.noPendingRequests.toUpperCase(),
-                      style: GoogleFonts.cinzel(color: EspyTheme.navyDeep.withValues(alpha: 0.3), fontSize: 12, fontWeight: FontWeight.w900),
+                      style: GoogleFonts.cinzel(color: EspyTheme.navyDeep.withOpacity(0.3), fontSize: 12, fontWeight: FontWeight.w900),
                     ),
                   );
                 }
@@ -186,8 +186,8 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(36),
-        border: Border.all(color: isEmergency ? EspyTheme.error : EspyTheme.gold.withValues(alpha: 0.15), width: 2),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 30, offset: const Offset(0, 20))],
+        border: Border.all(color: isEmergency ? EspyTheme.error : EspyTheme.gold.withOpacity(0.15), width: 2),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 30, offset: const Offset(0, 20))],
       ),
       padding: const EdgeInsets.all(32),
       child: Column(
@@ -198,7 +198,7 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                decoration: BoxDecoration(color: isEmergency ? EspyTheme.error.withValues(alpha: 0.1) : EspyTheme.gold.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(30)),
+                decoration: BoxDecoration(color: isEmergency ? EspyTheme.error.withOpacity(0.1) : EspyTheme.gold.withOpacity(0.1), borderRadius: BorderRadius.circular(30)),
                 child: Text(
                   (request['section'] ?? request['category'] ?? 'CARE').toString().toUpperCase(),
                   style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.w900, color: isEmergency ? EspyTheme.error : EspyTheme.goldDark, letterSpacing: 2),
@@ -210,7 +210,7 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
           const SizedBox(height: 32),
           Text(request['title'] ?? 'Help Request', style: GoogleFonts.cinzel(fontSize: 26, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep, height: 1.1)),
           const SizedBox(height: 24),
-          Expanded(child: SingleChildScrollView(child: Text(request['description'] ?? '', style: GoogleFonts.lora(fontSize: 15, color: EspyTheme.navyDeep.withValues(alpha: 0.7), height: 1.7, fontStyle: FontStyle.italic)))),
+          Expanded(child: SingleChildScrollView(child: Text(request['description'] ?? '', style: GoogleFonts.lora(fontSize: 15, color: EspyTheme.navyDeep.withOpacity(0.7), height: 1.7, fontStyle: FontStyle.italic)))),
           const SizedBox(height: 32),
           Row(
             children: [
@@ -265,7 +265,7 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
       onTap: onTap,
       child: Container(
         width: size, height: size,
-        decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white, border: Border.all(color: color.withValues(alpha: 0.2), width: 2)),
+        decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white, border: Border.all(color: color.withOpacity(0.2), width: 2)),
         child: Icon(icon, color: color, size: isLarge ? 28 : (isSmall ? 18 : 22)),
       ),
     );

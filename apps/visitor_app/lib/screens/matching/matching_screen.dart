@@ -193,8 +193,8 @@ class _MatchingScreenState extends State<MatchingScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(32),
-        border: Border.all(color: EspyTheme.gold.withValues(alpha: 0.2), width: 2),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 20)],
+        border: Border.all(color: EspyTheme.gold.withOpacity(0.2), width: 2),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20)],
       ),
       padding: const EdgeInsets.all(32),
       child: Column(
@@ -249,7 +249,7 @@ class _MatchingScreenState extends State<MatchingScreen> {
                 child: Container(
                   width: 40, height: 4,
                   margin: const EdgeInsets.only(bottom: 24),
-                  decoration: BoxDecoration(color: EspyTheme.navyDeep.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(2)),
+                  decoration: BoxDecoration(color: EspyTheme.navyDeep.withOpacity(0.1), borderRadius: BorderRadius.circular(2)),
                 ),
               ),
               Row(
@@ -340,7 +340,7 @@ class _MatchingScreenState extends State<MatchingScreen> {
         fontWeight: FontWeight.bold,
         color: selected ? Colors.white : Colors.black54
       ),
-      backgroundColor: Colors.black.withValues(alpha: 0.05),
+      backgroundColor: Colors.black.withOpacity(0.05),
       side: BorderSide.none,
     );
   }
@@ -351,8 +351,8 @@ class _MatchingScreenState extends State<MatchingScreen> {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(32),
-          border: Border.all(color: EspyTheme.royalBlue.withValues(alpha: 0.1), width: 1.5),
-          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 30, offset: const Offset(0, 15))],
+          border: Border.all(color: EspyTheme.royalBlue.withOpacity(0.1), width: 1.5),
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 30, offset: const Offset(0, 15))],
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(32),
@@ -375,7 +375,7 @@ class _MatchingScreenState extends State<MatchingScreen> {
                       begin: Alignment.bottomCenter,
                       end: Alignment.topCenter,
                       stops: const [0.0, 0.4, 0.8],
-                      colors: [EspyTheme.navyDeep.withValues(alpha: 0.9), EspyTheme.navyDeep.withValues(alpha: 0.2), Colors.transparent],
+                      colors: [EspyTheme.navyDeep.withOpacity(0.9), EspyTheme.navyDeep.withOpacity(0.2), Colors.transparent],
                     ),
                   ),
                 ),
@@ -466,9 +466,9 @@ class _MatchingScreenState extends State<MatchingScreen> {
         width: size, height: size,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: Colors.white.withValues(alpha: 0.9),
-          border: Border.all(color: color.withValues(alpha: 0.1), width: 2),
-          boxShadow: [BoxShadow(color: color.withValues(alpha: 0.05), blurRadius: 15, offset: const Offset(0, 5))],
+          color: Colors.white.withOpacity(0.9),
+          border: Border.all(color: color.withOpacity(0.1), width: 2),
+          boxShadow: [BoxShadow(color: color.withOpacity(0.05), blurRadius: 15, offset: const Offset(0, 5))],
         ),
         child: Icon(icon, color: color, size: isLarge ? 28 : (isSmall ? 18 : 22)),
       ),

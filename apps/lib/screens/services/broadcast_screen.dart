@@ -62,7 +62,7 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
                 delay: const Duration(milliseconds: 200),
                 child: Text(
                   l10n.broadcastDesc,
-                  style: GoogleFonts.montserrat(fontSize: 13, color: EspyTheme.navyDeep.withValues(alpha: 0.6), height: 1.5, fontWeight: FontWeight.w500),
+                  style: GoogleFonts.montserrat(fontSize: 13, color: EspyTheme.navyDeep.withOpacity(0.6), height: 1.5, fontWeight: FontWeight.w500),
                 ),
               ),
               const SizedBox(height: 40),
@@ -90,7 +90,7 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
                             onChanged: (val) => setState(() => _targetCountry = val!),
                             decoration: InputDecoration(
                               filled: true,
-                              fillColor: EspyTheme.navyDeep.withValues(alpha: 0.03),
+                              fillColor: EspyTheme.navyDeep.withOpacity(0.03),
                               contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none)
                             ),
@@ -105,7 +105,7 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
                           labelText: l10n.broadcastTitle.toUpperCase(),
                           labelStyle: GoogleFonts.montserrat(color: EspyTheme.royalBlue, fontSize: 10, fontWeight: FontWeight.bold),
                           hintText: 'e.g. Free Health Clinic Opening',
-                          hintStyle: TextStyle(color: EspyTheme.navyDeep.withValues(alpha: 0.2))
+                          hintStyle: TextStyle(color: EspyTheme.navyDeep.withOpacity(0.2))
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -117,7 +117,7 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
                           labelText: l10n.messageContent.toUpperCase(),
                           labelStyle: GoogleFonts.montserrat(color: EspyTheme.royalBlue, fontSize: 10, fontWeight: FontWeight.bold),
                           hintText: 'Detailed announcement for the community...',
-                          hintStyle: TextStyle(color: EspyTheme.navyDeep.withValues(alpha: 0.2))
+                          hintStyle: TextStyle(color: EspyTheme.navyDeep.withOpacity(0.2))
                         ),
                       ),
                       const SizedBox(height: 48),
@@ -162,7 +162,7 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
       child: Column(
         children: [
           Text(value, style: GoogleFonts.montserrat(fontSize: 20, fontWeight: FontWeight.w900, color: color)),
-          Text(label, style: GoogleFonts.montserrat(fontSize: 8, color: EspyTheme.navyDeep.withValues(alpha: 0.4), fontWeight: FontWeight.bold)),
+          Text(label, style: GoogleFonts.montserrat(fontSize: 8, color: EspyTheme.navyDeep.withOpacity(0.4), fontWeight: FontWeight.bold)),
         ],
       ),
     );

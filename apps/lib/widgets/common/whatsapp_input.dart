@@ -41,7 +41,7 @@ class _WhatsappInputState extends State<WhatsappInput> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
+            border: Border.all(color: Colors.black.withOpacity(0.05)),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
@@ -74,7 +74,7 @@ class _WhatsappInputState extends State<WhatsappInput> {
             style: GoogleFonts.lora(fontSize: 16, fontWeight: FontWeight.w500),
             decoration: InputDecoration(
               hintText: 'WhatsApp Number',
-              hintStyle: GoogleFonts.lora(fontSize: 14, color: EspyTheme.navy.withValues(alpha: 0.3)),
+              hintStyle: GoogleFonts.lora(fontSize: 14, color: EspyTheme.navy.withOpacity(0.3)),
               prefixIcon: Icon(Icons.chat_bubble_outline_rounded, color: Colors.green.shade400, size: 20),
             ),
           ),

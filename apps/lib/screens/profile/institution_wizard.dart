@@ -115,7 +115,7 @@ class _InstitutionWizardState extends State<InstitutionWizard> {
         elevation: 0,
         title: Text(
           l10n.protocolRegistration,
-          style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, letterSpacing: 2, color: EspyTheme.platinum, fontSize: 14),
+          style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, letterSpacing: 1, color: EspyTheme.platinum, fontSize: 13),
         ),
         iconTheme: const IconThemeData(color: EspyTheme.platinum),
       ),
@@ -145,7 +145,7 @@ class _InstitutionWizardState extends State<InstitutionWizard> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 24),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: Colors.white.withOpacity(0.05),
         border: Border(bottom: BorderSide(color: Colors.white10)),
       ),
       child: Row(
@@ -163,7 +163,7 @@ class _InstitutionWizardState extends State<InstitutionWizard> {
               color: isActive
                   ? EspyTheme.cyan
                   : (isDone ? EspyTheme.electricBlue : Colors.white12),
-              boxShadow: isActive ? [BoxShadow(color: EspyTheme.cyan.withValues(alpha: 0.3), blurRadius: 10)] : null,
+              boxShadow: isActive ? [BoxShadow(color: EspyTheme.cyan.withOpacity(0.3), blurRadius: 10)] : null,
             ),
           );
         }),
@@ -215,7 +215,7 @@ class _InstitutionWizardState extends State<InstitutionWizard> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: EspyTheme.skyBlue.withValues(alpha: 0.3)),
+                      border: Border.all(color: EspyTheme.skyBlue.withOpacity(0.3)),
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: DropdownButtonHideUnderline(
@@ -343,7 +343,7 @@ class _InstitutionWizardState extends State<InstitutionWizard> {
                     TextButton(
                       onPressed: () => _openMainLocationPicker(l10n),
                       child: Text(l10n.setPin,
-                          style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, color: EspyTheme.mahogany)),
+                          style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, color: EspyTheme.mahogany, fontSize: 12)),
                     ),
                   ],
                 ),
@@ -354,7 +354,7 @@ class _InstitutionWizardState extends State<InstitutionWizard> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.03),
+                  color: Colors.black.withOpacity(0.03),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Colors.black12),
                 ),
@@ -379,12 +379,12 @@ class _InstitutionWizardState extends State<InstitutionWizard> {
                   children: [
                     const Icon(Icons.verified_user_rounded, size: 64, color: EspyTheme.success),
                     const SizedBox(height: 32),
-                    Text(l10n.almostThere, style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, fontSize: 18)),
+                    Text(l10n.almostThere, style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: 1)),
                     const SizedBox(height: 16),
                     Text(
                       l10n.institutionDashboardRedir,
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.lora(color: EspyTheme.noir.withValues(alpha: 0.6), height: 1.6),
+                      style: GoogleFonts.montserrat(color: EspyTheme.noir.withOpacity(0.6), height: 1.5, fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
@@ -414,7 +414,7 @@ class _InstitutionWizardState extends State<InstitutionWizard> {
   }
 
   Widget _buildStepTitle(String title) {
-    return Text(title, style: GoogleFonts.cinzel(fontSize: 18, fontWeight: FontWeight.w900, color: EspyTheme.platinum, height: 1.1, letterSpacing: 1.5));
+    return Text(title, style: GoogleFonts.montserrat(fontSize: 18, fontWeight: FontWeight.w900, color: EspyTheme.platinum, height: 1.1, letterSpacing: 1));
   }
 
   Widget _buildFieldLabel(String label) {

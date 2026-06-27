@@ -86,8 +86,8 @@ class _SOSHubScreenState extends State<SOSHubScreen> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.redAccent.withValues(alpha: 0.1),
-                border: Border.all(color: Colors.redAccent.withValues(alpha: 0.2), width: 1),
+                color: Colors.redAccent.withOpacity(0.1),
+                border: Border.all(color: Colors.redAccent.withOpacity(0.2), width: 1),
               ),
               child: const Icon(Icons.emergency_share_rounded, color: Colors.redAccent, size: 42),
             ),
@@ -107,7 +107,7 @@ class _SOSHubScreenState extends State<SOSHubScreen> {
             "Immediate network response units and medical assistance coordinates.",
             textAlign: TextAlign.center,
             style: GoogleFonts.lora(
-              color: Colors.white.withValues(alpha: 0.5),
+              color: Colors.white.withOpacity(0.5),
               fontSize: 12,
               height: 1.5,
             ),
@@ -199,9 +199,9 @@ class _SOSHubScreenState extends State<SOSHubScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.04),
+        color: Colors.white.withOpacity(0.04),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08), width: 1),
+        border: Border.all(color: Colors.white.withOpacity(0.08), width: 1),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
@@ -221,7 +221,7 @@ class _SOSHubScreenState extends State<SOSHubScreen> {
                   Container(
                     width: 52, height: 52,
                     decoration: BoxDecoration(
-                      color: Colors.redAccent.withValues(alpha: 0.1),
+                      color: Colors.redAccent.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: const Icon(Icons.phone_forwarded_rounded, color: Colors.redAccent, size: 24),

@@ -39,7 +39,7 @@ class _ServiceSwipeScreenState extends State<ServiceSwipeScreen> {
             return Center(
               child: Text(
                 'NO ACTIVE SERVICES FOUND',
-                style: GoogleFonts.cinzel(color: EspyTheme.navyDeep.withValues(alpha: 0.3), fontSize: 12, fontWeight: FontWeight.w900),
+                style: GoogleFonts.cinzel(color: EspyTheme.navyDeep.withOpacity(0.3), fontSize: 12, fontWeight: FontWeight.w900),
               ),
             );
           }
@@ -115,7 +115,7 @@ class _ServiceSwipeScreenState extends State<ServiceSwipeScreen> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 30, offset: const Offset(0, 15))
+          BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 30, offset: const Offset(0, 15))
         ],
       ),
       child: ClipRRect(
@@ -143,8 +143,8 @@ class _ServiceSwipeScreenState extends State<ServiceSwipeScreen> {
                     end: Alignment.topCenter,
                     stops: const [0.0, 0.4, 0.8],
                     colors: [
-                      EspyTheme.navyDeep.withValues(alpha: 0.9),
-                      EspyTheme.navyDeep.withValues(alpha: 0.2),
+                      EspyTheme.navyDeep.withOpacity(0.9),
+                      EspyTheme.navyDeep.withOpacity(0.2),
                       Colors.transparent,
                     ],
                   ),
@@ -192,9 +192,9 @@ class _ServiceSwipeScreenState extends State<ServiceSwipeScreen> {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: EspyTheme.gold.withValues(alpha: 0.2),
+                            color: EspyTheme.gold.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: EspyTheme.gold.withValues(alpha: 0.4)),
+                            border: Border.all(color: EspyTheme.gold.withOpacity(0.4)),
                           ),
                           child: Text(
                             '\$${service['price'] ?? '0'}',
@@ -207,7 +207,7 @@ class _ServiceSwipeScreenState extends State<ServiceSwipeScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.1),
+                        color: Colors.white.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
@@ -220,7 +220,7 @@ class _ServiceSwipeScreenState extends State<ServiceSwipeScreen> {
                       service['description'] ?? 'No description provided.',
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.lora(fontSize: 13, color: Colors.white.withValues(alpha: 0.7), height: 1.5),
+                      style: GoogleFonts.lora(fontSize: 13, color: Colors.white.withOpacity(0.7), height: 1.5),
                     ),
                   ],
                 ),
@@ -255,9 +255,9 @@ class _ServiceSwipeScreenState extends State<ServiceSwipeScreen> {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: Colors.white,
-          border: Border.all(color: color.withValues(alpha: 0.1), width: 2),
+          border: Border.all(color: color.withOpacity(0.1), width: 2),
           boxShadow: [
-            BoxShadow(color: color.withValues(alpha: 0.1), blurRadius: 20, offset: const Offset(0, 8)),
+            BoxShadow(color: color.withOpacity(0.1), blurRadius: 20, offset: const Offset(0, 8)),
           ],
         ),
         child: Icon(icon, color: color, size: isLarge ? 32 : 24),

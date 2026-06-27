@@ -85,7 +85,7 @@ class _VisitorWizardState extends State<VisitorWizard> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 24),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: Colors.white.withOpacity(0.05),
         border: Border(bottom: BorderSide(color: Colors.white10)),
       ),
       child: Row(
@@ -103,7 +103,7 @@ class _VisitorWizardState extends State<VisitorWizard> {
               color: isActive
                   ? EspyTheme.cyan
                   : (isDone ? EspyTheme.electricBlue : Colors.white12),
-              boxShadow: isActive ? [BoxShadow(color: EspyTheme.cyan.withValues(alpha: 0.3), blurRadius: 10)] : null,
+              boxShadow: isActive ? [BoxShadow(color: EspyTheme.cyan.withOpacity(0.3), blurRadius: 10)] : null,
             ),
           );
         }),
@@ -179,7 +179,7 @@ class _VisitorWizardState extends State<VisitorWizard> {
                     Text(
                       l10n.profileSet,
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.lora(color: EspyTheme.noir.withValues(alpha: 0.6), height: 1.6),
+                      style: GoogleFonts.lora(color: EspyTheme.noir.withOpacity(0.6), height: 1.6),
                     ),
                   ],
                 ),

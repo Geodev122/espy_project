@@ -80,11 +80,11 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.receipt_long_rounded, size: 64, color: EspyTheme.navyDeep.withValues(alpha: 0.1)),
+                          Icon(Icons.receipt_long_rounded, size: 64, color: EspyTheme.navyDeep.withOpacity(0.1)),
                           const SizedBox(height: 16),
                           Text(
                             "NO TRANSACTION LOGS",
-                            style: GoogleFonts.cinzel(color: EspyTheme.navyDeep.withValues(alpha: 0.3), fontWeight: FontWeight.bold),
+                            style: GoogleFonts.cinzel(color: EspyTheme.navyDeep.withOpacity(0.3), fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
@@ -130,7 +130,7 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                       decoration: BoxDecoration(
-                                        color: (isCompleted ? EspyTheme.success : (isFailed ? EspyTheme.error : EspyTheme.warning)).withValues(alpha: 0.1),
+                                        color: (isCompleted ? EspyTheme.success : (isFailed ? EspyTheme.error : EspyTheme.warning)).withOpacity(0.1),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: Text(

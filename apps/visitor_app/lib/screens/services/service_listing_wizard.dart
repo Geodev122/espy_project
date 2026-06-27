@@ -115,7 +115,7 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
         child: LinearProgressIndicator(
           value: (_currentStep + 1) / 2, // Changed from 3 to 2
           minHeight: 6,
-          backgroundColor: EspyTheme.navyDeep.withValues(alpha: 0.05),
+          backgroundColor: EspyTheme.navyDeep.withOpacity(0.05),
           valueColor: const AlwaysStoppedAnimation<Color>(EspyTheme.royalBlue),
         ),
       ),
@@ -148,7 +148,7 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
               }
               final tags = snapshot.data ?? [];
               if (tags.isEmpty) {
-                return Text(l10n.noPricingTags.toUpperCase(), style: GoogleFonts.lora(fontSize: 11, color: EspyTheme.navyDeep.withValues(alpha: 0.4)));
+                return Text(l10n.noPricingTags.toUpperCase(), style: GoogleFonts.lora(fontSize: 11, color: EspyTheme.navyDeep.withOpacity(0.4)));
               }
               return DropdownButtonFormField<String>(
                 initialValue: _selectedPricingTagId,
@@ -182,7 +182,7 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
                 if (hint == null) return const SizedBox();
                 return Container(
                   padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(color: EspyTheme.royalBlue.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(12)),
+                  decoration: BoxDecoration(color: EspyTheme.royalBlue.withOpacity(0.05), borderRadius: BorderRadius.circular(12)),
                   child: Row(
                     children: [
                       const Icon(Icons.info_outline_rounded, color: EspyTheme.royalBlue, size: 16),
@@ -203,9 +203,9 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: EspyTheme.royalBlue.withValues(alpha: 0.2), width: 2),
+                border: Border.all(color: EspyTheme.royalBlue.withOpacity(0.2), width: 2),
                 boxShadow: [
-                  BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 20)
+                  BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 20)
                 ],
                 image: _webImageBytes != null 
                   ? DecorationImage(image: MemoryImage(_webImageBytes!), fit: BoxFit.cover)
@@ -231,7 +231,7 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
             style: GoogleFonts.montserrat(color: EspyTheme.navyDeep, fontSize: 14),
             decoration: InputDecoration(
               labelText: l10n.serviceTitle.toUpperCase(),
-              labelStyle: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep.withValues(alpha: 0.5)),
+              labelStyle: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep.withOpacity(0.5)),
             )
           ),
           const SizedBox(height: 24),
@@ -241,7 +241,7 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
             style: GoogleFonts.lora(color: EspyTheme.navyDeep, fontSize: 14),
             decoration: InputDecoration(
               labelText: l10n.description.toUpperCase(),
-              labelStyle: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep.withValues(alpha: 0.5)),
+              labelStyle: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep.withOpacity(0.5)),
             )
           ),
         ],
@@ -272,7 +272,7 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
                   title: Text(l10n.onlineDelivery, style: GoogleFonts.lora(fontSize: 14, fontWeight: FontWeight.bold)),
                   onChanged: (val) => setState(() => _locationType = val!)
                 ),
-                Divider(height: 1, color: EspyTheme.navyDeep.withValues(alpha: 0.05), indent: 16, endIndent: 16),
+                Divider(height: 1, color: EspyTheme.navyDeep.withOpacity(0.05), indent: 16, endIndent: 16),
                 RadioListTile<String>(
                   value: 'main', groupValue: _locationType,
                   activeColor: EspyTheme.royalBlue,
@@ -308,8 +308,8 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.5),
-        border: Border(top: BorderSide(color: EspyTheme.navyDeep.withValues(alpha: 0.05), width: 1))
+        color: Colors.white.withOpacity(0.5),
+        border: Border(top: BorderSide(color: EspyTheme.navyDeep.withOpacity(0.05), width: 1))
       ),
       child: Row(
         children: [
@@ -317,7 +317,7 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
             IconButton(
               onPressed: () => setState(() => _currentStep--), 
               icon: const Icon(Icons.arrow_back_ios_new_rounded),
-              color: EspyTheme.navyDeep.withValues(alpha: 0.4),
+              color: EspyTheme.navyDeep.withOpacity(0.4),
             ),
           const Spacer(),
           PremiumButton(

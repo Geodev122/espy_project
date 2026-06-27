@@ -51,7 +51,7 @@ class PaymentResultScreen extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: GoogleFonts.lora(
                       fontSize: 14,
-                      color: EspyTheme.platinum.withValues(alpha: 0.7),
+                      color: EspyTheme.platinum.withOpacity(0.7),
                       height: 1.6,
                     ),
                   ),

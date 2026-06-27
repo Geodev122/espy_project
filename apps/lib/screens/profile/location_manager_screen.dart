@@ -114,9 +114,9 @@ class _LocationManagerScreenState extends State<LocationManagerScreen> {
                       margin: const EdgeInsets.only(top: 8, bottom: 16),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: EspyTheme.gold.withValues(alpha: 0.05),
+                        color: EspyTheme.gold.withOpacity(0.05),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: EspyTheme.gold.withValues(alpha: 0.1)),
+                        border: Border.all(color: EspyTheme.gold.withOpacity(0.1)),
                       ),
                       child: Row(
                         children: [
@@ -143,7 +143,7 @@ class _LocationManagerScreenState extends State<LocationManagerScreen> {
                     return Container(
                       margin: const EdgeInsets.only(bottom: 12),
                       child: ListTile(
-                        tileColor: isExpired ? Colors.redAccent.withValues(alpha: 0.1) : Colors.white.withValues(alpha: 0.3),
+                        tileColor: isExpired ? Colors.redAccent.withOpacity(0.1) : Colors.white.withOpacity(0.3),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16)),
                         title: Text(loc['cityName'],

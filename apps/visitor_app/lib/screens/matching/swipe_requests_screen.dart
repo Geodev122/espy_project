@@ -78,7 +78,7 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
                     child: Text(
                       l10n.noPendingRequests.toUpperCase(),
                       style: GoogleFonts.cinzel(
-                          color: EspyTheme.navyDeep.withValues(alpha: 0.3),
+                          color: EspyTheme.navyDeep.withOpacity(0.3),
                           fontSize: 12,
                           fontWeight: FontWeight.w900),
                     ),
@@ -201,8 +201,8 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
                         decoration: BoxDecoration(
                           color: isSelected ? EspyTheme.royalBlue : Colors.white,
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: isSelected ? EspyTheme.royalBlue : Colors.black.withValues(alpha: 0.1)),
-                          boxShadow: isSelected ? [BoxShadow(color: EspyTheme.royalBlue.withValues(alpha: 0.2), blurRadius: 10)] : null,
+                          border: Border.all(color: isSelected ? EspyTheme.royalBlue : Colors.black.withOpacity(0.1)),
+                          boxShadow: isSelected ? [BoxShadow(color: EspyTheme.royalBlue.withOpacity(0.2), blurRadius: 10)] : null,
                         ),
                         child: Center(
                           child: Text(
@@ -210,7 +210,7 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
                             style: GoogleFonts.cinzel(
                               fontSize: 8,
                               fontWeight: FontWeight.w900,
-                              color: isSelected ? Colors.white : EspyTheme.navyDeep.withValues(alpha: 0.6),
+                              color: isSelected ? Colors.white : EspyTheme.navyDeep.withOpacity(0.6),
                             ),
                           ),
                         ),
@@ -238,17 +238,17 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
     return RepaintBoundary(
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.98),
+          color: Colors.white.withOpacity(0.98),
           borderRadius: BorderRadius.circular(36),
           border: Border.all(
-            color: isEmergency ? EspyTheme.error : EspyTheme.gold.withValues(alpha: 0.15),
+            color: isEmergency ? EspyTheme.error : EspyTheme.gold.withOpacity(0.15),
             width: 2,
           ),
           boxShadow: [
             BoxShadow(
               color: isEmergency
-                ? EspyTheme.error.withValues(alpha: 0.1)
-                : EspyTheme.navyDeep.withValues(alpha: 0.08),
+                ? EspyTheme.error.withOpacity(0.1)
+                : EspyTheme.navyDeep.withOpacity(0.08),
               blurRadius: 30,
               offset: const Offset(0, 20),
             ),
@@ -266,7 +266,7 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
                 child: Icon(
                   isEmergency ? Icons.sos_rounded : Icons.auto_awesome_rounded,
                   size: 280,
-                  color: isEmergency ? EspyTheme.error.withValues(alpha: 0.03) : EspyTheme.gold.withValues(alpha: 0.03),
+                  color: isEmergency ? EspyTheme.error.withOpacity(0.03) : EspyTheme.gold.withOpacity(0.03),
                 ),
               ),
 
@@ -292,7 +292,7 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                           decoration: BoxDecoration(
-                            color: isEmergency ? EspyTheme.error.withValues(alpha: 0.1) : EspyTheme.gold.withValues(alpha: 0.1),
+                            color: isEmergency ? EspyTheme.error.withOpacity(0.1) : EspyTheme.gold.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(30),
                           ),
                           child: Text(
@@ -325,7 +325,7 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
                     const SizedBox(height: 16),
                     Container(
                       width: 40, height: 3,
-                      decoration: BoxDecoration(color: EspyTheme.gold.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(2)),
+                      decoration: BoxDecoration(color: EspyTheme.gold.withOpacity(0.3), borderRadius: BorderRadius.circular(2)),
                     ),
                     const SizedBox(height: 24),
                     Expanded(
@@ -335,7 +335,7 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
                           request['description'] ?? '',
                           style: GoogleFonts.lora(
                             fontSize: 15,
-                            color: EspyTheme.navyDeep.withValues(alpha: 0.7),
+                            color: EspyTheme.navyDeep.withOpacity(0.7),
                             height: 1.7,
                             fontStyle: FontStyle.italic,
                           ),
@@ -343,7 +343,7 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
                       ),
                     ),
                     const SizedBox(height: 32),
-                    Divider(color: EspyTheme.navyDeep.withValues(alpha: 0.05)),
+                    Divider(color: EspyTheme.navyDeep.withOpacity(0.05)),
                     const SizedBox(height: 16),
                     Row(
                       children: [
@@ -449,7 +449,7 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
                 child: Container(
                   width: 40, height: 4,
                   margin: const EdgeInsets.only(bottom: 24),
-                  decoration: BoxDecoration(color: EspyTheme.navyDeep.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(2)),
+                  decoration: BoxDecoration(color: EspyTheme.navyDeep.withOpacity(0.1), borderRadius: BorderRadius.circular(2)),
                 ),
               ),
               Row(
@@ -534,7 +534,7 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
         fontWeight: FontWeight.bold,
         color: selected ? Colors.white : Colors.black54
       ),
-      backgroundColor: Colors.black.withValues(alpha: 0.05),
+      backgroundColor: Colors.black.withOpacity(0.05),
       side: BorderSide.none,
     );
   }
@@ -555,10 +555,10 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: Colors.white,
-          border: Border.all(color: color.withValues(alpha: 0.2), width: 2),
+          border: Border.all(color: color.withOpacity(0.2), width: 2),
           boxShadow: [
             BoxShadow(
-              color: color.withValues(alpha: 0.1),
+              color: color.withOpacity(0.1),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),

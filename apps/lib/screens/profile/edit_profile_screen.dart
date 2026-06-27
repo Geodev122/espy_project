@@ -152,7 +152,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             fillColor: Colors.white,
             filled: true,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: EspyTheme.skyBlue.withValues(alpha: 0.2))),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: EspyTheme.skyBlue.withOpacity(0.2))),
           ),
         ),
       ],

@@ -151,7 +151,7 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 24),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: Colors.white.withOpacity(0.05),
         border: Border(bottom: BorderSide(color: Colors.white10)),
       ),
       child: Row(
@@ -169,7 +169,7 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
               color: isActive
                   ? EspyTheme.cyan
                   : (isDone ? EspyTheme.electricBlue : Colors.white12),
-              boxShadow: isActive ? [BoxShadow(color: EspyTheme.cyan.withValues(alpha: 0.3), blurRadius: 10)] : null,
+              boxShadow: isActive ? [BoxShadow(color: EspyTheme.cyan.withOpacity(0.3), blurRadius: 10)] : null,
             ),
           );
         }),
@@ -213,7 +213,7 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
                     return Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(color: Colors.white10, borderRadius: BorderRadius.circular(12)),
-                      child: Text(l10n.noSectorsAvailable.toUpperCase(), style: GoogleFonts.cinzel(fontSize: 10, color: EspyTheme.platinum)),
+                      child: Text(l10n.noSectorsAvailable.toUpperCase(), style: GoogleFonts.montserrat(fontSize: 10, color: EspyTheme.platinum, fontWeight: FontWeight.bold)),
                     );
                   }
                   final isAr = Localizations.localeOf(context).languageCode == 'ar';
@@ -221,7 +221,7 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: EspyTheme.skyBlue.withValues(alpha: 0.3)),
+                      border: Border.all(color: EspyTheme.skyBlue.withOpacity(0.3)),
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: DropdownButtonHideUnderline(
@@ -271,16 +271,15 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
                       return Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(color: Colors.white10, borderRadius: BorderRadius.circular(12)),
-                        child: Text(l10n.noCategoriesFound.toUpperCase(), style: GoogleFonts.cinzel(fontSize: 10, color: EspyTheme.platinum)),
+                        child: Text(l10n.noCategoriesFound.toUpperCase(), style: GoogleFonts.montserrat(fontSize: 10, color: EspyTheme.platinum, fontWeight: FontWeight.bold)),
                       );
                     }
 
-                    final isAr = Localizations.localeOf(context).languageCode == 'ar';
                     return Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: EspyTheme.skyBlue.withValues(alpha: 0.3)),
+                        border: Border.all(color: EspyTheme.skyBlue.withOpacity(0.3)),
                       ),
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: DropdownButtonHideUnderline(
@@ -400,7 +399,7 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildStepTitle(l10n.nodesOfPresence),
+              _buildStepTitle(l10n.pinsOfPresence),
               const SizedBox(height: 32),
               _buildFieldLabel(l10n.mainHub),
               PremiumCard(
@@ -418,7 +417,7 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
                     TextButton(
                       onPressed: () => _openMainLocationPicker(l10n),
                       child: Text(l10n.setPin,
-                          style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, color: EspyTheme.mahogany, fontSize: 12)),
+                          style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, color: EspyTheme.mahogany, fontSize: 12, letterSpacing: 0.5)),
                     ),
                   ],
                 ),
@@ -429,7 +428,7 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.03),
+                  color: Colors.black.withOpacity(0.03),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Colors.black12),
                 ),
@@ -459,7 +458,7 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
                     Text(
                       l10n.professionalDashboardRedir,
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.lora(color: EspyTheme.noir.withValues(alpha: 0.6), height: 1.6),
+                      style: GoogleFonts.montserrat(color: EspyTheme.noir.withOpacity(0.6), height: 1.5, fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
