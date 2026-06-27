@@ -146,7 +146,10 @@ class OverviewPage extends ConsumerWidget {
                   final Map<String, double> dailyRev = {};
                   final filtered = data.where((t) => t['status'] == 'completed').toList();
                   for (var t in filtered) {
-                    final date = DateFormat('MM-dd').format((t['createdAt'] as Timestamp).toDate());
+                    final ts = t['createdAt'] as Timestamp?;
+                    if (ts == null) continue;
+                    
+                    final date = DateFormat('MM-dd').format(ts.toDate());
                     dailyRev[date] = (dailyRev[date] ?? 0) + (double.tryParse(t['amount']?.toString() ?? '0') ?? 0.0);
                   }
                   final sortedDates = dailyRev.keys.toList()..sort();
@@ -206,8 +209,8 @@ class OverviewPage extends ConsumerWidget {
               data: (txData) => requests.when(
                 data: (reqData) {
                   final combined = [
-                    ...txData.map((t) => {'type': 'tx', 'data': t, 'ts': t['createdAt']}),
-                    ...reqData.map((r) => {'type': 'req', 'data': r, 'ts': r['createdAt']}),
+                    ...txData.where((t) => t['createdAt'] != null).map((t) => {'type': 'tx', 'data': t, 'ts': t['createdAt']}),
+                    ...reqData.where((r) => r['createdAt'] != null).map((r) => {'type': 'req', 'data': r, 'ts': r['createdAt']}),
                   ];
                   combined.sort((a, b) => (b['ts'] as Timestamp).compareTo(a['ts'] as Timestamp));
 

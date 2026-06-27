@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class ServiceModel {
   final String id;
   final String title;
@@ -36,6 +38,13 @@ class ServiceModel {
   });
 
   factory ServiceModel.fromJson(Map<String, dynamic> json) {
+    DateTime? parseDate(dynamic val) {
+      if (val == null) return null;
+      if (val is Timestamp) return val.toDate();
+      if (val is DateTime) return val;
+      return DateTime.tryParse(val.toString());
+    }
+
     return ServiceModel(
       id: json['id'] as String,
       title: json['title'] as String? ?? 'Untitled',
@@ -49,8 +58,8 @@ class ServiceModel {
       institutionId: json['institutionId'] as String?,
       photoUrl: json['photoUrl'] as String?,
       isActive: json['isActive'] as bool? ?? true,
-      createdAt: json['createdAt'] != null ? DateTime.tryParse(json['createdAt'].toString()) : null,
-      updatedAt: json['updatedAt'] != null ? DateTime.tryParse(json['updatedAt'].toString()) : null,
+      createdAt: parseDate(json['createdAt']),
+      updatedAt: parseDate(json['updatedAt']),
       pricingType: json['pricingType'] as String? ?? 'standard',
       favoriteCount: json['favoriteCount'] ?? 0,
     );

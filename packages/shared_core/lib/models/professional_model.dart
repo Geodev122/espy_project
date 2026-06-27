@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class ProfessionalModel {
   final String id;
   final String? firebaseUid;
@@ -80,9 +82,18 @@ class ProfessionalModel {
   });
 
   factory ProfessionalModel.fromJson(Map<String, dynamic> json) {
+    DateTime? parseDate(dynamic val) {
+      if (val == null) return null;
+      if (val is Timestamp) return val.toDate();
+      if (val is DateTime) return val;
+      if (val is int) return DateTime.fromMillisecondsSinceEpoch(val);
+      if (val is double) return DateTime.fromMillisecondsSinceEpoch(val.toInt());
+      return DateTime.tryParse(val.toString());
+    }
+
     return ProfessionalModel(
-      id: json['id'] as String,
-      firebaseUid: json['firebaseUid'] as String?,
+      id: json['id'] as String? ?? json['uid'] as String? ?? '',
+      firebaseUid: json['firebaseUid'] as String? ?? json['uid'] as String?,
       fullNameEn: json['fullNameEn'] as String?,
       fullNameAr: json['fullNameAr'] as String?,
       name: json['name'] as String?,
@@ -104,14 +115,14 @@ class ProfessionalModel {
       isHonorVerified: json['isHonorVerified'] ?? json['isHonorVerified'] ?? false,
       authMethod: json['authMethod'] as String?,
       hasProfile: json['hasProfile'] as bool? ?? false,
-      lastPurchaseDate: json['last_purchase_date'] != null ? (json['last_purchase_date'] is DateTime ? json['last_purchase_date'] : DateTime.tryParse(json['last_purchase_date'].toString())) : null,
+      lastPurchaseDate: parseDate(json['last_purchase_date']),
       activeServices: json['active_services'] as int? ?? 0,
       activeSlots: json['active_slots'] as int? ?? 0,
       membershipTier: json['membershipTier']?.toString() ?? 'none',
       role: json['role'] as String? ?? 'visitor',
-      createdAt: json['createdAt'] != null ? (json['createdAt'] is DateTime ? json['createdAt'] : (json['createdAt'] is double ? DateTime.fromMillisecondsSinceEpoch(json['createdAt'].toInt()) : DateTime.tryParse(json['createdAt'].toString()))) : null,
-      updatedAt: json['updatedAt'] != null ? (json['updatedAt'] is DateTime ? json['updatedAt'] : DateTime.tryParse(json['updatedAt'].toString())) : null,
-      lastActive: json['last_active'] != null ? (json['last_active'] is DateTime ? json['last_active'] : (json['last_active'] is double ? DateTime.fromMillisecondsSinceEpoch(json['last_active'].toInt()) : DateTime.tryParse(json['last_active'].toString()))) : null,
+      createdAt: parseDate(json['createdAt']),
+      updatedAt: parseDate(json['updatedAt']),
+      lastActive: parseDate(json['last_active']),
       profileViews: json['profileViews'] ?? json['view_count'] ?? 0,
       whatsappClicks: json['whatsappClicks'] ?? json['message_count'] ?? 0,
       totalMatches: json['totalMatches'] as int? ?? 0,

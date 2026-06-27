@@ -11,16 +11,7 @@ final professionalsStreamProvider = StreamProvider<List<ProfessionalModel>>((ref
 });
 
 final institutionsStreamProvider = StreamProvider<List<ProfessionalModel>>((ref) {
-  final legacy = ref.watch(firestoreServiceProvider).watchAllInstitutions();
-  final modern = ref.watch(firestoreServiceProvider).watchNewInstitutions();
-  
-  return Rx.combineLatest2(legacy, modern, (List<ProfessionalModel> a, List<ProfessionalModel> b) {
-    final combined = [...a, ...b];
-    // Deduplicate by ID
-    final ids = <String>{};
-    return combined.where((u) => ids.add(u.id)).toList()
-      ..sort((a, b) => (b.createdAt ?? DateTime(0)).compareTo(a.createdAt ?? DateTime(0)));
-  });
+  return ref.watch(firestoreServiceProvider).watchAllInstitutions();
 });
 
 final servicesStreamProvider = StreamProvider<List<ServiceModel>>((ref) {

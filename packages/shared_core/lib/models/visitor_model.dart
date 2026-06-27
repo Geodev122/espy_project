@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class VisitorModel {
   final String id;
   final String? name;
@@ -22,14 +24,21 @@ class VisitorModel {
   });
 
   factory VisitorModel.fromJson(Map<String, dynamic> json) {
+    DateTime? parseDate(dynamic val) {
+      if (val == null) return null;
+      if (val is Timestamp) return val.toDate();
+      if (val is DateTime) return val;
+      return DateTime.tryParse(val.toString());
+    }
+
     return VisitorModel(
       id: json['id'] as String,
       name: json['name'] as String?,
       email: json['email'] as String?,
       phone: json['phone'] as String?,
       source: json['source'] as String? ?? 'pwa',
-      createdAt: json['createdAt'] != null ? DateTime.tryParse(json['createdAt'].toString()) : null,
-      updatedAt: json['updatedAt'] != null ? DateTime.tryParse(json['updatedAt'].toString()) : null,
+      createdAt: parseDate(json['createdAt']),
+      updatedAt: parseDate(json['updatedAt']),
       countryId: (json['countryId'] ?? json['country']) as String?,
       isVerified: json['isVerified'] as bool? ?? false,
     );

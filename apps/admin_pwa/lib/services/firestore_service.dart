@@ -34,12 +34,6 @@ class FirestoreService {
         .map((snap) => snap.docs.map((doc) => ProfessionalModel.fromJson({...doc.data(), 'id': doc.id})).toList());
   }
 
-  Stream<List<ProfessionalModel>> watchNewInstitutions() {
-    return _db.collection('directory_institutions')
-        .snapshots()
-        .map((snap) => snap.docs.map((doc) => ProfessionalModel.fromJson({...doc.data(), 'id': doc.id})).toList());
-  }
-
   // ── Services ──────────────────────────────────────────────────────────────
   
   Stream<List<ServiceModel>> watchAllServices() {

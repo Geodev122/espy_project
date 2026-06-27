@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme.dart';
 import 'package:shared_core/models/professional_model.dart';
 import '../../services/firestore_service.dart';
+import '../../providers/system_providers.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class AdminEditUserModal extends ConsumerStatefulWidget {

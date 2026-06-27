@@ -114,9 +114,12 @@ class _FinancePageState extends ConsumerState<FinancePage> with SingleTickerProv
           if (_regionFilter != 'ALL' && t['governorateId'] != _regionFilter) return false;
           if (_cityFilter != 'ALL' && t['cityId'] != _cityFilter) return false;
           if (_sectorFilter != 'ALL' && t['sectorId'] != _sectorFilter) return false;
-          if (_categoryFilter != 'ALL' && t['categoryId'] != _categoryFilter) return false;
+          
+          final ts = t['createdAt'] as Timestamp?;
+          if (ts == null) return false;
+          
           if (_analyticsDateRange != null) {
-            final date = (t['createdAt'] as Timestamp).toDate();
+            final date = ts.toDate();
             if (date.isBefore(_analyticsDateRange!.start) || date.isAfter(_analyticsDateRange!.end.add(const Duration(days: 1)))) return false;
           }
           return true;
@@ -273,7 +276,10 @@ class _FinancePageState extends ConsumerState<FinancePage> with SingleTickerProv
   Widget _buildRevenueTrendChart(List<Map<String, dynamic>> data) {
     final Map<String, Map<String, double>> dailyTrends = {};
     for (var t in data) {
-      final date = DateFormat('MM-dd').format((t['createdAt'] as Timestamp).toDate());
+      final ts = t['createdAt'] as Timestamp?;
+      if (ts == null) continue;
+      
+      final date = DateFormat('MM-dd').format(ts.toDate());
       dailyTrends.putIfAbsent(date, () => {'pins': 0, 'slots': 0, 'visibility': 0});
       final meta = t['metadata'] as Map<String, dynamic>? ?? {};
       final items = meta['items'] as List? ?? [];
