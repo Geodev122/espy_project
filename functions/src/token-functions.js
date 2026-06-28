@@ -20,7 +20,10 @@ exports.spendTokensHandler = async (request) => {
     try {
         const result = await db.runTransaction(async (transaction) => {
             const userDoc = await transaction.get(userRef);
-            if (!userDoc.exists) throw new Error('User not found');
+            if (!userDoc.exists) throw new Error(`Protocol error: User identity [${userId}] not synchronized.`);
+
+            const roleDoc = await transaction.get(roleRef);
+            if (!roleDoc.exists) throw new Error(`Protocol error: Account type profile not found in ${roleCol}.`);
 
             const data = userDoc.data();
             const balance = data.walletBalance || 0;

@@ -60,6 +60,18 @@ class VaultFavoritesScreen extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final fav = favorites[index];
                     final profId = fav['professionalId'];
+                    final requestId = fav['requestId'];
+
+                    if (requestId != null) {
+                      return StreamBuilder<DocumentSnapshot>(
+                        stream: FirebaseFirestore.instance.collection('directory_community_requests').doc(requestId).snapshots(),
+                        builder: (context, reqSnap) {
+                          if (!reqSnap.hasData || !reqSnap.data!.exists) return const SizedBox.shrink();
+                          final req = reqSnap.data!.data() as Map<String, dynamic>;
+                          return _buildRequestFavoriteTile(context, auth.user!.uid, fav['id'], req, index);
+                        },
+                      );
+                    }
 
                     return StreamBuilder<DocumentSnapshot>(
                       stream: FirebaseFirestore.instance.collection('directory_professionals').doc(profId).snapshots(),
@@ -119,6 +131,47 @@ class VaultFavoritesScreen extends StatelessWidget {
               IconButton(
                 icon: const Icon(Icons.favorite, color: EspyTheme.error),
                 onPressed: () => firestore.toggleFavorite(uid, profId, false),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRequestFavoriteTile(BuildContext context, String uid, String favDocId, Map<String, dynamic> data, int index) {
+    return FadeInRight(
+      delay: Duration(milliseconds: index * 100),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        child: PremiumCard(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                width: 56, height: 56,
+                decoration: BoxDecoration(color: EspyTheme.gold.withOpacity(0.1), shape: BoxShape.circle),
+                child: const Icon(Icons.help_outline_rounded, color: EspyTheme.gold),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      (data['title'] ?? 'Help Request').toString().toUpperCase(),
+                      style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, fontSize: 13, color: EspyTheme.navyDeep),
+                    ),
+                    Text(
+                      data['location'] ?? 'Lebanon',
+                      style: GoogleFonts.lora(fontSize: 11, color: Colors.black54),
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.favorite, color: EspyTheme.error),
+                onPressed: () => FirebaseFirestore.instance.collection('directory_favorites').doc(favDocId).delete(),
               ),
             ],
           ),

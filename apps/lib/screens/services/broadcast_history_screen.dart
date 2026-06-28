@@ -1,0 +1,110 @@
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
+import 'package:shared_core/theme/espy_theme.dart';
+import 'package:shared_core/services/auth_service.dart';
+
+class BroadcastHistoryScreen extends StatelessWidget {
+  const BroadcastHistoryScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final auth = Provider.of<AuthService>(context);
+    final uid = auth.user?.uid;
+
+    return Scaffold(
+      backgroundColor: EspyTheme.platinum,
+      appBar: AppBar(
+        title: Text('BROADCAST HISTORY', style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, fontSize: 14)),
+        backgroundColor: Colors.white,
+        foregroundColor: EspyTheme.navyDeep,
+        elevation: 0,
+      ),
+      body: uid == null
+          ? const Center(child: Text('Please sign in to view history'))
+          : StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('directory_broadcasts')
+                  .where('senderId', isEqualTo: uid)
+                  .orderBy('createdAt', descending: true)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator(color: EspyTheme.gold));
+                }
+
+                final docs = snapshot.data?.docs ?? [];
+
+                if (docs.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.history_rounded, size: 64, color: EspyTheme.navyDeep.withOpacity(0.1)),
+                        const SizedBox(height: 16),
+                        Text("NO BROADCASTS SENT", style: GoogleFonts.cinzel(color: EspyTheme.navyDeep.withOpacity(0.3), fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  padding: const EdgeInsets.all(24),
+                  itemCount: docs.length,
+                  itemBuilder: (context, index) {
+                    final data = docs[index].data() as Map<String, dynamic>;
+                    final date = (data['createdAt'] as Timestamp?)?.toDate();
+
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10)],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                date != null ? DateFormat('dd MMM yyyy • HH:mm').format(date) : 'N/A',
+                                style: GoogleFonts.montserrat(fontSize: 9, fontWeight: FontWeight.bold, color: EspyTheme.gold),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(color: EspyTheme.royalBlue.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+                                child: Text(
+                                  "${data['targetAudience'] ?? 'ALL'}",
+                                  style: GoogleFonts.cinzel(fontSize: 8, fontWeight: FontWeight.w900, color: EspyTheme.royalBlue),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Text(data['message'] ?? '', style: GoogleFonts.lora(fontSize: 14, color: EspyTheme.navyDeep)),
+                          const SizedBox(height: 20),
+                          Row(
+                            children: [
+                              const Icon(Icons.people_outline_rounded, size: 14, color: Colors.black38),
+                              const SizedBox(width: 8),
+                              Text(
+                                "${data['reachCount'] ?? 0} USERS REACHED",
+                                style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black38),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+    );
+  }
+}

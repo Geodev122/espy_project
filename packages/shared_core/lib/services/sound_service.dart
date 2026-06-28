@@ -23,6 +23,8 @@ class SoundService {
 
   static Future<void> _play(String assetPath, double volume) async {
     if (kIsWeb) {
+      // Browsers block audio/vibration unless a user gesture occurred.
+      // WebHelper handles the audio catch block.
       WebHelper.playAudio(assetPath, volume);
       return;
     }

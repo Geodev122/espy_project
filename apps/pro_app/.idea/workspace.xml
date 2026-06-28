@@ -4,13 +4,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0e1d1981-2c6b-49c0-8970-10699b435438" name="Changes" comment="test">
-      <change beforePath="$PROJECT_DIR$/../admin_pwa/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../admin_pwa/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../admin_pwa/lib/services/firestore_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../admin_pwa/lib/services/firestore_service.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../admin_pwa/lib/widgets/common/admin_edit_master_modal.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../admin_pwa/lib/widgets/common/admin_edit_master_modal.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../visitor_app/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../visitor_app/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="0e1d1981-2c6b-49c0-8970-10699b435438" name="Changes" comment="test" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -51,6 +45,9 @@
   &quot;fromUser&quot;: false
 }</component>
   <component name="ProjectId" id="3DqgtR2KQCB0gNXT8HfNSytPiJn" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />

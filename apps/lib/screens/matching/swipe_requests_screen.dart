@@ -27,6 +27,51 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
   String _selectedFilterCountry = 'ALL';
   bool _newestFirst = true;
 
+  List<String> _favoriteIds = [];
+  List<String> _contactedIds = [];
+  int _stackKey = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserMetadata();
+  }
+
+  void _loadUserMetadata() {
+    final userId = _firestore.getCurrentUserId;
+    if (userId.isEmpty) return;
+
+    // Load favorites (requests)
+    FirebaseFirestore.instance
+        .collection('directory_favorites')
+        .where('userId', isEqualTo: userId)
+        .snapshots()
+        .listen((snap) {
+      if (mounted) {
+        setState(() {
+          _favoriteIds = snap.docs
+              .map((doc) => (doc.data()['requestId'] ?? doc.data()['professionalId']) as String?)
+              .whereType<String>()
+              .toList();
+        });
+      }
+    });
+
+    // Load interactions (contacted)
+    FirebaseFirestore.instance
+        .collection('directory_interactions')
+        .where('userId', isEqualTo: userId)
+        .where('type', isEqualTo: 'request_match')
+        .snapshots()
+        .listen((snap) {
+      if (mounted) {
+        setState(() {
+          _contactedIds = snap.docs.map((doc) => doc.data()['targetId'] as String).toList();
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthService>(context, listen: false);
@@ -37,19 +82,6 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
       backgroundColor: Colors.transparent,
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "REQUESTS POOL",
-                  style: GoogleFonts.cinzel(fontSize: 12, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep, letterSpacing: 2),
-                ),
-                const SizedBox(width: 48),
-              ],
-            ),
-          ),
           Expanded(
             child: StreamBuilder<List<Map<String, dynamic>>>(
               stream: _firestore.getCommunityRequests(sectionId: _selectedFilterSectionId, newestFirst: _newestFirst),
@@ -87,8 +119,9 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
                       children: [
                         Expanded(
                           child: Padding(
-                            padding: const EdgeInsets.fromLTRB(8, 20, 8, 120),
+                            padding: const EdgeInsets.fromLTRB(8, 20, 8, 180),
                             child: CardSwiper(
+                              key: ValueKey(_stackKey),
                               controller: _controller,
                               cardsCount: _displayCards.length,
                               numberOfCardsDisplayed: _displayCards.length > 3 ? 3 : _displayCards.length,
@@ -132,6 +165,19 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
                                       await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
                                     }
                                   }
+                                } else if (direction == CardSwiperDirection.left) {
+                                  // Mark as favorite
+                                  final favId = '${uid}_${target['id']}';
+                                  await FirebaseFirestore.instance.collection('directory_favorites').doc(favId).set({
+                                    'userId': uid,
+                                    'requestId': target['id'],
+                                    'createdAt': FieldValue.serverTimestamp(),
+                                  });
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text("Request saved to Vault Favorites"), behavior: SnackBarBehavior.floating),
+                                    );
+                                  }
                                 }
                                 return true;
                               },
@@ -140,7 +186,7 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
                         ),
                       ],
                     ),
-                    Positioned(bottom: 110, left: 0, right: 0, child: _buildActionButtons()),
+                    Positioned(bottom: 130, left: 0, right: 0, child: _buildActionButtons()),
                   ],
                 );
               },
@@ -169,6 +215,20 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
           Text("QUEUE CLEARED", style: GoogleFonts.cinzel(fontSize: 22, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep)),
           const SizedBox(height: 16),
           Text("You have reviewed all active community requests in this sector.", textAlign: TextAlign.center, style: GoogleFonts.lora(fontSize: 14, color: Colors.black45)),
+          const SizedBox(height: 32),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                _stackKey++;
+              });
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: EspyTheme.gold,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
+            child: Text("RESTART PROTOCOL", style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, color: Colors.white)),
+          ),
         ],
       ),
     );
@@ -176,6 +236,9 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
 
   Widget _buildRequestCard(Map<String, dynamic> request) {
     final bool isEmergency = request['isSOS'] == true;
+    final bool isFavorite = _favoriteIds.contains(request['id']);
+    final bool isContacted = _contactedIds.contains(request['id']);
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -190,13 +253,25 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                decoration: BoxDecoration(color: isEmergency ? EspyTheme.error.withOpacity(0.1) : EspyTheme.gold.withOpacity(0.1), borderRadius: BorderRadius.circular(30)),
-                child: Text(
-                  (request['section'] ?? request['category'] ?? 'CARE').toString().toUpperCase(),
-                  style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.w900, color: isEmergency ? EspyTheme.error : EspyTheme.goldDark, letterSpacing: 2),
-                ),
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                    decoration: BoxDecoration(color: isEmergency ? EspyTheme.error.withOpacity(0.1) : EspyTheme.gold.withOpacity(0.1), borderRadius: BorderRadius.circular(30)),
+                    child: Text(
+                      (request['section'] ?? request['category'] ?? 'CARE').toString().toUpperCase(),
+                      style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.w900, color: isEmergency ? EspyTheme.error : EspyTheme.goldDark, letterSpacing: 2),
+                    ),
+                  ),
+                  if (isFavorite) ...[
+                    const SizedBox(width: 8),
+                    const Icon(Icons.favorite, color: EspyTheme.gold, size: 16),
+                  ],
+                  if (isContacted) ...[
+                    const SizedBox(width: 8),
+                    const Icon(Icons.check_circle, color: EspyTheme.success, size: 16),
+                  ],
+                ],
               ),
               if (isEmergency) Pulse(infinite: true, child: const Icon(Icons.emergency_rounded, color: EspyTheme.error, size: 24)),
             ],
@@ -225,7 +300,7 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
       children: [
         _buildCircleBtn(icon: Icons.tune_rounded, color: EspyTheme.gold, onTap: () => _showFilterModal(l10n), isSmall: true),
         const SizedBox(width: 20),
-        _buildCircleBtn(icon: Icons.close_rounded, color: EspyTheme.error, onTap: () => _controller.swipe(CardSwiperDirection.left)),
+        _buildCircleBtn(icon: Icons.favorite_border_rounded, color: EspyTheme.gold, onTap: () => _controller.swipe(CardSwiperDirection.left)),
         const SizedBox(width: 20),
         _buildCircleBtn(icon: Icons.chat_bubble_outline_rounded, color: Colors.green, onTap: () => _controller.swipe(CardSwiperDirection.right), isLarge: true),
       ],

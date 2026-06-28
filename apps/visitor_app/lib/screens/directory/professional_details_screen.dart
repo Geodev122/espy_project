@@ -7,13 +7,59 @@ import '../../l10n/app_localizations.dart';
 import '../../core/theme.dart';
 import '../../widgets/common/premium_button.dart' as common;
 
-class ProfessionalDetailsScreen extends StatelessWidget {
-  final Map<String, dynamic> professional;
-  const ProfessionalDetailsScreen({super.key, required this.professional});
+import 'package:animate_do/animate_do.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import '../../l10n/app_localizations.dart';
+import '../../core/theme.dart';
+import '../../widgets/common/premium_button.dart' as common;
+
+class ProfessionalDetailsScreen extends StatefulWidget {
+  final Map<String, dynamic>? professional;
+  final String? professionalId;
+  const ProfessionalDetailsScreen({super.key, this.professional, this.professionalId});
+
+  @override
+  State<ProfessionalDetailsScreen> createState() => _ProfessionalDetailsScreenState();
+}
+
+class _ProfessionalDetailsScreenState extends State<ProfessionalDetailsScreen> {
+  Map<String, dynamic>? _data;
+  bool _loading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.professional != null) {
+      _data = widget.professional;
+    } else if (widget.professionalId != null) {
+      _fetchData();
+    }
+  }
+
+  Future<void> _fetchData() async {
+    setState(() => _loading = true);
+    try {
+      final doc = await FirebaseFirestore.instance.collection('users').doc(widget.professionalId).get();
+      if (doc.exists) {
+        setState(() => _data = doc.data());
+      }
+    } finally {
+      setState(() => _loading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (_loading) return const Scaffold(body: Center(child: CircularProgressIndicator(color: EspyTheme.gold)));
+    if (_data == null) return const Scaffold(body: Center(child: Text("NODE DISCONNECTED")));
+
+    final professional = _data!;
     final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Container(
@@ -21,24 +67,24 @@ class ProfessionalDetailsScreen extends StatelessWidget {
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            _buildSliverAppBar(context),
+            _buildSliverAppBar(context, professional),
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildHeaderInfo(l10n),
+                    _buildHeaderInfo(l10n, professional),
                     const SizedBox(height: 40),
                     _buildSectionTitle(l10n.aboutTheNode.toUpperCase()),
                     const SizedBox(height: 16),
-                    _buildBio(l10n),
+                    _buildBio(l10n, professional),
                     const SizedBox(height: 40),
                     _buildSectionTitle(l10n.expertiseAndServices.toUpperCase()),
                     const SizedBox(height: 20),
-                    _buildExpertiseTags(),
+                    _buildExpertiseTags(professional),
                     const SizedBox(height: 48),
-                    _buildActions(context, l10n),
+                    _buildActions(context, l10n, professional),
                     const SizedBox(height: 48),
                   ],
                 ),
@@ -50,7 +96,7 @@ class ProfessionalDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSliverAppBar(BuildContext context) {
+  Widget _buildSliverAppBar(BuildContext context, Map<String, dynamic> professional) {
     return SliverAppBar(
       expandedHeight: 450,
       pinned: true,
@@ -104,7 +150,7 @@ class ProfessionalDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeaderInfo(AppLocalizations l10n) {
+  Widget _buildHeaderInfo(AppLocalizations l10n, Map<String, dynamic> professional) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -179,7 +225,7 @@ class ProfessionalDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBio(AppLocalizations l10n) {
+  Widget _buildBio(AppLocalizations l10n, Map<String, dynamic> professional) {
     return FadeInUp(
       child: Text(
         professional['bio'] ?? l10n.defaultBioLong,
@@ -192,7 +238,7 @@ class ProfessionalDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildExpertiseTags() {
+  Widget _buildExpertiseTags(Map<String, dynamic> professional) {
     final tags = professional['expertise'] as List? ??
         ['Clinical Care', 'Emergency Response', 'Patient Support'];
     return Wrap(
@@ -220,7 +266,7 @@ class ProfessionalDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildActions(BuildContext context, AppLocalizations l10n) {
+  Widget _buildActions(BuildContext context, AppLocalizations l10n, Map<String, dynamic> professional) {
     return Column(
       children: [
         common.PremiumButton(

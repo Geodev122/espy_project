@@ -4,13 +4,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="baa01f8f-2d7d-4d01-a4bc-275ecc73775d" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/services/firestore_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/firestore_service.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/widgets/common/admin_edit_master_modal.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/widgets/common/admin_edit_master_modal.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pro_app/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../pro_app/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../visitor_app/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../visitor_app/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="baa01f8f-2d7d-4d01-a4bc-275ecc73775d" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

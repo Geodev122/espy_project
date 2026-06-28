@@ -17,6 +17,8 @@ class SystemPage extends ConsumerStatefulWidget {
 
 class _SystemPageState extends ConsumerState<SystemPage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  String _infraCountryFilter = 'lebanon';
+  String _infraRegionFilter = 'ALL';
 
   @override
   void initState() {
@@ -122,6 +124,20 @@ class _SystemPageState extends ConsumerState<SystemPage> with SingleTickerProvid
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
               ),
             ),
+            const Spacer(),
+            asyncCountries.maybeWhen(
+              data: (countries) => DropdownButton<String>(
+                value: _infraCountryFilter,
+                dropdownColor: const Color(0xFF061226),
+                style: EspyTheme.cinzelStyle.copyWith(fontSize: 11, color: Colors.white),
+                items: [
+                  const DropdownMenuItem(value: 'ALL', child: Text('VIEW ALL COUNTRIES')),
+                  ...countries.map((c) => DropdownMenuItem(value: c['id'], child: Text(c['name_en'].toString().toUpperCase()))),
+                ],
+                onChanged: (v) => setState(() { _infraCountryFilter = v!; _infraRegionFilter = 'ALL'; }),
+              ),
+              orElse: () => const SizedBox(),
+            ),
           ],
         ),
         const SizedBox(height: 32),
@@ -137,23 +153,29 @@ class _SystemPageState extends ConsumerState<SystemPage> with SingleTickerProvid
         ),
         const SizedBox(height: 32),
         asyncGovernorates.when(
-          data: (data) => AdminSettingsTable(
-            title: 'H2: REGIONAL GOVERNORATES',
-            collection: 'directory_governorates',
-            columns: const ['Name EN', 'Name AR', 'Country ID'],
-            data: data,
-          ),
+          data: (data) {
+            final filtered = _infraCountryFilter == 'ALL' ? data : data.where((g) => g['country_id'] == _infraCountryFilter).toList();
+            return AdminSettingsTable(
+              title: 'H2: REGIONAL GOVERNORATES',
+              collection: 'directory_governorates',
+              columns: const ['Name EN', 'Name AR', 'Country ID'],
+              data: filtered,
+            );
+          },
           loading: () => const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator())),
           error: (e, s) => Text('Error: $e'),
         ),
         const SizedBox(height: 32),
         asyncCities.when(
-          data: (data) => AdminSettingsTable(
-            title: 'H3: DIRECTORY CITIES',
-            collection: 'directory_cities',
-            columns: const ['Name EN', 'Name AR', 'Country ID', 'Governorate ID'],
-            data: data,
-          ),
+          data: (data) {
+            final filtered = _infraCountryFilter == 'ALL' ? data : data.where((c) => c['country_id'] == _infraCountryFilter).toList();
+            return AdminSettingsTable(
+              title: 'H3: DIRECTORY CITIES',
+              collection: 'directory_cities',
+              columns: const ['Name EN', 'Name AR', 'Country ID', 'Governorate ID'],
+              data: filtered,
+            );
+          },
           loading: () => const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator())),
           error: (e, s) => Text('Error: $e'),
         ),

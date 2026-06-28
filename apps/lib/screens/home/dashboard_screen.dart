@@ -35,31 +35,6 @@ class DashboardScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            FadeInDown(
-              child: Text(
-                'PROTOCOL DASHBOARD',
-                style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w900,
-                  color: EspyTheme.navyDeep,
-                  letterSpacing: 1.5,
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
-            FadeInDown(
-              delay: const Duration(milliseconds: 100),
-              child: Text(
-                'LIVE MISSION STATUS',
-                style: GoogleFonts.montserrat(
-                  fontSize: 11,
-                  color: EspyTheme.navyDeep.withOpacity(0.5),
-                  letterSpacing: 0.5,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-            const SizedBox(height: 32),
             GridView.count(
               crossAxisCount: 2,
               shrinkWrap: true,
@@ -83,7 +58,15 @@ class DashboardScreen extends StatelessWidget {
                   value: '${user['serviceSlots'] ?? 0}',
                   status: 'TOTAL CAPACITY',
                   buttonLabel: 'MANAGE SLOTS',
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ServiceManagerScreen())),
+                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => Scaffold(
+                    appBar: AppBar(
+                      title: Text('SERVICE MANAGER', style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, fontSize: 14)),
+                      backgroundColor: Colors.white,
+                      foregroundColor: EspyTheme.navyDeep,
+                      elevation: 0,
+                    ),
+                    body: const ServiceManagerScreen(),
+                  ))),
                 ),
                 _buildDashboardBox(
                   context,

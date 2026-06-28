@@ -98,50 +98,134 @@ class _TokenShopScreenState extends State<TokenShopScreen> with SingleTickerProv
         final pricing = snapshot.data!.data() as Map<String, dynamic>? ?? {};
         final role = auth.userData?.role.name ?? 'professional';
         
-        final items = [
+        final newItems = [
           {
             'id': 'extra_pin',
-            'title': 'NEW PIN',
-            'desc': 'Unlock 1 additional location PIN on the public map.',
+            'title': 'LOCATION PIN',
+            'desc': 'Unlock 1 additional map node.',
             'cost': pricing['new_pin'] ?? pricing['${role}_new_pin'] ?? 500,
             'icon': LucideIcons.mapPin,
           },
           {
-            'id': 'renew_pin',
-            'title': 'RENEW PIN (30D)',
-            'desc': 'Extend 1 existing location PIN for another 30 days.',
-            'cost': pricing['renew_pin'] ?? pricing['${role}_renew_pin'] ?? 400,
-            'icon': LucideIcons.rotateCcw,
-          },
-          {
             'id': 'extra_slot',
-            'title': 'NEW SLOT',
-            'desc': 'Add 1 permanent slot to your service directory.',
+            'title': 'SERVICE SLOT',
+            'desc': 'Add 1 permanent slot.',
             'cost': pricing['new_slot'] ?? pricing['${role}_new_slot'] ?? 300,
             'icon': LucideIcons.layoutGrid,
           },
           {
-            'id': 'renew_slot',
-            'title': 'RENEW SLOT (30D)',
-            'desc': 'Extend 1 service slot visibility for another 30 days.',
-            'cost': pricing['renew_slot'] ?? 250,
-            'icon': LucideIcons.refreshCcw,
-          },
-          {
             'id': 'broadcast',
-            'title': 'NEW BROADCAST',
-            'desc': 'Send a priority signal to all visitors in the network.',
+            'title': 'BROADCAST',
+            'desc': 'Send priority signal.',
             'cost': pricing['broadcast'] ?? pricing['${role}_broadcast'] ?? 1000,
             'icon': LucideIcons.radio,
           },
         ];
 
-        return ListView.builder(
+        final renewItems = [
+          {
+            'id': 'renew_pin',
+            'title': 'RENEW PIN',
+            'desc': 'Extend node visibility (30D).',
+            'cost': pricing['renew_pin'] ?? pricing['${role}_renew_pin'] ?? 400,
+            'icon': LucideIcons.rotateCcw,
+          },
+          {
+            'id': 'renew_slot',
+            'title': 'RENEW SLOT',
+            'desc': 'Extend slot visibility (30D).',
+            'cost': pricing['renew_slot'] ?? 250,
+            'icon': LucideIcons.refreshCcw,
+          },
+        ];
+
+        return ListView(
           padding: const EdgeInsets.all(24),
-          itemCount: items.length,
-          itemBuilder: (context, index) => _buildStoreItem(items[index], auth),
+          children: [
+            _buildSectionHeader('ACTIVATE NEW PROTOCOLS'),
+            const SizedBox(height: 16),
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                childAspectRatio: 0.85,
+              ),
+              itemCount: newItems.length,
+              itemBuilder: (context, index) => _buildCompactStoreItem(newItems[index], auth, isRenew: false),
+            ),
+            const SizedBox(height: 32),
+            _buildSectionHeader('RENEW CURRENT PROTOCOLS'),
+            const SizedBox(height: 16),
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                childAspectRatio: 0.85,
+              ),
+              itemCount: renewItems.length,
+              itemBuilder: (context, index) => _buildCompactStoreItem(renewItems[index], auth, isRenew: true),
+            ),
+          ],
         );
       },
+    );
+  }
+
+  Widget _buildCompactStoreItem(Map<String, dynamic> item, AuthService auth, {bool isRenew = false}) {
+    final balance = auth.userData?.walletBalance ?? 0;
+    final bool canAfford = balance >= (item['cost'] as int);
+
+    return FadeInUp(
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: isRenew ? EspyTheme.royalBlue.withOpacity(0.1) : EspyTheme.gold.withOpacity(0.1)),
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10)],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Icon(item['icon'] as IconData, color: isRenew ? EspyTheme.royalBlue : EspyTheme.gold, size: 20),
+                Text(
+                  '${item['cost']} \$E',
+                  style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep),
+                ),
+              ],
+            ),
+            const Spacer(),
+            Text(item['title'] as String, style: GoogleFonts.cinzel(fontSize: 9, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep, letterSpacing: 0.5)),
+            const SizedBox(height: 4),
+            Text(item['desc'] as String, style: GoogleFonts.lora(fontSize: 8, color: Colors.black38, fontWeight: FontWeight.w600), maxLines: 2, overflow: TextOverflow.ellipsis),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: TextButton(
+                onPressed: canAfford ? () => _handleSpend(item, auth) : null,
+                style: TextButton.styleFrom(
+                  backgroundColor: canAfford ? (isRenew ? EspyTheme.royalBlue : EspyTheme.gold) : Colors.black12,
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: Text(
+                  isRenew ? 'RENEW' : 'ACTIVATE',
+                  style: GoogleFonts.montserrat(fontSize: 8, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 1),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

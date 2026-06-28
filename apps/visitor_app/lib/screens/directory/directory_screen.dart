@@ -76,7 +76,7 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
   Widget _buildServiceCard(Map<String, dynamic> service) {
     return GestureDetector(
       onTap: () {
-        // Navigate to professional details if possible
+        // Navigate to professional details
         final profId = service['professionalId'] ?? service['institutionId'];
         if (profId != null) {
           Navigator.push(context, MaterialPageRoute(builder: (_) => ProfessionalDetailsScreen(professionalId: profId)));

@@ -11,6 +11,7 @@ import '../../l10n/app_localizations.dart';
 import 'package:shared_core/theme/espy_theme.dart';
 import 'package:shared_core/services/auth_service.dart';
 import 'package:shared_core/services/firestore_service.dart';
+import '../../widgets/common/premium_button.dart';
 
 class MatchingScreen extends StatefulWidget {
   const MatchingScreen({super.key});
@@ -23,11 +24,48 @@ class _MatchingScreenState extends State<MatchingScreen> {
   final FirestoreService _firestore = FirestoreService();
   final CardSwiperController _controller = CardSwiperController();
   List<Map<String, dynamic>> _displayCards = [];
+  List<String> _favoriteIds = [];
+  List<String> _contactedIds = [];
   int _currentIndex = 0;
+  int _stackKey = 0;
   String? _filterSectorId;
   String? _filterPriceTagId;
   String _filterCountry = 'ALL';
   bool _newestFirst = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserMetadata();
+  }
+
+  void _loadUserMetadata() {
+    final userId = _firestore.getCurrentUserId;
+    if (userId.isEmpty) return;
+
+    // Load favorites
+    _firestore.getUserFavorites(userId).listen((favs) {
+      if (mounted) {
+        setState(() {
+          _favoriteIds = favs.map((f) => f['professionalId'] as String).toList();
+        });
+      }
+    });
+
+    // Load interactions (contacted)
+    FirebaseFirestore.instance
+        .collection('directory_interactions')
+        .where('userId', isEqualTo: userId)
+        .where('type', isEqualTo: 'like')
+        .snapshots()
+        .listen((snap) {
+      if (mounted) {
+        setState(() {
+          _contactedIds = snap.docs.map((doc) => doc.data()['targetId'] as String).toList();
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,6 +107,10 @@ class _MatchingScreenState extends State<MatchingScreen> {
                   'hasResults': filtered.isNotEmpty,
                 },
                 ...filtered,
+                {
+                  'id': 'end_card',
+                  'isEnd': true,
+                },
               ];
 
               return Stack(
@@ -77,8 +119,9 @@ class _MatchingScreenState extends State<MatchingScreen> {
                     children: [
                       Expanded(
                         child: Padding(
-                          padding: const EdgeInsets.fromLTRB(8, 0, 8, 80),
+                          padding: const EdgeInsets.fromLTRB(8, 0, 8, 180),
                           child: CardSwiper(
+                            key: ValueKey(_stackKey),
                             controller: _controller,
                             cardsCount: _displayCards.length,
                             numberOfCardsDisplayed: _displayCards.length > 3 ? 3 : _displayCards.length,
@@ -90,12 +133,15 @@ class _MatchingScreenState extends State<MatchingScreen> {
                               if (cardData['isInfo'] == true) {
                                 return _buildInfoCard(cardData['hasResults']);
                               }
+                              if (cardData['isEnd'] == true) {
+                                return _buildEndCard();
+                              }
                               return _buildSwipeCard(cardData);
                             },
                             onSwipe: (previousIndex, currentIndex, direction) async {
                               setState(() => _currentIndex = currentIndex ?? 0);
                               final target = _displayCards[previousIndex];
-                              if (target['isInfo'] == true) return true;
+                              if (target['isInfo'] == true || target['isEnd'] == true) return true;
 
                               final userId = _firestore.getCurrentUserId;
 
@@ -123,18 +169,18 @@ class _MatchingScreenState extends State<MatchingScreen> {
                                   }
                                 }
                               } else if (direction == CardSwiperDirection.left) {
-                                await _firestore.recordInteraction(
-                                  userId: userId,
-                                  targetId: target['id'],
-                                  type: 'dislike',
-                                );
-                              } else if (direction == CardSwiperDirection.top) {
                                 await _firestore.toggleFavorite(userId, target['id'], true);
                                 if (mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(content: Text("Protocol saved to Vault Favorites"), behavior: SnackBarBehavior.floating),
                                   );
                                 }
+                              } else if (direction == CardSwiperDirection.top) {
+                                await _firestore.recordInteraction(
+                                  userId: userId,
+                                  targetId: target['id'],
+                                  type: 'skip',
+                                );
                               }
                               return true;
                             },
@@ -144,7 +190,7 @@ class _MatchingScreenState extends State<MatchingScreen> {
                     ],
                   ),
                   Positioned(
-                    bottom: 32,
+                    bottom: 140,
                     left: 0,
                     right: 0,
                     child: _buildActionButtons(l10n),
@@ -155,6 +201,38 @@ class _MatchingScreenState extends State<MatchingScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildEndCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(32),
+        border: Border.all(color: EspyTheme.gold.withOpacity(0.2), width: 2),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20)],
+      ),
+      padding: const EdgeInsets.all(32),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.check_circle_outline_rounded, size: 80, color: EspyTheme.success),
+          const SizedBox(height: 24),
+          Text("PROTOCOL SCAN COMPLETE", style: GoogleFonts.cinzel(fontSize: 20, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep)),
+          const SizedBox(height: 16),
+          Text("You have reviewed all active protocols in this sector.", textAlign: TextAlign.center, style: GoogleFonts.lora(fontSize: 14, color: Colors.black45)),
+          const SizedBox(height: 32),
+          PremiumButton(
+            label: "RESTART PROTOCOL",
+            onPressed: () {
+              setState(() {
+                _stackKey++;
+                _currentIndex = 0;
+              });
+            },
+          ),
+        ],
+      ),
     );
   }
 
@@ -317,6 +395,9 @@ class _MatchingScreenState extends State<MatchingScreen> {
 
   Widget _buildSwipeCard(Map<String, dynamic> prof) {
     final l10n = AppLocalizations.of(context)!;
+    final bool isFavorite = _favoriteIds.contains(prof['id']);
+    final bool isContacted = _contactedIds.contains(prof['id']);
+
     return RepaintBoundary(
       child: Container(
         decoration: BoxDecoration(
@@ -338,6 +419,41 @@ class _MatchingScreenState extends State<MatchingScreen> {
                 )
               else
                 Container(color: Colors.white10, child: const Icon(Icons.person, size: 120, color: EspyTheme.royalBlue)),
+
+              // Badges
+              Positioned(
+                top: 20, left: 20,
+                child: Row(
+                  children: [
+                    if (isFavorite)
+                      Container(
+                        margin: const EdgeInsets.only(right: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(color: EspyTheme.gold, borderRadius: BorderRadius.circular(20)),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.favorite, color: Colors.white, size: 12),
+                            const SizedBox(width: 4),
+                            Text("FAVORITE", style: GoogleFonts.montserrat(fontSize: 8, fontWeight: FontWeight.w900, color: Colors.white)),
+                          ],
+                        ),
+                      ),
+                    if (isContacted)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(color: EspyTheme.success, borderRadius: BorderRadius.circular(20)),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.check_circle, color: Colors.white, size: 12),
+                            const SizedBox(width: 4),
+                            Text("PREVIOUSLY CONTACTED", style: GoogleFonts.montserrat(fontSize: 8, fontWeight: FontWeight.w900, color: Colors.white)),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+
               Positioned.fill(
                 child: Container(
                   decoration: BoxDecoration(

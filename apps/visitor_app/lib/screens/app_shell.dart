@@ -17,6 +17,10 @@ import 'package:shared_core/models/user_model.dart';
 
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'directory/directory_screen.dart';
+import 'map/map_explore_screen.dart';
+import 'matching/matching_screen.dart';
+import 'community/community_feed_screen.dart';
+import 'emergency/sos_hub_screen.dart';
 import 'services/broadcast_screen.dart';
 import 'profile/broadcasts_and_notifications_screen.dart';
 import '../widgets/common/espy_side_menu.dart';
@@ -105,10 +109,10 @@ class _AppShellState extends State<AppShell> {
   List<Widget> _getScreens(BuildContext context) {
     final double topPadding = MediaQuery.of(context).padding.top + 70;
     return [
-      const MapExploreScreen(),
-      Padding(padding: EdgeInsets.only(top: topPadding), child: const MatchingScreen()),
-      Padding(padding: EdgeInsets.only(top: topPadding), child: const DirectoryScreen()),
-      Padding(padding: EdgeInsets.only(top: topPadding), child: const CommunityFeedScreen()),
+      MapExploreScreen(),
+      Padding(padding: EdgeInsets.only(top: topPadding), child: MatchingScreen()),
+      Padding(padding: EdgeInsets.only(top: topPadding), child: DirectoryScreen()),
+      Padding(padding: EdgeInsets.only(top: topPadding), child: CommunityFeedScreen()),
     ];
   }
 
@@ -207,7 +211,7 @@ class _AppShellState extends State<AppShell> {
       onTap: () {
         HapticFeedback.heavyImpact();
         SoundService.playSOS();
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const SOSHubScreen()));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => SOSHubScreen()));
       },
       child: Stack(
         alignment: Alignment.center,

@@ -12,8 +12,7 @@ import '../../screens/profile/edit_profile_screen.dart';
 import '../../screens/profile/notifications_screen.dart';
 import '../../screens/profile/privacy_vault_screen.dart';
 import '../../screens/community/announcements_screen.dart';
-import '../../screens/services/broadcast_screen.dart';
-import '../../screens/profile/subscription_hub_screen.dart';
+import '../../screens/services/broadcast_history_screen.dart';
 import '../../screens/profile/vault_favorites_screen.dart';
 import '../../screens/profile/token_shop_screen.dart';
 import '../../screens/profile/wallet_screen.dart';
@@ -66,15 +65,12 @@ class EspySideMenu extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildSectionHeader('FINANCIAL PROTOCOLS'),
                   _buildMenuItem(context, LucideIcons.history, 'PAYMENT LEDGER', const PaymentHistoryScreen()),
-                  if (isProOrInst) ...[
-                    _buildMenuItem(context, Icons.credit_card_rounded, 'SUBSCRIPTION VAULT', const SubscriptionHubScreen()),
-                  ],
                   _buildMenuItem(context, LucideIcons.shieldCheck, 'PRIVACY VAULT', const PrivacyVaultScreen()),
 
                   const SizedBox(height: 16),
                   _buildSectionHeader('NETWORK SIGNALS'),
                   if (isProOrInst) ...[
-                    _buildMenuItem(context, Icons.campaign_rounded, 'DISPATCH BROADCAST', const BroadcastScreen()),
+                    _buildMenuItem(context, Icons.history_rounded, 'BROADCAST HISTORY', const BroadcastHistoryScreen()),
                   ],
                   _buildMenuItem(context, Icons.analytics_outlined, 'NETWORK LOGS', const AnnouncementsScreen()),
                 ],

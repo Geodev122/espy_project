@@ -32,7 +32,6 @@ import '../widgets/common/premium_button.dart';
 
 import '../../l10n/app_localizations.dart';
 
-import 'package:glassmorphism/glassmorphism.dart';
 import 'package:shared_core/services/firestore_service.dart';
 
 class AppShell extends StatefulWidget {
@@ -188,16 +187,16 @@ class _AppShellState extends State<AppShell> {
     final double topPadding = MediaQuery.of(context).padding.top + 70;
     if (role == UserRole.visitor) {
       return [
-        const MapExploreScreen(),
-        Padding(padding: EdgeInsets.only(top: topPadding), child: const MatchingScreen()),
-        Padding(padding: EdgeInsets.only(top: topPadding), child: const CommunityFeedScreen()),
+        MapExploreScreen(),
+        Padding(padding: EdgeInsets.only(top: topPadding), child: MatchingScreen()),
+        Padding(padding: EdgeInsets.only(top: topPadding), child: CommunityFeedScreen()),
       ];
     }
     return [
-      Padding(padding: EdgeInsets.only(top: topPadding), child: const DashboardScreen()),
-      const MapExploreScreen(),
-      Padding(padding: EdgeInsets.only(top: topPadding), child: const SwipeRequestsScreen()),
-      Padding(padding: EdgeInsets.only(top: topPadding), child: const ServiceManagerScreen()),
+      Padding(padding: EdgeInsets.only(top: topPadding), child: DashboardScreen()),
+      MapExploreScreen(),
+      Padding(padding: EdgeInsets.only(top: topPadding), child: SwipeRequestsScreen()),
+      Padding(padding: EdgeInsets.only(top: topPadding), child: ServiceManagerScreen()),
     ];
   }
 
@@ -265,69 +264,51 @@ class _AppShellState extends State<AppShell> {
   }
 
   Widget _buildProviderNav(List<NavItem> items) {
-    return GlassmorphicContainer(
+    return Container(
       width: double.infinity,
       height: 80,
-      borderRadius: 0,
-      blur: 15,
-      alignment: Alignment.center,
-      border: 0,
-      linearGradient: LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [
-          EspyTheme.navyDeep.withOpacity(0.9),
-          EspyTheme.navyDeep,
-        ],
-      ),
-      borderGradient: LinearGradient(
-        colors: [Colors.white.withOpacity(0.2), Colors.white.withOpacity(0.05)],
-      ),
-      child: Container(
-        margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-        height: 60,
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.05),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: items.map((item) => _buildNavItemWidget(item)).toList(),
+      color: EspyTheme.navyDeep.withOpacity(0.9),
+      child: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+          child: Container(
+            margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+            height: 60,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: items.map((item) => _buildNavItemWidget(item)).toList(),
+            ),
+          ),
         ),
       ),
     );
   }
 
   Widget _buildExclusiveVisitorNav() {
-    return GlassmorphicContainer(
+    return Container(
       width: double.infinity,
       height: 100,
-      borderRadius: 0,
-      blur: 15,
-      alignment: Alignment.center,
-      border: 0,
-      linearGradient: LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [
-          EspyTheme.platinum.withOpacity(0.1),
-          EspyTheme.platinum.withOpacity(0.9),
-        ],
-      ),
-      borderGradient: LinearGradient(
-        colors: [Colors.white.withOpacity(0.2), Colors.white.withOpacity(0.05)],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 20),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildSOSButton(),
-            const SizedBox(width: 24),
-            _buildMapMatchToggle(),
-            const SizedBox(width: 24),
-            _buildRequestAction(),
-          ],
+      color: EspyTheme.platinum.withOpacity(0.9),
+      child: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildSOSButton(),
+                const SizedBox(width: 24),
+                _buildMapMatchToggle(),
+                const SizedBox(width: 24),
+                _buildRequestAction(),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -338,7 +319,7 @@ class _AppShellState extends State<AppShell> {
       onTap: () {
         HapticFeedback.heavyImpact();
         SoundService.playSOS();
-        Navigator.push(context, MaterialPageRoute(builder: (_) => const SOSHubScreen()));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => SOSHubScreen()));
       },
       child: Stack(
         alignment: Alignment.center,
@@ -487,83 +468,76 @@ class _AppShellState extends State<AppShell> {
     final currentLabel = (_selectedIndex < navItems.length) ? navItems[_selectedIndex].label : 'ESPY';
     final bool isVisitor = role == UserRole.visitor;
 
-    return GlassmorphicContainer(
+    return Container(
       width: double.infinity,
       height: MediaQuery.of(context).padding.top + 70,
-      borderRadius: 0,
-      blur: 20,
-      alignment: Alignment.bottomCenter,
-      border: 0,
-      linearGradient: LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [
-          (isVisitor ? EspyTheme.platinum : Colors.white).withOpacity(0.95),
-          (isVisitor ? EspyTheme.platinum : Colors.white).withOpacity(0.85),
-        ],
+      decoration: BoxDecoration(
+        color: (isVisitor ? EspyTheme.platinum : Colors.white).withOpacity(1.0),
+        border: Border(
+          bottom: BorderSide(color: Colors.black.withOpacity(0.08), width: 1.5),
+        ),
       ),
-      borderGradient: LinearGradient(
-        colors: [Colors.white.withOpacity(0.2), Colors.white.withOpacity(0.05)],
-      ),
-      padding: EdgeInsets.fromLTRB(16, MediaQuery.of(context).padding.top, 16, 8),
-      child: Row(
-        children: [
-          // Left: User Avatar -> Opens Drawer
-          GestureDetector(
-            onTap: () => _scaffoldKey.currentState?.openDrawer(),
-            child: Hero(
-              tag: 'header-profile-avatar',
-              child: Container(
-                width: 38,
-                height: 38,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: EspyTheme.royalBlue.withOpacity(0.15), width: 1.5),
-                  image: user.photoUrl != null
-                      ? DecorationImage(image: CachedNetworkImageProvider(user.photoUrl!), fit: BoxFit.cover)
-                      : null,
-                ),
-                child: user.photoUrl == null
-                    ? const Icon(Icons.person_rounded, color: EspyTheme.royalBlue, size: 20)
-                    : null,
-              ),
-            ),
-          ),
-          const SizedBox(width: 16),
-          // Center: Label & Name
-          Expanded(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(16, MediaQuery.of(context).padding.top, 16, 8),
+        child: Row(
               children: [
-                Text(
-                  currentLabel,
-                  style: GoogleFonts.montserrat(fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 1.5, color: EspyTheme.navyDeep),
-                ),
-                if (user.name != null)
-                  Text(
-                    user.name!.toUpperCase(),
-                    style: GoogleFonts.montserrat(fontSize: 8, fontWeight: FontWeight.w700, letterSpacing: 0.5, color: EspyTheme.gold),
+                // Left: User Avatar -> Opens Drawer
+                GestureDetector(
+                  onTap: () => _scaffoldKey.currentState?.openDrawer(),
+                  child: Hero(
+                    tag: 'header-profile-avatar',
+                    child: Container(
+                      width: 38,
+                      height: 38,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: EspyTheme.royalBlue.withOpacity(0.15), width: 1.5),
+                        image: user.photoUrl != null
+                            ? DecorationImage(image: CachedNetworkImageProvider(user.photoUrl!), fit: BoxFit.cover)
+                            : null,
+                      ),
+                      child: user.photoUrl == null
+                          ? const Icon(Icons.person_rounded, color: EspyTheme.royalBlue, size: 20)
+                          : null,
+                    ),
                   ),
+                ),
+                const SizedBox(width: 16),
+                // Center: Label & Name
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        currentLabel,
+                        style: GoogleFonts.montserrat(fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 1.5, color: EspyTheme.navyDeep),
+                      ),
+                      if (user.name != null)
+                        Text(
+                          user.name!.toUpperCase(),
+                          style: GoogleFonts.montserrat(fontSize: 8, fontWeight: FontWeight.w700, letterSpacing: 0.5, color: EspyTheme.gold),
+                        ),
+                    ],
+                  ),
+                ),
+                // Right: Actions
+                if (isVisitor)
+                  IconButton(
+                    icon: const Icon(Icons.campaign_rounded, color: EspyTheme.navyDeep, size: 22),
+                    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => AnnouncementsScreen())),
+                    tooltip: 'Broadcasts',
+                  ),
+                IconButton(
+                  icon: const Icon(Icons.notifications_none_rounded, color: EspyTheme.navyDeep, size: 22),
+                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => NotificationsScreen())),
+                  tooltip: 'Notifications',
+                ),
+                const SizedBox(width: 4),
+                _buildLocaleToggle(localeService),
               ],
             ),
           ),
-          // Right: Actions
-          if (isVisitor)
-            IconButton(
-              icon: const Icon(Icons.campaign_rounded, color: EspyTheme.navyDeep, size: 22),
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => AnnouncementsScreen())),
-              tooltip: 'Broadcasts',
-            ),
-          IconButton(
-            icon: const Icon(Icons.notifications_none_rounded, color: EspyTheme.navyDeep, size: 22),
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => NotificationsScreen())),
-            tooltip: 'Notifications',
-          ),
-          const SizedBox(width: 4),
-          _buildLocaleToggle(localeService),
-        ],
-      ),
     );
   }
 

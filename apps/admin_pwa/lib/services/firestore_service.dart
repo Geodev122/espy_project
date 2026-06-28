@@ -437,7 +437,9 @@ class FirestoreService {
       'directory_professionals', 
       'directory_institutions', 
       'directory_visitors',
-      'directory_services'
+      'directory_services',
+      'directory_membership_transactions',
+      'directory_community_requests'
     ];
 
     for (var col in collections) {
@@ -456,6 +458,48 @@ class FirestoreService {
         if (cId != null && cMap.containsKey(cId)) updates['countryId'] = cMap[cId];
         if (gId != null && gMap.containsKey(gId)) updates['governorateId'] = gMap[gId];
         if (ctId != null && cityMap.containsKey(ctId)) updates['cityId'] = cityMap[ctId];
+
+        // Also re-anchor mainLocation map if it exists
+        if (data['mainLocation'] != null && data['mainLocation'] is Map) {
+          final loc = Map<String, dynamic>.from(data['mainLocation']);
+          bool locChanged = false;
+          
+          final lcId = loc['countryId']?.toString();
+          final lgId = loc['governorateId']?.toString();
+          final lctId = loc['cityId']?.toString();
+
+          if (lcId != null && cMap.containsKey(lcId)) { loc['countryId'] = cMap[lcId]; locChanged = true; }
+          if (lgId != null && gMap.containsKey(lgId)) { loc['governorateId'] = gMap[lgId]; locChanged = true; }
+          if (lctId != null && cityMap.containsKey(lctId)) { loc['cityId'] = cityMap[lctId]; locChanged = true; }
+          
+          if (locChanged) updates['mainLocation'] = loc;
+        }
+
+        // Also re-anchor secondaryLocations list if it exists
+        if (data['secondaryLocations'] != null && data['secondaryLocations'] is List) {
+          final list = List.from(data['secondaryLocations']);
+          bool listChanged = false;
+          for (int i = 0; i < list.length; i++) {
+            if (list[i] is Map) {
+              final loc = Map<String, dynamic>.from(list[i]);
+              bool locChanged = false;
+              
+              final lcId = loc['countryId']?.toString();
+              final lgId = loc['governorateId']?.toString();
+              final lctId = loc['cityId']?.toString();
+
+              if (lcId != null && cMap.containsKey(lcId)) { loc['countryId'] = cMap[lcId]; locChanged = true; }
+              if (lgId != null && gMap.containsKey(lgId)) { loc['governorateId'] = gMap[lgId]; locChanged = true; }
+              if (lctId != null && cityMap.containsKey(lctId)) { loc['cityId'] = cityMap[lctId]; locChanged = true; }
+              
+              if (locChanged) {
+                list[i] = loc;
+                listChanged = true;
+              }
+            }
+          }
+          if (listChanged) updates['secondaryLocations'] = list;
+        }
 
         if (updates.isNotEmpty) {
           batch.update(doc.reference, updates);
