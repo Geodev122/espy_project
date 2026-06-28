@@ -73,7 +73,30 @@ class _AdminEditMasterModalState extends ConsumerState<AdminEditMasterModal> {
         data[key] = val;
       });
       
-      final id = widget.item?['id'] ?? DateTime.now().millisecondsSinceEpoch.toString();
+      final nameEn = _controllers['name_en']?.text ?? _controllers['label_en']?.text ?? 'unnamed';
+      final nameSlug = nameEn.trim().toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '_').replaceAll(RegExp(r'^_+|_+$'), '');
+      
+      String id = widget.item?['id']?.toString() ?? '';
+      
+      if (id.isEmpty) {
+        // Generate Slug-based ID for new entries
+        switch (widget.collection) {
+          case 'directory_countries':
+            id = nameSlug;
+            data['parent_anchor_id'] = 'global';
+            break;
+          case 'directory_governorates':
+            id = '${_selectedIds['country_id']}-$nameSlug';
+            data['parent_id'] = _selectedIds['country_id'];
+            break;
+          case 'directory_cities':
+            id = '${_selectedIds['governorate_id']}-$nameSlug';
+            break;
+          default:
+            id = DateTime.now().millisecondsSinceEpoch.toString();
+        }
+      }
+
       await ref.read(firestoreServiceProvider).updateItem(widget.collection, id, data);
       
       if (mounted) Navigator.pop(context);

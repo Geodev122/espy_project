@@ -340,123 +340,138 @@ class FirestoreService {
 
   // ── Anchor Management & Migration ──────────────────────────────────────────
 
-  Future<void> setupGlobalAnchors() async {
-    final timestamp = FieldValue.serverTimestamp();
+  String _toSlug(String name) {
+    return name.trim().toLowerCase()
+      .replaceAll(RegExp(r'[^a-z0-9]+'), '_')
+      .replaceAll(RegExp(r'^_+|_+$'), '');
+  }
 
-    // 1. Ensure Top-Level "Global" Anchor exists
-    final globalRef = _db.collection('directory_anchors').doc('global');
-    await globalRef.set({
+  Future<void> syncAndCleanAnchors() async {
+    final timestamp = FieldValue.serverTimestamp();
+    
+    // 1. Ensure Global Root Anchor
+    await _db.collection('directory_anchors').doc('global').set({
       'name_en': 'Global Ecosystem',
-      'name_ar': 'النظام العالمي',
       'type': 'root',
       'isActive': true,
       'updatedAt': timestamp,
     }, SetOptions(merge: true));
 
-    // 2. Ensure Lebanon exists and is anchored to Global
-    final lebanonRef = _db.collection('directory_countries').doc('lebanon');
-    await lebanonRef.set({
-      'name_en': 'Lebanon',
-      'name_ar': 'لبنان',
-      'code': 'LB',
-      'currency': 'LBP',
-      'phone_code': '+961',
-      'parent_anchor_id': 'global', // Hierarchy Level 1
-      'isActive': true,
-      'updatedAt': timestamp,
-    }, SetOptions(merge: true));
+    // Maps for re-anchoring
+    final countryMap = <String, String>{};
+    final govMap = <String, String>{};
+    final cityMap = <String, String>{};
 
-    // Helper for large batching
-    Future<void> runBatchedDeletes(List<DocumentReference> refs) async {
-      if (refs.isEmpty) return;
-      var batch = _db.batch();
-      int count = 0;
-      for (var ref in refs) {
-        batch.delete(ref);
-        count++;
-        if (count >= 400) {
-          await batch.commit();
-          batch = _db.batch();
-          count = 0;
-        }
-      }
-      if (count > 0) await batch.commit();
+    // 2. Process Countries
+    final countriesSnap = await _db.collection('directory_countries').get();
+    for (var doc in countriesSnap.docs) {
+      final data = doc.data();
+      final name = (data['name_en']?.toString() ?? data['name']?.toString() ?? 'Unknown').trim();
+      final slug = _toSlug(name);
+      
+      countryMap[doc.id] = slug;
+      await _db.collection('directory_countries').doc(slug).set({
+        ...data,
+        'id': slug,
+        'parent_anchor_id': 'global',
+        'updatedAt': timestamp,
+      }, SetOptions(merge: true));
+      
+      if (doc.id != slug) await doc.reference.delete();
     }
 
-    Future<void> runBatchedUpdates(List<DocumentReference> refs, Map<String, dynamic> data) async {
-      if (refs.isEmpty) return;
-      var batch = _db.batch();
-      int count = 0;
-      for (var ref in refs) {
-        batch.update(ref, data);
-        count++;
-        if (count >= 400) {
-          await batch.commit();
-          batch = _db.batch();
-          count = 0;
-        }
-      }
-      if (count > 0) await batch.commit();
-    }
-
-    // 3. Audit Regions (Governorates) -> Anchor to Lebanon
+    // 3. Process Governorates (Regions)
     final govSnap = await _db.collection('directory_governorates').get();
-    final seenGovs = <String>{};
-    final govDeletes = <DocumentReference>[];
-    final govUpdateRefs = <DocumentReference>[];
-
     for (var doc in govSnap.docs) {
       final data = doc.data();
-      final nameEn = (data['name_en']?.toString() ?? data['name']?.toString() ?? data['label_en']?.toString() ?? '').trim().toLowerCase();
+      final name = (data['name_en']?.toString() ?? data['name']?.toString() ?? data['label_en']?.toString() ?? 'Unknown').trim();
+      final oldCountryId = data['country_id']?.toString() ?? data['country']?.toString();
+      final newCountryId = oldCountryId != null ? (countryMap[oldCountryId] ?? _toSlug(oldCountryId)) : 'lebanon';
       
-      if (nameEn.isEmpty || seenGovs.contains(nameEn)) {
-        govDeletes.add(doc.reference);
-      } else {
-        seenGovs.add(nameEn);
-        // All current regions must be anchored to Lebanon
-        govUpdateRefs.add(doc.reference);
-      }
+      final slug = '$newCountryId-${_toSlug(name)}';
+      govMap[doc.id] = slug;
+
+      await _db.collection('directory_governorates').doc(slug).set({
+        ...data,
+        'id': slug,
+        'country_id': newCountryId,
+        'parent_id': newCountryId,
+        'updatedAt': timestamp,
+      }, SetOptions(merge: true));
+
+      if (doc.id != slug) await doc.reference.delete();
     }
-    await runBatchedDeletes(govDeletes);
-    await runBatchedUpdates(govUpdateRefs, {
-      'country_id': 'lebanon', 
-      'parent_id': 'lebanon', // Explicit hierarchy
-      'updatedAt': timestamp
-    });
 
-    // 4. Audit Cities -> Anchor to Regions
+    // 4. Process Cities
     final citySnap = await _db.collection('directory_cities').get();
-    final seenCities = <String>{};
-    final cityDeletes = <DocumentReference>[];
-    final cityUpdateRefs = <DocumentReference>[];
-
     for (var doc in citySnap.docs) {
       final data = doc.data();
-      final nameEn = (data['name_en']?.toString() ?? data['name']?.toString() ?? data['label_en']?.toString() ?? '').trim().toLowerCase();
-      final govId = data['governorate_id'] ?? data['gov_id'] ?? data['region_id'];
+      final name = (data['name_en']?.toString() ?? data['name']?.toString() ?? 'Unknown').trim();
+      final oldGovId = data['governorate_id']?.toString() ?? data['gov_id']?.toString();
+      final oldCountryId = data['country_id']?.toString() ?? data['country']?.toString();
       
-      final compositeKey = '$nameEn-$govId';
-      if (nameEn.isEmpty || govId == null || seenCities.contains(compositeKey)) {
-        cityDeletes.add(doc.reference);
-      } else {
-        seenCities.add(compositeKey);
-        // Ensure city is correctly anchored to its region and parent country
-        cityUpdateRefs.add(doc.reference);
-      }
-    }
-    await runBatchedDeletes(cityDeletes);
-    // Note: We don't force a single region, we just ensure the country link is Lebanon
-    await runBatchedUpdates(cityUpdateRefs, {'country_id': 'lebanon', 'updatedAt': timestamp});
+      final newCountryId = oldCountryId != null ? (countryMap[oldCountryId] ?? _toSlug(oldCountryId)) : 'lebanon';
+      final newGovId = oldGovId != null ? (govMap[oldGovId] ?? _toSlug(oldGovId)) : '$newCountryId-unknown';
 
-    // 5. Ensure all other countries are anchored to Global
-    final countriesSnap = await _db.collection('directory_countries').get();
-    final countryUpdateRefs = <DocumentReference>[];
-    for (var doc in countriesSnap.docs) {
-      if (doc.id != 'lebanon') {
-        countryUpdateRefs.add(doc.reference);
-      }
+      final slug = '$newGovId-${_toSlug(name)}';
+      cityMap[doc.id] = slug;
+
+      await _db.collection('directory_cities').doc(slug).set({
+        ...data,
+        'id': slug,
+        'country_id': newCountryId,
+        'governorate_id': newGovId,
+        'updatedAt': timestamp,
+      }, SetOptions(merge: true));
+
+      if (doc.id != slug) await doc.reference.delete();
     }
-    await runBatchedUpdates(countryUpdateRefs, {'parent_anchor_id': 'global', 'updatedAt': timestamp});
+
+    // 5. Re-anchor all dependent nodes
+    await _reanchorNodes(countryMap, govMap, cityMap);
+  }
+
+  Future<void> _reanchorNodes(Map<String, String> cMap, Map<String, String> gMap, Map<String, String> cityMap) async {
+    final collections = [
+      'users', 
+      'directory_professionals', 
+      'directory_institutions', 
+      'directory_visitors',
+      'directory_services'
+    ];
+
+    for (var col in collections) {
+      final snap = await _db.collection(col).get();
+      final batch = _db.batch();
+      int count = 0;
+
+      for (var doc in snap.docs) {
+        final data = doc.data();
+        final updates = <String, dynamic>{};
+        
+        final cId = data['countryId']?.toString() ?? data['country_id']?.toString();
+        final gId = data['governorateId']?.toString() ?? data['governorate_id']?.toString();
+        final ctId = data['cityId']?.toString() ?? data['city_id']?.toString();
+
+        if (cId != null && cMap.containsKey(cId)) updates['countryId'] = cMap[cId];
+        if (gId != null && gMap.containsKey(gId)) updates['governorateId'] = gMap[gId];
+        if (ctId != null && cityMap.containsKey(ctId)) updates['cityId'] = cityMap[ctId];
+
+        if (updates.isNotEmpty) {
+          batch.update(doc.reference, updates);
+          count++;
+          if (count >= 400) {
+            await batch.commit();
+            count = 0;
+          }
+        }
+      }
+      if (count > 0) await batch.commit();
+    }
+  }
+
+  Future<void> setupGlobalAnchors() async {
+    await syncAndCleanAnchors();
   }
 
   // ── Token System ──────────────────────────────────────────────────────────

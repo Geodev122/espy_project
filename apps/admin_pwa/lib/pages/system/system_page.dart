@@ -89,41 +89,77 @@ class _SystemPageState extends ConsumerState<SystemPage> with SingleTickerProvid
           children: [
             ElevatedButton.icon(
               onPressed: () async {
-                await ref.read(firestoreServiceProvider).setupGlobalAnchors();
-                ref.invalidate(countriesFutureProvider);
-                ref.invalidate(governoratesFutureProvider);
-                ref.invalidate(citiesFutureProvider);
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Anchors synchronized. Duplicates removed. Lebanon set as Global Anchor.'))
-                  );
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (_) => const Center(child: CircularProgressIndicator()),
+                );
+                try {
+                  await ref.read(firestoreServiceProvider).syncAndCleanAnchors();
+                  ref.invalidate(countriesFutureProvider);
+                  ref.invalidate(governoratesFutureProvider);
+                  ref.invalidate(citiesFutureProvider);
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Ecosystem Hierarchy Re-anchored Successfully.'))
+                    );
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Migration Failed: $e'))
+                    );
+                  }
                 }
               },
               icon: const Icon(LucideIcons.refreshCcw, size: 16),
-              label: const Text('SYNC & DEDUPLICATE ANCHORS'),
+              label: const Text('SYNC & RE-ANCHOR ECOSYSTEM'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: EspyTheme.electricBlue.withOpacity(0.1),
                 foregroundColor: EspyTheme.electricBlue,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 32),
         asyncCountries.when(
           data: (data) => AdminSettingsTable(
-            title: 'DIRECTORY COUNTRIES',
+            title: 'H1: NATION STATES (COUNTRIES)',
             collection: 'directory_countries',
             columns: const ['Name EN', 'Name AR', 'Code', 'Currency'],
             data: data,
           ),
           loading: () => const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator())),
-          error: (e, s) => Container(
-            padding: const EdgeInsets.all(20),
-            color: Colors.redAccent.withOpacity(0.1),
-            child: Text('ACCESS RESTRICTED OR NETWORK ERROR: $e', style: const TextStyle(color: Colors.redAccent, fontSize: 10)),
-          ),
+          error: (e, s) => Text('Error: $e'),
         ),
         const SizedBox(height: 32),
+        asyncGovernorates.when(
+          data: (data) => AdminSettingsTable(
+            title: 'H2: REGIONAL GOVERNORATES',
+            collection: 'directory_governorates',
+            columns: const ['Name EN', 'Name AR', 'Country ID'],
+            data: data,
+          ),
+          loading: () => const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator())),
+          error: (e, s) => Text('Error: $e'),
+        ),
+        const SizedBox(height: 32),
+        asyncCities.when(
+          data: (data) => AdminSettingsTable(
+            title: 'H3: DIRECTORY CITIES',
+            collection: 'directory_cities',
+            columns: const ['Name EN', 'Name AR', 'Country ID', 'Governorate ID'],
+            data: data,
+          ),
+          loading: () => const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator())),
+          error: (e, s) => Text('Error: $e'),
+        ),
+        const SizedBox(height: 48),
+        _buildSectionHeader('SYSTEM SECTORS & CATEGORIES'),
+        const SizedBox(height: 24),
         asyncSectors.when(
           data: (data) => AdminSettingsTable(
             title: 'DIRECTORY SECTORS',
@@ -132,36 +168,7 @@ class _SystemPageState extends ConsumerState<SystemPage> with SingleTickerProvid
             data: data,
           ),
           loading: () => const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator())),
-          error: (e, s) => Text('Error loading sectors: $e', style: const TextStyle(color: Colors.redAccent, fontSize: 10)),
-        ),
-        const SizedBox(height: 32),
-        asyncGovernorates.when(
-          data: (data) => AdminSettingsTable(
-            title: 'REGIONAL GOVERNORATES',
-            collection: 'directory_governorates',
-            columns: const ['Name EN', 'Name AR', 'Country ID'],
-            data: data,
-          ),
-          loading: () => const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator())),
-          error: (e, s) => Text('Error loading governorates: $e', style: const TextStyle(color: Colors.redAccent, fontSize: 10)),
-        ),
-        const SizedBox(height: 32),
-        asyncCities.when(
-          data: (data) => AdminSettingsTable(
-            title: 'DIRECTORY CITIES',
-            collection: 'directory_cities',
-            columns: const ['Name EN', 'Name AR', 'Country ID', 'Governorate ID'],
-            data: data,
-          ),
-          loading: () => const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator())),
-          error: (e, s) => Text('Error loading cities: $e', style: const TextStyle(color: Colors.redAccent, fontSize: 10)),
-        ),
-        const SizedBox(height: 32),
-        AdminSettingsTable(
-          title: 'EMERGENCY HOTLINES',
-          collection: 'emergency_hotlines',
-          columns: const ['Label EN', 'Label AR', 'Number', 'Country ID'],
-          data: [], // Placeholder for now, can be fetched if provider added
+          error: (e, s) => Text('Error loading sectors: $e'),
         ),
         const SizedBox(height: 32),
         asyncCategories.when(
