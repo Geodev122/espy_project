@@ -215,22 +215,32 @@ class _SystemPageState extends ConsumerState<SystemPage> with SingleTickerProvid
                 style: EspyTheme.cinzelStyle.copyWith(fontSize: 12, color: Colors.white, fontWeight: FontWeight.bold),
               ),
               subtitle: Text('${countryGovs.length} REGIONS IDENTIFIED', style: const TextStyle(fontSize: 10, color: Colors.white24)),
-              trailing: IconButton(
-                icon: const Icon(LucideIcons.plus, size: 16, color: EspyTheme.gold),
-                onPressed: () => showDialog(
-                  context: context, 
-                  builder: (_) => AdminEditMasterModal(
-                    collection: 'directory_governorates', 
-                    title: 'NEW REGION FOR ${country['name_en']}',
-                    item: {'country_id': country['id']},
-                  )
-                ),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(LucideIcons.plus, size: 16, color: EspyTheme.gold),
+                    onPressed: () => showDialog(
+                      context: context, 
+                      builder: (_) => AdminEditMasterModal(
+                        collection: 'directory_governorates', 
+                        title: 'NEW REGION FOR ${country['name_en']}',
+                        item: {'country_id': country['id']},
+                      )
+                    ),
+                  ),
+                  const Icon(Icons.expand_more, color: Colors.white24),
+                ],
               ),
               children: countryGovs.map((gov) {
                 final govCities = cities.where((c) => c['governorate_id'] == gov['id']).toList();
                 
-                return Padding(
-                  padding: const EdgeInsets.only(left: 32),
+                return Container(
+                  margin: const EdgeInsets.only(left: 24, right: 16, bottom: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.02),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   child: ExpansionTile(
                     shape: const Border(),
                     leading: const Icon(LucideIcons.map, color: EspyTheme.gold, size: 14),
@@ -250,24 +260,53 @@ class _SystemPageState extends ConsumerState<SystemPage> with SingleTickerProvid
                         )
                       ),
                     ),
-                    children: govCities.map((city) => ListTile(
-                      contentPadding: const EdgeInsets.only(left: 64, right: 24),
-                      leading: const Icon(LucideIcons.mapPin, color: EspyTheme.cyan, size: 12),
-                      title: Text(city['name_en']?.toString() ?? 'Unnamed City', style: const TextStyle(fontSize: 11, color: Colors.white54)),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: const Icon(LucideIcons.edit, size: 12, color: Colors.white24),
-                            onPressed: () => showDialog(context: context, builder: (_) => AdminEditMasterModal(collection: 'directory_cities', item: city, title: 'EDIT CITY')),
+                    children: [
+                      // Scrollable grid for cities to keep it readable
+                      Container(
+                        constraints: const BoxConstraints(maxHeight: 400),
+                        padding: const EdgeInsets.all(16),
+                        child: SingleChildScrollView(
+                          child: Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: govCities.map((city) => Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.05),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.white.withOpacity(0.05)),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(city['name_en']?.toString() ?? 'City', style: const TextStyle(fontSize: 10, color: Colors.white70, fontWeight: FontWeight.bold)),
+                                      if (city['lat'] != null)
+                                        Text('${city['lat']}, ${city['lng']}', style: const TextStyle(fontSize: 8, color: Colors.white12)),
+                                    ],
+                                  ),
+                                  const SizedBox(width: 8),
+                                  IconButton(
+                                    icon: const Icon(LucideIcons.edit, size: 10, color: Colors.white24),
+                                    onPressed: () => showDialog(context: context, builder: (_) => AdminEditMasterModal(collection: 'directory_cities', item: city, title: 'EDIT CITY')),
+                                    constraints: const BoxConstraints(maxWidth: 24, maxHeight: 24),
+                                    padding: EdgeInsets.zero,
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(LucideIcons.trash2, size: 10, color: Colors.redAccent),
+                                    onPressed: () => _handleDelete(city['id'], 'directory_cities'),
+                                    constraints: const BoxConstraints(maxWidth: 24, maxHeight: 24),
+                                    padding: EdgeInsets.zero,
+                                  ),
+                                ],
+                              ),
+                            )).toList(),
                           ),
-                          IconButton(
-                            icon: const Icon(LucideIcons.trash2, size: 12, color: Colors.redAccent),
-                            onPressed: () => _handleDelete(city['id'], 'directory_cities'),
-                          ),
-                        ],
+                        ),
                       ),
-                    )).toList(),
+                    ],
                   ),
                 );
               }).toList(),

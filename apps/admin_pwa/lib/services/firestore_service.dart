@@ -385,10 +385,30 @@ class FirestoreService {
       .replaceAll(RegExp(r'^_+|_+$'), '');
   }
 
+  String _normalizeAnchorName(String name) {
+    String n = name.toLowerCase().trim();
+    if (n.startsWith('el ')) n = n.substring(3);
+    if (n.startsWith('al ')) n = n.substring(3);
+    if (n.startsWith('the ')) n = n.substring(4);
+    return _toSlug(n);
+  }
+
   Future<void> syncAndCleanAnchors() async {
     final timestamp = FieldValue.serverTimestamp();
     
-    // 1. Ensure Global Root Anchor
+    // 1. Canonical Lebanese Governorates (Validated from master list)
+    final Map<String, Map<String, String>> canonicalGovs = {
+      'akkar': {'en': 'Akkar', 'ar': 'عكار'},
+      'baalbek_hermel': {'en': 'Baalbek-El Hermel', 'ar': 'بعلبك - الهرمل'},
+      'beirut': {'en': 'Beirut', 'ar': 'بيروت'},
+      'bekaa': {'en': 'Bekaa', 'ar': 'البقاع'},
+      'nabatieh': {'en': 'El Nabatieh', 'ar': 'النبطية'},
+      'mount_lebanon': {'en': 'Mount Lebanon', 'ar': 'جبل لبنان'},
+      'north': {'en': 'North', 'ar': 'الشمال'},
+      'south': {'en': 'South', 'ar': 'الجنوب'},
+    };
+
+    // 2. Setup Roots
     await _db.collection('directory_anchors').doc('global').set({
       'name_en': 'Global Ecosystem',
       'type': 'root',
@@ -396,106 +416,106 @@ class FirestoreService {
       'updatedAt': timestamp,
     }, SetOptions(merge: true));
 
-    // Maps for re-anchoring
-    final countryMap = <String, String>{};
-    final govMap = <String, String>{};
-    final cityMap = <String, String>{};
+    await _db.collection('directory_countries').doc('lebanon').set({
+      'name_en': 'Lebanon',
+      'name_ar': 'لبنان',
+      'id': 'lebanon',
+      'parent_anchor_id': 'global',
+      'isActive': true,
+      'updatedAt': timestamp,
+    }, SetOptions(merge: true));
 
-    // 2. Process Countries
-    final countriesSnap = await _db.collection('directory_countries').get();
-    for (var doc in countriesSnap.docs) {
-      final data = doc.data();
-      final name = (data['name_en']?.toString() ?? data['name']?.toString() ?? doc.id).trim();
-      final slug = _toSlug(name);
-      
-      countryMap[doc.id] = slug;
-      await _db.collection('directory_countries').doc(slug).set({
-        ...data,
+    // 3. Process Governorates (Regions)
+    final govMap = <String, String>{}; // Old ID/Name -> New Canonical Slug
+    final govSnap = await _db.collection('directory_governorates').get();
+    
+    // Seed canonical governorates
+    for (var entry in canonicalGovs.entries) {
+      final slug = 'lebanon-${entry.key}';
+      await _db.collection('directory_governorates').doc(slug).set({
         'id': slug,
-        'parent_anchor_id': 'global',
-        'updatedAt': timestamp,
-      }, SetOptions(merge: true));
-      
-      if (doc.id != slug) await doc.reference.delete();
-    }
-
-    // Default Lebanon if missing
-    if (!countryMap.containsValue('lebanon')) {
-      await _db.collection('directory_countries').doc('lebanon').set({
-        'name_en': 'Lebanon',
-        'name_ar': 'لبنان',
-        'id': 'lebanon',
-        'parent_anchor_id': 'global',
+        'name_en': entry.value['en'],
+        'name_ar': entry.value['ar'],
+        'country_id': 'lebanon',
+        'parent_id': 'lebanon',
         'isActive': true,
         'updatedAt': timestamp,
       }, SetOptions(merge: true));
-      countryMap['lebanon'] = 'lebanon';
     }
 
-    // 3. Process Governorates (Regions)
-    final govSnap = await _db.collection('directory_governorates').get();
+    // Build the mapping from existing data to canonical
     for (var doc in govSnap.docs) {
       final data = doc.data();
-      final name = (data['name_en']?.toString() ?? data['name']?.toString() ?? data['label_en']?.toString() ?? doc.id).trim();
-      final oldCountryId = data['country_id']?.toString() ?? data['country']?.toString();
+      final name = (data['name_en'] ?? data['name'] ?? doc.id).toString().toLowerCase();
       
-      // Attempt to resolve country or default to lebanon
-      String newCountryId = 'lebanon';
-      if (oldCountryId != null) {
-        newCountryId = countryMap[oldCountryId] ?? _toSlug(oldCountryId);
+      String targetKey = 'unknown';
+      if (name.contains('akkar')) targetKey = 'akkar';
+      else if (name.contains('baalbek') || name.contains('hermel')) targetKey = 'baalbek_hermel';
+      else if (name.contains('beirut') || name.contains('bayrouth')) targetKey = 'beirut';
+      else if (name.contains('bekaa') || name.contains('biqaa')) targetKey = 'bekaa';
+      else if (name.contains('nabatie') || name.contains('nabatiy')) targetKey = 'nabatieh';
+      else if (name.contains('mount') || name.contains('jabal')) targetKey = 'mount_lebanon';
+      else if (name.contains('north') || name.contains('chimal')) targetKey = 'north';
+      else if (name.contains('south') || name.contains('janoub')) targetKey = 'south';
+
+      final targetSlug = 'lebanon-$targetKey';
+      govMap[doc.id] = targetSlug;
+      govMap[name] = targetSlug; // Also map by name for city linking
+      
+      // Delete redundant old doc
+      if (doc.id != targetSlug) {
+        await doc.reference.delete();
       }
-      
-      final slug = '$newCountryId-${_toSlug(name)}';
-      govMap[doc.id] = slug;
-
-      await _db.collection('directory_governorates').doc(slug).set({
-        ...data,
-        'id': slug,
-        'country_id': newCountryId,
-        'parent_id': newCountryId,
-        'updatedAt': timestamp,
-      }, SetOptions(merge: true));
-
-      if (doc.id != slug) await doc.reference.delete();
     }
 
-    // 4. Process Cities
+    // 4. Process Cities (Aggressive Deduplication)
     final citySnap = await _db.collection('directory_cities').get();
+    final cityMap = <String, String>{};
+    
     for (var doc in citySnap.docs) {
       final data = doc.data();
-      final name = (data['name_en']?.toString() ?? data['name']?.toString() ?? doc.id).trim();
-      final oldGovId = data['governorate_id']?.toString() ?? data['gov_id']?.toString() ?? data['region_id']?.toString();
-      final oldCountryId = data['country_id']?.toString() ?? data['country']?.toString();
+      final nameEn = (data['name_en'] ?? data['name'] ?? '').toString();
+      if (nameEn.isEmpty) {
+        await doc.reference.delete();
+        continue;
+      }
+
+      final normalizedCityName = _normalizeAnchorName(nameEn);
       
-      String newCountryId = 'lebanon';
-      if (oldCountryId != null) {
-        newCountryId = countryMap[oldCountryId] ?? _toSlug(oldCountryId);
-      }
+      // Resolve Governorate
+      final rawGov = (data['governorate_id'] ?? data['governorate'] ?? data['region'] ?? 'beirut').toString().toLowerCase();
+      String targetGovSlug = 'lebanon-beirut';
+      
+      if (rawGov.contains('akkar')) targetGovSlug = 'lebanon-akkar';
+      else if (rawGov.contains('baalbek')) targetGovSlug = 'lebanon-baalbek_hermel';
+      else if (rawGov.contains('bekaa')) targetGovSlug = 'lebanon-bekaa';
+      else if (rawGov.contains('nabati')) targetGovSlug = 'lebanon-nabatieh';
+      else if (rawGov.contains('mount') || rawGov.contains('jabal')) targetGovSlug = 'lebanon-mount_lebanon';
+      else if (rawGov.contains('north')) targetGovSlug = 'lebanon-north';
+      else if (rawGov.contains('south')) targetGovSlug = 'lebanon-south';
+      else if (govMap.containsKey(rawGov)) targetGovSlug = govMap[rawGov]!;
 
-      String newGovId = '$newCountryId-unknown';
-      if (oldGovId != null) {
-        newGovId = govMap[oldGovId] ?? _toSlug(oldGovId);
-        if (!newGovId.startsWith(newCountryId)) {
-           newGovId = '$newCountryId-$newGovId';
-        }
-      }
+      final finalCityId = '$targetGovSlug-$normalizedCityName';
+      cityMap[doc.id] = finalCityId;
 
-      final slug = '$newGovId-${_toSlug(name)}';
-      cityMap[doc.id] = slug;
-
-      await _db.collection('directory_cities').doc(slug).set({
+      // Update/Create canonical city doc
+      await _db.collection('directory_cities').doc(finalCityId).set({
         ...data,
-        'id': slug,
-        'country_id': newCountryId,
-        'governorate_id': newGovId,
+        'id': finalCityId,
+        'country_id': 'lebanon',
+        'governorate_id': targetGovSlug,
         'updatedAt': timestamp,
       }, SetOptions(merge: true));
 
-      if (doc.id != slug) await doc.reference.delete();
+      if (doc.id != finalCityId) {
+        await doc.reference.delete();
+      }
     }
 
-    // 5. Re-anchor all dependent nodes
-    await _reanchorNodes(countryMap, govMap, cityMap);
+    // 5. Global re-anchoring of all data nodes
+    await _reanchorNodes({'lebanon': 'lebanon'}, govMap, cityMap);
+    
+    _debug.log('FIRESTORE', 'Database core cleaned and reorganized.');
   }
 
   Future<void> _reanchorNodes(Map<String, String> cMap, Map<String, String> gMap, Map<String, String> cityMap) async {
