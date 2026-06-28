@@ -25,7 +25,7 @@ class _LocationPickerModalState extends State<LocationPickerModal> {
   bool _isResolving = false;
   final MapController _mapController = MapController();
 
-  String? _selectedCountryId;
+  String? _selectedCountryId = 'lebanon';
   String? _selectedGovernorateId;
   String? _selectedCityId;
 

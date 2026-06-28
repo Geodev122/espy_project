@@ -315,6 +315,7 @@ class FirestoreService {
       'uid': uid,
       'isActive': true,
       'isVerified': true, // Default to true as per new algorithm
+      'countryId': data['countryId'] ?? 'lebanon',
       'last_active': timestamp,
       'updatedAt': timestamp
     };

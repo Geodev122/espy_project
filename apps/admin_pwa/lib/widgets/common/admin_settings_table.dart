@@ -4,6 +4,8 @@ import '../../core/theme.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'admin_edit_master_modal.dart';
 import '../../services/firestore_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 class AdminSettingsTable extends ConsumerWidget {
   final String title;

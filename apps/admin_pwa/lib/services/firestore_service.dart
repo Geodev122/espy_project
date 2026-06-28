@@ -343,7 +343,17 @@ class FirestoreService {
   Future<void> setupGlobalAnchors() async {
     final timestamp = FieldValue.serverTimestamp();
 
-    // 1. Ensure Lebanon exists as the Global Anchor
+    // 1. Ensure Top-Level "Global" Anchor exists
+    final globalRef = _db.collection('directory_anchors').doc('global');
+    await globalRef.set({
+      'name_en': 'Global Ecosystem',
+      'name_ar': 'النظام العالمي',
+      'type': 'root',
+      'isActive': true,
+      'updatedAt': timestamp,
+    }, SetOptions(merge: true));
+
+    // 2. Ensure Lebanon exists and is anchored to Global
     final lebanonRef = _db.collection('directory_countries').doc('lebanon');
     await lebanonRef.set({
       'name_en': 'Lebanon',
@@ -351,6 +361,7 @@ class FirestoreService {
       'code': 'LB',
       'currency': 'LBP',
       'phone_code': '+961',
+      'parent_anchor_id': 'global', // Hierarchy Level 1
       'isActive': true,
       'updatedAt': timestamp,
     }, SetOptions(merge: true));
@@ -388,7 +399,7 @@ class FirestoreService {
       if (count > 0) await batch.commit();
     }
 
-    // 2. Audit and fix governorates (Regions)
+    // 3. Audit Regions (Governorates) -> Anchor to Lebanon
     final govSnap = await _db.collection('directory_governorates').get();
     final seenGovs = <String>{};
     final govDeletes = <DocumentReference>[];
@@ -396,21 +407,24 @@ class FirestoreService {
 
     for (var doc in govSnap.docs) {
       final data = doc.data();
-      final nameEn = (data['name_en']?.toString() ?? data['name']?.toString() ?? '').trim().toLowerCase();
+      final nameEn = (data['name_en']?.toString() ?? data['name']?.toString() ?? data['label_en']?.toString() ?? '').trim().toLowerCase();
       
       if (nameEn.isEmpty || seenGovs.contains(nameEn)) {
         govDeletes.add(doc.reference);
       } else {
         seenGovs.add(nameEn);
-        if (data['country_id'] != 'lebanon') {
-          govUpdateRefs.add(doc.reference);
-        }
+        // All current regions must be anchored to Lebanon
+        govUpdateRefs.add(doc.reference);
       }
     }
     await runBatchedDeletes(govDeletes);
-    await runBatchedUpdates(govUpdateRefs, {'country_id': 'lebanon', 'updatedAt': timestamp});
+    await runBatchedUpdates(govUpdateRefs, {
+      'country_id': 'lebanon', 
+      'parent_id': 'lebanon', // Explicit hierarchy
+      'updatedAt': timestamp
+    });
 
-    // 3. Audit and fix cities
+    // 4. Audit Cities -> Anchor to Regions
     final citySnap = await _db.collection('directory_cities').get();
     final seenCities = <String>{};
     final cityDeletes = <DocumentReference>[];
@@ -418,24 +432,31 @@ class FirestoreService {
 
     for (var doc in citySnap.docs) {
       final data = doc.data();
-      final nameEn = (data['name_en']?.toString() ?? data['name']?.toString() ?? '').trim().toLowerCase();
-      final govId = data['governorate_id'];
+      final nameEn = (data['name_en']?.toString() ?? data['name']?.toString() ?? data['label_en']?.toString() ?? '').trim().toLowerCase();
+      final govId = data['governorate_id'] ?? data['gov_id'] ?? data['region_id'];
       
-      // Some entries might use 'country' instead of 'country_id'
-      final countryId = data['country_id'] ?? data['country'];
-
       final compositeKey = '$nameEn-$govId';
-      if (nameEn.isEmpty || seenCities.contains(compositeKey)) {
+      if (nameEn.isEmpty || govId == null || seenCities.contains(compositeKey)) {
         cityDeletes.add(doc.reference);
       } else {
         seenCities.add(compositeKey);
-        if (countryId != 'lebanon') {
-          cityUpdateRefs.add(doc.reference);
-        }
+        // Ensure city is correctly anchored to its region and parent country
+        cityUpdateRefs.add(doc.reference);
       }
     }
     await runBatchedDeletes(cityDeletes);
+    // Note: We don't force a single region, we just ensure the country link is Lebanon
     await runBatchedUpdates(cityUpdateRefs, {'country_id': 'lebanon', 'updatedAt': timestamp});
+
+    // 5. Ensure all other countries are anchored to Global
+    final countriesSnap = await _db.collection('directory_countries').get();
+    final countryUpdateRefs = <DocumentReference>[];
+    for (var doc in countriesSnap.docs) {
+      if (doc.id != 'lebanon') {
+        countryUpdateRefs.add(doc.reference);
+      }
+    }
+    await runBatchedUpdates(countryUpdateRefs, {'parent_anchor_id': 'global', 'updatedAt': timestamp});
   }
 
   // ── Token System ──────────────────────────────────────────────────────────
