@@ -73,6 +73,7 @@ class AdminSettingsTable extends ConsumerWidget {
         headingTextStyle: EspyTheme.cinzelStyle.copyWith(fontSize: 9, color: Colors.white24),
         dataTextStyle: EspyTheme.loraStyle.copyWith(fontSize: 13, color: Colors.white70),
         columns: [
+          const DataColumn(label: Text('SYSTEM ID')),
           ...columns.map((c) => DataColumn(label: Text(c.toUpperCase()))),
           const DataColumn(label: Text('ACTIONS')),
         ],
@@ -81,6 +82,7 @@ class AdminSettingsTable extends ConsumerWidget {
             return _buildRow(context, ref, item);
           } catch (e) {
             return DataRow(cells: [
+              const DataCell(Text('ERR')),
               ...columns.map((_) => const DataCell(Text('ERR'))),
               DataCell(Text(e.toString().substring(0, 10))),
             ]);
@@ -94,6 +96,7 @@ class AdminSettingsTable extends ConsumerWidget {
     return DataRow(
       key: ValueKey(item['id'] ?? DateTime.now().toString()),
       cells: [
+        DataCell(Text(item['id']?.toString() ?? '—', style: const TextStyle(fontSize: 9, color: EspyTheme.gold))),
         ...columns.map((c) {
           final key = c.toLowerCase().replaceAll(' ', '_');
           var value = item[key];

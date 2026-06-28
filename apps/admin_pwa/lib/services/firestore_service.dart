@@ -296,14 +296,53 @@ class FirestoreService {
 
   // ── Metadata ───────────────────────────────────────────────────────────────
 
+  Stream<List<Map<String, dynamic>>> watchCountries() {
+    return _db.collection('directory_countries')
+        .snapshots()
+        .map((snap) => snap.docs.map((doc) => {...(doc.data() as Map<String, dynamic>), 'id': doc.id}).toList()
+        ..sort((a, b) => (a['name_en'] ?? '').toString().compareTo(b['name_en'] ?? '')));
+  }
+
+  Stream<List<Map<String, dynamic>>> watchGovernorates({String? countryId}) {
+    Query query = _db.collection('directory_governorates');
+    if (countryId != null && countryId != 'ALL') {
+      query = query.where('country_id', isEqualTo: countryId);
+    }
+    return query.snapshots()
+        .map((snap) => snap.docs.map((doc) => {...(doc.data() as Map<String, dynamic>), 'id': doc.id}).toList()
+        ..sort((a, b) => (a['name_en'] ?? '').toString().compareTo(b['name_en'] ?? '')));
+  }
+
+  Stream<List<Map<String, dynamic>>> watchCities({String? governorateId}) {
+    Query query = _db.collection('directory_cities');
+    if (governorateId != null && governorateId != 'ALL') {
+      query = query.where('governorate_id', isEqualTo: governorateId);
+    }
+    return query.snapshots()
+        .map((snap) => snap.docs.map((doc) => {...(doc.data() as Map<String, dynamic>), 'id': doc.id}).toList()
+        ..sort((a, b) => (a['name_en'] ?? '').toString().compareTo(b['name_en'] ?? '')));
+  }
+
+  Stream<List<Map<String, dynamic>>> watchSectors() {
+    return _db.collection('directory_sectors')
+        .snapshots()
+        .map((snap) => snap.docs.map((doc) => {...(doc.data() as Map<String, dynamic>), 'id': doc.id}).toList());
+  }
+
+  Stream<List<Map<String, dynamic>>> watchCollection(String collection) {
+    return _db.collection(collection)
+        .snapshots()
+        .map((snap) => snap.docs.map((doc) => {...(doc.data() as Map<String, dynamic>), 'id': doc.id}).toList());
+  }
+
   Future<List<Map<String, dynamic>>> getCountries() async {
-    final snap = await _db.collection('directory_countries').orderBy('name_en').get();
+    final snap = await _db.collection('directory_countries').get();
     return snap.docs.map((doc) => {...(doc.data() as Map<String, dynamic>), 'id': doc.id}).toList();
   }
 
   Future<List<Map<String, dynamic>>> getGovernorates({String? countryId}) async {
-    Query query = _db.collection('directory_governorates').orderBy('name_en');
-    if (countryId != null) {
+    Query query = _db.collection('directory_governorates');
+    if (countryId != null && countryId != 'ALL') {
       query = query.where('country_id', isEqualTo: countryId);
     }
     final snap = await query.get();
@@ -311,8 +350,8 @@ class FirestoreService {
   }
 
   Future<List<Map<String, dynamic>>> getCities({String? governorateId}) async {
-    Query query = _db.collection('directory_cities').orderBy('name_en');
-    if (governorateId != null) {
+    Query query = _db.collection('directory_cities');
+    if (governorateId != null && governorateId != 'ALL') {
       query = query.where('governorate_id', isEqualTo: governorateId);
     }
     final snap = await query.get();
@@ -366,7 +405,7 @@ class FirestoreService {
     final countriesSnap = await _db.collection('directory_countries').get();
     for (var doc in countriesSnap.docs) {
       final data = doc.data();
-      final name = (data['name_en']?.toString() ?? data['name']?.toString() ?? 'Unknown').trim();
+      final name = (data['name_en']?.toString() ?? data['name']?.toString() ?? doc.id).trim();
       final slug = _toSlug(name);
       
       countryMap[doc.id] = slug;
@@ -380,13 +419,31 @@ class FirestoreService {
       if (doc.id != slug) await doc.reference.delete();
     }
 
+    // Default Lebanon if missing
+    if (!countryMap.containsValue('lebanon')) {
+      await _db.collection('directory_countries').doc('lebanon').set({
+        'name_en': 'Lebanon',
+        'name_ar': 'لبنان',
+        'id': 'lebanon',
+        'parent_anchor_id': 'global',
+        'isActive': true,
+        'updatedAt': timestamp,
+      }, SetOptions(merge: true));
+      countryMap['lebanon'] = 'lebanon';
+    }
+
     // 3. Process Governorates (Regions)
     final govSnap = await _db.collection('directory_governorates').get();
     for (var doc in govSnap.docs) {
       final data = doc.data();
-      final name = (data['name_en']?.toString() ?? data['name']?.toString() ?? data['label_en']?.toString() ?? 'Unknown').trim();
+      final name = (data['name_en']?.toString() ?? data['name']?.toString() ?? data['label_en']?.toString() ?? doc.id).trim();
       final oldCountryId = data['country_id']?.toString() ?? data['country']?.toString();
-      final newCountryId = oldCountryId != null ? (countryMap[oldCountryId] ?? _toSlug(oldCountryId)) : 'lebanon';
+      
+      // Attempt to resolve country or default to lebanon
+      String newCountryId = 'lebanon';
+      if (oldCountryId != null) {
+        newCountryId = countryMap[oldCountryId] ?? _toSlug(oldCountryId);
+      }
       
       final slug = '$newCountryId-${_toSlug(name)}';
       govMap[doc.id] = slug;
@@ -406,12 +463,22 @@ class FirestoreService {
     final citySnap = await _db.collection('directory_cities').get();
     for (var doc in citySnap.docs) {
       final data = doc.data();
-      final name = (data['name_en']?.toString() ?? data['name']?.toString() ?? 'Unknown').trim();
-      final oldGovId = data['governorate_id']?.toString() ?? data['gov_id']?.toString();
+      final name = (data['name_en']?.toString() ?? data['name']?.toString() ?? doc.id).trim();
+      final oldGovId = data['governorate_id']?.toString() ?? data['gov_id']?.toString() ?? data['region_id']?.toString();
       final oldCountryId = data['country_id']?.toString() ?? data['country']?.toString();
       
-      final newCountryId = oldCountryId != null ? (countryMap[oldCountryId] ?? _toSlug(oldCountryId)) : 'lebanon';
-      final newGovId = oldGovId != null ? (govMap[oldGovId] ?? _toSlug(oldGovId)) : '$newCountryId-unknown';
+      String newCountryId = 'lebanon';
+      if (oldCountryId != null) {
+        newCountryId = countryMap[oldCountryId] ?? _toSlug(oldCountryId);
+      }
+
+      String newGovId = '$newCountryId-unknown';
+      if (oldGovId != null) {
+        newGovId = govMap[oldGovId] ?? _toSlug(oldGovId);
+        if (!newGovId.startsWith(newCountryId)) {
+           newGovId = '$newCountryId-$newGovId';
+        }
+      }
 
       final slug = '$newGovId-${_toSlug(name)}';
       cityMap[doc.id] = slug;

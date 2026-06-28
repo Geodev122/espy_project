@@ -5,25 +5,32 @@ final tokenPricingStreamProvider = StreamProvider<Map<String, dynamic>>((ref) {
   return ref.watch(firestoreServiceProvider).watchTokenPricing();
 });
 
-final countriesFutureProvider = FutureProvider<List<Map<String, dynamic>>>((ref) {
-  return ref.watch(firestoreServiceProvider).getCountries();
+final countriesStreamProvider = StreamProvider<List<Map<String, dynamic>>>((ref) {
+  return ref.watch(firestoreServiceProvider).watchCountries();
 });
 
-final sectorsFutureProvider = FutureProvider<List<Map<String, dynamic>>>((ref) {
-  return ref.watch(firestoreServiceProvider).getSectors();
+final sectorsStreamProvider = StreamProvider<List<Map<String, dynamic>>>((ref) {
+  return ref.watch(firestoreServiceProvider).watchSectors();
 });
 
-final governoratesFutureProvider = FutureProvider<List<Map<String, dynamic>>>((ref) {
-  return ref.watch(firestoreServiceProvider).getGovernorates();
+final governoratesStreamProvider = StreamProvider<List<Map<String, dynamic>>>((ref) {
+  return ref.watch(firestoreServiceProvider).watchGovernorates();
 });
 
-final citiesFutureProvider = FutureProvider<List<Map<String, dynamic>>>((ref) {
-  return ref.watch(firestoreServiceProvider).getCities();
+final citiesStreamProvider = StreamProvider<List<Map<String, dynamic>>>((ref) {
+  return ref.watch(firestoreServiceProvider).watchCities();
 });
 
-final categoriesFutureProvider = FutureProvider<List<Map<String, dynamic>>>((ref) {
-  return ref.watch(firestoreServiceProvider).listCollection('directory_categories');
+final categoriesStreamProvider = StreamProvider<List<Map<String, dynamic>>>((ref) {
+  return ref.watch(firestoreServiceProvider).watchCollection('directory_categories');
 });
+
+// Legacy compat or specific futures if needed
+final countriesFutureProvider = FutureProvider((ref) => ref.watch(countriesStreamProvider.future));
+final governoratesFutureProvider = FutureProvider((ref) => ref.watch(governoratesStreamProvider.future));
+final citiesFutureProvider = FutureProvider((ref) => ref.watch(citiesStreamProvider.future));
+final sectorsFutureProvider = FutureProvider((ref) => ref.watch(sectorsStreamProvider.future));
+final categoriesFutureProvider = FutureProvider((ref) => ref.watch(categoriesStreamProvider.future));
 
 final regionsFutureProvider = FutureProvider.family<List<Map<String, dynamic>>, String>((ref, countryId) {
   if (countryId == 'ALL') return [];

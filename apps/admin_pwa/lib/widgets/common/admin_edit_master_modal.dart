@@ -83,14 +83,24 @@ class _AdminEditMasterModalState extends ConsumerState<AdminEditMasterModal> {
         switch (widget.collection) {
           case 'directory_countries':
             id = nameSlug;
+            data['id'] = id;
             data['parent_anchor_id'] = 'global';
             break;
           case 'directory_governorates':
-            id = '${_selectedIds['country_id']}-$nameSlug';
-            data['parent_id'] = _selectedIds['country_id'];
+            final countryId = _selectedIds['country_id'] ?? 'lebanon';
+            id = '$countryId-$nameSlug';
+            data['id'] = id;
+            data['country_id'] = countryId;
+            data['parent_id'] = countryId;
             break;
           case 'directory_cities':
-            id = '${_selectedIds['governorate_id']}-$nameSlug';
+            final govId = _selectedIds['governorate_id'];
+            if (govId == null) throw 'Governorate (Region) is required for City';
+            id = '$govId-$nameSlug';
+            data['id'] = id;
+            data['governorate_id'] = govId;
+            // Also keep country_id for easy filtering
+            data['country_id'] = govId.split('-').first;
             break;
           default:
             id = DateTime.now().millisecondsSinceEpoch.toString();

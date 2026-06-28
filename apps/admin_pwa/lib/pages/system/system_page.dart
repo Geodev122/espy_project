@@ -4,6 +4,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../core/theme.dart';
 import '../../services/firestore_service.dart';
 import '../../widgets/common/admin_settings_table.dart';
+import '../../widgets/common/admin_edit_master_modal.dart';
 import '../../providers/system_providers.dart';
 import 'sync_debugger_page.dart';
 import 'token_management_page.dart';
@@ -66,11 +67,11 @@ class _SystemPageState extends ConsumerState<SystemPage> with SingleTickerProvid
   }
 
   Widget _buildInfrastructureView() {
-    final asyncCountries = ref.watch(countriesFutureProvider);
-    final asyncSectors = ref.watch(sectorsFutureProvider);
-    final asyncGovernorates = ref.watch(governoratesFutureProvider);
-    final asyncCities = ref.watch(citiesFutureProvider);
-    final asyncCategories = ref.watch(categoriesFutureProvider);
+    final asyncCountries = ref.watch(countriesStreamProvider);
+    final asyncGovernorates = ref.watch(governoratesStreamProvider);
+    final asyncCities = ref.watch(citiesStreamProvider);
+    final asyncSectors = ref.watch(sectorsStreamProvider);
+    final asyncCategories = ref.watch(categoriesStreamProvider);
 
     return ListView(
       padding: const EdgeInsets.all(40),
@@ -85,7 +86,7 @@ class _SystemPageState extends ConsumerState<SystemPage> with SingleTickerProvid
           ],
         ),
         const SizedBox(height: 48),
-        _buildSectionHeader('GLOBAL ANCHORS', subtitle: 'Manage geographical hierarchy and system sectors'),
+        _buildSectionHeader('GEOGRAPHICAL HIERARCHY', subtitle: 'Manage Global -> Country -> Region -> City anchors'),
         const SizedBox(height: 24),
         Row(
           children: [
@@ -98,13 +99,13 @@ class _SystemPageState extends ConsumerState<SystemPage> with SingleTickerProvid
                 );
                 try {
                   await ref.read(firestoreServiceProvider).syncAndCleanAnchors();
-                  ref.invalidate(countriesFutureProvider);
-                  ref.invalidate(governoratesFutureProvider);
-                  ref.invalidate(citiesFutureProvider);
+                  ref.invalidate(countriesStreamProvider);
+                  ref.invalidate(governoratesStreamProvider);
+                  ref.invalidate(citiesStreamProvider);
                   if (context.mounted) {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Ecosystem Hierarchy Re-anchored Successfully.'))
+                      const SnackBar(content: Text('Ecosystem Hierarchy Re-anchored and Deduplicated Successfully.'))
                     );
                   }
                 } catch (e) {
@@ -117,17 +118,23 @@ class _SystemPageState extends ConsumerState<SystemPage> with SingleTickerProvid
                 }
               },
               icon: const Icon(LucideIcons.refreshCcw, size: 16),
-              label: const Text('SYNC & RE-ANCHOR ECOSYSTEM'),
+              label: const Text('FORCE SYNC & DEDUPLICATE'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: EspyTheme.electricBlue.withOpacity(0.1),
                 foregroundColor: EspyTheme.electricBlue,
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
               ),
             ),
+            const SizedBox(width: 16),
+            OutlinedButton.icon(
+              onPressed: () => showDialog(context: context, builder: (_) => AdminEditMasterModal(collection: 'directory_countries', title: 'ADD NEW COUNTRY')),
+              icon: const Icon(LucideIcons.plus, size: 16),
+              label: const Text('ADD COUNTRY'),
+            ),
             const Spacer(),
             asyncCountries.maybeWhen(
               data: (countries) => DropdownButton<String>(
-                value: _infraCountryFilter,
+                value: countries.any((c) => c['id'] == _infraCountryFilter) ? _infraCountryFilter : (countries.isNotEmpty ? countries.first['id'] : 'ALL'),
                 dropdownColor: const Color(0xFF061226),
                 style: EspyTheme.cinzelStyle.copyWith(fontSize: 11, color: Colors.white),
                 items: [
@@ -142,42 +149,23 @@ class _SystemPageState extends ConsumerState<SystemPage> with SingleTickerProvid
         ),
         const SizedBox(height: 32),
         asyncCountries.when(
-          data: (data) => AdminSettingsTable(
-            title: 'H1: NATION STATES (COUNTRIES)',
-            collection: 'directory_countries',
-            columns: const ['Name EN', 'Name AR', 'Code', 'Currency'],
-            data: data,
+          data: (countries) {
+            if (countries.isEmpty) {
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(40),
+                  child: Text('NO COUNTRIES DEFINED. USE THE BUTTON ABOVE TO START EXPANDING.', style: TextStyle(color: Colors.white24, fontSize: 10)),
+                ),
+              );
+            }
+            return _buildHierarchicalTree(countries, asyncGovernorates.value ?? [], asyncCities.value ?? []);
+          },
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (e, s) => Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(color: Colors.redAccent.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+            child: Text('HIERARCHY FETCH ERROR: $e', style: const TextStyle(color: Colors.redAccent, fontSize: 10)),
           ),
-          loading: () => const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator())),
-          error: (e, s) => Text('Error: $e'),
-        ),
-        const SizedBox(height: 32),
-        asyncGovernorates.when(
-          data: (data) {
-            final filtered = _infraCountryFilter == 'ALL' ? data : data.where((g) => g['country_id'] == _infraCountryFilter).toList();
-            return AdminSettingsTable(
-              title: 'H2: REGIONAL GOVERNORATES',
-              collection: 'directory_governorates',
-              columns: const ['Name EN', 'Name AR', 'Country ID'],
-              data: filtered,
-            );
-          },
-          loading: () => const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator())),
-          error: (e, s) => Text('Error: $e'),
-        ),
-        const SizedBox(height: 32),
-        asyncCities.when(
-          data: (data) {
-            final filtered = _infraCountryFilter == 'ALL' ? data : data.where((c) => c['country_id'] == _infraCountryFilter).toList();
-            return AdminSettingsTable(
-              title: 'H3: DIRECTORY CITIES',
-              collection: 'directory_cities',
-              columns: const ['Name EN', 'Name AR', 'Country ID', 'Governorate ID'],
-              data: filtered,
-            );
-          },
-          loading: () => const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator())),
-          error: (e, s) => Text('Error: $e'),
         ),
         const SizedBox(height: 48),
         _buildSectionHeader('SYSTEM SECTORS & CATEGORIES'),
@@ -205,6 +193,118 @@ class _SystemPageState extends ConsumerState<SystemPage> with SingleTickerProvid
         ),
       ],
     );
+  }
+
+  Widget _buildHierarchicalTree(List<Map<String, dynamic>> countries, List<Map<String, dynamic>> govs, List<Map<String, dynamic>> cities) {
+    // Audit Orphans
+    final orphanGovs = govs.where((g) => !countries.any((c) => c['id'] == g['country_id'])).toList();
+    final orphanCities = cities.where((city) => !govs.any((g) => g['id'] == city['governorate_id'])).toList();
+
+    return Column(
+      children: [
+        ...countries.map((country) {
+          final countryGovs = govs.where((g) => g['country_id'] == country['id']).toList();
+          
+          return Card(
+            margin: const EdgeInsets.only(bottom: 16),
+            child: ExpansionTile(
+              shape: const Border(),
+              leading: const Icon(LucideIcons.globe, color: EspyTheme.electricBlue, size: 18),
+              title: Text(
+                '${country['name_en']?.toString().toUpperCase() ?? 'UNKNOWN'} (${country['id']})',
+                style: EspyTheme.cinzelStyle.copyWith(fontSize: 12, color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text('${countryGovs.length} REGIONS IDENTIFIED', style: const TextStyle(fontSize: 10, color: Colors.white24)),
+              trailing: IconButton(
+                icon: const Icon(LucideIcons.plus, size: 16, color: EspyTheme.gold),
+                onPressed: () => showDialog(
+                  context: context, 
+                  builder: (_) => AdminEditMasterModal(
+                    collection: 'directory_governorates', 
+                    title: 'NEW REGION FOR ${country['name_en']}',
+                    item: {'country_id': country['id']},
+                  )
+                ),
+              ),
+              children: countryGovs.map((gov) {
+                final govCities = cities.where((c) => c['governorate_id'] == gov['id']).toList();
+                
+                return Padding(
+                  padding: const EdgeInsets.only(left: 32),
+                  child: ExpansionTile(
+                    shape: const Border(),
+                    leading: const Icon(LucideIcons.map, color: EspyTheme.gold, size: 14),
+                    title: Text(
+                      gov['name_en']?.toString().toUpperCase() ?? 'UNKNOWN REGION',
+                      style: const TextStyle(fontSize: 11, color: Colors.white70, fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Text('${govCities.length} CITIES', style: const TextStyle(fontSize: 9, color: Colors.white24)),
+                    trailing: IconButton(
+                      icon: const Icon(LucideIcons.plus, size: 14, color: EspyTheme.cyan),
+                      onPressed: () => showDialog(
+                        context: context, 
+                        builder: (_) => AdminEditMasterModal(
+                          collection: 'directory_cities', 
+                          title: 'NEW CITY FOR ${gov['name_en']}',
+                          item: {'country_id': country['id'], 'governorate_id': gov['id']},
+                        )
+                      ),
+                    ),
+                    children: govCities.map((city) => ListTile(
+                      contentPadding: const EdgeInsets.only(left: 64, right: 24),
+                      leading: const Icon(LucideIcons.mapPin, color: EspyTheme.cyan, size: 12),
+                      title: Text(city['name_en']?.toString() ?? 'Unnamed City', style: const TextStyle(fontSize: 11, color: Colors.white54)),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(LucideIcons.edit, size: 12, color: Colors.white24),
+                            onPressed: () => showDialog(context: context, builder: (_) => AdminEditMasterModal(collection: 'directory_cities', item: city, title: 'EDIT CITY')),
+                          ),
+                          IconButton(
+                            icon: const Icon(LucideIcons.trash2, size: 12, color: Colors.redAccent),
+                            onPressed: () => _handleDelete(city['id'], 'directory_cities'),
+                          ),
+                        ],
+                      ),
+                    )).toList(),
+                  ),
+                );
+              }).toList(),
+            ),
+          );
+        }).toList(),
+
+        if (orphanGovs.isNotEmpty || orphanCities.isNotEmpty) ...[
+          const SizedBox(height: 32),
+          _buildSectionHeader('SYSTEM ORPHANS (SUPERADMIN AUDIT)', subtitle: 'Data points with disconnected hierarchy links'),
+          const SizedBox(height: 24),
+          if (orphanGovs.isNotEmpty)
+            AdminSettingsTable(title: 'ORPHAN REGIONS', collection: 'directory_governorates', columns: const ['Name EN', 'Country ID'], data: orphanGovs),
+          const SizedBox(height: 16),
+          if (orphanCities.isNotEmpty)
+            AdminSettingsTable(title: 'ORPHAN CITIES', collection: 'directory_cities', columns: const ['Name EN', 'Gov ID'], data: orphanCities),
+        ],
+      ],
+    );
+  }
+
+  Future<void> _handleDelete(String id, String collection) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF061226),
+        title: const Text('CONFIRM DELETE'),
+        content: const Text('Permanently remove this master data entry?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('CANCEL')),
+          ElevatedButton(onPressed: () => Navigator.pop(ctx, true), style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent), child: const Text('DELETE')),
+        ],
+      ),
+    );
+    if (confirm == true) {
+      await ref.read(firestoreServiceProvider).deleteItem(collection, id);
+    }
   }
 
   Widget _buildSectionHeader(String title, {String? subtitle}) {
