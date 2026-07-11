@@ -81,7 +81,6 @@ void main() async {
           create: (context) => DirectoryViewModel(context.read<EspyRepository>()),
           update: (context, repo, previous) => DirectoryViewModel(repo),
         ),
-        Provider<EspyRepository>(create: (_) => FirestoreEspyRepository()),
         ChangeNotifierProxyProvider2<AuthService, EspyRepository, DashboardViewModel>(
           create: (context) => DashboardViewModel(context.read<AuthService>(), context.read<EspyRepository>()),
           update: (context, auth, repo, previous) => DashboardViewModel(auth, repo),

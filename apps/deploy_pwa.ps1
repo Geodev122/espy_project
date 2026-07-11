@@ -35,13 +35,13 @@ Write-Host "Step 2: Building Flutter Web (Release)..." -ForegroundColor Cyan
 flutter build web --release --pwa-strategy=offline-first
 
 # 3. Deploy to Firebase Hosting
-Write-Host "Step 3: Deploying to Firebase Hosting (pro-app)..." -ForegroundColor Cyan
+Write-Host "Step 3: Deploying to Firebase Hosting (espy-app)..." -ForegroundColor Cyan
 # Need to run from the root directory where firebase.json is located
 Push-Location ..
 if ($FirebaseCmd -eq "npx firebase") {
-    Invoke-Expression "$FirebaseCmd deploy --only hosting:pro-app"
+    Invoke-Expression "$FirebaseCmd deploy --only hosting:espy-app"
 } else {
-    & $FirebaseCmd deploy --only hosting:pro-app
+    & $FirebaseCmd deploy --only hosting:espy-app
 }
 Pop-Location
 
