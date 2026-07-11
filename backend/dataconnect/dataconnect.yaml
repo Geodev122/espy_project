@@ -1,13 +1,12 @@
-specVersion: "v1alpha"
+specVersion: "v1beta"
 serviceId: "espy-protocol"
 location: "us-central1"
 schema:
   source: "."
   datasource:
     postgresql:
-      database: "espy_db"
       cloudSql:
         instanceId: "espy-instance"
-connector:
-  - id: "espy-connector"
-    path: "./connector"
+      database: "espy_db"
+connectors:
+  - "./connector"

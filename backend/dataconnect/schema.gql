@@ -1,4 +1,4 @@
-# 🛡️ Espy Protocol Unified Relational Schema v3.2 (PostgreSQL Optimized)
+# 🛡️ Espy Protocol Unified Relational Schema v3.4 (PostgreSQL Optimized)
 
 # ─── 1. Identity & Access ────────────────────────────────────────────────
 
@@ -126,6 +126,18 @@ type RechargeCard @table {
   redeemedAt: Timestamp
 }
 
+type ExternalTransaction @table {
+  id: UUID! @default(expr: "uuidV4()") @primaryKey
+  user: User!
+  amount: Float!
+  currency: String! @default(value: "USD")
+  gateway: String! # whish, google_pay
+  status: String! # pending, completed, failed
+  externalId: String # Gateway reference
+  metadata: String # JSON payload
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
 type Match @table {
   id: UUID! @default(expr: "uuidV4()") @primaryKey
   visitor: User!
@@ -137,12 +149,44 @@ type Match @table {
 type Interaction @table {
   id: UUID! @default(expr: "uuidV4()") @primaryKey
   user: User!
-  targetId: String! # UID or Service ID
-  type: String! # view, favorite, swipe_right, skip
+  targetId: String! # UID, Service ID, or Request ID
+  type: String! # view, favorite, swipe_right, skip, respond
   createdAt: Timestamp! @default(expr: "request.time")
 }
 
-# ─── 4. Communications & Support ──────────────────────────────────────────
+# ─── 4. Communications & Community ────────────────────────────────────────
+
+type CommunityRequest @table {
+  id: UUID! @default(expr: "uuidV4()") @primaryKey
+  user: User!
+  title: String!
+  description: String!
+  sector: Sector
+  locationLabel: String
+  whatsapp: String
+  status: String! @default(value: "active") # active, fulfilled, expired
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+type SOSAlert @table {
+  id: UUID! @default(expr: "uuidV4()") @primaryKey
+  user: User!
+  lat: Float!
+  lng: Float!
+  status: String! @default(value: "active") # active, resolved
+  timestamp: Timestamp! @default(expr: "request.time")
+}
+
+type Broadcast @table {
+  id: UUID! @default(expr: "uuidV4()") @primaryKey
+  sender: User!
+  title: String!
+  message: String!
+  targetCountry: String @default(value: "GLOBAL")
+  reachCount: Int @default(value: 0)
+  status: String! @default(value: "queued") # queued, sent
+  createdAt: Timestamp! @default(expr: "request.time")
+}
 
 type Announcement @table {
   id: UUID! @default(expr: "uuidV4()") @primaryKey
