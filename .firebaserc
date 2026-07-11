@@ -1,12 +1,23 @@
 {
   "projects": {
-    "default": "espy-453d3"
+    "default": "espy-453d3",
+    "espy": "espy-253f7"
   },
   "targets": {
     "espy-453d3": {
       "hosting": {
         "espy-app": [
           "espy-app"
+        ],
+        "espy-253f7": [
+          "espy-253f7"
+        ]
+      }
+    },
+    "espy-253f7": {
+      "hosting": {
+        "espy-253f7": [
+          "espy-253f7"
         ]
       }
     }

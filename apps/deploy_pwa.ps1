@@ -1,5 +1,4 @@
-# Espy Protocol - PWA Deployment Sequence
-# Run this script to build and deploy the Professional App as a PWA.
+# Espy Protocol - Unified PWA Deployment Sequence
 
 # Set explicit path for Flutter to match System Variables
 $env:PATH = "C:\Flutter\SDK\flutter_windows_3.24.5-stable\flutter\bin;" + $env:PATH
@@ -35,15 +34,24 @@ Write-Host "Step 2: Building Flutter Web (Release)..." -ForegroundColor Cyan
 flutter build web --release --pwa-strategy=offline-first
 
 # 3. Deploy to Firebase Hosting
-Write-Host "Step 3: Deploying to Firebase Hosting (espy-app)..." -ForegroundColor Cyan
-# Need to run from the root directory where firebase.json is located
+Write-Host "Step 3: Deploying to Firebase Hosting..." -ForegroundColor Cyan
 Push-Location ..
+
+Write-Host "Deploying Admin App Interface (espy-app)..." -ForegroundColor Yellow
 if ($FirebaseCmd -eq "npx firebase") {
     Invoke-Expression "$FirebaseCmd deploy --only hosting:espy-app"
 } else {
     & $FirebaseCmd deploy --only hosting:espy-app
 }
+
+Write-Host "Deploying User App Interface (espy-253f7)..." -ForegroundColor Yellow
+if ($FirebaseCmd -eq "npx firebase") {
+    Invoke-Expression "$FirebaseCmd deploy --only hosting:espy-253f7"
+} else {
+    & $FirebaseCmd deploy --only hosting:espy-253f7"
+}
+
 Pop-Location
 
 Write-Host "--- PROTOCOL COMPLETE ---" -ForegroundColor Green
-Write-Host "YOUR PWA IS LIVE!" -ForegroundColor Yellow
+Write-Host "UNIFIED PWA DEPLOYED TO BOTH TARGETS!" -ForegroundColor Yellow
