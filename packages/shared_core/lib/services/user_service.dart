@@ -3,11 +3,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
-import 'firestore_service.dart';
+import 'espy_repository.dart';
 
 class UserService extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirestoreService _firestore = FirestoreService();
+  final EspyRepository _repository;
 
   Map<String, dynamic>? _profile;
   bool _loading = false;
@@ -17,7 +17,7 @@ class UserService extends ChangeNotifier {
   bool get isLoading => _loading;
   String get userId => _auth.currentUser?.uid ?? '';
 
-  UserService() {
+  UserService(this._repository) {
     _auth.authStateChanges().listen((user) {
       _profileSubscription?.cancel();
       if (user != null) {
@@ -62,14 +62,15 @@ class UserService extends ChangeNotifier {
     final user = _auth.currentUser;
     if (user == null) return;
 
-    await _firestore.updateUserProfile(user.uid, data);
+    await _repository.updateUser(user.uid, data);
   }
 
+  // Refactored to separate logic into repo if possible, but keep simple for now
   Future<void> syncVisitorData({String? name, String? whatsapp}) async {
     final user = _auth.currentUser;
     if (user == null) return;
 
-    await _firestore.updateVisitorProfile(user.uid, {
+    await _repository.updateUser(user.uid, {
       if (name != null) 'name': name,
       if (whatsapp != null) 'whatsapp': whatsapp,
       'role': 'visitor',

@@ -2,27 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/firebase/firebase-tools/master/schema/firebase.json",
   "hosting": [
     {
-      "target": "admin-dashboard",
-      "public": "apps/admin_pwa/build/web",
-      "ignore": [
-        "**/node_modules/**"
-      ],
-      "rewrites": [
-        { "source": "**", "destination": "/index.html" }
-      ]
-    },
-    {
-      "target": "visitor-app",
-      "public": "apps/visitor_app/build/web",
-      "ignore": [
-        "**/node_modules/**"
-      ],
-      "rewrites": [
-        { "source": "**", "destination": "/index.html" }
-      ]
-    },
-    {
-      "target": "pro-app",
+      "target": "espy-app",
       "public": "apps/build/web",
       "ignore": [
         "**/node_modules/**"
@@ -33,16 +13,19 @@
     }
   ],
   "firestore": {
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
+    "rules": "backend/firestore.rules",
+    "indexes": "backend/firestore.indexes.json"
   },
   "storage": {
-    "rules": "storage.rules"
+    "rules": "backend/storage.rules"
   },
   "functions": {
-    "source": "functions"
+    "source": "backend/functions"
   },
   "database": {
-    "rules": "database.rules.json"
+    "rules": "backend/database.rules.json"
+  },
+  "dataconnect": {
+    "source": "backend/dataconnect"
   }
 }

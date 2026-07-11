@@ -1,0 +1,167 @@
+# Espy Protocol DataConnect Mutations
+
+# ─── 1. User Mutations ────────────────────────────────────────────────────
+
+mutation CreateUser($id: String!, $email: String!, $name: String, $role: String!) {
+  user_insert(data: {
+    id: $id,
+    email: $email,
+    name: $name,
+    role: $role,
+    isActive: true,
+    hasProfile: false,
+    walletBalance: 0,
+    tokensUsed: 0
+  })
+}
+
+mutation UpdateUserProfile($id: String!, $name: String, $photoUrl: String) {
+  user_update(id: $id, data: {
+    name: $name,
+    photoUrl: $photoUrl,
+    updatedAt_expr: "request.time"
+  })
+}
+
+# ─── 2. Service Mutations ──────────────────────────────────────────────────
+
+mutation CreateService($providerId: String!, $title: String!, $description: String, $price: Int!) {
+  service_insert(data: {
+    providerId: $providerId,
+    title: $title,
+    description: $description,
+    price: $price,
+    isActive: true
+  })
+}
+
+# ─── 3. Match Mutations ────────────────────────────────────────────────────
+
+mutation CreateMatchRequest($visitorId: String!, $professionalId: String!) {
+  match_insert(data: {
+    visitorId: $visitorId,
+    professionalId: $professionalId,
+    status: "requested"
+  })
+}
+
+# ─── 4. Token & Asset Mutations ──────────────────────────────────────────
+
+mutation SpendTokensForPin($userId: String!, $cost: Int!) {
+  user_update(id: $userId, data: {
+    walletBalance_expr: "walletBalance - $cost",
+    tokensUsed_expr: "walletBalance + $cost",
+    updatedAt_expr: "request.time"
+  })
+  professional_update(id: $userId, data: {
+    practicePins_expr: "practicePins + 1"
+  })
+  walletLedger_insert(data: {
+    userId: $userId,
+    type: "debit",
+    amount: $cost,
+    itemId: "extra_pin",
+    description: "Purchased: EXTRA PIN"
+  })
+}
+
+mutation SpendTokensForSlot($userId: String!, $cost: Int!) {
+  user_update(id: $userId, data: {
+    walletBalance_expr: "walletBalance - $cost",
+    tokensUsed_expr: "tokensUsed + $cost",
+    updatedAt_expr: "request.time"
+  })
+  professional_update(id: $userId, data: {
+    serviceSlots_expr: "serviceSlots + 1"
+  })
+  walletLedger_insert(data: {
+    userId: $userId,
+    type: "debit",
+    amount: $cost,
+    itemId: "extra_slot",
+    description: "Purchased: EXTRA SLOT"
+  })
+}
+
+mutation SpendTokensForBroadcast($userId: String!, $cost: Int!) {
+  user_update(id: $userId, data: {
+    walletBalance_expr: "walletBalance - $cost",
+    tokensUsed_expr: "tokensUsed + $cost",
+    updatedAt_expr: "request.time"
+  })
+  professional_update(id: $userId, data: {
+    broadcastsBought_expr: "broadcastsBought + 1"
+  })
+  walletLedger_insert(data: {
+    userId: $userId,
+    type: "debit",
+    amount: $cost,
+    itemId: "broadcast",
+    description: "Purchased: BROADCAST CREDIT"
+  })
+}
+
+# ─── 5. Redemption Mutations ──────────────────────────────────────────────
+
+mutation RedeemRechargeCode($code: String!, $userId: String!) {
+  # This requires a 'one-to-one' atomic update logic often handled by custom resolvers
+  # or a transaction across multiple table updates in DataConnect.
+  rechargeCard_update(id: $code, data: {
+    status: "used",
+    redeemedBy_expr: "$userId",
+    redeemedAt_expr: "request.time"
+  })
+  # Logic to fetch tokenValue from the card and update user balance
+  # would typically be handled by a DataConnect Custom Resolver (Node.js/Go)
+  # or a Cloud Function that executes these mutations.
+}
+
+# ─── 6. Administrative Mutations ──────────────────────────────────────────
+
+mutation ApproveProfessional($id: String!, $isApproved: Boolean!) {
+  professional_update(id: $id, data: {
+    isApproved: $isApproved
+  })
+  user_update(id: $id, data: {
+    hasProfile: true,
+    updatedAt_expr: "request.time"
+  })
+}
+
+mutation ToggleHonorBadge($id: String!, $isHonorVerified: Boolean!) {
+  professional_update(id: $id, data: {
+    isHonorVerified: $isHonorVerified
+  })
+}
+
+# ─── 7. System Management Mutations ───────────────────────────────────────
+
+mutation CreateAnnouncement($title: String!, $content: String!, $category: String!) {
+  announcement_insert(data: {
+    title: $title,
+    content: $content,
+    category: $category
+  })
+}
+
+mutation UpdateUserStatus($id: String!, $isActive: Boolean!) {
+  user_update(id: $id, data: {
+    isActive: $isActive
+  })
+}
+
+mutation CloseSupportTicket($id: UUID!) {
+  supportTicket_update(id: $id, data: {
+    status: "closed"
+  })
+}
+
+mutation LogAdminAction($adminId: String!, $action: String!, $entityId: String!, $entityType: String!, $details: String) {
+  adminLog_insert(data: {
+    adminId: $adminId,
+    action: $action,
+    entityId: $entityId,
+    entityType: $entityType,
+    details: $details
+  })
+}

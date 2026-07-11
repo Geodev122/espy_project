@@ -1,0 +1,201 @@
+# 🛡️ Espy Protocol Unified Relational Schema v3.2 (PostgreSQL Optimized)
+
+# ─── 1. Identity & Access ────────────────────────────────────────────────
+
+type User @table {
+  id: String! @primaryKey # Firebase UID
+  email: String! @unique
+  name: String
+  role: String! # visitor, professional, institution, admin
+  isActive: Boolean! @default(value: true)
+  hasProfile: Boolean! @default(value: false)
+  walletBalance: Int! @default(value: 0)
+  tokensUsed: Int! @default(value: 0)
+  photoUrl: String
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
+type Professional @table {
+  id: String! @primaryKey # Matches User ID
+  user: User! @onDelete(cascade: true)
+  fullNameEn: String
+  fullNameAr: String
+  specialty: String
+  specialtyAr: String
+  bioEn: String
+  bioAr: String
+  whatsapp: String
+  isApproved: Boolean! @default(value: false)
+  isHonorVerified: Boolean! @default(value: false)
+  countryId: String
+  governorateId: String
+  cityId: String
+  serviceSlots: Int! @default(value: 2)
+  practicePins: Int! @default(value: 0)
+  broadcastsBought: Int! @default(value: 0)
+  broadcastsUsed: Int! @default(value: 0)
+  visibilityExpiresAt: Timestamp
+}
+
+type Institution @table {
+  id: String! @primaryKey # Matches User ID
+  user: User! @onDelete(cascade: true)
+  nameEn: String
+  nameAr: String
+  category: String
+  registrationNumber: String
+  isApproved: Boolean! @default(value: false)
+  serviceSlots: Int! @default(value: 5)
+  practicePins: Int! @default(value: 0)
+  visibilityExpiresAt: Timestamp
+}
+
+type Visitor @table {
+  id: String! @primaryKey # Matches User ID
+  user: User! @onDelete(cascade: true)
+  interests: [String]
+}
+
+# ─── 2. Taxonomy & Discovery ──────────────────────────────────────────────
+
+type Sector @table {
+  id: String! @primaryKey
+  nameEn: String!
+  nameAr: String
+  displayOrder: Int @default(value: 999)
+  isActive: Boolean! @default(value: true)
+}
+
+type Category @table {
+  id: String! @primaryKey
+  parentSector: Sector
+  nameEn: String!
+  nameAr: String
+  type: String! # professional, institution
+  displayOrder: Int @default(value: 999)
+  isActive: Boolean! @default(value: true)
+}
+
+type Service @table {
+  id: UUID! @default(expr: "uuidV4()") @primaryKey
+  provider: User!
+  title: String!
+  description: String
+  price: Int!
+  category: Category
+  isActive: Boolean! @default(value: true)
+  isAllocated: Boolean! @default(value: false)
+  visibilityExpiresAt: Timestamp
+  imageUrl: String
+}
+
+type LocationNode @table {
+  id: UUID! @default(expr: "uuidV4()") @primaryKey
+  user: User!
+  isMain: Boolean! @default(value: false)
+  label: String
+  cityName: String
+  countryId: String
+  lat: Float!
+  lng: Float!
+  activity: String
+}
+
+# ─── 3. Operations & Ledger ───────────────────────────────────────────────
+
+type WalletLedger @table {
+  id: UUID! @default(expr: "uuidV4()") @primaryKey
+  user: User!
+  type: String! # credit, debit
+  amount: Int!
+  itemId: String
+  description: String
+  timestamp: Timestamp! @default(expr: "request.time")
+}
+
+type RechargeCard @table {
+  id: String! @primaryKey # Code
+  tokenValue: Int!
+  extraPins: Int @default(value: 0)
+  extraSlots: Int @default(value: 0)
+  broadcasts: Int @default(value: 0)
+  targetRole: String @default(value: "any")
+  status: String! @default(value: "active") # active, used
+  redeemedBy: User
+  redeemedAt: Timestamp
+}
+
+type Match @table {
+  id: UUID! @default(expr: "uuidV4()") @primaryKey
+  visitor: User!
+  professional: User!
+  status: String! # requested, accepted, rejected
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+type Interaction @table {
+  id: UUID! @default(expr: "uuidV4()") @primaryKey
+  user: User!
+  targetId: String! # UID or Service ID
+  type: String! # view, favorite, swipe_right, skip
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+# ─── 4. Communications & Support ──────────────────────────────────────────
+
+type Announcement @table {
+  id: UUID! @default(expr: "uuidV4()") @primaryKey
+  title: String!
+  content: String!
+  category: String! # general, health, system
+  status: String! @default(value: "approved")
+  targetRole: String # null for all, or visitor/pro
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+type SystemNotification @table {
+  id: UUID! @default(expr: "uuidV4()") @primaryKey
+  recipient: User!
+  title: String!
+  message: String!
+  type: String!
+  isRead: Boolean! @default(value: false)
+  timestamp: Timestamp! @default(expr: "request.time")
+}
+
+type EmergencyHotline @table {
+  id: UUID! @default(expr: "uuidV4()") @primaryKey
+  countryId: String!
+  nameEn: String!
+  nameAr: String
+  number: String!
+  category: String # Medical, Security, Fire
+  displayOrder: Int @default(value: 999)
+}
+
+type SupportTicket @table {
+  id: UUID! @default(expr: "uuidV4()") @primaryKey
+  user: User!
+  subject: String!
+  message: String!
+  status: String! @default(value: "open") # open, closed, pending
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+# ─── 5. Administration ────────────────────────────────────────────────────
+
+type AdminLog @table {
+  id: UUID! @default(expr: "uuidV4()") @primaryKey
+  admin: User!
+  action: String! # APPROVE_PROFILE, SUSPEND_USER, etc.
+  entityId: String!
+  entityType: String!
+  details: String
+  timestamp: Timestamp! @default(expr: "request.time")
+}
+
+type AppConfig @table {
+  key: String! @primaryKey
+  value: String! # JSON payload
+}
