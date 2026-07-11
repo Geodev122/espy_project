@@ -1,19 +1,20 @@
-# 🛠️ Support Suite Workstation Context
+# 🛠️ Espy Protocol Unified Workstation Context
 
-You are working in the **Support Suite** standalone workstation.
+You are working in the **Espy Protocol** unified repository.
 
 ## 📍 Important Structural Context
 
-- This directory is a **Directory Junction** pointing to `D:\repositories\AWARD Site\hope-support-suit`.
-- This is **NOT** a standalone Git repository. It is a subfolder of the master repo at `D:\repositories\AWARD Site`.
-- **ALL Git operations** must be performed in the Master Repo root: `D:\repositories\AWARD Site`.
+- This project is now unified. The apps and core logic are all contained within this repository.
+- All dependencies have been adjusted to the **C: drive** following the decommissioning of drive D.
+- Frontend logic is in `/apps` and `/packages/shared_core`.
+- Backend logic (Functions, DataConnect) is in `/backend`.
 
 ## 📖 Master Guide
 
-For full details on development, deployment, and synchronization logic, please refer to the master guide in the root of the main repository:
-👉 `../../WORKSTATION_GUIDE.md` (physically located in the parent directory of the main repo).
+For full details on development, deployment, and MVVM architecture, please refer to the guides in:
+👉 `.artifacts/20260711-150015-e112ca46-abcd-45f6-a4de-c6ab05b51f83/mvvm_guide.artifact.md`
 
 ## 🚀 Local Deployment
 
-- Hosting Target: `support-suit`
-- Command: `firebase deploy --only hosting:support-suit`
+- Hosting Target: `espy-app`
+- Command: `firebase deploy --only hosting:espy-app`

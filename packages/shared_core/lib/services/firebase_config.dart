@@ -3,30 +3,30 @@ import 'package:flutter/foundation.dart';
 
 class FirebaseConfig {
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyA1zjDvYC6Rq6AVwjSsDpvhZJuCYtyx31s',
-    appId: '1:901792627653:android:0792e2c2ab42ea6bf6e9ac',
-    messagingSenderId: '901792627653',
-    projectId: 'hope-bearer-award',
-    storageBucket: 'hope-bearer-award.firebasestorage.app',
+    apiKey: 'AIzaSyDFT0A-DodhyqsogAn7bpQHSjSFUtxKDpo',
+    appId: '1:425540347151:android:placeholder', // Need actual Android App ID
+    messagingSenderId: '425540347151',
+    projectId: 'espy-453d3',
+    storageBucket: 'espy-453d3.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBoDoITldWZHob7NDFRntKHcyB06CPgKjI',
-    appId: '1:901792627653:ios:placeholder', // Need actual iOS App ID if available
-    messagingSenderId: '901792627653',
-    projectId: 'hope-bearer-award',
-    storageBucket: 'hope-bearer-award.firebasestorage.app',
-    iosBundleId: 'com.hopesupportsuit.app',
+    apiKey: 'AIzaSyDFT0A-DodhyqsogAn7bpQHSjSFUtxKDpo',
+    appId: '1:425540347151:ios:placeholder', // Need actual iOS App ID
+    messagingSenderId: '425540347151',
+    projectId: 'espy-453d3',
+    storageBucket: 'espy-453d3.firebasestorage.app',
+    iosBundleId: 'com.espyprotocol.app',
   );
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCLms3fjwWnBC3aQlxafU6hF7m2Egw3KCc',
-    authDomain: 'hope-bearer-award.firebaseapp.com',
-    projectId: 'hope-bearer-award',
-    storageBucket: 'hope-bearer-award.firebasestorage.app',
-    messagingSenderId: '901792627653',
-    appId: '1:901792627653:web:d215087d3416ac8ff6e9ac',
-    measurementId: 'G-QZKLKL4ZF8',
+    apiKey: 'AIzaSyDFT0A-DodhyqsogAn7bpQHSjSFUtxKDpo',
+    authDomain: 'espy-453d3.firebaseapp.com',
+    projectId: 'espy-453d3',
+    storageBucket: 'espy-453d3.firebasestorage.app',
+    messagingSenderId: '425540347151',
+    appId: '1:425540347151:web:bbca01d8a4eef075d8ca7a',
+    measurementId: 'G-42V44VK60V',
   );
 
   static FirebaseOptions get currentPlatform {

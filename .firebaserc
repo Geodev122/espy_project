@@ -1,18 +1,12 @@
 {
   "projects": {
-    "default": "hope-bearer-award"
+    "default": "espy-453d3"
   },
   "targets": {
-    "hope-bearer-award": {
+    "espy-453d3": {
       "hosting": {
-        "admin-dashboard": [
-          "hope-bearer-award-admin"
-        ],
-        "visitor-app": [
-          "hope-bearer-award-visitor"
-        ],
-        "pro-app": [
-          "hope-bearer-award-pro"
+        "espy-app": [
+          "espy-app"
         ]
       }
     }
