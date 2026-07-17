@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'package:cloud_functions/cloud_functions.dart';
+import '../services/auth_service.dart';
 import '../services/espy_repository.dart';
 
 class WalletViewModel extends ChangeNotifier {
@@ -39,7 +42,7 @@ class WalletViewModel extends ChangeNotifier {
     _isProcessing = true;
     notifyListeners();
     try {
-      final result = await _functions.httpsCallable('redeemRechargeCode').call({
+      final result = await FirebaseFunctions.instanceFor(region: 'us-central1').httpsCallable('redeemRechargeCode').call({
         'userId': _authService.user!.uid,
         'code': code.trim(),
       });

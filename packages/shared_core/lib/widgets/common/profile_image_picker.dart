@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
-import '../../core/theme.dart';
+import 'package:shared_core/theme/espy_theme.dart';
 import 'package:shared_core/services/sound_service.dart';
 
 class ProfileImagePicker extends StatefulWidget {

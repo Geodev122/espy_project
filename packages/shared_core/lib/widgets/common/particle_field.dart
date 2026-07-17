@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import '../../core/theme.dart';
+import 'package:shared_core/theme/espy_theme.dart';
 
 class ParticleField extends StatefulWidget {
   const ParticleField({super.key});

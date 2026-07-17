@@ -7,9 +7,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'platform/google_login_helper.dart';
 import '../models/user_model.dart';
 import 'espy_repository.dart';
+import 'debug_service.dart';
 
 class AuthService extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final FirebaseFunctions _functions = FirebaseFunctions.instanceFor(region: 'us-central1');
   final EspyRepository _repository;
   final GoogleLoginHelper _googleSignIn = getGoogleLoginHelper();
   final DebugService _debug = DebugService();

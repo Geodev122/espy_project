@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../core/theme.dart';
+import 'package:shared_core/theme/espy_theme.dart';
 
 class CinematicBackground extends StatefulWidget {
   final Widget? child;

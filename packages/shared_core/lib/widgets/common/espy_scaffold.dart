@@ -9,6 +9,7 @@ class EspyScaffold extends StatelessWidget {
   final Widget? drawer;
   final bool extendBodyBehindAppBar;
   final bool useCinematicBackground;
+  final Widget? floatingActionButton;
 
   const EspyScaffold({
     super.key,
@@ -18,6 +19,7 @@ class EspyScaffold extends StatelessWidget {
     this.drawer,
     this.extendBodyBehindAppBar = true,
     this.useCinematicBackground = true,
+    this.floatingActionButton,
   });
 
   @override
@@ -35,6 +37,7 @@ class EspyScaffold extends StatelessWidget {
       drawer: drawer,
       bottomNavigationBar: bottomNavigationBar,
       extendBodyBehindAppBar: extendBodyBehindAppBar,
+      floatingActionButton: floatingActionButton,
     );
   }
 }

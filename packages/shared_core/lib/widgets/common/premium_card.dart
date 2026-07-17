@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import '../../core/theme.dart';
+import 'package:shared_core/theme/espy_theme.dart';
 
 class PremiumCard extends StatelessWidget {
   final Widget child;

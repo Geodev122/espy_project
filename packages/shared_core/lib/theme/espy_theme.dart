@@ -35,6 +35,8 @@ class EspyTheme {
   static const Color noir          = Color(0xFF020617);
   static const Color mahogany      = Color(0xFF451A03);
   static const Color navy          = navyDeep;
+  static const Color cognac        = Color(0xFF8B4513);
+  static const Color teal          = Color(0xFF008080);
 
   static const LinearGradient backgroundGradient = LinearGradient(
     begin: Alignment.topCenter,
@@ -64,6 +66,18 @@ class EspyTheme {
     stops: [0.0, 0.5, 1.0],
   );
 
+  static const LinearGradient metallicNoir = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF1E293B), Color(0xFF0F172A), Color(0xFF020617)],
+  );
+
+  static const LinearGradient cyanFlame = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [skyBlue, Color(0xFF00CED1), Color(0xFF008B8B)],
+  );
+
   static const LinearGradient goldRule = LinearGradient(
     colors: [Colors.transparent, gold, gold, Colors.transparent],
     stops: [0.0, 0.3, 0.7, 1.0],
@@ -88,6 +102,26 @@ class EspyTheme {
 
   static TextStyle get wordmarkStyle => GoogleFonts.montserrat(
     fontSize: 36, fontWeight: FontWeight.w900, color: textWordmark, letterSpacing: 10,
+  );
+
+  static TextStyle get taglineStyle => GoogleFonts.montserrat(
+    fontSize: 10, fontWeight: FontWeight.w700, color: textOnDarkMuted, letterSpacing: 4,
+  );
+
+  static BoxDecoration get premiumCardDecoration => BoxDecoration(
+    gradient: backgroundGradient,
+    borderRadius: BorderRadius.circular(24),
+    boxShadow: [
+      BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 20, offset: const Offset(0, 8)),
+    ],
+  );
+
+  static BoxDecoration get cardDecoration => BoxDecoration(
+    color: white,
+    borderRadius: BorderRadius.circular(24),
+    boxShadow: [
+      BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 15, offset: const Offset(0, 4)),
+    ],
   );
 
   static ThemeData get metallicTheme {

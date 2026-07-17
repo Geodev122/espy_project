@@ -13,6 +13,7 @@ import 'package:shared_core/theme/espy_theme.dart';
 import 'package:shared_core/services/auth_service.dart';
 import 'package:shared_core/services/user_service.dart';
 import 'package:shared_core/services/sound_service.dart';
+import 'package:shared_core/services/firestore_service.dart';
 import 'package:shared_core/services/locale_service.dart';
 import 'package:shared_core/models/user_model.dart';
 
@@ -27,9 +28,9 @@ import 'map/map_explore_screen.dart';
 import '../professional/services/service_manager_screen.dart';
 import '../visitor/emergency/sos_hub_screen.dart';
 import '../../widgets/common/espy_side_menu.dart';
-import \u0027package:shared_core/widgets/common/premium_button.dart\u0027;
+import 'package:shared_core/widgets/common/premium_button.dart';
 
-import \u0027package:espy_app/l10n/app_localizations.dart\u0027;
+import 'package:espy_app/l10n/app_localizations.dart';
 
 import '../admin/dashboard_screen.dart' as admin;
 

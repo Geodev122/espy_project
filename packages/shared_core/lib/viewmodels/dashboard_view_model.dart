@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../services/auth_service.dart';
 import '../services/espy_repository.dart';
 
 class DashboardViewModel extends ChangeNotifier {
@@ -19,7 +22,7 @@ class DashboardViewModel extends ChangeNotifier {
     final expiry = profile?['visibilityExpiresAt'] != null
         ? (profile?['visibilityExpiresAt'] is Timestamp
             ? (profile?['visibilityExpiresAt'] as Timestamp).toDate()
-            : DateTime.tryParse(profile?['visibilityExpiresAt'].toString()))
+            : DateTime.tryParse(profile?['visibilityExpiresAt']?.toString() ?? ''))
         : null;
 
     if (expiry == null) return 0;

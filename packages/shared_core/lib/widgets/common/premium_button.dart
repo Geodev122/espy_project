@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/theme.dart';
+import 'package:shared_core/theme/espy_theme.dart';
 import 'package:shared_core/services/sound_service.dart';
 
 enum PremiumButtonVariant { electric, cyan, gold, glass, outline, platinum }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/theme.dart';
+import 'package:shared_core/theme/espy_theme.dart';
 
 class WhatsappInput extends StatefulWidget {
   final String? initialCode;
