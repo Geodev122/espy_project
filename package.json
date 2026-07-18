@@ -2,14 +2,10 @@
   "name": "espy-project-monorepo",
   "private": true,
   "scripts": {
-    "build:all": "npm run build:admin && npm run build:visitor && npm run build:pro",
-    "build:admin": "cd apps/admin_pwa && flutter build web --release",
-    "build:visitor": "cd apps/visitor_app && flutter build web --release",
-    "build:pro": "cd apps/pro_app && flutter build web --release",
-    "deploy": "firebase deploy",
-    "deploy:admin": "firebase deploy --only hosting:admin-dashboard",
-    "deploy:visitor": "firebase deploy --only hosting:visitor-app",
-    "deploy:pro": "firebase deploy --only hosting:pro-app",
-    "deploy:functions": "firebase deploy --only functions"
+    "frontend:build": "cd apps && flutter build web --release",
+    "frontend:deploy": "powershell -File ./apps/deploy_pwa.ps1",
+    "backend:deploy": "firebase deploy --only functions,firestore:rules,storage,dataconnect",
+    "backend:sync": "firebase dataconnect:sdk:generate",
+    "deploy:all": "npm run frontend:deploy && npm run backend:deploy"
   }
 }

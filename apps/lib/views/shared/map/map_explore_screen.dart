@@ -11,14 +11,14 @@ import 'package:animate_do/animate_do.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import 'package:espy_app/l10n/app_localizations.dart';
-import 'package:shared_core/theme/espy_theme.dart';
-import 'package:shared_core/services/firestore_service.dart';
-import 'package:shared_core/services/auth_service.dart';
-import 'package:shared_core/services/sound_service.dart';
-import 'package:shared_core/models/user_model.dart';
-import 'package:shared_core/services/directory_view_model.dart';
-import 'package:shared_core/widgets/common/premium_button.dart';
-import 'package:shared_core/widgets/common/espy_scaffold.dart';
+import 'package:espy_app/theme/espy_theme.dart';
+import 'package:espy_app/viewmodels/firestore_service.dart';
+import 'package:espy_app/viewmodels/auth_service.dart';
+import 'package:espy_app/viewmodels/sound_service.dart';
+import 'package:espy_app/models/user_model.dart';
+import 'package:espy_app/viewmodels/directory_view_model.dart';
+import 'package:espy_app/widgets/common/premium_button.dart';
+import 'package:espy_app/widgets/common/espy_scaffold.dart';
 
 class MapExploreScreen extends StatefulWidget {
   const MapExploreScreen({super.key});

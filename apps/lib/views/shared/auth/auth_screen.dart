@@ -3,10 +3,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:animate_do/animate_do.dart';
 
-import 'package:shared_core/theme/espy_theme.dart';
-import 'package:shared_core/services/auth_service.dart';
-import 'package:shared_core/widgets/common/premium_button.dart';
-import 'package:shared_core/widgets/common/espy_scaffold.dart';
+import 'package:espy_app/theme/espy_theme.dart';
+import 'package:espy_app/viewmodels/auth_service.dart';
+import 'package:espy_app/widgets/common/premium_button.dart';
+import 'package:espy_app/widgets/common/espy_scaffold.dart';
 import 'package:espy_app/l10n/app_localizations.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -223,12 +223,20 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
           children: [
             Expanded(
               child: _roleToggleItem(
+                label: l10n.visitor.toUpperCase(),
+                isActive: _selectedRole == 'visitor',
+                onTap: () => setState(() => _selectedRole = 'visitor'),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _roleToggleItem(
                 label: l10n.professional.toUpperCase(),
                 isActive: _selectedRole == 'professional',
                 onTap: () => setState(() => _selectedRole = 'professional'),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 8),
             Expanded(
               child: _roleToggleItem(
                 label: l10n.institution.toUpperCase(),

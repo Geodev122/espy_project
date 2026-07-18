@@ -4,15 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:espy_app/l10n/app_localizations.dart';
-import 'package:shared_core/theme/espy_theme.dart';
-import 'package:shared_core/services/user_service.dart';
-import 'package:shared_core/services/sound_service.dart';
-import 'package:shared_core/services/storage_service.dart';
-import 'package:shared_core/widgets/common/premium_button.dart';
-import 'package:shared_core/widgets/common/premium_card.dart';
-import 'package:shared_core/widgets/common/profile_image_picker.dart';
-import 'package:shared_core/widgets/common/location_picker_modal.dart';
-import 'package:shared_core/widgets/common/espy_scaffold.dart';
+import 'package:espy_app/theme/espy_theme.dart';
+import 'package:espy_app/viewmodels/user_service.dart';
+import 'package:espy_app/viewmodels/sound_service.dart';
+import 'package:espy_app/viewmodels/storage_service.dart';
+import 'package:espy_app/widgets/common/premium_button.dart';
+import 'package:espy_app/widgets/common/premium_card.dart';
+import 'package:espy_app/widgets/common/profile_image_picker.dart';
+import 'package:espy_app/widgets/common/location_picker_modal.dart';
+import 'package:espy_app/widgets/common/espy_scaffold.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});

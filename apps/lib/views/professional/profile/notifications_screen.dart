@@ -3,11 +3,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:espy_app/l10n/app_localizations.dart';
-import 'package:shared_core/theme/espy_theme.dart';
-import 'package:shared_core/services/firestore_service.dart';
-import 'package:shared_core/services/auth_service.dart';
-import 'package:shared_core/widgets/common/premium_card.dart';
-import 'package:shared_core/widgets/common/espy_scaffold.dart';
+import 'package:espy_app/theme/espy_theme.dart';
+import 'package:espy_app/viewmodels/firestore_service.dart';
+import 'package:espy_app/viewmodels/auth_service.dart';
+import 'package:espy_app/widgets/common/premium_card.dart';
+import 'package:espy_app/widgets/common/espy_scaffold.dart';
 
 class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});

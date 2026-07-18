@@ -5,10 +5,10 @@ import 'package:provider/provider.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:animate_do/animate_do.dart';
 
-import 'package:shared_core/theme/espy_theme.dart';
-import 'package:shared_core/services/auth_service.dart';
-import 'package:shared_core/services/user_service.dart';
-import 'package:shared_core/services/sound_service.dart';
+import 'package:espy_app/theme/espy_theme.dart';
+import 'package:espy_app/viewmodels/auth_service.dart';
+import 'package:espy_app/viewmodels/user_service.dart';
+import 'package:espy_app/viewmodels/sound_service.dart';
 
 import 'package:espy_app/views/admin/dashboard_screen.dart';
 import 'package:espy_app/views/professional/profile/edit_profile_screen.dart';

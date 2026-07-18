@@ -3,9 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:math' as math;
 
-import 'package:shared_core/theme/espy_theme.dart';
-import 'package:shared_core/widgets/common/particle_field.dart';
-import 'package:shared_core/widgets/common/espy_scaffold.dart';
+import 'package:espy_app/theme/espy_theme.dart';
+import 'package:espy_app/widgets/common/particle_field.dart';
+import 'package:espy_app/widgets/common/espy_scaffold.dart';
 import 'package:espy_app/l10n/app_localizations.dart';
 
 class SplashScreen extends StatefulWidget {

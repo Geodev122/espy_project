@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_core/theme/espy_theme.dart';
-import 'package:shared_core/widgets/common/espy_scaffold.dart';
-import 'package:shared_core/widgets/common/premium_card.dart';
+import 'package:espy_app/theme/espy_theme.dart';
+import 'package:espy_app/widgets/common/espy_scaffold.dart';
+import 'package:espy_app/widgets/common/premium_card.dart';
+
+import 'modules/verifications_screen.dart';
+import 'modules/support_inbox_screen.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({super.key});
@@ -53,8 +56,12 @@ class AdminDashboardScreen extends StatelessWidget {
   Widget _buildActionList(BuildContext context) {
     return Column(
       children: [
-        _adminTile("PENDING VERIFICATIONS", Icons.verified_user_rounded, () {}),
-        _adminTile("SUPPORT INBOX", Icons.support_agent_rounded, () {}),
+        _adminTile("PENDING VERIFICATIONS", Icons.verified_user_rounded, () {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const VerificationsScreen()));
+        }),
+        _adminTile("SUPPORT INBOX", Icons.support_agent_rounded, () {
+           Navigator.push(context, MaterialPageRoute(builder: (_) => const SupportInboxScreen()));
+        }),
         _adminTile("SYSTEM ANNOUNCEMENTS", Icons.campaign_rounded, () {}),
         _adminTile("WALLET LEDGER AUDIT", Icons.account_balance_wallet_rounded, () {}),
         _adminTile("TAXONOMY MANAGEMENT", Icons.category_rounded, () {}),

@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_core/services/platform/web_helper.dart';
-import 'package:shared_core/services/auth_service.dart';
-import 'package:shared_core/models/user_model.dart';
+import 'package:espy_app/viewmodels/platform/web_helper.dart';
+import 'package:espy_app/viewmodels/auth_service.dart';
+import 'package:espy_app/models/user_model.dart';
 
 import 'app_shell.dart';
 import 'onboarding/splash_screen.dart';

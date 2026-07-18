@@ -4,10 +4,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:espy_app/l10n/app_localizations.dart';
 
-import 'package:shared_core/theme/espy_theme.dart';
-import 'package:shared_core/widgets/common/premium_button.dart';
-import 'package:shared_core/widgets/common/espy_scaffold.dart';
-import 'package:shared_core/services/locale_service.dart';
+import 'package:espy_app/theme/espy_theme.dart';
+import 'package:espy_app/widgets/common/premium_button.dart';
+import 'package:espy_app/widgets/common/espy_scaffold.dart';
+import 'package:espy_app/viewmodels/locale_service.dart';
 import '../auth/auth_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -79,13 +79,35 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     child: Column(
                       children: [
                         PremiumButton(
-                          label: l10n.register.toUpperCase(),
+                          label: l10n.findHope.toUpperCase(),
                           fullWidth: true,
-                          variant: PremiumButtonVariant.gold,
-                          icon: Icons.person_add_rounded,
-                          onPressed: () => _navigateToAuth(context, isSignUp: true),
+                          variant: PremiumButtonVariant.cyan,
+                          icon: Icons.person_search_rounded,
+                          onPressed: () => _navigateToAuth(context, role: 'visitor', isSignUp: true),
                         ),
                         const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: PremiumButton(
+                                label: l10n.professional.toUpperCase(),
+                                variant: PremiumButtonVariant.gold,
+                                icon: Icons.medical_services_rounded,
+                                onPressed: () => _navigateToAuth(context, role: 'professional', isSignUp: true),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: PremiumButton(
+                                label: l10n.institution.toUpperCase(),
+                                variant: PremiumButtonVariant.gold,
+                                icon: Icons.account_balance_rounded,
+                                onPressed: () => _navigateToAuth(context, role: 'institution', isSignUp: true),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
                         PremiumButton(
                           label: l10n.login.toUpperCase(),
                           fullWidth: true,

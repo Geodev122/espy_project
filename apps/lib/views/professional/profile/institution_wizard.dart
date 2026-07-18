@@ -6,17 +6,17 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import 'package:espy_app/l10n/app_localizations.dart';
-import 'package:shared_core/theme/espy_theme.dart';
-import 'package:shared_core/services/auth_service.dart';
-import 'package:shared_core/services/firestore_service.dart';
-import 'package:shared_core/services/storage_service.dart';
-import 'package:shared_core/widgets/common/location_picker_modal.dart';
-import 'package:shared_core/widgets/common/premium_button.dart';
-import 'package:shared_core/widgets/common/premium_card.dart';
-import 'package:shared_core/widgets/common/profile_image_picker.dart';
-import 'package:shared_core/widgets/common/document_picker.dart';
-import 'package:shared_core/widgets/common/espy_scaffold.dart';
-import 'package:shared_core/widgets/common/wizard_step_container.dart';
+import 'package:espy_app/theme/espy_theme.dart';
+import 'package:espy_app/viewmodels/auth_service.dart';
+import 'package:espy_app/viewmodels/firestore_service.dart';
+import 'package:espy_app/viewmodels/storage_service.dart';
+import 'package:espy_app/widgets/common/location_picker_modal.dart';
+import 'package:espy_app/widgets/common/premium_button.dart';
+import 'package:espy_app/widgets/common/premium_card.dart';
+import 'package:espy_app/widgets/common/profile_image_picker.dart';
+import 'package:espy_app/widgets/common/document_picker.dart';
+import 'package:espy_app/widgets/common/espy_scaffold.dart';
+import 'package:espy_app/widgets/common/wizard_step_container.dart';
 
 class InstitutionWizard extends StatefulWidget {
   const InstitutionWizard({super.key});
@@ -355,6 +355,39 @@ class _InstitutionWizardState extends State<InstitutionWizard> {
   }
 
   Future<void> _submitProfile() async {
-     // ... logic to submit via repo
+    final auth = Provider.of<AuthService>(context, listen: false);
+    setState(() => _isSubmitting = true);
+
+    try {
+      String? photoUrl;
+      if (_profileImageWebBytes != null) {
+        photoUrl = await _storage.uploadProfileImageWeb(userId: auth.user!.uid, bytes: _profileImageWebBytes!);
+      } else if (_profileImageFile != null) {
+        photoUrl = await _storage.uploadProfileImage(userId: auth.user!.uid, file: _profileImageFile!);
+      }
+
+      await _firestore.createProfessionalProfile(auth.user!.uid, {
+        'name': _nameController.text,
+        'fullNameEn': _nameController.text,
+        'bio': _bioController.text,
+        'bio_ar': _bioArController.text,
+        'whatsapp': '${_whatsappCodeController.text}${_whatsappNumberController.text}',
+        'whatsapp_code': _whatsappCodeController.text,
+        'whatsapp_number': _whatsappNumberController.text,
+        'registrationNumber': _registrationController.text,
+        'categoryId': _selectedCategoryId,
+        'mainLocation': _mainLocation,
+        'photoUrl': photoUrl ?? auth.user?.photoURL,
+        'role': 'institution',
+        'hasProfile': true,
+      });
+
+      await auth.fetchUserData();
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
+    }
   }
 }

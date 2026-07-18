@@ -7,11 +7,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
 import 'package:espy_app/l10n/app_localizations.dart';
-import 'package:shared_core/theme/espy_theme.dart';
-import 'package:shared_core/viewmodels/services_view_model.dart';
-import 'package:shared_core/services/user_service.dart';
-import 'package:shared_core/widgets/common/premium_card.dart';
-import 'package:shared_core/widgets/common/espy_scaffold.dart';
+import 'package:espy_app/theme/espy_theme.dart';
+import 'package:espy_app/viewmodels/services_view_model.dart';
+import 'package:espy_app/viewmodels/user_service.dart';
+import 'package:espy_app/widgets/common/premium_card.dart';
+import 'package:espy_app/widgets/common/espy_scaffold.dart';
 import 'service_listing_wizard.dart';
 
 class ServiceManagerScreen extends StatefulWidget {

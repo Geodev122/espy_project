@@ -5,9 +5,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:shared_core/theme/espy_theme.dart';
-import 'package:shared_core/services/auth_service.dart';
-import 'package:shared_core/viewmodels/matching_view_model.dart';
+import 'package:espy_app/theme/espy_theme.dart';
+import 'package:espy_app/viewmodels/auth_service.dart';
+import 'package:espy_app/viewmodels/matching_view_model.dart';
 import 'package:espy_app/l10n/app_localizations.dart';
 
 class ServiceSwipeScreen extends StatefulWidget {

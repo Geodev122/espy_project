@@ -6,10 +6,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import 'package:espy_app/l10n/app_localizations.dart';
-import 'package:shared_core/theme/espy_theme.dart';
-import 'package:shared_core/services/emergency_service.dart';
-import 'package:shared_core/services/locale_service.dart';
-import 'package:shared_core/widgets/common/espy_scaffold.dart';
+import 'package:espy_app/theme/espy_theme.dart';
+import 'package:espy_app/viewmodels/emergency_service.dart';
+import 'package:espy_app/viewmodels/locale_service.dart';
+import 'package:espy_app/widgets/common/espy_scaffold.dart';
 
 class SOSHubScreen extends StatefulWidget {
   const SOSHubScreen({super.key});

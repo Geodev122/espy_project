@@ -5,13 +5,13 @@ import 'package:provider/provider.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'package:shared_core/theme/espy_theme.dart';
-import 'package:shared_core/services/auth_service.dart';
-import 'package:shared_core/services/whish_pay_service.dart';
-import 'package:shared_core/viewmodels/wallet_view_model.dart';
-import 'package:shared_core/widgets/common/premium_card.dart';
-import 'package:shared_core/widgets/common/premium_button.dart';
-import 'package:shared_core/widgets/common/espy_scaffold.dart';
+import 'package:espy_app/theme/espy_theme.dart';
+import 'package:espy_app/viewmodels/auth_service.dart';
+import 'package:espy_app/viewmodels/whish_pay_service.dart';
+import 'package:espy_app/viewmodels/wallet_view_model.dart';
+import 'package:espy_app/widgets/common/premium_card.dart';
+import 'package:espy_app/widgets/common/premium_button.dart';
+import 'package:espy_app/widgets/common/espy_scaffold.dart';
 import 'package:espy_app/l10n/app_localizations.dart';
 
 import 'package:webview_flutter/webview_flutter.dart';

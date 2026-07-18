@@ -5,10 +5,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import 'package:espy_app/l10n/app_localizations.dart';
-import 'package:shared_core/theme/espy_theme.dart';
-import 'package:shared_core/services/auth_service.dart';
-import 'package:shared_core/services/user_service.dart';
-import 'package:shared_core/services/locale_service.dart';
+import 'package:espy_app/theme/espy_theme.dart';
+import 'package:espy_app/viewmodels/auth_service.dart';
+import 'package:espy_app/viewmodels/user_service.dart';
+import 'package:espy_app/viewmodels/locale_service.dart';
 import '../emergency/sos_hub_screen.dart';
 import 'location_manager_screen.dart';
 import 'edit_profile_screen.dart';
