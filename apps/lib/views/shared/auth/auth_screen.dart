@@ -109,6 +109,7 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
 
   Widget _buildFormCard(AppLocalizations l10n) {
     final authService = Provider.of<AuthService>(context);
+    final bool showEmailPass = _selectedRole == 'visitor' || !_isSignUp;
 
     return Container(
       padding: const EdgeInsets.all(32),
@@ -125,68 +126,83 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
           children: [
             _buildCardHeader(l10n),
             const SizedBox(height: 32),
+            if (_isSignUp) ...[
+              _buildRoleSelector(l10n),
+              const SizedBox(height: 24),
+            ],
             AnimatedSize(
               duration: const Duration(milliseconds: 280),
               curve: Curves.easeInOut,
               child: Column(
                 children: [
-                  if (_isSignUp) ...[
-                    _buildRoleSelector(l10n),
+                  if (showEmailPass) ...[
+                    if (_isSignUp) ...[
+                      _buildTextField(
+                        controller: _nameController,
+                        hint: l10n.legalFullName.toUpperCase(),
+                        icon: Icons.person_outline_rounded,
+                        autofillHint: AutofillHints.name,
+                        validator: (v) => (v == null || v.isEmpty) ? 'Name required' : null,
+                      ),
+                      const SizedBox(height: 16),
+                      _buildTextField(
+                        controller: _redemptionCodeController,
+                        hint: 'REDEMPTION CODE (OPTIONAL)',
+                        icon: Icons.qr_code_rounded,
+                        autofillHint: '',
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                    _buildTextField(
+                      controller: _emailController,
+                      hint: l10n.emailAddress.toUpperCase(),
+                      icon: Icons.mail_outline_rounded,
+                      autofillHint: AutofillHints.email,
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (v) => (v == null || !v.contains('@')) ? 'Enter a valid email' : null,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildPasswordField(l10n),
+                    if (!_isSignUp) ...[
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(l10n.passwordResetSent), backgroundColor: EspyTheme.royalBlue)
+                            );
+                          },
+                          child: Text(l10n.forgotPassword, style: GoogleFonts.montserrat(fontSize: 12, fontWeight: FontWeight.w600, color: EspyTheme.royalBlue)),
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 24),
-                    _buildTextField(
-                      controller: _nameController,
-                      hint: l10n.legalFullName.toUpperCase(),
-                      icon: Icons.person_outline_rounded,
-                      autofillHint: AutofillHints.name,
-                      validator: (v) => (v == null || v.isEmpty) ? 'Name required' : null,
+                    PremiumButton(
+                      label: authService.isLoading
+                          ? l10n.syncing.toUpperCase()
+                          : (_isSignUp ? l10n.initializeAccount.toUpperCase() : l10n.secureLogin.toUpperCase()),
+                      isLoading: authService.isLoading,
+                      fullWidth: true,
+                      variant: PremiumButtonVariant.gold,
+                      icon: _isSignUp ? Icons.person_add_outlined : Icons.login_rounded,
+                      onPressed: _handleEmailAuth,
                     ),
                     const SizedBox(height: 16),
-                    _buildTextField(
-                      controller: _redemptionCodeController,
-                      hint: 'REDEMPTION CODE (OPTIONAL)',
-                      icon: Icons.qr_code_rounded,
-                      autofillHint: '',
-                    ),
+                    Center(child: Text(l10n.or, style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.w800, color: Colors.black26))),
                     const SizedBox(height: 16),
+                  ] else ...[
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      child: Text(
+                        "PROFESSIONAL AND INSTITUTION ROLES REQUIRE SECURE GOOGLE IDENTITY FOR VERIFICATION.",
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.w700, color: EspyTheme.royalBlue, height: 1.5),
+                      ),
+                    ),
                   ],
-                  _buildTextField(
-                    controller: _emailController,
-                    hint: l10n.emailAddress.toUpperCase(),
-                    icon: Icons.mail_outline_rounded,
-                    autofillHint: AutofillHints.email,
-                    keyboardType: TextInputType.emailAddress,
-                    validator: (v) => (v == null || !v.contains('@')) ? 'Enter a valid email' : null,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildPasswordField(l10n),
                 ],
               ),
             ),
-            if (!_isSignUp) ...[
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(l10n.passwordResetSent), backgroundColor: EspyTheme.royalBlue)
-                    );
-                  },
-                  child: Text(l10n.forgotPassword, style: GoogleFonts.montserrat(fontSize: 12, fontWeight: FontWeight.w600, color: EspyTheme.royalBlue)),
-                ),
-              ),
-            ],
-            const SizedBox(height: 24),
-            PremiumButton(
-              label: authService.isLoading
-                  ? l10n.syncing.toUpperCase()
-                  : (_isSignUp ? l10n.initializeAccount.toUpperCase() : l10n.secureLogin.toUpperCase()),
-              isLoading: authService.isLoading,
-              fullWidth: true,
-              variant: PremiumButtonVariant.gold,
-              icon: _isSignUp ? Icons.person_add_outlined : Icons.login_rounded,
-              onPressed: _handleEmailAuth,
-            ),
-            const SizedBox(height: 16),
             PremiumButton(
               label: l10n.continueWithGoogle.toUpperCase(),
               isLoading: authService.isLoading,
