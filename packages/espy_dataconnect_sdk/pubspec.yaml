@@ -1,0 +1,13 @@
+name: espy_dataconnect_sdk
+description: Shared Firebase Data Connect SDK for Espy Project
+version: 1.0.0
+publish_to: 'none'
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  firebase_core: ^4.11.0
+  firebase_data_connect: ^0.3.0+7

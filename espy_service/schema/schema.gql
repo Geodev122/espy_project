@@ -1,0 +1,235 @@
+# ESPY PROTOCOL - UNIFIED SCHEMA v5.11
+
+# --- Enums ---
+
+enum UserRole {
+  VISITOR
+  PROFESSIONAL
+  INSTITUTION
+  ADMIN
+}
+
+enum MembershipTier {
+  BASIC
+  GOLD
+  PLATINUM
+}
+
+enum TransactionType {
+  RECHARGE
+  PURCHASE
+  REFUND
+  BONUS
+}
+
+enum InteractionType {
+  LIKE
+  DISLIKE
+  VIEW
+  FAVORITE
+  SHARE
+}
+
+enum CommunityRequestStatus {
+  ACTIVE
+  FULFILLED
+  EXPIRED
+  PENDING
+}
+
+# --- 1. Identity & Profiles ---
+
+type User @table(key: "id") {
+  id: String!
+  email: String! @unique
+  name: String
+  role: UserRole! @default(value: VISITOR)
+  isActive: Boolean! @default(value: true)
+  walletBalance: Int! @default(value: 0)
+  tokensUsed: Int! @default(value: 0)
+  photoUrl: String
+  phone: String
+  whatsapp: String
+  lastActiveAt: Timestamp @default(expr: "request.time")
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
+type ProfessionalProfile @table(key: "id") {
+  id: String!
+  user: User! @ref(fields: ["id"]) @onDelete(cascade: true)
+  fullNameAr: String
+  specialty: String
+  specialtyAr: String
+  bioEn: String
+  bioAr: String
+  isApproved: Boolean! @default(value: false)
+  isHonorVerified: Boolean! @default(value: false)
+  membershipTier: MembershipTier @default(value: BASIC)
+  serviceSlots: Int! @default(value: 2)
+  practicePins: Int! @default(value: 0)
+  visibilityExpiresAt: Timestamp
+}
+
+type InstitutionProfile @table(key: "id") {
+  id: String!
+  user: User! @ref(fields: ["id"]) @onDelete(cascade: true)
+  nameAr: String
+  registrationNumber: String
+  isApproved: Boolean! @default(value: false)
+  serviceSlots: Int! @default(value: 5)
+  visibilityExpiresAt: Timestamp
+}
+
+type VisitorProfile @table(key: "id") {
+  id: String!
+  user: User! @ref(fields: ["id"]) @onDelete(cascade: true)
+  interests: [String]
+}
+
+# --- 2. Taxonomy & Location ---
+
+type Sector @table(key: "id") {
+  id: String!
+  nameEn: String!
+  nameAr: String
+  displayOrder: Int @default(value: 999)
+  isActive: Boolean! @default(value: true)
+}
+
+type Category @table(key: "id") {
+  id: String!
+  sector: Sector!
+  nameEn: String!
+  nameAr: String
+  targetRole: UserRole!
+  isActive: Boolean! @default(value: true)
+}
+
+type Country @table(key: "id") {
+  id: String!
+  nameEn: String!
+  nameAr: String
+  flagEmoji: String
+}
+
+type LocationNode @table(key: "id") {
+  id: UUID! @default(expr: "uuidV4()")
+  user: User!
+  country: Country!
+  governorateName: String
+  cityName: String
+  lat: Float!
+  lng: Float!
+  isMain: Boolean! @default(value: false)
+  isVerified: Boolean! @default(value: false)
+  label: String
+}
+
+# --- 3. Core Business Logic ---
+
+type Service @table(key: "id") {
+  id: UUID! @default(expr: "uuidV4()")
+  provider: User!
+  category: Category!
+  titleEn: String!
+  titleAr: String
+  descriptionEn: String
+  descriptionAr: String
+  price: Int @default(value: 0)
+  isActive: Boolean! @default(value: true)
+  isAllocated: Boolean! @default(value: false)
+  imageUrl: String
+  visibilityExpiresAt: Timestamp
+}
+
+type CommunityRequest @table(key: "id") {
+  id: UUID! @default(expr: "uuidV4()")
+  user: User!
+  sector: Sector!
+  title: String!
+  description: String!
+  whatsapp: String
+  locationLabel: String
+  status: CommunityRequestStatus! @default(value: ACTIVE)
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+# --- 4. Ledger & Analytics ---
+
+type WalletTransaction @table(key: "id") {
+  id: UUID! @default(expr: "uuidV4()")
+  user: User!
+  amount: Int!
+  type: TransactionType!
+  referenceId: String
+  description: String
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+type Interaction @table(key: "id") {
+  id: UUID! @default(expr: "uuidV4()")
+  actor: User!
+  targetId: String!
+  type: InteractionType!
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+type SOSAlert @table(key: "id") {
+  id: UUID! @default(expr: "uuidV4()")
+  user: User!
+  lat: Float!
+  lng: Float!
+  status: String! @default(value: "active")
+  timestamp: Timestamp! @default(expr: "request.time")
+}
+
+# --- 5. Communications ---
+
+type SystemNotification @table(key: "id") {
+  id: UUID! @default(expr: "uuidV4()")
+  recipient: User!
+  title: String!
+  message: String!
+  type: String!
+  isRead: Boolean! @default(value: false)
+  timestamp: Timestamp! @default(expr: "request.time")
+}
+
+type Broadcast @table(key: "id") {
+  id: UUID! @default(expr: "uuidV4()")
+  sender: User!
+  title: String!
+  message: String!
+  targetCountry: String @default(value: "GLOBAL")
+  status: String! @default(value: "queued")
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+type Announcement @table(key: "id") {
+  id: UUID! @default(expr: "uuidV4()")
+  titleEn: String!
+  titleAr: String
+  contentEn: String!
+  contentAr: String
+  category: String!
+  status: String! @default(value: "approved")
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+# --- 6. Administration ---
+
+type AdminLog @table(key: "id") {
+  id: UUID! @default(expr: "uuidV4()")
+  admin: User!
+  action: String!
+  entityId: String!
+  entityType: String!
+  details: String
+  timestamp: Timestamp! @default(expr: "request.time")
+}
+
+type AppConfig @table(key: "key") {
+  key: String!
+  value: String!
+}

@@ -9,12 +9,12 @@ import 'package:espy_app/theme/espy_theme.dart';
 import 'package:espy_app/viewmodels/auth_service.dart';
 import 'package:espy_app/viewmodels/user_service.dart';
 import 'package:espy_app/viewmodels/locale_service.dart';
-import '../emergency/sos_hub_screen.dart';
+import '../../visitor/emergency/sos_hub_screen.dart';
 import 'location_manager_screen.dart';
 import 'edit_profile_screen.dart';
 import 'notifications_screen.dart';
 import 'privacy_vault_screen.dart';
-import 'subscription_hub_screen.dart';
+import '../../visitor/profile/subscription_hub_screen.dart';
 import 'payment_history_screen.dart';
 
 class VaultScreen extends StatelessWidget {

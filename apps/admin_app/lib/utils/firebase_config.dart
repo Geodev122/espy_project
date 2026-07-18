@@ -1,6 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
-import 'dart:html' as html;
+import 'package:web/web.dart' as web;
 
 class FirebaseConfig {
   // 🛡️ SHARED CORE CONFIG
@@ -31,10 +31,12 @@ class FirebaseConfig {
     measurementId: "G-5T8N8NE50D",
   );
 
-  // 📱 MOBILE APP (NATIVE)
+  // 📱 MOBILE APP (ANDROID)
+  // Note: Using a placeholder appId as native credentials weren't provided.
+  // Requires google-services.json for full native support.
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: _apiKey,
-    appId: "1:425540347151:android:725b89a8eef075d8ca7a", // Derived placeholder
+    appId: "1:425540347151:android:placeholder",
     messagingSenderId: _senderId,
     projectId: _projectId,
     storageBucket: _bucket,
@@ -42,12 +44,12 @@ class FirebaseConfig {
 
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      final String host = html.window.location.hostname ?? '';
-      // Detect based on Firebase Hosting site IDs
+      final String host = web.window.location.hostname;
+      // Detect based on Hosting site IDs
       if (host.contains('espy-253f7') || host.contains('espy-user')) {
         return userWeb;
       }
-      // Default to Admin or check for espy-453d3
+      // Default to Admin
       return adminWeb;
     }
     
@@ -55,8 +57,7 @@ class FirebaseConfig {
       case TargetPlatform.android:
         return android;
       default:
-        // Use userWeb config as a safe fallback for native platforms 
-        // to ensure measureId/appId consistency with seeker apps
+        // Fallback to userWeb as a safe configuration for cross-platform defaults
         return userWeb;
     }
   }

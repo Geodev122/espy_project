@@ -25,7 +25,7 @@ class ServicesViewModel extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    _servicesSub = _repository.getProfessionalServices(_authService.user!.uid).listen((data) {
+    _servicesSub = _repository.listProfessionalServices(_authService.user!.uid).listen((data) {
       _professionalServices = data;
       _isLoading = false;
       notifyListeners();

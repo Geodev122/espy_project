@@ -1,39 +1,31 @@
 class CountryModel {
   final String id;
   final String nameEn;
-  final String nameAr;
-  final String code;
-  final String currency;
-  final String phoneCode;
+  final String? nameAr;
+  final String? flagEmoji;
 
   CountryModel({
     required this.id,
     required this.nameEn,
-    required this.nameAr,
-    required this.code,
-    required this.currency,
-    required this.phoneCode,
+    this.nameAr,
+    this.flagEmoji,
   });
 
-  factory CountryModel.fromJson(Map<String, dynamic> json) {
+  factory CountryModel.fromMap(Map<String, dynamic> data) {
     return CountryModel(
-      id: json['id'] ?? '',
-      nameEn: json['name_en'] ?? '',
-      nameAr: json['name_ar'] ?? '',
-      code: json['code'] ?? '',
-      currency: json['currency'] ?? 'USD',
-      phoneCode: json['phone_code'] ?? '',
+      id: data['id'] ?? '',
+      nameEn: data['nameEn'] ?? data['name_en'] ?? '',
+      nameAr: data['nameAr'] ?? data['name_ar'],
+      flagEmoji: data['flagEmoji'],
     );
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'name_en': nameEn,
-      'name_ar': nameAr,
-      'code': code,
-      'currency': currency,
-      'phone_code': phoneCode,
+      'nameEn': nameEn,
+      'nameAr': nameAr,
+      'flagEmoji': flagEmoji,
     };
   }
 }

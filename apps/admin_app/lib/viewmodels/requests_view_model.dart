@@ -10,7 +10,7 @@ class RequestsViewModel extends ChangeNotifier {
   List<Map<String, dynamic>> _requests = [];
   List<String> _favoriteIds = [];
   bool _isLoading = true;
-  String _selectedSectionId = 'All';
+  String _selectedSectorId = 'All';
   bool _newestFirst = true;
 
   StreamSubscription? _requestsSub;
@@ -25,7 +25,7 @@ class RequestsViewModel extends ChangeNotifier {
     
     _loadRequests();
     
-    _favsSub = _repository.getFavoriteIds(_authService.user!.uid).listen((ids) {
+    _favsSub = _repository.listFavoriteIds(_authService.user!.uid).listen((ids) {
       _favoriteIds = ids;
       notifyListeners();
     });
@@ -36,8 +36,8 @@ class RequestsViewModel extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    _requestsSub = _repository.getCommunityRequests(
-      sectionId: _selectedSectionId,
+    _requestsSub = _repository.listCommunityRequests(
+      sectorId: _selectedSectorId,
       newestFirst: _newestFirst,
     ).listen((data) {
       _requests = data;
@@ -56,14 +56,14 @@ class RequestsViewModel extends ChangeNotifier {
     _loadRequests();
   }
 
-  void setSection(String sectionId) {
-    _selectedSectionId = sectionId;
+  void setSection(String sectorId) {
+    _selectedSectorId = sectorId;
     _loadRequests();
   }
 
   Future<void> favoriteRequest(String requestId, bool isFavorite) async {
     if (_authService.user == null) return;
-    await _repository.favoriteRequest(_authService.user!.uid, requestId, isFavorite);
+    await _repository.toggleFavorite(_authService.user!.uid, requestId, isFavorite);
   }
 
   @override

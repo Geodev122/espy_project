@@ -2,42 +2,34 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ServiceModel {
   final String id;
-  final String title;
+  final String providerId;
+  final String categoryId;
+  final String titleEn;
   final String? titleAr;
-  final String? description;
+  final String? descriptionEn;
   final String? descriptionAr;
-  final String? categoryId;
-  final String? sectorId;
-  final String? countryId;
-  final String professionalId;
-  final String? institutionId;
-  final String? photoUrl;
+  final int price;
   final bool isActive;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
-  final String pricingType;
-  final int favoriteCount;
+  final bool isAllocated;
+  final String? imageUrl;
+  final DateTime? visibilityExpiresAt;
 
   ServiceModel({
     required this.id,
-    required this.title,
+    required this.providerId,
+    required this.categoryId,
+    required this.titleEn,
     this.titleAr,
-    this.description,
+    this.descriptionEn,
     this.descriptionAr,
-    this.categoryId,
-    this.sectorId,
-    this.countryId,
-    required this.professionalId,
-    this.institutionId,
-    this.photoUrl,
+    this.price = 0,
     this.isActive = true,
-    this.createdAt,
-    this.updatedAt,
-    this.pricingType = 'standard',
-    this.favoriteCount = 0,
+    this.isAllocated = false,
+    this.imageUrl,
+    this.visibilityExpiresAt,
   });
 
-  factory ServiceModel.fromJson(Map<String, dynamic> json) {
+  factory ServiceModel.fromMap(Map<String, dynamic> data) {
     DateTime? parseDate(dynamic val) {
       if (val == null) return null;
       if (val is Timestamp) return val.toDate();
@@ -46,22 +38,35 @@ class ServiceModel {
     }
 
     return ServiceModel(
-      id: json['id'] as String,
-      title: json['title'] as String? ?? 'Untitled',
-      titleAr: json['titleAr'] as String?,
-      description: json['description'] as String?,
-      descriptionAr: json['descriptionAr'] as String?,
-      categoryId: json['categoryId'] as String?,
-      sectorId: json['sectorId'] as String?,
-      countryId: (json['countryId'] ?? json['country']) as String?,
-      professionalId: json['professionalId'] as String? ?? '',
-      institutionId: json['institutionId'] as String?,
-      photoUrl: json['photoUrl'] as String?,
-      isActive: json['isActive'] as bool? ?? true,
-      createdAt: parseDate(json['createdAt']),
-      updatedAt: parseDate(json['updatedAt']),
-      pricingType: json['pricingType'] as String? ?? 'standard',
-      favoriteCount: json['favoriteCount'] ?? 0,
+      id: data['id'] ?? '',
+      providerId: data['providerId'] ?? data['professionalId'] ?? '',
+      categoryId: data['categoryId'] ?? '',
+      titleEn: data['titleEn'] ?? data['title'] ?? 'Untitled',
+      titleAr: data['titleAr'],
+      descriptionEn: data['descriptionEn'] ?? data['description'],
+      descriptionAr: data['descriptionAr'],
+      price: data['price'] ?? 0,
+      isActive: data['isActive'] ?? true,
+      isAllocated: data['isAllocated'] ?? false,
+      imageUrl: data['imageUrl'] ?? data['photoUrl'],
+      visibilityExpiresAt: parseDate(data['visibilityExpiresAt']),
     );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'providerId': providerId,
+      'categoryId': categoryId,
+      'titleEn': titleEn,
+      'titleAr': titleAr,
+      'descriptionEn': descriptionEn,
+      'descriptionAr': descriptionAr,
+      'price': price,
+      'isActive': isActive,
+      'isAllocated': isAllocated,
+      'imageUrl': imageUrl,
+      'visibilityExpiresAt': visibilityExpiresAt,
+    };
   }
 }

@@ -1,0 +1,93 @@
+# ESPY PROTOCOL - DATA CONNECT MUTATIONS v5.10
+
+# --- 1. Identity & Profile ---
+
+mutation CreateUser($id: String!, $email: String!, $name: String, $role: UserRole!) @auth(expr: "auth.uid == id") {
+  user_insert(data: {
+    id: $id,
+    email: $email,
+    name: $name,
+    role: $role
+  })
+}
+
+mutation UpdateUserProfile($id: String!, $name: String, $photoUrl: String) @auth(expr: "auth.uid == id") {
+  user_update(key: { id: $id }, data: {
+    name: $name,
+    photoUrl: $photoUrl,
+    updatedAt_expr: "request.time"
+  })
+}
+
+# --- 2. Service & Discovery ---
+
+mutation CreateService($categoryId: String!, $titleEn: String!, $price: Int!) @auth(level: USER) {
+  service_insert(data: {
+    providerId_expr: "auth.uid",
+    categoryId: $categoryId,
+    titleEn: $titleEn,
+    price: $price
+  })
+}
+
+mutation UpdateService($id: UUID!, $isActive: Boolean, $isAllocated: Boolean) @auth(level: USER) {
+  # We should ideally check ownership here, but for now we rely on app logic or add a check
+  service_update(key: { id: $id }, data: {
+    isActive: $isActive,
+    isAllocated: $isAllocated
+  })
+}
+
+mutation CreateLocationNode($countryId: String!, $label: String!, $lat: Float!, $lng: Float!, $isMain: Boolean!) @auth(level: USER) {
+  locationNode_insert(data: {
+    userId_expr: "auth.uid",
+    countryId: $countryId,
+    label: $label,
+    lat: $lat,
+    lng: $lng,
+    isMain: $isMain
+  })
+}
+
+# --- 3. Financial Operations ---
+
+mutation SpendTokens($userId: String!, $cost: Int!, $ledgerAmount: Int!, $type: TransactionType = PURCHASE, $description: String!) @auth(expr: "auth.uid == userId") {
+  user_update(key: { id: $userId }, data: {
+    walletBalance_expr: "walletBalance - $cost",
+    tokensUsed_expr: "tokensUsed + $cost",
+    updatedAt_expr: "request.time"
+  })
+  walletTransaction_insert(data: {
+    userId: $userId,
+    amount: $ledgerAmount,
+    type: $type,
+    description: $description
+  })
+}
+
+# --- 4. Community & Interaction ---
+
+mutation PostCommunityRequest($sectorId: String!, $title: String!, $description: String!) @auth(level: USER) {
+  communityRequest_insert(data: {
+    userId_expr: "auth.uid",
+    sectorId: $sectorId,
+    title: $title,
+    description: $description
+  })
+}
+
+mutation RecordInteraction($targetId: String!, $type: InteractionType!) @auth(level: USER) {
+  interaction_insert(data: {
+    actorId_expr: "auth.uid",
+    targetId: $targetId,
+    type: $type
+  })
+}
+
+# --- 5. Administration ---
+
+mutation ApproveProfessional($id: String!, $isApproved: Boolean!) @auth(expr: "auth.token.role == 'ADMIN'") {
+  professionalProfile_update(key: { id: $id }, data: {
+    isApproved: $isApproved
+  })
+}

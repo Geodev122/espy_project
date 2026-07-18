@@ -9,6 +9,7 @@ import 'package:espy_app/theme/espy_theme.dart';
 import 'package:espy_app/viewmodels/auth_service.dart';
 import 'package:espy_app/viewmodels/matching_view_model.dart';
 import 'package:espy_app/l10n/app_localizations.dart';
+import 'package:espy_app/widgets/common/espy_scaffold.dart';
 
 class ServiceSwipeScreen extends StatefulWidget {
   const ServiceSwipeScreen({super.key});

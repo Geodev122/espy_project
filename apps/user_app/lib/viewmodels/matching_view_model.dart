@@ -29,19 +29,19 @@ class MatchingViewModel extends ChangeNotifier {
     if (_authService.user == null) return;
     final userId = _authService.user!.uid;
 
-    _servicesSub = _repository.getActiveServices().listen((services) {
+    _servicesSub = _repository.listActiveServices().listen((services) {
       _allServices = services;
       _applyFilters();
       _isLoading = false;
       notifyListeners();
     });
 
-    _favsSub = _repository.getFavoriteIds(userId).listen((ids) {
+    _favsSub = _repository.listFavoriteIds(userId).listen((ids) {
       _favoriteIds = ids;
       notifyListeners();
     });
 
-    _contactedSub = _repository.getContactedIds(userId).listen((ids) {
+    _contactedSub = _repository.listContactedIds(userId).listen((ids) {
       _contactedIds = ids;
       notifyListeners();
     });
@@ -76,10 +76,10 @@ class MatchingViewModel extends ChangeNotifier {
     }).toList();
 
     _filteredServices.sort((a, b) {
-      final t1 = a['createdAt'] ?? 0;
-      final t2 = b['createdAt'] ?? 0;
-      // In firestore repo these are mapped or are Timestamps
-      return _newestFirst ? 1 : -1; // Simple toggle for now, actual date comparison needed
+      final dynamic da = a['createdAt'];
+      final dynamic db = b['createdAt'];
+      if (da == null || db == null) return 0;
+      return _newestFirst ? db.compareTo(da) : da.compareTo(db);
     });
   }
 

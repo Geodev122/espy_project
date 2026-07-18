@@ -1,0 +1,7 @@
+specVersion: v1beta
+serviceId: espy-453d3-service
+location: us-east1
+schema:
+  source: "./schema"
+connectorDirs:
+  - "./connector"

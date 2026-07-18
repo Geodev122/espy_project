@@ -1,47 +1,12 @@
 {
-  "$schema": "https://raw.githubusercontent.com/firebase/firebase-tools/master/schema/firebase.json",
-  "hosting": [
+  "dataconnect": [
     {
-      "target": "espy-app",
-      "public": "apps/admin_app/build/web",
-      "ignore": [
-        "**/node_modules/**"
-      ],
-      "rewrites": [
-        {
-          "source": "**",
-          "destination": "/index.html"
-        }
-      ]
-    },
-    {
-      "target": "espy-253f7",
-      "public": "apps/user_app/build/web",
-      "ignore": [
-        "**/node_modules/**"
-      ],
-      "rewrites": [
-        {
-          "source": "**",
-          "destination": "/index.html"
-        }
-      ]
+      "source": "espy_service"
     }
   ],
-  "firestore": {
-    "rules": "backend/firestore.rules",
-    "indexes": "backend/firestore.indexes.json"
-  },
-  "storage": {
-    "rules": "backend/storage.rules"
-  },
-  "functions": {
-    "source": "backend/functions"
-  },
-  "database": {
-    "rules": "backend/database.rules.json"
-  },
-  "dataconnect": {
-    "source": "backend/dataconnect"
+  "emulators": {
+    "dataconnect": {
+      "dataDir": "espy_service/.dataconnect/pgliteData"
+    }
   }
 }

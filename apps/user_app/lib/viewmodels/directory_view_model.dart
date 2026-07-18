@@ -26,7 +26,7 @@ class DirectoryViewModel extends ChangeNotifier {
   }
 
   void _init() {
-    _providersSubscription = _repository.getAllProviders().listen((providers) {
+    _providersSubscription = _repository.listAllProviders().listen((providers) {
       _providers = providers;
       _applyFilters();
       _isLoading = false;

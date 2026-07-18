@@ -1,0 +1,170 @@
+# ESPY PROTOCOL - DATA CONNECT QUERIES v5.10
+
+# --- 1. Identity & Profile ---
+
+query GetUser($uid: String!) @auth(expr: "auth.uid == uid") {
+  user(key: { id: $uid }) {
+    id
+    email
+    name
+    role
+    walletBalance
+    photoUrl
+    isActive
+    professionalProfile {
+      specialty
+      isApproved
+      membershipTier
+      visibilityExpiresAt
+    }
+  }
+}
+
+query GetProfessionalDetails($uid: String!) @auth(level: PUBLIC) {
+  professionalProfile(key: { id: $uid }) {
+    id
+    fullNameAr
+    specialty
+    specialtyAr
+    bioEn
+    bioAr
+    isApproved
+    isHonorVerified
+    membershipTier
+    serviceSlots
+    practicePins
+    visibilityExpiresAt
+    user {
+      email
+      photoUrl
+      whatsapp
+    }
+  }
+}
+
+# --- 2. Discovery & Search ---
+
+query ListActiveServices($categoryId: String) @auth(level: PUBLIC) {
+  services(where: {
+    _and: [
+      { isActive: { eq: true } },
+      { category: { id: { eq: $categoryId } } }
+    ]
+  }) {
+    id
+    titleEn
+    titleAr
+    descriptionEn
+    price
+    imageUrl
+    provider {
+      id
+      name
+      photoUrl
+    }
+  }
+}
+
+query SearchServices($query: String, $minPrice: Int, $maxPrice: Int) @auth(level: PUBLIC) {
+  services(where: {
+    _and: [
+      { isActive: { eq: true } },
+      { titleEn: { contains: $query } },
+      { price: { ge: $minPrice } },
+      { price: { le: $maxPrice } }
+    ]
+  }) {
+    id
+    titleEn
+    price
+    imageUrl
+    provider {
+      id
+      name
+    }
+  }
+}
+
+query ListLocationNodes($userId: String!) @auth(level: PUBLIC) {
+  locationNodes(where: { user: { id: { eq: $userId } } }) {
+    id
+    label
+    cityName
+    lat
+    lng
+    isMain
+  }
+}
+
+query ListInteractions($actorId: String!, $type: InteractionType) @auth(expr: "auth.uid == actorId") {
+  interactions(where: {
+    _and: [
+      { actor: { id: { eq: $actorId } } },
+      { type: { eq: $type } }
+    ]
+  }) {
+    targetId
+  }
+}
+
+# --- 3. Financial & Ledger ---
+
+query GetWalletTransactions($userId: String!) @auth(expr: "auth.uid == userId") {
+  walletTransactions(where: { user: { id: { eq: $userId } } }, orderBy: [{ createdAt: DESC }]) {
+    id
+    type
+    amount
+    referenceId
+    description
+    createdAt
+  }
+}
+
+# --- 4. Community & Comms ---
+
+query ListCommunityRequests($sectorId: String, $status: CommunityRequestStatus = ACTIVE) @auth(level: USER) {
+  communityRequests(
+    where: {
+      _and: [
+        { status: { eq: $status } },
+        { sector: { id: { eq: $sectorId } } }
+      ]
+    },
+    orderBy: [{ createdAt: DESC }]
+  ) {
+    id
+    title
+    description
+    locationLabel
+    status
+    createdAt
+    user {
+      name
+    }
+  }
+}
+
+# --- 5. Administration & Audit ---
+
+query GetSystemStats @auth(expr: "auth.token.role == 'ADMIN'") {
+  users_aggregate {
+    _count
+  }
+  services_aggregate(where: { isActive: { eq: true } }) {
+    _count
+  }
+  communityRequests_aggregate(where: { status: { eq: ACTIVE } }) {
+    _count
+  }
+}
+
+query ListPendingApprovals @auth(expr: "auth.token.role == 'ADMIN'") {
+  professionalProfiles(where: { isApproved: { eq: false } }) {
+    id
+    fullNameAr
+    user {
+      email
+      createdAt
+    }
+  }
+}

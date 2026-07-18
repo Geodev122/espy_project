@@ -206,7 +206,7 @@ class AuthService extends ChangeNotifier {
 
   Future<void> _createInitialUserDoc(User user, {String? initialRole, String? nameOverride}) async {
     final userData = {
-      'uid': user.uid,
+      'id': user.uid,
       'email': user.email,
       'name': nameOverride ?? user.displayName,
       'photoUrl': user.photoURL,

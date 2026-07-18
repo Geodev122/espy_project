@@ -1,5 +1,0 @@
-connectorId: "espy-connector"
-generate:
-  dartSdk:
-    outputDir: "../../../apps/lib/generated/dataconnect"
-    package: "espy_app_dataconnect"

@@ -3,19 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'l10n/app_localizations.dart';
 import 'theme/espy_theme.dart';
-import 'viewmodels/auth_service.dart';
-import 'viewmodels/user_service.dart';
 import 'viewmodels/locale_service.dart';
-import 'viewmodels/directory_view_model.dart';
-import 'viewmodels/dashboard_view_model.dart';
-import 'viewmodels/wallet_view_model.dart';
-import 'viewmodels/matching_view_model.dart';
-import 'viewmodels/requests_view_model.dart';
-import 'viewmodels/services_view_model.dart';
-import 'viewmodels/espy_repository.dart';
-import 'viewmodels/firestore_service.dart';
-import 'viewmodels/storage_service.dart';
-import 'viewmodels/whish_pay_service.dart';
 import 'views/shared/main_gate.dart';
 
 class EspyApp extends StatelessWidget {
@@ -26,7 +14,7 @@ class EspyApp extends StatelessWidget {
     return Consumer<LocaleService>(
       builder: (context, localeService, _) {
         return MaterialApp(
-          title: 'Espy',
+          title: 'Espy Admin',
           debugShowCheckedModeBanner: false,
           theme: EspyTheme.metallicTheme,
           localizationsDelegates: const [

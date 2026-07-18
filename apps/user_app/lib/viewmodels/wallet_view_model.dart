@@ -26,7 +26,7 @@ class WalletViewModel extends ChangeNotifier {
     _isLoadingTransactions = true;
     notifyListeners();
 
-    _repository.getUserTransactions(_authService.user!.uid).listen((data) {
+    _repository.listWalletTransactions(_authService.user!.uid).listen((data) {
       _transactions = data;
       _isLoadingTransactions = false;
       notifyListeners();
