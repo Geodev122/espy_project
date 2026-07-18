@@ -1,4 +1,4 @@
-# ESPY PROTOCOL - UNIFIED SCHEMA v5.11
+# ESPY PROTOCOL - UNIFIED SCHEMA v5.12
 
 # --- Enums ---
 
@@ -57,7 +57,7 @@ type User @table(key: "id") {
 
 type ProfessionalProfile @table(key: "id") {
   id: String!
-  user: User! @ref(fields: ["id"]) @onDelete(cascade: true)
+  user: User! @ref(fields: ["id"])
   fullNameAr: String
   specialty: String
   specialtyAr: String
@@ -73,7 +73,7 @@ type ProfessionalProfile @table(key: "id") {
 
 type InstitutionProfile @table(key: "id") {
   id: String!
-  user: User! @ref(fields: ["id"]) @onDelete(cascade: true)
+  user: User! @ref(fields: ["id"])
   nameAr: String
   registrationNumber: String
   isApproved: Boolean! @default(value: false)
@@ -83,7 +83,7 @@ type InstitutionProfile @table(key: "id") {
 
 type VisitorProfile @table(key: "id") {
   id: String!
-  user: User! @ref(fields: ["id"]) @onDelete(cascade: true)
+  user: User! @ref(fields: ["id"])
   interests: [String]
 }
 
