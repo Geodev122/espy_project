@@ -2,7 +2,8 @@
   "name": "espy-project-monorepo",
   "private": true,
   "scripts": {
-    "frontend:build": "cd apps && flutter build web --release",
+    "admin:build": "cd apps/admin_app && flutter build web --release",
+    "user:build": "cd apps/user_app && flutter build web --release",
     "frontend:deploy": "powershell -File ./apps/deploy_pwa.ps1",
     "backend:deploy": "firebase deploy --only functions,firestore:rules,storage,dataconnect",
     "backend:sync": "firebase dataconnect:sdk:generate",

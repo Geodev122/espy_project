@@ -1,57 +1,29 @@
-# Espy Protocol - Unified PWA Deployment Sequence
+# Espy Protocol - Distinct PWA Deployment Sequence
 
-# Set explicit path for Flutter to match System Variables
+# Set explicit path for Flutter
 $env:PATH = "C:\Flutter\SDK\flutter_windows_3.24.5-stable\flutter\bin;" + $env:PATH
 
-function Check-Command($cmd) {
-    $check = Get-Command $cmd -ErrorAction SilentlyContinue
-    if ($check -eq $null) {
-        Write-Host "ERROR: $cmd not found. Please install it and add it to your PATH." -ForegroundColor Red
-        exit
-    }
-}
+# Get current script directory
+$scriptPath = split-path -parent $MyInvocation.MyCommand.Definition
 
-Write-Host "--- INITIALIZING PROTOCOL: PWA DEPLOYMENT SEQUENCE ---" -ForegroundColor Yellow
+Write-Host "--- INITIALIZING PROTOCOL: DUAL PWA DEPLOYMENT ---" -ForegroundColor Yellow
 
-# Check for Flutter
-Check-Command "flutter"
-
-# Determine Firebase command (firebase or npx firebase)
-$FirebaseCmd = "firebase"
-$checkFirebase = Get-Command "firebase" -ErrorAction SilentlyContinue
-if ($checkFirebase -eq $null) {
-    Write-Host "Firebase CLI not found in PATH, trying npx firebase..." -ForegroundColor Gray
-    $FirebaseCmd = "npx firebase"
-}
-
-# 1. Generate Web Icons
-Write-Host "Step 1: Generating web icons..." -ForegroundColor Cyan
-flutter pub get
-flutter pub run flutter_launcher_icons
-
-# 2. Execute Production Build
-Write-Host "Step 2: Building Flutter Web (Release)..." -ForegroundColor Cyan
+# 1. Build Admin App
+Write-Host "Step 1: Building ADMIN PWA..." -ForegroundColor Cyan
+Push-Location "$scriptPath/admin_app"
 flutter build web --release --pwa-strategy=offline-first
-
-# 3. Deploy to Firebase Hosting
-Write-Host "Step 3: Deploying to Firebase Hosting..." -ForegroundColor Cyan
-Push-Location ..
-
-Write-Host "Deploying Admin App Interface (espy-app)..." -ForegroundColor Yellow
-if ($FirebaseCmd -eq "npx firebase") {
-    Invoke-Expression "$FirebaseCmd deploy --only hosting:espy-app"
-} else {
-    & $FirebaseCmd deploy --only hosting:espy-app
-}
-
-Write-Host "Deploying User App Interface (espy-253f7)..." -ForegroundColor Yellow
-if ($FirebaseCmd -eq "npx firebase") {
-    Invoke-Expression "$FirebaseCmd deploy --only hosting:espy-253f7"
-} else {
-    & $FirebaseCmd deploy --only hosting:espy-253f7"
-}
-
 Pop-Location
 
-Write-Host "--- PROTOCOL COMPLETE ---" -ForegroundColor Green
-Write-Host "UNIFIED PWA DEPLOYED TO BOTH TARGETS!" -ForegroundColor Yellow
+# 2. Build User App
+Write-Host "Step 2: Building USER PWA..." -ForegroundColor Cyan
+Push-Location "$scriptPath/user_app"
+flutter build web --release --pwa-strategy=offline-first
+Pop-Location
+
+# 3. Deploy to Firebase
+Write-Host "Step 3: Deploying to Firebase Hosting..." -ForegroundColor Cyan
+Push-Location "$scriptPath/.."
+npx firebase deploy --only hosting
+Pop-Location
+
+Write-Host "--- PROTOCOL COMPLETE: BOTH APPS DEPLOYED ---" -ForegroundColor Green

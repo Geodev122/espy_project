@@ -3,7 +3,7 @@
   "hosting": [
     {
       "target": "espy-app",
-      "public": "apps/build/web",
+      "public": "apps/admin_app/build/web",
       "ignore": [
         "**/node_modules/**"
       ],
@@ -16,7 +16,7 @@
     },
     {
       "target": "espy-253f7",
-      "public": "apps/build/web",
+      "public": "apps/user_app/build/web",
       "ignore": [
         "**/node_modules/**"
       ],
