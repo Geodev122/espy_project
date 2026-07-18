@@ -101,6 +101,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     final size = MediaQuery.of(context).size;
     return EspyScaffold(
       useCinematicBackground: false,
+      extendBodyBehindAppBar: true,
       body: AnimatedBuilder(
         animation: _exitCtrl,
         builder: (context, child) => Opacity(opacity: _exitOpacity.value, child: child),
@@ -120,23 +121,42 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   }
 
   Widget _buildHalo(Size size) {
-    final haloCenter = Offset(size.width / 2, size.height / 2 - 60);
     return AnimatedBuilder(
       animation: _haloCtrl,
-      builder: (_, __) => CustomPaint(
-        painter: _HaloPainter(center: haloCenter, innerAlpha: _haloInner.value, outerAlpha: _haloOuter.value, innerRadius: 140, outerRadius: 210, colour: EspyTheme.skyBlue),
-        child: const SizedBox.expand(),
+      builder: (_, __) => Center(
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 120),
+          child: CustomPaint(
+            painter: _HaloPainter(
+              center: Offset.zero,
+              innerAlpha: _haloInner.value,
+              outerAlpha: _haloOuter.value,
+              innerRadius: 140,
+              outerRadius: 210,
+              colour: EspyTheme.skyBlue,
+            ),
+          ),
+        ),
       ),
     );
   }
 
   Widget _buildShimmerRing(Size size) {
-    final center = Offset(size.width / 2, size.height / 2 - 60);
     return AnimatedBuilder(
       animation: _shimmerCtrl,
-      builder: (_, __) => !_shimmerCtrl.isAnimating && _shimmerCtrl.value == 0 ? const SizedBox.shrink() : CustomPaint(
-        painter: _ShimmerRingPainter(center: center, radius: 142, angle: _shimmerAngle.value, opacity: _shimmerOpacity.value, colour: EspyTheme.gold),
-        child: const SizedBox.expand(),
+      builder: (_, __) => !_shimmerCtrl.isAnimating && _shimmerCtrl.value == 0 ? const SizedBox.shrink() : Center(
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 120),
+          child: CustomPaint(
+            painter: _ShimmerRingPainter(
+              center: Offset.zero,
+              radius: 142,
+              angle: _shimmerAngle.value,
+              opacity: _shimmerOpacity.value,
+              colour: EspyTheme.gold,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -154,15 +174,16 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   }
 
   Widget _buildBottomText(Size size) {
+    final l10n = AppLocalizations.of(context)!;
     return Positioned(
       bottom: 52, left: 24, right: 24,
       child: Column(
         children: [
-          FadeTransition(opacity: _wordmarkOpacity, child: Text('Espy', style: GoogleFonts.montserrat(fontSize: 38, fontWeight: FontWeight.w700, color: Colors.white, letterSpacing: 5))),
+          FadeTransition(opacity: _wordmarkOpacity, child: Text(l10n.appTitle, style: GoogleFonts.montserrat(fontSize: 38, fontWeight: FontWeight.w700, color: Colors.white, letterSpacing: 5))),
           const SizedBox(height: 10),
           FadeTransition(opacity: _ruleOpacity, child: Container(height: 1.5, decoration: const BoxDecoration(gradient: EspyTheme.goldRule))),
           const SizedBox(height: 10),
-          SlideTransition(position: _taglineSlide, child: FadeTransition(opacity: _taglineOpacity, child: Text('Hope, Healing, Humanity', style: GoogleFonts.playfairDisplay(fontSize: 15, fontStyle: FontStyle.italic, color: EspyTheme.gold)))),
+          SlideTransition(position: _taglineSlide, child: FadeTransition(opacity: _taglineOpacity, child: Text(l10n.hopeHealingHumanity.toUpperCase(), style: GoogleFonts.playfairDisplay(fontSize: 15, fontStyle: FontStyle.italic, color: EspyTheme.gold)))),
           const SizedBox(height: 24),
           _buildProgressBar(),
         ],

@@ -7,7 +7,7 @@ import 'l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'dart:ui';
 
-import 'core/theme.dart';
+import 'package:shared_core/theme/espy_theme.dart';
 import 'package:shared_core/services/auth_service.dart';
 import 'package:shared_core/services/firebase_config.dart';
 import 'package:shared_core/services/firestore_service.dart';

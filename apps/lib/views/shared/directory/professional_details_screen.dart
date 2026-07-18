@@ -47,11 +47,11 @@ class _ProfessionalDetailsScreenState extends State<ProfessionalDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (_loading) return const EspyScaffold(body: Center(child: CircularProgressIndicator(color: EspyTheme.gold)));
-    if (_data == null) return const EspyScaffold(body: Center(child: Text("NODE DISCONNECTED", style: TextStyle(color: Colors.white))));
+    if (_data == null) return EspyScaffold(body: Center(child: Text(l10n.nodeDisconnected.toUpperCase(), style: const TextStyle(color: Colors.white))));
 
     final professional = _data!;
-    final l10n = AppLocalizations.of(context)!;
 
     return EspyScaffold(
       useCinematicBackground: true,
@@ -136,7 +136,7 @@ class _ProfessionalDetailsScreenState extends State<ProfessionalDetailsScreen> {
             const Icon(Icons.location_on_rounded, size: 18, color: EspyTheme.cyan),
             const SizedBox(width: 8),
             Text(
-              professional['mainLocation']?['cityName'] ?? 'GLOBAL',
+              professional['mainLocation']?['cityName'] ?? l10n.global.toUpperCase(),
               style: GoogleFonts.montserrat(fontSize: 15, color: Colors.white70, fontWeight: FontWeight.bold),
             ),
           ],

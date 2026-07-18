@@ -45,31 +45,32 @@ class _TokenShopScreenState extends State<TokenShopScreen> with SingleTickerProv
   @override
   Widget build(BuildContext context) {
     final walletVM = Provider.of<WalletViewModel>(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return EspyScaffold(
       useCinematicBackground: false,
       appBar: AppBar(
-        title: Text('ESPY STORE', style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, fontSize: 14)),
+        title: Text(l10n.espyStore.toUpperCase(), style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, fontSize: 14)),
         bottom: TabBar(
           controller: _tabController,
           labelStyle: GoogleFonts.cinzel(fontWeight: FontWeight.w900, fontSize: 10, letterSpacing: 1),
-          tabs: const [
+          tabs: [
             Tab(text: 'RECHARGE WALLET'),
-            Tab(text: 'ESPY STORE'),
+            Tab(text: l10n.espyStore.toUpperCase()),
           ],
         ),
       ),
       body: TabBarView(
         controller: _tabController,
         children: [
-          _buildRechargeTab(context, walletVM),
-          _buildStoreTab(context, walletVM),
+          _buildRechargeTab(context, walletVM, l10n),
+          _buildStoreTab(context, walletVM, l10n),
         ],
       ),
     );
   }
 
-  Widget _buildRechargeTab(BuildContext context, WalletViewModel vm) {
+  Widget _buildRechargeTab(BuildContext context, WalletViewModel vm, AppLocalizations l10n) {
     final bundles = [
       {'tokens': 1000, 'price': 10, 'label': 'SILVER BUNDLE', 'icon': LucideIcons.gem},
       {'tokens': 5000, 'price': 45, 'label': 'GOLD BUNDLE', 'icon': LucideIcons.coins},
@@ -81,16 +82,16 @@ class _TokenShopScreenState extends State<TokenShopScreen> with SingleTickerProv
       children: [
         _buildSectionHeader('SELECT TOKEN BUNDLE'),
         const SizedBox(height: 16),
-        ...bundles.map((b) => _buildBundleCard(b, vm)).toList(),
+        ...bundles.map((b) => _buildBundleCard(b, vm, l10n)).toList(),
         const SizedBox(height: 32),
         _buildSectionHeader('REDEMPTION CODE'),
         const SizedBox(height: 16),
-        _buildCodeInput(vm),
+        _buildCodeInput(vm, l10n),
       ],
     );
   }
 
-  Widget _buildStoreTab(BuildContext context, WalletViewModel vm) {
+  Widget _buildStoreTab(BuildContext context, WalletViewModel vm, AppLocalizations l10n) {
     return StreamBuilder<DocumentSnapshot>(
       stream: FirebaseFirestore.instance.collection('directory_settings').doc('token_pricing').snapshots(),
       builder: (context, snapshot) {
@@ -103,21 +104,21 @@ class _TokenShopScreenState extends State<TokenShopScreen> with SingleTickerProv
         final newItems = [
           {
             'id': 'extra_pin',
-            'title': 'LOCATION PIN',
+            'title': l10n.locationSettings.toUpperCase(),
             'desc': 'Unlock 1 additional map node.',
             'cost': pricing['new_pin'] ?? pricing['${role}_new_pin'] ?? 500,
             'icon': LucideIcons.mapPin,
           },
           {
             'id': 'extra_slot',
-            'title': 'SERVICE SLOT',
+            'title': l10n.serviceSlots.toUpperCase(),
             'desc': 'Add 1 permanent slot.',
             'cost': pricing['new_slot'] ?? pricing['${role}_new_slot'] ?? 300,
             'icon': LucideIcons.layoutGrid,
           },
           {
             'id': 'broadcast',
-            'title': 'BROADCAST',
+            'title': l10n.broadcast.toUpperCase(),
             'desc': 'Send priority signal.',
             'cost': pricing['broadcast'] ?? pricing['${role}_broadcast'] ?? 1000,
             'icon': LucideIcons.radio,
@@ -156,7 +157,7 @@ class _TokenShopScreenState extends State<TokenShopScreen> with SingleTickerProv
                 childAspectRatio: 0.85,
               ),
               itemCount: newItems.length,
-              itemBuilder: (context, index) => _buildCompactStoreItem(newItems[index], vm, isRenew: false),
+              itemBuilder: (context, index) => _buildCompactStoreItem(newItems[index], vm, l10n, isRenew: false),
             ),
             const SizedBox(height: 32),
             _buildSectionHeader('RENEW CURRENT PROTOCOLS'),
@@ -171,7 +172,7 @@ class _TokenShopScreenState extends State<TokenShopScreen> with SingleTickerProv
                 childAspectRatio: 0.85,
               ),
               itemCount: renewItems.length,
-              itemBuilder: (context, index) => _buildCompactStoreItem(renewItems[index], vm, isRenew: true),
+              itemBuilder: (context, index) => _buildCompactStoreItem(renewItems[index], vm, l10n, isRenew: true),
             ),
           ],
         );
@@ -179,7 +180,7 @@ class _TokenShopScreenState extends State<TokenShopScreen> with SingleTickerProv
     );
   }
 
-  Widget _buildCompactStoreItem(Map<String, dynamic> item, WalletViewModel vm, {bool isRenew = false}) {
+  Widget _buildCompactStoreItem(Map<String, dynamic> item, WalletViewModel vm, AppLocalizations l10n, {bool isRenew = false}) {
     final bool canAfford = vm.balance >= (item['cost'] as int);
 
     return FadeInUp(
@@ -212,7 +213,7 @@ class _TokenShopScreenState extends State<TokenShopScreen> with SingleTickerProv
             SizedBox(
               width: double.infinity,
               child: TextButton(
-                onPressed: (canAfford && !vm.isProcessing) ? () => _handleSpend(item, vm) : null,
+                onPressed: (canAfford && !vm.isProcessing) ? () => _handleSpend(item, vm, l10n) : null,
                 style: TextButton.styleFrom(
                   backgroundColor: canAfford ? (isRenew ? EspyTheme.royalBlue : EspyTheme.gold) : Colors.black12,
                   padding: const EdgeInsets.symmetric(vertical: 8),
@@ -221,7 +222,7 @@ class _TokenShopScreenState extends State<TokenShopScreen> with SingleTickerProv
                 child: vm.isProcessing 
                   ? const SizedBox(height: 10, width: 10, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                   : Text(
-                      isRenew ? 'RENEW' : 'ACTIVATE',
+                      isRenew ? l10n.upgrade.toUpperCase() : l10n.continueText.toUpperCase(),
                       style: GoogleFonts.montserrat(fontSize: 8, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: 1),
                     ),
               ),
@@ -236,7 +237,7 @@ class _TokenShopScreenState extends State<TokenShopScreen> with SingleTickerProv
     return Text(title, style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep.withOpacity(0.5), letterSpacing: 2));
   }
 
-  Widget _buildBundleCard(Map<String, dynamic> bundle, WalletViewModel vm) {
+  Widget _buildBundleCard(Map<String, dynamic> bundle, WalletViewModel vm, AppLocalizations l10n) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       child: PremiumCard(
@@ -254,14 +255,14 @@ class _TokenShopScreenState extends State<TokenShopScreen> with SingleTickerProv
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(bundle['label'] as String, style: GoogleFonts.cinzel(fontSize: 12, fontWeight: FontWeight.w900)),
-                  Text('${bundle['tokens']} ESPY TOKENS', style: GoogleFonts.montserrat(fontSize: 14, fontWeight: FontWeight.bold, color: EspyTheme.gold)),
+                  Text(l10n.espyTokens.replaceAll('{amount}', bundle['tokens'].toString()), style: GoogleFonts.montserrat(fontSize: 14, fontWeight: FontWeight.bold, color: EspyTheme.gold)),
                 ],
               ),
             ),
             PremiumButton(
               label: '\$${bundle['price']}',
               size: PremiumButtonSize.small,
-              onPressed: () => _handleWhishRecharge(bundle),
+              onPressed: () => _handleWhishRecharge(bundle, l10n),
             ),
           ],
         ),
@@ -269,7 +270,7 @@ class _TokenShopScreenState extends State<TokenShopScreen> with SingleTickerProv
     );
   }
 
-  Widget _buildCodeInput(WalletViewModel vm) {
+  Widget _buildCodeInput(WalletViewModel vm, AppLocalizations l10n) {
     return PremiumCard(
       padding: const EdgeInsets.all(20),
       child: Row(
@@ -277,24 +278,24 @@ class _TokenShopScreenState extends State<TokenShopScreen> with SingleTickerProv
           Expanded(
             child: TextField(
               controller: _codeController,
-              decoration: const InputDecoration(
-                hintText: 'ENTER RECHARGE CODE',
+              decoration: InputDecoration(
+                hintText: l10n.rechargeCard.toUpperCase(),
                 border: InputBorder.none,
                 filled: false,
               ),
             ),
           ),
           PremiumButton(
-            label: vm.isProcessing ? '...' : 'REDEEM',
+            label: vm.isProcessing ? '...' : l10n.continueText.toUpperCase(),
             size: PremiumButtonSize.small,
-            onPressed: vm.isProcessing ? null : () => _handleRedeem(vm),
+            onPressed: vm.isProcessing ? null : () => _handleRedeem(vm, l10n),
           ),
         ],
       ),
     );
   }
 
-  Future<void> _handleRedeem(WalletViewModel vm) async {
+  Future<void> _handleRedeem(WalletViewModel vm, AppLocalizations l10n) async {
     final code = _codeController.text.trim();
     if (code.isEmpty) return;
 
@@ -302,7 +303,7 @@ class _TokenShopScreenState extends State<TokenShopScreen> with SingleTickerProv
     if (mounted) {
       if (result['success']) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('SUCCESS! ADDED ${result['added']} TOKENS'), backgroundColor: EspyTheme.success),
+          SnackBar(content: Text(l10n.successAddedTokens.replaceAll('{amount}', result['added'].toString())), backgroundColor: EspyTheme.success),
         );
         _codeController.clear();
       } else {
@@ -311,13 +312,13 @@ class _TokenShopScreenState extends State<TokenShopScreen> with SingleTickerProv
     }
   }
 
-  Future<void> _handleWhishRecharge(Map<String, dynamic> bundle) async {
+  Future<void> _handleWhishRecharge(Map<String, dynamic> bundle, AppLocalizations l10n) async {
     final auth = Provider.of<AuthService>(context, listen: false);
     final method = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: EspyTheme.platinum,
-        title: Text('SELECT PAYMENT METHOD', style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, fontSize: 14)),
+        title: Text(l10n.selectPaymentMethod.toUpperCase(), style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, fontSize: 14)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -340,9 +341,9 @@ class _TokenShopScreenState extends State<TokenShopScreen> with SingleTickerProv
     if (method == null) return;
 
     if (method == 'whish') {
-      await _executeWhishPayment(bundle, auth);
+      await _executeWhishPayment(bundle, auth, l10n);
     } else {
-      await _executeGPayPayment(bundle, auth);
+      await _executeGPayPayment(bundle, auth, l10n);
     }
   }
 
@@ -369,7 +370,7 @@ class _TokenShopScreenState extends State<TokenShopScreen> with SingleTickerProv
     );
   }
 
-  Future<void> _executeWhishPayment(Map<String, dynamic> bundle, AuthService auth) async {
+  Future<void> _executeWhishPayment(Map<String, dynamic> bundle, AuthService auth, AppLocalizations l10n) async {
     final whish = WhishPayService();
     try {
       final result = await whish.initializePayment(
@@ -390,7 +391,7 @@ class _TokenShopScreenState extends State<TokenShopScreen> with SingleTickerProv
             context,
             MaterialPageRoute(
               builder: (context) => Scaffold(
-                appBar: AppBar(title: const Text('WHISH PAY SECURE')),
+                appBar: AppBar(title: Text(l10n.whishPaySecure.toUpperCase())),
                 body: WebViewWidget(
                   controller: WebViewController()
                     ..setJavaScriptMode(JavaScriptMode.unrestricted)
@@ -406,7 +407,7 @@ class _TokenShopScreenState extends State<TokenShopScreen> with SingleTickerProv
     }
   }
 
-  Future<void> _executeGPayPayment(Map<String, dynamic> bundle, AuthService auth) async {
+  Future<void> _executeGPayPayment(Map<String, dynamic> bundle, AuthService auth, AppLocalizations l10n) async {
     final _payClient = Pay({
       PayProvider.google_pay: PaymentConfiguration.fromJsonString(
         '''{
@@ -469,7 +470,7 @@ class _TokenShopScreenState extends State<TokenShopScreen> with SingleTickerProv
       });
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('PAYMENT COMPLETED')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.paymentCompleted.toUpperCase())));
         await auth.fetchUserData();
       }
     } catch (e) {
@@ -477,12 +478,12 @@ class _TokenShopScreenState extends State<TokenShopScreen> with SingleTickerProv
     }
   }
 
-  Future<void> _handleSpend(Map<String, dynamic> item, WalletViewModel vm) async {
+  Future<void> _handleSpend(Map<String, dynamic> item, WalletViewModel vm, AppLocalizations l10n) async {
     final result = await vm.spendTokens(itemId: item['id'], cost: item['cost']);
     if (mounted) {
       if (result['success']) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('SUCCESSFULLY ACTIVATED ${item['title']}'), backgroundColor: EspyTheme.success),
+          SnackBar(content: Text(l10n.successfullyActivated.replaceAll('{item}', item['title'])), backgroundColor: EspyTheme.success),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Purchase Error: ${result['error']}')));

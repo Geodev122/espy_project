@@ -61,6 +61,18 @@ class RoleSelectionScreen extends StatelessWidget {
                       delay: const Duration(milliseconds: 400),
                       child: _buildRoleCard(
                         context,
+                        title: l10n.visitor,
+                        subtitle: l10n.visitorDesc,
+                        icon: Icons.person_search_rounded,
+                        color: EspyTheme.skyBlue,
+                        onTap: () => _handleRoleSelection(context, 'visitor'),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    FadeInRight(
+                      delay: const Duration(milliseconds: 600),
+                      child: _buildRoleCard(
+                        context,
                         title: l10n.professional,
                         subtitle: l10n.professionalDesc,
                         icon: Icons.medical_services_rounded,
@@ -70,13 +82,13 @@ class RoleSelectionScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 20),
                     FadeInRight(
-                      delay: const Duration(milliseconds: 600),
+                      delay: const Duration(milliseconds: 800),
                       child: _buildRoleCard(
                         context,
                         title: l10n.institution,
                         subtitle: l10n.institutionDesc,
                         icon: Icons.account_balance_rounded,
-                        color: EspyTheme.cognac,
+                        color: EspyTheme.goldDark,
                         onTap: () => _handleRoleSelection(context, 'institution'),
                       ),
                     ),
@@ -132,6 +144,17 @@ class RoleSelectionScreen extends StatelessWidget {
   }
 
   Future<void> _handleRoleSelection(BuildContext context, String role) async {
-     // ... logic
+    final auth = Provider.of<AuthService>(context, listen: false);
+    final firestore = FirestoreService();
+    
+    try {
+      await firestore.updateUserProfile(auth.user!.uid, {'role': role});
+      await auth.fetchUserData();
+      // MainGate will handle navigation
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
+    }
   }
 }

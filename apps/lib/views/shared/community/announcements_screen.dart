@@ -12,13 +12,15 @@ class AnnouncementsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final FirestoreService firestore = FirestoreService();
+    final l10n = AppLocalizations.of(context)!;
 
     return EspyScaffold(
       useCinematicBackground: true,
       appBar: AppBar(
-        title: Text('NETWORK ANNOUNCEMENTS', style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, letterSpacing: 2, color: EspyTheme.gold)),
+        title: Text(l10n.networkAnnouncements.toUpperCase(), style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, letterSpacing: 2, color: Colors.white)),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: StreamBuilder<List<Map<String, dynamic>>>(
         stream: firestore.getAnnouncements(),
@@ -32,7 +34,7 @@ class AnnouncementsScreen extends StatelessWidget {
           if (announcements.isEmpty) {
             return Center(
               child: Text(
-                'NO RECENT ANNOUNCEMENTS',
+                l10n.noNewProtocols.toUpperCase(),
                 style: GoogleFonts.cinzel(color: Colors.white24, fontWeight: FontWeight.bold),
               ),
             );

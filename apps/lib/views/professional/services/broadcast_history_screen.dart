@@ -15,14 +15,15 @@ class BroadcastHistoryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthService>(context);
     final uid = auth.user?.uid;
+    final l10n = AppLocalizations.of(context)!;
 
     return EspyScaffold(
       useCinematicBackground: false,
       appBar: AppBar(
-        title: Text('BROADCAST HISTORY', style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, fontSize: 14)),
+        title: Text(l10n.broadcastHistory.toUpperCase(), style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, fontSize: 14)),
       ),
       body: uid == null
-          ? const Center(child: Text('Please sign in to view history'))
+          ? Center(child: Text(l10n.signInViewNotifications))
           : StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('directory_broadcasts')
@@ -41,9 +42,9 @@ class BroadcastHistoryScreen extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.history_rounded, size: 64, color: Colors.white10),
+                        const Icon(Icons.history_rounded, size: 64, color: Colors.white10),
                         const SizedBox(height: 16),
-                        Text("NO BROADCASTS SENT", style: GoogleFonts.cinzel(color: Colors.white24, fontWeight: FontWeight.bold)),
+                        Text(l10n.noBroadcastsSent.toUpperCase(), style: GoogleFonts.cinzel(color: Colors.white24, fontWeight: FontWeight.bold)),
                       ],
                     ),
                   );

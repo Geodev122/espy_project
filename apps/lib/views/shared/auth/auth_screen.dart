@@ -53,6 +53,7 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
 
     return EspyScaffold(
       useCinematicBackground: true,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -165,8 +166,12 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
-                  onPressed: () {},
-                  child: Text('Forgot password?', style: GoogleFonts.montserrat(fontSize: 12, fontWeight: FontWeight.w600, color: EspyTheme.royalBlue)),
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(l10n.passwordResetSent), backgroundColor: EspyTheme.royalBlue)
+                    );
+                  },
+                  child: Text(l10n.forgotPassword, style: GoogleFonts.montserrat(fontSize: 12, fontWeight: FontWeight.w600, color: EspyTheme.royalBlue)),
                 ),
               ),
             ],

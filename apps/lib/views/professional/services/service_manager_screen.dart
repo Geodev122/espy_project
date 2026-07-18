@@ -28,9 +28,16 @@ class _ServiceManagerScreenState extends State<ServiceManagerScreen> {
     final userService = Provider.of<UserService>(context);
     final l10n = AppLocalizations.of(context)!;
     final userData = userService.profile ?? {};
+    final bool canPop = Navigator.canPop(context);
 
     return EspyScaffold(
       useCinematicBackground: false,
+      appBar: canPop ? AppBar(
+        title: Text(l10n.services.toUpperCase(), style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, fontSize: 14)),
+        backgroundColor: Colors.white,
+        foregroundColor: EspyTheme.navyDeep,
+        elevation: 0,
+      ) : null,
       body: viewModel.isLoading
           ? const Center(child: CircularProgressIndicator(color: EspyTheme.gold))
           : CustomScrollView(

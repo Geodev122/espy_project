@@ -32,6 +32,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     final l10n = AppLocalizations.of(context)!;
     return EspyScaffold(
       useCinematicBackground: true,
+      extendBodyBehindAppBar: true,
       body: Stack(
         children: [
           Positioned(
@@ -66,9 +67,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     delay: const Duration(milliseconds: 600),
                     child: Column(
                       children: [
-                        Text('ESPY', style: EspyTheme.wordmarkStyle.copyWith(fontSize: 32, fontWeight: FontWeight.w900, letterSpacing: 12, color: Colors.white, height: 1.0)),
+                        Text(l10n.appTitle.toUpperCase(), style: EspyTheme.wordmarkStyle.copyWith(fontSize: 32, fontWeight: FontWeight.w900, letterSpacing: 12, color: Colors.white, height: 1.0)),
                         const SizedBox(height: 16),
-                        Text('HOPE, HEALING, HUMANITY', style: EspyTheme.taglineStyle.copyWith(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 4, color: EspyTheme.textOnDarkMuted)),
+                        Text(l10n.hopeHealingHumanity.toUpperCase(), style: EspyTheme.taglineStyle.copyWith(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 4, color: EspyTheme.textOnDarkMuted)),
                       ],
                     ),
                   ),

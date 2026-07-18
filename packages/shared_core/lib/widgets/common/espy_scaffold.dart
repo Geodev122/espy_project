@@ -17,7 +17,7 @@ class EspyScaffold extends StatelessWidget {
     this.appBar,
     this.bottomNavigationBar,
     this.drawer,
-    this.extendBodyBehindAppBar = true,
+    this.extendBodyBehindAppBar = false,
     this.useCinematicBackground = true,
     this.floatingActionButton,
   });
@@ -31,7 +31,7 @@ class EspyScaffold extends StatelessWidget {
     }
 
     return Scaffold(
-      backgroundColor: EspyTheme.navyDeep,
+      backgroundColor: useCinematicBackground ? EspyTheme.navyDeep : Theme.of(context).scaffoldBackgroundColor,
       appBar: appBar,
       body: currentBody,
       drawer: drawer,

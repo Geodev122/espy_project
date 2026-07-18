@@ -92,7 +92,7 @@ class _MatchingScreenState extends State<MatchingScreen> {
                       await viewModel.toggleFavorite(target['id'] as String, true);
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Protocol saved to Vault Favorites"), behavior: SnackBarBehavior.floating),
+                          SnackBar(content: Text(l10n.protocolSavedFavorites), behavior: SnackBarBehavior.floating),
                         );
                       }
                     } else if (direction == CardSwiperDirection.top) {
@@ -126,9 +126,9 @@ class _MatchingScreenState extends State<MatchingScreen> {
         children: [
           const Icon(Icons.check_circle_outline_rounded, size: 80, color: EspyTheme.success),
           const SizedBox(height: 24),
-          Text("PROTOCOL SCAN COMPLETE", style: GoogleFonts.cinzel(fontSize: 20, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep)),
+          Text(l10n.protocolScanComplete.toUpperCase(), style: GoogleFonts.cinzel(fontSize: 20, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep)),
           const SizedBox(height: 16),
-          Text("You have reviewed all active protocols.", textAlign: TextAlign.center, style: GoogleFonts.lora(fontSize: 14, color: Colors.black45)),
+          Text(l10n.reviewedAllProtocols, textAlign: TextAlign.center, style: GoogleFonts.lora(fontSize: 14, color: Colors.black45)),
           const SizedBox(height: 32),
           PremiumButton(
             label: "RESTART PROTOCOL",
@@ -152,7 +152,7 @@ class _MatchingScreenState extends State<MatchingScreen> {
         children: [
           Icon(hasResults ? Icons.auto_awesome_rounded : Icons.search_off_rounded, size: 64, color: EspyTheme.gold),
           const SizedBox(height: 24),
-          Text(hasResults ? "PROTOCOL GUIDE" : "NO SERVICES FOUND", style: GoogleFonts.montserrat(fontSize: 18, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep)),
+          Text(hasResults ? "PROTOCOL GUIDE" : l10n.noActiveServicesFound.toUpperCase(), style: GoogleFonts.montserrat(fontSize: 18, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep)),
           const SizedBox(height: 16),
           Text(
             hasResults
@@ -162,7 +162,7 @@ class _MatchingScreenState extends State<MatchingScreen> {
             style: GoogleFonts.lora(fontSize: 14, color: Colors.black54, height: 1.6),
           ),
           const SizedBox(height: 32),
-          Text("SWIPE TO BEGIN", style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.bold, color: EspyTheme.gold, letterSpacing: 2)),
+          Text(l10n.swipeToBegin.toUpperCase(), style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.bold, color: EspyTheme.gold, letterSpacing: 2)),
         ],
       ),
     );

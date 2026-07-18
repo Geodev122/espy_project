@@ -53,15 +53,7 @@ class DashboardScreen extends StatelessWidget {
                   value: '${viewModel.serviceSlots}',
                   status: 'TOTAL CAPACITY',
                   buttonLabel: 'MANAGE SLOTS',
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => Scaffold(
-                    appBar: AppBar(
-                      title: Text('SERVICE MANAGER', style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, fontSize: 14)),
-                      backgroundColor: Colors.white,
-                      foregroundColor: EspyTheme.navyDeep,
-                      elevation: 0,
-                    ),
-                    body: const ServiceManagerScreen(),
-                  ))),
+                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ServiceManagerScreen())),
                 ),
                 _buildDashboardBox(
                   context,
@@ -169,8 +161,8 @@ class DashboardScreen extends StatelessWidget {
               ],
             ),
             const Spacer(),
-            Text('VISIBILITY', style: GoogleFonts.montserrat(fontSize: 9, fontWeight: FontWeight.w900, color: isExpired ? Colors.redAccent : EspyTheme.gold, letterSpacing: 1)),
-            Text('DAYS REMAINING', style: GoogleFonts.montserrat(fontSize: 8, color: Colors.white38, fontWeight: FontWeight.w600)),
+            Text(l10n.visibility.toUpperCase(), style: GoogleFonts.montserrat(fontSize: 9, fontWeight: FontWeight.w900, color: isExpired ? Colors.redAccent : EspyTheme.gold, letterSpacing: 1)),
+            Text(l10n.daysRemaining.toUpperCase(), style: GoogleFonts.montserrat(fontSize: 8, color: Colors.white38, fontWeight: FontWeight.w600)),
             const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
@@ -178,7 +170,7 @@ class DashboardScreen extends StatelessWidget {
                 onPressed: viewModel.isRenewing ? null : () async {
                    final success = await viewModel.quickRenew();
                    if (success && context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('VISIBILITY EXTENDED BY 30 DAYS'), backgroundColor: EspyTheme.success));
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.visibilityExtended), backgroundColor: EspyTheme.success));
                    }
                 },
                 style: ElevatedButton.styleFrom(

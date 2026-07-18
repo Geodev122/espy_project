@@ -1,3 +1,8 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// EspyTheme — Unified Core Theme v4.5
+// Hope, Healing, Humanity
+// ─────────────────────────────────────────────────────────────────────────────
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -5,6 +10,10 @@ import 'package:google_fonts/google_fonts.dart';
 class EspyTheme {
   EspyTheme._();
 
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 1. COLORS
+  // ═══════════════════════════════════════════════════════════════════════════
+  
   static const Color navyDeep   = Color(0xFF0A2342); 
   static const Color navyMid    = Color(0xFF0D3060); 
   static const Color navyLight  = Color(0xFF1A5298); 
@@ -30,13 +39,15 @@ class EspyTheme {
   static const Color warning = Color(0xFFF59E0B);
   static const Color error   = Color(0xFFEF4444);
 
-  static const Color electricBlue  = royalBlue;
-  static const Color cyan          = skyBlue;
-  static const Color noir          = Color(0xFF020617);
-  static const Color mahogany      = Color(0xFF451A03);
-  static const Color navy          = navyDeep;
-  static const Color cognac        = Color(0xFF8B4513);
-  static const Color teal          = Color(0xFF008080);
+  // Aliases
+  static const Color navy = navyDeep;
+  static const Color noir = navyDeep;
+  static const Color electricBlue = royalBlue;
+  static const Color cyan = skyBlue;
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 2. GRADIENTS
+  // ═══════════════════════════════════════════════════════════════════════════
 
   static const LinearGradient backgroundGradient = LinearGradient(
     begin: Alignment.topCenter,
@@ -66,16 +77,16 @@ class EspyTheme {
     stops: [0.0, 0.5, 1.0],
   );
 
-  static const LinearGradient metallicNoir = LinearGradient(
+  static const LinearGradient walletGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFF1E293B), Color(0xFF0F172A), Color(0xFF020617)],
+    colors: [navyDeep, navyMid, royalBlue],
   );
 
-  static const LinearGradient cyanFlame = LinearGradient(
+  static const LinearGradient rechargeGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [skyBlue, Color(0xFF00CED1), Color(0xFF008B8B)],
+    colors: [gold, goldDark],
   );
 
   static const LinearGradient goldRule = LinearGradient(
@@ -83,22 +94,9 @@ class EspyTheme {
     stops: [0.0, 0.3, 0.7, 1.0],
   );
 
-  static SystemUiOverlayStyle get systemUIOverlayDark => const SystemUiOverlayStyle(
-    statusBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.dark,
-    statusBarBrightness: Brightness.light,
-    systemNavigationBarColor: platinum,
-    systemNavigationBarIconBrightness: Brightness.dark,
-  );
-
-  static TextStyle get cinzelStyle => GoogleFonts.montserrat(
-    fontWeight: FontWeight.w900,
-    letterSpacing: 1.5,
-  );
-
-  static TextStyle get loraStyle => GoogleFonts.montserrat(
-    fontWeight: FontWeight.w400,
-  );
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 3. TYPOGRAPHY
+  // ═══════════════════════════════════════════════════════════════════════════
 
   static TextStyle get wordmarkStyle => GoogleFonts.montserrat(
     fontSize: 36, fontWeight: FontWeight.w900, color: textWordmark, letterSpacing: 10,
@@ -108,20 +106,40 @@ class EspyTheme {
     fontSize: 10, fontWeight: FontWeight.w700, color: textOnDarkMuted, letterSpacing: 4,
   );
 
-  static BoxDecoration get premiumCardDecoration => BoxDecoration(
-    gradient: backgroundGradient,
-    borderRadius: BorderRadius.circular(24),
-    boxShadow: [
-      BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 20, offset: const Offset(0, 8)),
-    ],
+  static TextStyle get cinzelStyle => GoogleFonts.montserrat(
+    fontWeight: FontWeight.w900, letterSpacing: 1.5,
   );
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 4. DECORATIONS
+  // ═══════════════════════════════════════════════════════════════════════════
 
   static BoxDecoration get cardDecoration => BoxDecoration(
     color: white,
     borderRadius: BorderRadius.circular(24),
     boxShadow: [
-      BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 15, offset: const Offset(0, 4)),
+      BoxShadow(color: navyDeep.withOpacity(0.05), blurRadius: 15, offset: const Offset(0, 4)),
     ],
+  );
+
+  static BoxDecoration get premiumCardDecoration => BoxDecoration(
+    gradient: walletGradient,
+    borderRadius: BorderRadius.circular(28),
+    boxShadow: [
+      BoxShadow(color: navyDeep.withOpacity(0.3), blurRadius: 30, offset: const Offset(0, 15)),
+    ],
+  );
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 5. SYSTEM & THEMES
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  static SystemUiOverlayStyle get systemUIOverlayDark => const SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.dark,
+    statusBarBrightness: Brightness.light,
+    systemNavigationBarColor: platinum,
+    systemNavigationBarIconBrightness: Brightness.dark,
   );
 
   static ThemeData get metallicTheme {
@@ -148,39 +166,16 @@ class EspyTheme {
         bodyMedium: GoogleFonts.montserrat(fontSize: 12, color: textSecondary, fontWeight: FontWeight.w400),
         labelLarge: GoogleFonts.montserrat(fontSize: 9, fontWeight: FontWeight.w900, color: gold, letterSpacing: 1.5),
       ),
-    );
-  }
-
-  static ThemeData get noirGovernanceTheme {
-    return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.dark,
-      primaryColor: electricBlue,
-      scaffoldBackgroundColor: Color(0xFF0A192F),
-      colorScheme: const ColorScheme.dark(
-        primary: electricBlue,
-        secondary: gold,
-        surface: Color(0xFF061226),
-        error: Color(0xFFEF4444),
-      ),
-      appBarTheme: AppBarTheme(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: true,
-        iconTheme: const IconThemeData(color: Color(0xFFF2E8CE), size: 20),
-        titleTextStyle: cinzelStyle.copyWith(
-          fontSize: 14,
-          color: Color(0xFFF2E8CE),
-          letterSpacing: 3,
-        ),
-      ),
-      textTheme: TextTheme(
-        displayLarge: cinzelStyle.copyWith(fontSize: 32, color: Color(0xFFF2E8CE)),
-        displayMedium: cinzelStyle.copyWith(fontSize: 24, color: Color(0xFFF2E8CE)),
-        titleLarge: cinzelStyle.copyWith(fontSize: 18, color: Color(0xFFF2E8CE)),
-        bodyLarge: loraStyle.copyWith(fontSize: 16, color: Color(0xFFF2E8CE).withOpacity(0.9)),
-        bodyMedium: loraStyle.copyWith(fontSize: 14, color: Color(0xFFF2E8CE).withOpacity(0.7)),
-        labelLarge: cinzelStyle.copyWith(fontSize: 11, fontWeight: FontWeight.bold, color: gold),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: skyBlue.withOpacity(0.3))),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: royalBlue, width: 1.5)),
+        labelStyle: GoogleFonts.montserrat(fontSize: 12, fontWeight: FontWeight.w600, color: navyDeep),
+        hintStyle: GoogleFonts.montserrat(fontSize: 14, color: navyDeep.withOpacity(0.3)),
+        prefixIconColor: navyDeep.withOpacity(0.5),
       ),
     );
   }

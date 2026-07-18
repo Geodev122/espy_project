@@ -29,7 +29,7 @@ class VaultFavoritesScreen extends StatelessWidget {
         elevation: 0,
       ),
       body: auth.user == null
-          ? const Center(child: Text('Sign in to view favorites', style: TextStyle(color: Colors.white)))
+          ? Center(child: Text(l10n.signInViewFavorites, style: const TextStyle(color: Colors.white)))
           : StreamBuilder<List<Map<String, dynamic>>>(
               stream: firestore.getUserFavorites(auth.user!.uid),
               builder: (context, snapshot) {
@@ -44,10 +44,10 @@ class VaultFavoritesScreen extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.favorite_border_rounded, size: 64, color: Colors.white10),
+                        const Icon(Icons.favorite_border_rounded, size: 64, color: Colors.white10),
                         const SizedBox(height: 16),
                         Text(
-                          "NO FAVORITES SAVED",
+                          l10n.noOwnRequests.toUpperCase(),
                           style: GoogleFonts.cinzel(color: Colors.white24, fontWeight: FontWeight.bold),
                         ),
                       ],

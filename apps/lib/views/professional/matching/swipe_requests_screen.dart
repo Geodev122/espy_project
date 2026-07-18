@@ -92,7 +92,7 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
                       await viewModel.favoriteRequest(target['id'] as String, true);
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Request saved to Vault Favorites"), behavior: SnackBarBehavior.floating),
+                          SnackBar(content: Text(l10n.protocolSavedFavorites), behavior: SnackBarBehavior.floating),
                         );
                       }
                     }
@@ -121,9 +121,9 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
         children: [
           const Icon(Icons.check_circle_outline_rounded, size: 80, color: EspyTheme.success),
           const SizedBox(height: 24),
-          Text("QUEUE CLEARED", style: GoogleFonts.cinzel(fontSize: 22, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep)),
+          Text(l10n.queueCleared.toUpperCase(), style: GoogleFonts.cinzel(fontSize: 22, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep)),
           const SizedBox(height: 16),
-          Text("You have reviewed all active community requests.", textAlign: TextAlign.center, style: GoogleFonts.lora(fontSize: 14, color: Colors.black45)),
+          Text(l10n.reviewedAllRequests, textAlign: TextAlign.center, style: GoogleFonts.lora(fontSize: 14, color: Colors.black45)),
           const SizedBox(height: 32),
           PremiumButton(
             label: "RESTART PROTOCOL",
@@ -211,10 +211,10 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text("REQUEST FILTERS", style: GoogleFonts.cinzel(fontSize: 22, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep)),
+            Text(l10n.requestFilters.toUpperCase(), style: GoogleFonts.cinzel(fontSize: 22, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep)),
             const SizedBox(height: 32),
             SwitchListTile(
-              title: const Text("NEWEST FIRST"),
+              title: Text(l10n.newestFirst.toUpperCase()),
               value: vm.newestFirst,
               onChanged: (v) {
                 Navigator.pop(context);

@@ -23,7 +23,7 @@ class NotificationsScreen extends StatelessWidget {
       useCinematicBackground: false,
       appBar: AppBar(title: Text(l10n.networkNotifications.toUpperCase()), backgroundColor: Colors.transparent, elevation: 0),
       body: auth.user == null
-          ? const Center(child: Text('Sign in to view notifications'))
+          ? Center(child: Text(l10n.signInViewNotifications))
           : StreamBuilder<List<Map<String, dynamic>>>(
               stream: firestore.getNotifications(auth.user!.uid, role: role),
               builder: (context, snapshot) {

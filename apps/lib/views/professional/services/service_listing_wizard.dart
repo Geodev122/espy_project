@@ -63,9 +63,10 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
     return EspyScaffold(
       useCinematicBackground: true,
       appBar: AppBar(
-        title: Text(l10n.serviceProtocol.toUpperCase()),
+        title: Text(l10n.serviceProtocol.toUpperCase(), style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, letterSpacing: 2, color: Colors.white, fontSize: 13)),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Column(
         children: [

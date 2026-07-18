@@ -98,10 +98,10 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text(
-          l10n.protocolRegistration,
-          style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, letterSpacing: 1, color: EspyTheme.platinum, fontSize: 13),
+          l10n.protocolRegistration.toUpperCase(),
+          style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, letterSpacing: 2, color: Colors.white, fontSize: 13),
         ),
-        iconTheme: const IconThemeData(color: EspyTheme.platinum),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SafeArea(
         child: Column(
@@ -127,8 +127,8 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 24),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        border: Border(bottom: BorderSide(color: Colors.white10)),
+        color: Colors.white.withOpacity(0.1),
+        border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.1))),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,

@@ -26,6 +26,7 @@ class WalletScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final walletVM = Provider.of<WalletViewModel>(context);
     final authService = Provider.of<AuthService>(context);
+    final l10n = AppLocalizations.of(context)!;
     
     if (authService.userData == null) {
        return const Center(child: CircularProgressIndicator(color: EspyTheme.gold));
@@ -38,17 +39,17 @@ class WalletScreen extends StatelessWidget {
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
-          _buildAppBar(context, user),
+          _buildAppBar(context, user, l10n),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
               child: Column(
                 children: [
-                  _buildWalletCard(context, walletVM),
+                  _buildWalletCard(context, walletVM, l10n),
                   const SizedBox(height: 32),
-                  _buildMenuGrid(context, authService),
+                  _buildMenuGrid(context, authService, l10n),
                   const SizedBox(height: 48),
-                  _buildSignOut(context, authService),
+                  _buildSignOut(context, authService, l10n),
                   const SizedBox(height: 40),
                 ],
               ),
@@ -59,8 +60,8 @@ class WalletScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAppBar(BuildContext context, dynamic user) {
-    final bool isVisitor = user.role.name == 'visitor';
+  Widget _buildAppBar(BuildContext context, UserModel user, AppLocalizations l10n) {
+    final bool isVisitor = user.role == UserRole.visitor;
 
     return SliverAppBar(
       expandedHeight: 200,
@@ -109,7 +110,7 @@ class WalletScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    isVisitor ? 'ESPY VISITOR' : 'CARE PROTOCOL NODE',
+                    isVisitor ? l10n.visitor.toUpperCase() : 'CARE PROTOCOL NODE',
                     style: GoogleFonts.montserrat(
                       color: EspyTheme.royalBlue,
                       fontSize: 8,
@@ -126,7 +127,7 @@ class WalletScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildWalletCard(BuildContext context, WalletViewModel vm) {
+  Widget _buildWalletCard(BuildContext context, WalletViewModel vm, AppLocalizations l10n) {
     return FadeInDown(
       child: Container(
         width: double.infinity,
@@ -141,7 +142,7 @@ class WalletScreen extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('CURRENT BALANCE', 
+                    Text(l10n.currentBalance.toUpperCase(),
                       style: GoogleFonts.montserrat(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
                     const SizedBox(height: 8),
                     Row(
@@ -161,7 +162,7 @@ class WalletScreen extends StatelessWidget {
                     color: Colors.white.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(LucideIcons.wallet, color: EspyTheme.gold, size: 28),
+                  child: const Icon(LucideIcons.wallet, color: EspyTheme.gold, size: 28),
                 ),
               ],
             ),
@@ -173,8 +174,8 @@ class WalletScreen extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(context, MaterialPageRoute(builder: (_) => const TokenShopScreen(initialTab: 0)));
                     },
-                    icon: Icon(LucideIcons.plusCircle, size: 16),
-                    label: const Text('RECHARGE'),
+                    icon: const Icon(LucideIcons.plusCircle, size: 16),
+                    label: Text(l10n.fundNow.toUpperCase()),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: EspyTheme.gold,
                       foregroundColor: EspyTheme.navyDeep,
@@ -189,7 +190,7 @@ class WalletScreen extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(context, MaterialPageRoute(builder: (_) => const TokenShopScreen(initialTab: 1)));
                     },
-                    icon: Icon(LucideIcons.shoppingBag, size: 16),
+                    icon: const Icon(LucideIcons.shoppingBag, size: 16),
                     label: const Text('STORE'),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.white,
@@ -207,19 +208,18 @@ class WalletScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuGrid(BuildContext context, AuthService auth) {
-    final role = auth.userData?.role.name;
+  Widget _buildMenuGrid(BuildContext context, AuthService auth, AppLocalizations l10n) {
     final localeService = Provider.of<LocaleService>(context);
 
     return Column(
       children: [
         Row(
           children: [
-            Expanded(child: _buildSmallMenuItem(LucideIcons.mapPin, 'NODES', () {
+            Expanded(child: _buildSmallMenuItem(LucideIcons.mapPin, l10n.locationSettings.toUpperCase(), () {
               Navigator.push(context, MaterialPageRoute(builder: (_) => const LocationManagerScreen()));
             })),
             const SizedBox(width: 16),
-            Expanded(child: _buildSmallMenuItem(LucideIcons.user, 'PROFILE', () {
+            Expanded(child: _buildSmallMenuItem(LucideIcons.user, l10n.editProfile.toUpperCase(), () {
               Navigator.push(context, MaterialPageRoute(builder: (_) => const EditProfileScreen()));
             })),
           ],
@@ -227,21 +227,21 @@ class WalletScreen extends StatelessWidget {
         const SizedBox(height: 16),
         Row(
           children: [
-            Expanded(child: _buildSmallMenuItem(LucideIcons.history, 'LEDGER', () {
+            Expanded(child: _buildSmallMenuItem(LucideIcons.history, l10n.vaultLogs.toUpperCase(), () {
               Navigator.push(context, MaterialPageRoute(builder: (_) => const PaymentHistoryScreen()));
             })),
             const SizedBox(width: 16),
-            Expanded(child: _buildSmallMenuItem(LucideIcons.shieldCheck, 'PRIVACY', () {
+            Expanded(child: _buildSmallMenuItem(LucideIcons.shieldCheck, l10n.privacyVault.toUpperCase(), () {
               Navigator.push(context, MaterialPageRoute(builder: (_) => const PrivacyVaultScreen()));
             })),
           ],
         ),
         const SizedBox(height: 16),
-        _buildFullMenuItem(LucideIcons.languages, 'LANGUAGE: ${localeService.locale.languageCode.toUpperCase()}', () {
+        _buildFullMenuItem(LucideIcons.languages, '${l10n.language.toUpperCase()}: ${localeService.locale.languageCode.toUpperCase()}', () {
           localeService.toggleLocale();
         }),
         const SizedBox(height: 16),
-        _buildFullMenuItem(LucideIcons.bell, 'NOTIFICATIONS', () {
+        _buildFullMenuItem(LucideIcons.bell, l10n.notifications.toUpperCase(), () {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const NotificationsScreen()));
         }),
       ],
@@ -289,12 +289,12 @@ class WalletScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSignOut(BuildContext context, AuthService auth) {
+  Widget _buildSignOut(BuildContext context, AuthService auth, AppLocalizations l10n) {
     return FadeInUp(
       child: TextButton(
         onPressed: () => auth.signOut(),
         child: Text(
-          'SIGN OUT PROTOCOL',
+          l10n.signOutProtocol.toUpperCase(),
           style: GoogleFonts.montserrat(
             color: EspyTheme.error,
             fontWeight: FontWeight.w900,

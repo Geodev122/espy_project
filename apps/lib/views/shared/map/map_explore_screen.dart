@@ -224,7 +224,8 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
     final bool filtersActive = directoryVM.selectedSectorId != null || directoryVM.selectedRole != null;
 
     return EspyScaffold(
-      useCinematicBackground: false, // Map needs full screen interaction
+      useCinematicBackground: false, 
+      extendBodyBehindAppBar: true,
       body: Stack(
         children: [
           FlutterMap(
@@ -401,12 +402,12 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
           children: [
             Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.black12, borderRadius: BorderRadius.circular(2)))),
             const SizedBox(height: 24),
-            Text("MY NODES OF PRESENCE", style: GoogleFonts.cinzel(fontSize: 14, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep, letterSpacing: 2)),
+            Text(l10n.myNodesOfPresence.toUpperCase(), style: GoogleFonts.cinzel(fontSize: 14, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep, letterSpacing: 2)),
             const SizedBox(height: 16),
             if (nodes.isEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 32),
-                child: Center(child: Text("NO NODES INITIALIZED", style: GoogleFonts.lora(fontSize: 12, color: Colors.black26, fontStyle: FontStyle.italic))),
+                child: Center(child: Text(l10n.noNodesInitialized.toUpperCase(), style: GoogleFonts.lora(fontSize: 12, color: Colors.black26, fontStyle: FontStyle.italic))),
               ),
             ...nodes.map((node) => ListTile(
               onTap: () {
@@ -484,7 +485,7 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
                 Center(child: Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: 24), decoration: BoxDecoration(color: EspyTheme.navyDeep.withOpacity(0.1), borderRadius: BorderRadius.circular(2)))),
                 Text(l10n.mapFilters.toUpperCase(), style: GoogleFonts.cinzel(fontSize: 22, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep, letterSpacing: 2)),
                 const SizedBox(height: 32),
-                Text("COUNTRY", style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.bold, color: EspyTheme.royalBlue, letterSpacing: 2)),
+                Text(l10n.country.toUpperCase(), style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.bold, color: EspyTheme.royalBlue, letterSpacing: 2)),
                 const SizedBox(height: 12),
                 StreamBuilder<List<Map<String, dynamic>>>(
                   stream: firestore.getCountries(),
@@ -494,7 +495,7 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
                       spacing: 12, runSpacing: 8,
                       children: [
                         ChoiceChip(
-                          label: const Text("ALL"),
+                          label: Text(l10n.all.toUpperCase()),
                           selected: tempCountryId == null,
                           onSelected: (v) => setModalState(() => tempCountryId = null),
                           selectedColor: EspyTheme.gold,
@@ -510,13 +511,13 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
                   }
                 ),
                 const SizedBox(height: 24),
-                Text("USER ROLE", style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.bold, color: EspyTheme.royalBlue, letterSpacing: 2)),
+                Text(l10n.userRole.toUpperCase(), style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.bold, color: EspyTheme.royalBlue, letterSpacing: 2)),
                 const SizedBox(height: 12),
                 Wrap(
                   spacing: 12,
                   children: [
                     ChoiceChip(
-                      label: const Text("ALL"),
+                      label: Text(l10n.all.toUpperCase()),
                       selected: tempRole == null,
                       onSelected: (v) {
                         setModalState(() => tempRole = null);
@@ -525,7 +526,7 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
                       labelStyle: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.bold, color: tempRole == null ? Colors.white : Colors.black54),
                     ),
                     ChoiceChip(
-                      label: const Text("PROFESSIONAL"),
+                      label: Text(l10n.professional.toUpperCase()),
                       selected: tempRole == 'professional',
                       onSelected: (v) {
                         setModalState(() => tempRole = 'professional');
@@ -534,7 +535,7 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
                       labelStyle: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.bold, color: tempRole == 'professional' ? Colors.white : Colors.black54),
                     ),
                     ChoiceChip(
-                      label: const Text("INSTITUTION"),
+                      label: Text(l10n.institution.toUpperCase()),
                       selected: tempRole == 'institution',
                       onSelected: (v) {
                         setModalState(() => tempRole = 'institution');
@@ -621,13 +622,13 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         ),
-                        child: Text("CLEAR ALL", style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, color: Colors.redAccent, fontSize: 12, letterSpacing: 1)),
+                        child: Text(l10n.clearAll.toUpperCase(), style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, color: Colors.redAccent, fontSize: 12, letterSpacing: 1)),
                       ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: PremiumButton(
-                        label: "ACTIVATE",
+                        label: l10n.acknowledge.toUpperCase(),
                         fullWidth: true,
                         onPressed: () {
                           vm.setFilters(

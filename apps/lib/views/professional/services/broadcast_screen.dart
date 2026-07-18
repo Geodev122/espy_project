@@ -135,11 +135,11 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
       padding: const EdgeInsets.all(24),
       child: Row(
         children: [
-          _buildStat('BOUGHT', bought.toString(), EspyTheme.gold),
+          _buildStat(l10n.used.toUpperCase(), bought.toString(), EspyTheme.gold),
           _buildDivider(),
-          _buildStat('USED', used.toString(), Colors.white54),
+          _buildStat(l10n.used.toUpperCase(), used.toString(), Colors.white54),
           _buildDivider(),
-          _buildStat('AVAILABLE', available.toString(), EspyTheme.success),
+          _buildStat(l10n.available.toUpperCase(), available.toString(), EspyTheme.success),
         ],
       ),
     );

@@ -8,7 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_core/theme/espy_theme.dart';
 import 'package:shared_core/services/auth_service.dart';
 import 'package:shared_core/viewmodels/matching_view_model.dart';
-import 'package:shared_core/widgets/common/espy_scaffold.dart';
+import 'package:espy_app/l10n/app_localizations.dart';
 
 class ServiceSwipeScreen extends StatefulWidget {
   const ServiceSwipeScreen({super.key});
@@ -24,13 +24,14 @@ class _ServiceSwipeScreenState extends State<ServiceSwipeScreen> {
   Widget build(BuildContext context) {
     final viewModel = Provider.of<MatchingViewModel>(context);
     final auth = Provider.of<AuthService>(context, listen: false);
+    final l10n = AppLocalizations.of(context)!;
 
     return EspyScaffold(
       useCinematicBackground: false,
       body: viewModel.isLoading
           ? const Center(child: CircularProgressIndicator(color: EspyTheme.gold))
           : viewModel.services.isEmpty
-              ? Center(child: Text('NO ACTIVE SERVICES FOUND', style: GoogleFonts.cinzel(color: EspyTheme.navyDeep.withOpacity(0.3), fontWeight: FontWeight.w900)))
+              ? Center(child: Text(l10n.noActiveServicesFound.toUpperCase(), style: GoogleFonts.cinzel(color: EspyTheme.navyDeep.withOpacity(0.3), fontWeight: FontWeight.w900)))
               : Stack(
                   children: [
                     CardSwiper(

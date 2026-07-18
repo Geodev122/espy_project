@@ -26,10 +26,12 @@ class _PrivacyVaultScreenState extends State<PrivacyVaultScreen> {
     final l10n = AppLocalizations.of(context)!;
     return EspyScaffold(
       useCinematicBackground: true,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text(l10n.privacyVaultTitle.toUpperCase()),
+        title: Text(l10n.privacyVaultTitle.toUpperCase(), style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, letterSpacing: 2, color: Colors.white, fontSize: 13)),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),

@@ -1,4 +1,4 @@
-# 🛡️ Espy Protocol Unified Relational Schema v3.4 (PostgreSQL Optimized)
+# 🛡️ Espy Protocol Unified Relational Schema v4.0 (Unified App & Admin)
 
 # ─── 1. Identity & Access ────────────────────────────────────────────────
 
@@ -12,6 +12,7 @@ type User @table {
   walletBalance: Int! @default(value: 0)
   tokensUsed: Int! @default(value: 0)
   photoUrl: String
+  lastActiveAt: Timestamp @default(expr: "request.time")
   createdAt: Timestamp! @default(expr: "request.time")
   updatedAt: Timestamp! @default(expr: "request.time")
 }
@@ -28,6 +29,9 @@ type Professional @table {
   whatsapp: String
   isApproved: Boolean! @default(value: false)
   isHonorVerified: Boolean! @default(value: false)
+  isFeatured: Boolean! @default(value: false)
+  averageRating: Float @default(value: 0.0)
+  reviewCount: Int @default(value: 0)
   countryId: String
   governorateId: String
   cityId: String
@@ -46,6 +50,9 @@ type Institution @table {
   category: String
   registrationNumber: String
   isApproved: Boolean! @default(value: false)
+  isFeatured: Boolean! @default(value: false)
+  averageRating: Float @default(value: 0.0)
+  reviewCount: Int @default(value: 0)
   serviceSlots: Int! @default(value: 5)
   practicePins: Int! @default(value: 0)
   visibilityExpiresAt: Timestamp
@@ -80,20 +87,25 @@ type Category @table {
 type Service @table {
   id: UUID! @default(expr: "uuidV4()") @primaryKey
   provider: User!
-  title: String!
-  description: String
+  titleEn: String!
+  titleAr: String
+  descriptionEn: String
+  descriptionAr: String
   price: Int!
   category: Category
   isActive: Boolean! @default(value: true)
   isAllocated: Boolean! @default(value: false)
   visibilityExpiresAt: Timestamp
   imageUrl: String
+  averageRating: Float @default(value: 0.0)
+  reviewCount: Int @default(value: 0)
 }
 
 type LocationNode @table {
   id: UUID! @default(expr: "uuidV4()") @primaryKey
   user: User!
   isMain: Boolean! @default(value: false)
+  isVerified: Boolean! @default(value: false)
   label: String
   cityName: String
   countryId: String
@@ -102,7 +114,31 @@ type LocationNode @table {
   activity: String
 }
 
-# ─── 3. Operations & Ledger ───────────────────────────────────────────────
+# ─── 3. Reputation & Feedback ───────────────────────────────────────────
+
+type Review @table {
+  id: UUID! @default(expr: "uuidV4()") @primaryKey
+  author: User!
+  targetUser: User # If reviewing a professional/institution
+  targetService: Service # If reviewing a specific service
+  rating: Int! # 1-5
+  comment: String
+  isApproved: Boolean! @default(value: true)
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+type Report @table {
+  id: UUID! @default(expr: "uuidV4()") @primaryKey
+  reporter: User!
+  targetId: String! # UID, Service ID, or Request ID
+  targetType: String! # USER, SERVICE, REQUEST
+  reason: String!
+  status: String! @default(value: "pending") # pending, resolved, dismissed
+  adminNote: String
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+# ─── 4. Operations & Ledger ───────────────────────────────────────────────
 
 type WalletLedger @table {
   id: UUID! @default(expr: "uuidV4()") @primaryKey
@@ -154,7 +190,7 @@ type Interaction @table {
   createdAt: Timestamp! @default(expr: "request.time")
 }
 
-# ─── 4. Communications & Community ────────────────────────────────────────
+# ─── 5. Communications & Community ────────────────────────────────────────
 
 type CommunityRequest @table {
   id: UUID! @default(expr: "uuidV4()") @primaryKey
@@ -190,8 +226,10 @@ type Broadcast @table {
 
 type Announcement @table {
   id: UUID! @default(expr: "uuidV4()") @primaryKey
-  title: String!
-  content: String!
+  titleEn: String!
+  titleAr: String
+  contentEn: String!
+  contentAr: String
   category: String! # general, health, system
   status: String! @default(value: "approved")
   targetRole: String # null for all, or visitor/pro
@@ -227,7 +265,7 @@ type SupportTicket @table {
   createdAt: Timestamp! @default(expr: "request.time")
 }
 
-# ─── 5. Administration ────────────────────────────────────────────────────
+# ─── 6. Administration & Marketing ────────────────────────────────────────
 
 type AdminLog @table {
   id: UUID! @default(expr: "uuidV4()") @primaryKey
@@ -236,10 +274,36 @@ type AdminLog @table {
   entityId: String!
   entityType: String!
   details: String
+  oldValue: String
+  newValue: String
   timestamp: Timestamp! @default(expr: "request.time")
 }
 
 type AppConfig @table {
   key: String! @primaryKey
   value: String! # JSON payload
+}
+
+type Promotion @table {
+  id: UUID! @default(expr: "uuidV4()") @primaryKey
+  titleEn: String!
+  titleAr: String
+  descriptionEn: String
+  descriptionAr: String
+  imageUrl: String
+  linkUrl: String
+  type: String! # banner, popup, featured_list
+  targetRole: String # visitor, professional, institution
+  isActive: Boolean! @default(value: true)
+  expiresAt: Timestamp
+  priority: Int @default(value: 0)
+}
+
+type AnalyticsEvent @table {
+  id: UUID! @default(expr: "uuidV4()") @primaryKey
+  user: User
+  eventType: String! # PAGE_VIEW, BUTTON_CLICK, SEARCH
+  eventKey: String!
+  metadata: String # JSON
+  timestamp: Timestamp! @default(expr: "request.time")
 }

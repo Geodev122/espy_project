@@ -24,18 +24,19 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
     final auth = Provider.of<AuthService>(context);
     final firestore = FirestoreService();
     final String? userId = auth.user?.uid;
+    final l10n = AppLocalizations.of(context)!;
 
     return EspyScaffold(
       useCinematicBackground: false,
-      appBar: AppBar(title: const Text("PAYMENT PROTOCOLS"), backgroundColor: Colors.transparent, elevation: 0),
+      appBar: AppBar(title: Text(l10n.paymentProtocols.toUpperCase()), backgroundColor: Colors.transparent, elevation: 0),
       body: userId == null
-          ? const Center(child: Text("Authorized personnel only."))
+          ? Center(child: Text(l10n.authorizedPersonnelOnly))
           : StreamBuilder<List<Map<String, dynamic>>>(
               stream: firestore.getUserTransactions(userId),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator(color: EspyTheme.gold));
                 final txs = snapshot.data ?? [];
-                if (txs.isEmpty) return const Center(child: Text("NO TRANSACTION LOGS", style: TextStyle(color: Colors.white24)));
+                if (txs.isEmpty) return Center(child: Text(l10n.noTransactionLogs.toUpperCase(), style: const TextStyle(color: Colors.white24)));
 
                 return ListView.builder(
                   padding: const EdgeInsets.all(24),

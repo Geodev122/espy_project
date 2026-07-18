@@ -176,7 +176,7 @@ class _AppShellState extends State<AppShell> {
               }
               Navigator.pop(context);
             },
-            child: Text('ACKNOWLEDGE', style: GoogleFonts.cinzel(fontWeight: FontWeight.bold, color: EspyTheme.noir)),
+            child: Text(l10n.acknowledge.toUpperCase(), style: GoogleFonts.cinzel(fontWeight: FontWeight.bold, color: EspyTheme.noir)),
           ),
         ],
       ),
@@ -184,26 +184,25 @@ class _AppShellState extends State<AppShell> {
   }
 
   List<Widget> _getScreens(UserRole? role, BuildContext context) {
-    final double topPadding = MediaQuery.of(context).padding.top + 70;
     if (role == UserRole.visitor) {
       return [
         const MapExploreScreen(),
-        Padding(padding: EdgeInsets.only(top: topPadding), child: const MatchingScreen()),
-        Padding(padding: EdgeInsets.only(top: topPadding), child: const CommunityFeedScreen()),
+        const MatchingScreen(),
+        const CommunityFeedScreen(),
       ];
     }
     if (role == UserRole.admin) {
       return [
-        Padding(padding: EdgeInsets.only(top: topPadding), child: const admin.AdminDashboardScreen()),
+        const admin.AdminDashboardScreen(),
         const MapExploreScreen(),
-        Padding(padding: EdgeInsets.only(top: topPadding), child: const CommunityFeedScreen()),
+        const CommunityFeedScreen(),
       ];
     }
     return [
-      Padding(padding: EdgeInsets.only(top: topPadding), child: const DashboardScreen()),
+      const DashboardScreen(),
       const MapExploreScreen(),
-      Padding(padding: EdgeInsets.only(top: topPadding), child: const SwipeRequestsScreen()),
-      Padding(padding: EdgeInsets.only(top: topPadding), child: const ServiceManagerScreen()),
+      const SwipeRequestsScreen(),
+      const ServiceManagerScreen(),
     ];
   }
 
@@ -258,19 +257,13 @@ class _AppShellState extends State<AppShell> {
         drawer: const EspySideMenu(),
         extendBody: true,
         backgroundColor: isVisitor ? EspyTheme.platinum : Colors.white,
-        body: Stack(
-          children: [
-            IndexedStack(
-              index: _selectedIndex,
-              children: screens,
-            ),
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: _buildCustomHeader(context, user, role),
-            ),
-          ],
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(70),
+          child: _buildCustomHeader(context, user, role),
+        ),
+        body: IndexedStack(
+          index: _selectedIndex,
+          children: screens,
         ),
         bottomNavigationBar: isVisitor ? _buildExclusiveVisitorNav() : _buildProviderNav(items),
       ),
@@ -480,13 +473,13 @@ class _AppShellState extends State<AppShell> {
     final localeService = Provider.of<LocaleService>(context);
     final navItems = _getNavItems(context, role);
     final currentLabel = (_selectedIndex < navItems.length) ? navItems[_selectedIndex].label : 'ESPY';
-    final bool isVisitor = role == UserRole.visitor;
+    final Color bgColor = Theme.of(context).scaffoldBackgroundColor;
 
     return Container(
       width: double.infinity,
       height: MediaQuery.of(context).padding.top + 70,
       decoration: BoxDecoration(
-        color: (isVisitor ? EspyTheme.platinum : Colors.white).withOpacity(1.0),
+        color: bgColor.withOpacity(0.95),
         border: Border(
           bottom: BorderSide(color: Colors.black.withOpacity(0.08), width: 1.5),
         ),

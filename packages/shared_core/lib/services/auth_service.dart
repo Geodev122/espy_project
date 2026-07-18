@@ -97,18 +97,21 @@ class AuthService extends ChangeNotifier {
   }
 
   Future<bool> checkIsAdmin() async {
+    if (_userData?.role == UserRole.admin) return true;
+    
     final user = _auth.currentUser;
     if (user == null) return false;
     
-    // Admin check could also be moved to repo
-    try {
-       // ... existing admin logic for now or move to repo
-    } catch (e) {}
-
     const superAdmins = ['admin@espy.com', 'committee@hope-bearer.org', 'geo.elnajjar@gmail.com', 'geodev122@gmail.com'];
     if (superAdmins.contains(user.email)) return true;
 
-    return false;
+    // Fallback to token claim if available
+    try {
+      final idToken = await user.getIdTokenResult();
+      return idToken.claims?['admin'] == true || idToken.claims?['role'] == 'admin';
+    } catch (e) {
+      return false;
+    }
   }
 
   Future<UserCredential?> signUpWithEmail({
