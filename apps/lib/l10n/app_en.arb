@@ -305,5 +305,6 @@
   "dispatch": "DISPATCH",
   "hopeHealingHumanity": "HOPE, HEALING, HUMANITY",
   "availableExpansions": "AVAILABLE EXPANSIONS",
+  "rechargeCard": "RECHARGE CARD",
   "ok": "OK"
 }

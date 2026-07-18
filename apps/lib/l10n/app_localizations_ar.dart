@@ -794,4 +794,166 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get instWelcomeMessage =>
       'تهانينا! تم تسجيل مؤسستك. منشأتك الأساسية نشطة الآن على الخريطة. لتوسيع قدراتك، يرجى زيارة محفظة Espy.';
+
+  @override
+  String get systemOverview => 'نظرة عامة على النظام';
+
+  @override
+  String get visibility => 'الظهور';
+
+  @override
+  String get daysRemaining => 'أيام متبقية';
+
+  @override
+  String get visibilityExtended => 'تم تمديد الظهور لمدة 30 يومًا';
+
+  @override
+  String get protocolSavedFavorites => 'تم حفظ البروتوكول في المفضلة';
+
+  @override
+  String get protocolScanComplete => 'اكتمل مسح البروتوكول';
+
+  @override
+  String get reviewedAllProtocols => 'لقد راجعت جميع البروتوكولات النشطة.';
+
+  @override
+  String get swipeToBegin => 'اسحب للبدء';
+
+  @override
+  String get noActiveServicesFound => 'لم يتم العثور على خدمات نشطة';
+
+  @override
+  String get queueCleared => 'تم إخلاء قائمة الانتظار';
+
+  @override
+  String get reviewedAllRequests => 'لقد راجعت جميع طلبات المجتمع النشطة.';
+
+  @override
+  String get requestFilters => 'فلاتر الطلبات';
+
+  @override
+  String get newestFirst => 'الأحدث أولاً';
+
+  @override
+  String get update => 'تحديث';
+
+  @override
+  String get limitReached => 'تم الوصول إلى الحد الأقصى';
+
+  @override
+  String get visitWalletPurchasePins =>
+      'قم بزيارة محفظة Espy لشراء المزيد من الدبابيس.';
+
+  @override
+  String get signInViewNotifications => 'سجل الدخول لعرض الإشعارات';
+
+  @override
+  String get paymentProtocols => 'بروتوكولات الدفع';
+
+  @override
+  String get authorizedPersonnelOnly => 'للموظفين المصرح لهم فقط.';
+
+  @override
+  String get noTransactionLogs => 'لا توجد سجلات معاملات';
+
+  @override
+  String get espyStore => 'متجر ESPY';
+
+  @override
+  String get espyTokens => 'رموز ESPY';
+
+  @override
+  String successAddedTokens(Object amount) {
+    return 'نجاح! تمت إضافة $amount رمز';
+  }
+
+  @override
+  String get selectPaymentMethod => 'اختر طريقة الدفع';
+
+  @override
+  String get whishPaySecure => 'WHISH PAY آمن';
+
+  @override
+  String get paymentCompleted => 'اكتملت عملية الدفع';
+
+  @override
+  String successfullyActivated(Object item) {
+    return 'تم تفعيل $item بنجاح';
+  }
+
+  @override
+  String get signInViewFavorites => 'سجل الدخول لعرض المفضلة';
+
+  @override
+  String get currentBalance => 'الرصيد الحالي';
+
+  @override
+  String get broadcastHistory => 'سجل البث';
+
+  @override
+  String get noBroadcastsSent => 'لم يتم إرسال أي بث';
+
+  @override
+  String get allocationAnchors => 'التخصيص والروابط';
+
+  @override
+  String get primaryHubPin => 'دبوس المركز الرئيسي';
+
+  @override
+  String get specificPracticePin => 'دبوس ممارسة محدد';
+
+  @override
+  String get serviceSlotManual => 'فتحة خدمة (يدوي)';
+
+  @override
+  String get acknowledge => 'تأكيد';
+
+  @override
+  String get passwordResetSent =>
+      'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني';
+
+  @override
+  String get forgotPassword => 'هل نسيت كلمة المرور؟';
+
+  @override
+  String get networkAnnouncements => 'إعلانات الشبكة';
+
+  @override
+  String get nodeDisconnected => 'العقدة غير متصلة';
+
+  @override
+  String get myNodesOfPresence => 'دبابيس التواجد الخاصة بي';
+
+  @override
+  String get noNodesInitialized => 'لم يتم تهيئة أي عقد';
+
+  @override
+  String get country => 'الدولة';
+
+  @override
+  String get userRole => 'دور المستخدم';
+
+  @override
+  String get clearAll => 'مسح الكل';
+
+  @override
+  String get accountSuspended => 'الحساب معلق';
+
+  @override
+  String get accessRestricted => 'تم تقييد وصولك من قبل المجلس.';
+
+  @override
+  String get dispatch => 'إرسال';
+
+  @override
+  String get hopeHealingHumanity => 'أمل، شفاء، إنسانية';
+
+  @override
+  String get availableExpansions => 'التوسعات المتاحة';
+
+  @override
+  String get rechargeCard => 'بطاقة شحن';
+
+  @override
+  String get ok => 'موافق';
 }

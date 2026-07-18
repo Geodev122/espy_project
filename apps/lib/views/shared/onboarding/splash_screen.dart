@@ -6,6 +6,7 @@ import 'dart:math' as math;
 import 'package:shared_core/theme/espy_theme.dart';
 import 'package:shared_core/widgets/common/particle_field.dart';
 import 'package:shared_core/widgets/common/espy_scaffold.dart';
+import 'package:espy_app/l10n/app_localizations.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

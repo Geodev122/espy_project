@@ -7,6 +7,7 @@ import 'package:shared_core/theme/espy_theme.dart';
 import 'package:shared_core/services/auth_service.dart';
 import 'package:shared_core/widgets/common/premium_card.dart';
 import 'package:shared_core/widgets/common/espy_scaffold.dart';
+import 'package:espy_app/l10n/app_localizations.dart';
 
 class BroadcastHistoryScreen extends StatelessWidget {
   const BroadcastHistoryScreen({super.key});

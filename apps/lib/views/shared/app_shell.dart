@@ -153,6 +153,7 @@ class _AppShellState extends State<AppShell> {
 
   void _showNotificationPrompt(Map<String, dynamic> notification) {
     if (!mounted) return;
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -474,6 +475,7 @@ class _AppShellState extends State<AppShell> {
     final navItems = _getNavItems(context, role);
     final currentLabel = (_selectedIndex < navItems.length) ? navItems[_selectedIndex].label : 'ESPY';
     final Color bgColor = Theme.of(context).scaffoldBackgroundColor;
+    final bool isVisitor = role == UserRole.visitor;
 
     return Container(
       width: double.infinity,

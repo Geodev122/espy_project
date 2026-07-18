@@ -48,7 +48,7 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildQuotaHeader(bought, used, available),
+            _buildQuotaHeader(bought, used, available, l10n),
             const SizedBox(height: 32),
             FadeInDown(
               child: Text(
@@ -130,7 +130,7 @@ class _BroadcastScreenState extends State<BroadcastScreen> {
     );
   }
 
-  Widget _buildQuotaHeader(int bought, int used, int available) {
+  Widget _buildQuotaHeader(int bought, int used, int available, AppLocalizations l10n) {
     return PremiumCard(
       padding: const EdgeInsets.all(24),
       child: Row(

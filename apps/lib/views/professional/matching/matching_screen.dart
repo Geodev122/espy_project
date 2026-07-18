@@ -63,8 +63,8 @@ class _MatchingScreenState extends State<MatchingScreen> {
                   padding: EdgeInsets.zero,
                   cardBuilder: (context, index, horizontalThreshold, verticalThreshold) {
                     final cardData = displayCards[index];
-                    if (cardData['isInfo'] == true) return _buildInfoCard(cardData['hasResults'] as bool);
-                    if (cardData['isEnd'] == true) return _buildEndCard();
+                    if (cardData['isInfo'] == true) return _buildInfoCard(cardData['hasResults'] as bool, l10n);
+                    if (cardData['isEnd'] == true) return _buildEndCard(l10n);
                     return _buildSwipeCard(cardData);
                   },
                   onSwipe: (previousIndex, currentIndex, direction) async {
@@ -113,7 +113,7 @@ class _MatchingScreenState extends State<MatchingScreen> {
     );
   }
 
-  Widget _buildEndCard() {
+  Widget _buildEndCard(AppLocalizations l10n) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -139,7 +139,7 @@ class _MatchingScreenState extends State<MatchingScreen> {
     );
   }
 
-  Widget _buildInfoCard(bool hasResults) {
+  Widget _buildInfoCard(bool hasResults, AppLocalizations l10n) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,

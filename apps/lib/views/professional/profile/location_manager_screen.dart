@@ -10,6 +10,7 @@ import 'package:shared_core/widgets/common/location_picker_modal.dart';
 import 'package:shared_core/widgets/common/premium_button.dart';
 import 'package:shared_core/widgets/common/premium_card.dart';
 import 'package:shared_core/widgets/common/espy_scaffold.dart';
+import 'package:espy_app/l10n/app_localizations.dart';
 import 'token_shop_screen.dart';
 
 class LocationManagerScreen extends StatefulWidget {

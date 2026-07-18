@@ -1621,6 +1621,318 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Congratulations! Your institution is registered. Your main facility is now active on the map. To expand your capacity, visit your Espy Wallet.'**
   String get instWelcomeMessage;
+
+  /// No description provided for @systemOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'SYSTEM OVERVIEW'**
+  String get systemOverview;
+
+  /// No description provided for @visibility.
+  ///
+  /// In en, this message translates to:
+  /// **'VISIBILITY'**
+  String get visibility;
+
+  /// No description provided for @daysRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'DAYS REMAINING'**
+  String get daysRemaining;
+
+  /// No description provided for @visibilityExtended.
+  ///
+  /// In en, this message translates to:
+  /// **'VISIBILITY EXTENDED BY 30 DAYS'**
+  String get visibilityExtended;
+
+  /// No description provided for @protocolSavedFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Protocol saved to Vault Favorites'**
+  String get protocolSavedFavorites;
+
+  /// No description provided for @protocolScanComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'PROTOCOL SCAN COMPLETE'**
+  String get protocolScanComplete;
+
+  /// No description provided for @reviewedAllProtocols.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reviewed all active protocols.'**
+  String get reviewedAllProtocols;
+
+  /// No description provided for @swipeToBegin.
+  ///
+  /// In en, this message translates to:
+  /// **'SWIPE TO BEGIN'**
+  String get swipeToBegin;
+
+  /// No description provided for @noActiveServicesFound.
+  ///
+  /// In en, this message translates to:
+  /// **'NO ACTIVE SERVICES FOUND'**
+  String get noActiveServicesFound;
+
+  /// No description provided for @queueCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'QUEUE CLEARED'**
+  String get queueCleared;
+
+  /// No description provided for @reviewedAllRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reviewed all active community requests.'**
+  String get reviewedAllRequests;
+
+  /// No description provided for @requestFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'REQUEST FILTERS'**
+  String get requestFilters;
+
+  /// No description provided for @newestFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'NEWEST FIRST'**
+  String get newestFirst;
+
+  /// No description provided for @update.
+  ///
+  /// In en, this message translates to:
+  /// **'UPDATE'**
+  String get update;
+
+  /// No description provided for @limitReached.
+  ///
+  /// In en, this message translates to:
+  /// **'LIMIT REACHED'**
+  String get limitReached;
+
+  /// No description provided for @visitWalletPurchasePins.
+  ///
+  /// In en, this message translates to:
+  /// **'Visit Espy Wallet to purchase more PINs.'**
+  String get visitWalletPurchasePins;
+
+  /// No description provided for @signInViewNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to view notifications'**
+  String get signInViewNotifications;
+
+  /// No description provided for @paymentProtocols.
+  ///
+  /// In en, this message translates to:
+  /// **'PAYMENT PROTOCOLS'**
+  String get paymentProtocols;
+
+  /// No description provided for @authorizedPersonnelOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Authorized personnel only.'**
+  String get authorizedPersonnelOnly;
+
+  /// No description provided for @noTransactionLogs.
+  ///
+  /// In en, this message translates to:
+  /// **'NO TRANSACTION LOGS'**
+  String get noTransactionLogs;
+
+  /// No description provided for @espyStore.
+  ///
+  /// In en, this message translates to:
+  /// **'ESPY STORE'**
+  String get espyStore;
+
+  /// No description provided for @espyTokens.
+  ///
+  /// In en, this message translates to:
+  /// **'ESPY TOKENS'**
+  String get espyTokens;
+
+  /// No description provided for @successAddedTokens.
+  ///
+  /// In en, this message translates to:
+  /// **'SUCCESS! ADDED {amount} TOKENS'**
+  String successAddedTokens(Object amount);
+
+  /// No description provided for @selectPaymentMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'SELECT PAYMENT METHOD'**
+  String get selectPaymentMethod;
+
+  /// No description provided for @whishPaySecure.
+  ///
+  /// In en, this message translates to:
+  /// **'WHISH PAY SECURE'**
+  String get whishPaySecure;
+
+  /// No description provided for @paymentCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'PAYMENT COMPLETED'**
+  String get paymentCompleted;
+
+  /// No description provided for @successfullyActivated.
+  ///
+  /// In en, this message translates to:
+  /// **'SUCCESSFULLY ACTIVATED {item}'**
+  String successfullyActivated(Object item);
+
+  /// No description provided for @signInViewFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to view favorites'**
+  String get signInViewFavorites;
+
+  /// No description provided for @currentBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'CURRENT BALANCE'**
+  String get currentBalance;
+
+  /// No description provided for @broadcastHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'BROADCAST HISTORY'**
+  String get broadcastHistory;
+
+  /// No description provided for @noBroadcastsSent.
+  ///
+  /// In en, this message translates to:
+  /// **'NO BROADCASTS SENT'**
+  String get noBroadcastsSent;
+
+  /// No description provided for @allocationAnchors.
+  ///
+  /// In en, this message translates to:
+  /// **'ALLOCATION & ANCHORS'**
+  String get allocationAnchors;
+
+  /// No description provided for @primaryHubPin.
+  ///
+  /// In en, this message translates to:
+  /// **'PRIMARY HUB PIN'**
+  String get primaryHubPin;
+
+  /// No description provided for @specificPracticePin.
+  ///
+  /// In en, this message translates to:
+  /// **'SPECIFIC PRACTICE PIN'**
+  String get specificPracticePin;
+
+  /// No description provided for @serviceSlotManual.
+  ///
+  /// In en, this message translates to:
+  /// **'SERVICE SLOT (MANUAL)'**
+  String get serviceSlotManual;
+
+  /// No description provided for @acknowledge.
+  ///
+  /// In en, this message translates to:
+  /// **'ACKNOWLEDGE'**
+  String get acknowledge;
+
+  /// No description provided for @passwordResetSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Password reset link sent to your email'**
+  String get passwordResetSent;
+
+  /// No description provided for @forgotPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password?'**
+  String get forgotPassword;
+
+  /// No description provided for @networkAnnouncements.
+  ///
+  /// In en, this message translates to:
+  /// **'NETWORK ANNOUNCEMENTS'**
+  String get networkAnnouncements;
+
+  /// No description provided for @nodeDisconnected.
+  ///
+  /// In en, this message translates to:
+  /// **'NODE DISCONNECTED'**
+  String get nodeDisconnected;
+
+  /// No description provided for @myNodesOfPresence.
+  ///
+  /// In en, this message translates to:
+  /// **'MY NODES OF PRESENCE'**
+  String get myNodesOfPresence;
+
+  /// No description provided for @noNodesInitialized.
+  ///
+  /// In en, this message translates to:
+  /// **'NO NODES INITIALIZED'**
+  String get noNodesInitialized;
+
+  /// No description provided for @country.
+  ///
+  /// In en, this message translates to:
+  /// **'COUNTRY'**
+  String get country;
+
+  /// No description provided for @userRole.
+  ///
+  /// In en, this message translates to:
+  /// **'USER ROLE'**
+  String get userRole;
+
+  /// No description provided for @clearAll.
+  ///
+  /// In en, this message translates to:
+  /// **'CLEAR ALL'**
+  String get clearAll;
+
+  /// No description provided for @accountSuspended.
+  ///
+  /// In en, this message translates to:
+  /// **'ACCOUNT SUSPENDED'**
+  String get accountSuspended;
+
+  /// No description provided for @accessRestricted.
+  ///
+  /// In en, this message translates to:
+  /// **'Your access has been restricted by the board.'**
+  String get accessRestricted;
+
+  /// No description provided for @dispatch.
+  ///
+  /// In en, this message translates to:
+  /// **'DISPATCH'**
+  String get dispatch;
+
+  /// No description provided for @hopeHealingHumanity.
+  ///
+  /// In en, this message translates to:
+  /// **'HOPE, HEALING, HUMANITY'**
+  String get hopeHealingHumanity;
+
+  /// No description provided for @availableExpansions.
+  ///
+  /// In en, this message translates to:
+  /// **'AVAILABLE EXPANSIONS'**
+  String get availableExpansions;
+
+  /// No description provided for @rechargeCard.
+  ///
+  /// In en, this message translates to:
+  /// **'RECHARGE CARD'**
+  String get rechargeCard;
+
+  /// No description provided for @ok.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get ok;
 }
 
 class _AppLocalizationsDelegate

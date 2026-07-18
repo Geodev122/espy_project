@@ -10,6 +10,7 @@ import 'package:shared_core/services/auth_service.dart';
 import 'package:shared_core/theme/espy_theme.dart';
 import 'package:shared_core/viewmodels/requests_view_model.dart';
 import 'package:shared_core/widgets/common/premium_button.dart';
+import 'package:espy_app/l10n/app_localizations.dart';
 
 class SwipeRequestsScreen extends StatefulWidget {
   const SwipeRequestsScreen({super.key});
@@ -66,8 +67,8 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
                   padding: EdgeInsets.zero,
                   cardBuilder: (context, index, horizontalThreshold, verticalThreshold) {
                     final data = displayCards[index];
-                    if (data['isEnd'] == true) return _buildEndCard();
-                    return _buildRequestCard(data);
+                    if (data['isEnd'] == true) return _buildEndCard(l10n);
+                    return _buildRequestCard(data, l10n);
                   },
                   onSwipe: (previousIndex, currentIndex, direction) async {
                     final target = displayCards[previousIndex];
@@ -103,12 +104,12 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
             ),
           ],
         ),
-        Positioned(bottom: 130, left: 0, right: 0, child: _buildActionButtons(viewModel)),
+        Positioned(bottom: 130, left: 0, right: 0, child: _buildActionButtons(viewModel, l10n)),
       ],
     );
   }
 
-  Widget _buildEndCard() {
+  Widget _buildEndCard(AppLocalizations l10n) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.9),
@@ -134,7 +135,7 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
     );
   }
 
-  Widget _buildRequestCard(Map<String, dynamic> request) {
+  Widget _buildRequestCard(Map<String, dynamic> request, AppLocalizations l10n) {
     final bool isEmergency = request['isSOS'] == true;
     final viewModel = Provider.of<RequestsViewModel>(context, listen: false);
     final bool isFavorite = viewModel.favoriteIds.contains(request['id']);
@@ -188,11 +189,11 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
     );
   }
 
-  Widget _buildActionButtons(RequestsViewModel vm) {
+  Widget _buildActionButtons(RequestsViewModel vm, AppLocalizations l10n) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _buildCircleBtn(icon: Icons.tune_rounded, color: EspyTheme.gold, onTap: () => _showFilterModal(vm), isSmall: true),
+        _buildCircleBtn(icon: Icons.tune_rounded, color: EspyTheme.gold, onTap: () => _showFilterModal(vm, l10n), isSmall: true),
         const SizedBox(width: 20),
         _buildCircleBtn(icon: Icons.favorite_border_rounded, color: EspyTheme.gold, onTap: () => _controller.swipe(CardSwiperDirection.left)),
         const SizedBox(width: 20),
@@ -201,7 +202,7 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
     );
   }
 
-  void _showFilterModal(RequestsViewModel vm) {
+  void _showFilterModal(RequestsViewModel vm, AppLocalizations l10n) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,

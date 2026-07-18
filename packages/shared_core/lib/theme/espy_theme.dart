@@ -39,6 +39,8 @@ class EspyTheme {
   static const Color warning = Color(0xFFF59E0B);
   static const Color error   = Color(0xFFEF4444);
 
+  static const Color teal = success;
+
   // Aliases
   static const Color navy = navyDeep;
   static const Color noir = navyDeep;
@@ -63,6 +65,13 @@ class EspyTheme {
     stops: [0.0, 0.4, 1.0],
   );
 
+  static const LinearGradient cyanFlame = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF0099BB), Color(0xFF00D4FF), Color(0xFFA0EFFF)],
+    stops: [0.0, 0.5, 1.0],
+  );
+
   static const LinearGradient lightBlueFlame = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
@@ -74,6 +83,13 @@ class EspyTheme {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [goldLight, gold, goldDark],
+    stops: [0.0, 0.5, 1.0],
+  );
+
+  static const LinearGradient metallicNoir = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [navyDeep, navyMid, Color(0xFF020617)],
     stops: [0.0, 0.5, 1.0],
   );
 

@@ -349,7 +349,7 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
                   const SizedBox(height: 12),
                   _buildMapControl(
                     icon: Icons.hub_rounded,
-                    onTap: () => _showMyNodes(user.rawData, isAr),
+                    onTap: () => _showMyNodes(user.rawData, isAr, l10n),
                     color: EspyTheme.gold,
                     iconColor: Colors.white,
                     isGold: true,
@@ -363,7 +363,7 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
     );
   }
 
-  void _showMyNodes(Map<String, dynamic> userData, bool isAr) {
+  void _showMyNodes(Map<String, dynamic> userData, bool isAr, AppLocalizations l10n) {
     final List<Map<String, dynamic>> nodes = [];
     if (userData['mainLocation'] != null) {
       nodes.add({

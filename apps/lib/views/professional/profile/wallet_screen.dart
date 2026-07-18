@@ -11,6 +11,7 @@ import 'package:shared_core/services/auth_service.dart';
 import 'package:shared_core/services/locale_service.dart';
 import 'package:shared_core/viewmodels/wallet_view_model.dart';
 import 'package:shared_core/widgets/common/espy_scaffold.dart';
+import 'package:shared_core/models/user_model.dart';
 
 import 'location_manager_screen.dart';
 import 'edit_profile_screen.dart';

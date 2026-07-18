@@ -12,6 +12,7 @@ import 'package:shared_core/viewmodels/wallet_view_model.dart';
 import 'package:shared_core/widgets/common/premium_card.dart';
 import 'package:shared_core/widgets/common/premium_button.dart';
 import 'package:shared_core/widgets/common/espy_scaffold.dart';
+import 'package:espy_app/l10n/app_localizations.dart';
 
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:pay/pay.dart';
@@ -303,7 +304,7 @@ class _TokenShopScreenState extends State<TokenShopScreen> with SingleTickerProv
     if (mounted) {
       if (result['success']) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.successAddedTokens.replaceAll('{amount}', result['added'].toString())), backgroundColor: EspyTheme.success),
+          SnackBar(content: Text(l10n.successAddedTokens(result['added'].toString())), backgroundColor: EspyTheme.success),
         );
         _codeController.clear();
       } else {
@@ -483,7 +484,7 @@ class _TokenShopScreenState extends State<TokenShopScreen> with SingleTickerProv
     if (mounted) {
       if (result['success']) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.successfullyActivated.replaceAll('{item}', item['title'])), backgroundColor: EspyTheme.success),
+          SnackBar(content: Text(l10n.successfullyActivated(item['title'])), backgroundColor: EspyTheme.success),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Purchase Error: ${result['error']}')));

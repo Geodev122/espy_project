@@ -801,4 +801,167 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get instWelcomeMessage =>
       'Congratulations! Your institution is registered. Your main facility is now active on the map. To expand your capacity, visit your Espy Wallet.';
+
+  @override
+  String get systemOverview => 'SYSTEM OVERVIEW';
+
+  @override
+  String get visibility => 'VISIBILITY';
+
+  @override
+  String get daysRemaining => 'DAYS REMAINING';
+
+  @override
+  String get visibilityExtended => 'VISIBILITY EXTENDED BY 30 DAYS';
+
+  @override
+  String get protocolSavedFavorites => 'Protocol saved to Vault Favorites';
+
+  @override
+  String get protocolScanComplete => 'PROTOCOL SCAN COMPLETE';
+
+  @override
+  String get reviewedAllProtocols => 'You have reviewed all active protocols.';
+
+  @override
+  String get swipeToBegin => 'SWIPE TO BEGIN';
+
+  @override
+  String get noActiveServicesFound => 'NO ACTIVE SERVICES FOUND';
+
+  @override
+  String get queueCleared => 'QUEUE CLEARED';
+
+  @override
+  String get reviewedAllRequests =>
+      'You have reviewed all active community requests.';
+
+  @override
+  String get requestFilters => 'REQUEST FILTERS';
+
+  @override
+  String get newestFirst => 'NEWEST FIRST';
+
+  @override
+  String get update => 'UPDATE';
+
+  @override
+  String get limitReached => 'LIMIT REACHED';
+
+  @override
+  String get visitWalletPurchasePins =>
+      'Visit Espy Wallet to purchase more PINs.';
+
+  @override
+  String get signInViewNotifications => 'Sign in to view notifications';
+
+  @override
+  String get paymentProtocols => 'PAYMENT PROTOCOLS';
+
+  @override
+  String get authorizedPersonnelOnly => 'Authorized personnel only.';
+
+  @override
+  String get noTransactionLogs => 'NO TRANSACTION LOGS';
+
+  @override
+  String get espyStore => 'ESPY STORE';
+
+  @override
+  String get espyTokens => 'ESPY TOKENS';
+
+  @override
+  String successAddedTokens(Object amount) {
+    return 'SUCCESS! ADDED $amount TOKENS';
+  }
+
+  @override
+  String get selectPaymentMethod => 'SELECT PAYMENT METHOD';
+
+  @override
+  String get whishPaySecure => 'WHISH PAY SECURE';
+
+  @override
+  String get paymentCompleted => 'PAYMENT COMPLETED';
+
+  @override
+  String successfullyActivated(Object item) {
+    return 'SUCCESSFULLY ACTIVATED $item';
+  }
+
+  @override
+  String get signInViewFavorites => 'Sign in to view favorites';
+
+  @override
+  String get currentBalance => 'CURRENT BALANCE';
+
+  @override
+  String get broadcastHistory => 'BROADCAST HISTORY';
+
+  @override
+  String get noBroadcastsSent => 'NO BROADCASTS SENT';
+
+  @override
+  String get allocationAnchors => 'ALLOCATION & ANCHORS';
+
+  @override
+  String get primaryHubPin => 'PRIMARY HUB PIN';
+
+  @override
+  String get specificPracticePin => 'SPECIFIC PRACTICE PIN';
+
+  @override
+  String get serviceSlotManual => 'SERVICE SLOT (MANUAL)';
+
+  @override
+  String get acknowledge => 'ACKNOWLEDGE';
+
+  @override
+  String get passwordResetSent => 'Password reset link sent to your email';
+
+  @override
+  String get forgotPassword => 'Forgot password?';
+
+  @override
+  String get networkAnnouncements => 'NETWORK ANNOUNCEMENTS';
+
+  @override
+  String get nodeDisconnected => 'NODE DISCONNECTED';
+
+  @override
+  String get myNodesOfPresence => 'MY NODES OF PRESENCE';
+
+  @override
+  String get noNodesInitialized => 'NO NODES INITIALIZED';
+
+  @override
+  String get country => 'COUNTRY';
+
+  @override
+  String get userRole => 'USER ROLE';
+
+  @override
+  String get clearAll => 'CLEAR ALL';
+
+  @override
+  String get accountSuspended => 'ACCOUNT SUSPENDED';
+
+  @override
+  String get accessRestricted =>
+      'Your access has been restricted by the board.';
+
+  @override
+  String get dispatch => 'DISPATCH';
+
+  @override
+  String get hopeHealingHumanity => 'HOPE, HEALING, HUMANITY';
+
+  @override
+  String get availableExpansions => 'AVAILABLE EXPANSIONS';
+
+  @override
+  String get rechargeCard => 'RECHARGE CARD';
+
+  @override
+  String get ok => 'OK';
 }
