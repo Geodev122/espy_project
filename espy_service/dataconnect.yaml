@@ -1,7 +1,11 @@
-specVersion: v1beta
-serviceId: espy-453d3-service
-location: us-east1
+specVersion: "v1beta"
+serviceId: "espy-453d3-service"
+location: "us-east1"
 schema:
   source: "./schema"
-connectorDirs:
-  - "./connector"
+  datasource:
+    postgresql:
+      database: "espy-453d3-database"
+      cloudSql:
+        instanceId: "espy-453d3-instance"
+connectorDirs: ["./connector"]

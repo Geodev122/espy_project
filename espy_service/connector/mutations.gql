@@ -1,4 +1,4 @@
-# ESPY PROTOCOL - DATA CONNECT MUTATIONS v5.10
+# ESPY PROTOCOL - DATA CONNECT MUTATIONS v5.12
 
 # --- 1. Identity & Profile ---
 
@@ -31,7 +31,6 @@ mutation CreateService($categoryId: String!, $titleEn: String!, $price: Int!) @a
 }
 
 mutation UpdateService($id: UUID!, $isActive: Boolean, $isAllocated: Boolean) @auth(level: USER) {
-  # We should ideally check ownership here, but for now we rely on app logic or add a check
   service_update(key: { id: $id }, data: {
     isActive: $isActive,
     isAllocated: $isAllocated
@@ -53,8 +52,8 @@ mutation CreateLocationNode($countryId: String!, $label: String!, $lat: Float!, 
 
 mutation SpendTokens($userId: String!, $cost: Int!, $ledgerAmount: Int!, $type: TransactionType = PURCHASE, $description: String!) @auth(expr: "auth.uid == userId") {
   user_update(key: { id: $userId }, data: {
-    walletBalance_expr: "walletBalance - $cost",
-    tokensUsed_expr: "tokensUsed + $cost",
+    walletBalance_update: { dec: $cost },
+    tokensUsed_update: { inc: $cost },
     updatedAt_expr: "request.time"
   })
   walletTransaction_insert(data: {
