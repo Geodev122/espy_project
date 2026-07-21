@@ -208,7 +208,7 @@ class _AppShellState extends State<AppShell> {
     final localeService = Provider.of<LocaleService>(context);
     final navItems = _getNavItems(context, role);
     final currentLabel = (_selectedIndex < navItems.length) ? navItems[_selectedIndex].label : 'ESPY';
-    final Color bgColor = isAr ? Colors.white : Colors.white;
+    final Color bgColor = Colors.white;
 
     return Container(
       width: double.infinity,

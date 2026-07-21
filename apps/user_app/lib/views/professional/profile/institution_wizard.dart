@@ -231,10 +231,10 @@ class _InstitutionWizardState extends State<InstitutionWizard> {
         label: vm.currentPhase == 1 ? "FINALIZE ONBOARDING" : l10n.continueText.toUpperCase(),
         isLoading: vm.isSubmitting,
         onPressed: () {
-          if (viewModel.currentPhase == 0) {
-             viewModel.setPhase(1);
+          if (vm.currentPhase == 0) {
+             vm.setPhase(1);
           } else {
-            viewModel.submitProfessionalRegistration(
+            vm.submitProfessionalRegistration(
               name: _nameController.text.trim(),
               bio: _bioController.text,
               bioAr: _bioArController.text,

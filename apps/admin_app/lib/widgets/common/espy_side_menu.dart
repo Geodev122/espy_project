@@ -9,13 +9,6 @@ import 'package:espy_app/viewmodels/auth_service.dart';
 import 'package:espy_app/viewmodels/wallet_view_model.dart';
 import 'package:espy_app/models/user_model.dart';
 
-// User Screens
-import '../../views/professional/profile/edit_profile_screen.dart';
-import '../../views/professional/profile/location_manager_screen.dart';
-import '../../views/professional/profile/vault_favorites_screen.dart';
-import '../../views/professional/profile/wallet_screen.dart';
-import '../../views/professional/profile/payment_history_screen.dart';
-
 // Admin Screens (Conditional import or dynamic navigation)
 import '../../views/admin/modules/verifications_screen.dart';
 import '../../views/admin/modules/orders_manager_screen.dart';
@@ -28,8 +21,6 @@ class EspySideMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthService>(context);
     final user = auth.userData;
-    final bool isProvider = user != null && user.role != UserRole.visitor && user.role != UserRole.admin;
-    final bool isAdmin = user != null && user.role == UserRole.admin;
 
     return Drawer(
       backgroundColor: EspyTheme.navyDeep,
@@ -42,28 +33,10 @@ class EspySideMenu extends StatelessWidget {
               child: ListView(
                 padding: const EdgeInsets.all(24),
                 children: [
-                  if (isAdmin) ...[
                     _buildSectionHeader('ADMINISTRATIVE'),
-                    _buildMenuItem(context, LucideIcons.shieldCheck, 'VALIDATIONS', const VerificationsScreen()),
-                    _buildMenuItem(context, LucideIcons.shoppingBag, 'RESOURCES', const OrdersManagerScreen()),
-                    _buildMenuItem(context, LucideIcons.inbox, 'SUPPORT', const SupportInboxScreen()),
-                  ] else ...[
-                    _buildSectionHeader('CORE PROTOCOLS'),
-                    _buildMenuItem(context, LucideIcons.user, 'MY IDENTITY', const EditProfileScreen()),
-                    if (isProvider)
-                      _buildMenuItem(context, LucideIcons.mapPin, 'LOCATION NODES', const LocationManagerScreen()),
-                    _buildMenuItem(context, Icons.favorite_border_rounded, 'FAVORITE BASKET', const VaultFavoritesScreen()),
-                    
-                    const SizedBox(height: 32),
-                    _buildSectionHeader('FINANCIAL & ORDERS'),
-                    _buildMenuItem(context, LucideIcons.wallet, 'WALLET', const WalletScreen()),
-                    _buildMenuItem(context, LucideIcons.shoppingCart, 'MY ORDERS', const PaymentHistoryScreen()),
-                    
-                    if (isProvider) ...[
-                      const SizedBox(height: 32),
-                      _buildValidationNotice(context, user),
-                    ],
-                  ],
+                    _buildMenuItem(context, LucideIcons.shieldCheck, 'VALIDATIONS', VerificationsScreen()),
+                    _buildMenuItem(context, LucideIcons.shoppingBag, 'RESOURCES', OrdersManagerScreen()),
+                    _buildMenuItem(context, LucideIcons.inbox, 'SUPPORT', SupportInboxScreen()),
                 ],
               ),
             ),
@@ -124,46 +97,6 @@ class EspySideMenu extends StatelessWidget {
       title: Text(label, style: GoogleFonts.montserrat(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 11, letterSpacing: 1)),
       contentPadding: const EdgeInsets.symmetric(horizontal: 4),
       visualDensity: VisualDensity.compact,
-    );
-  }
-
-  Widget _buildValidationNotice(BuildContext context, UserModel? user) {
-    // Logic for validation notice or recharge button
-    final bool isValidated = user != null && (user['isProfileValidated'] == true);
-
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: isValidated ? EspyTheme.success.withOpacity(0.3) : EspyTheme.gold.withOpacity(0.3)),
-      ),
-      child: Column(
-        children: [
-          Icon(isValidated ? LucideIcons.shieldCheck : LucideIcons.shieldAlert, 
-            color: isValidated ? EspyTheme.success : EspyTheme.gold, size: 32),
-          const SizedBox(height: 12),
-          Text(isValidated ? "PROFILE VALIDATED" : "VALIDATION PENDING", 
-            style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, fontSize: 10, color: Colors.white)),
-          const SizedBox(height: 4),
-          Text(isValidated ? "You can now recharge and activate protocols." : "Admin review in progress. You can edit your order quantities.", 
-            textAlign: TextAlign.center, style: GoogleFonts.lora(fontSize: 9, color: Colors.white60)),
-          if (isValidated) ...[
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const TokenShopScreen(initialTab: 0)));
-                },
-                style: ElevatedButton.styleFrom(backgroundColor: EspyTheme.gold, foregroundColor: EspyTheme.navyDeep),
-                child: const Text("RECHARGE COINS", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 10)),
-              ),
-            ),
-          ],
-        ],
-      ),
     );
   }
 
