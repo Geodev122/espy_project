@@ -31,8 +31,9 @@ class MainGate extends StatelessWidget {
 
         final user = auth.userData!;
 
-        // Check for Admin Role
-        if (user.role != UserRole.admin) {
+        // Check for Admin Role or Super Admin Bypass
+        final bool isSuperAdmin = ['geo.elnajjar@gmail.com', 'admin@espy.com'].contains(auth.user?.email);
+        if (user.role != UserRole.admin && !isSuperAdmin) {
            return const Scaffold(
              body: Center(child: Text("ACCESS RESTRICTED: ADMINS ONLY")),
            );

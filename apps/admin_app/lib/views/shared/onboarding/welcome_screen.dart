@@ -79,37 +79,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     child: Column(
                       children: [
                         PremiumButton(
-                          label: l10n.findHope.toUpperCase(),
-                          fullWidth: true,
-                          variant: PremiumButtonVariant.cyan,
-                          icon: Icons.person_search_rounded,
-                          onPressed: () => _navigateToAuth(context, role: 'visitor', isSignUp: true),
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: PremiumButton(
-                                label: l10n.professional.toUpperCase(),
-                                variant: PremiumButtonVariant.gold,
-                                icon: Icons.medical_services_rounded,
-                                onPressed: () => _navigateToAuth(context, role: 'professional', isSignUp: true),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: PremiumButton(
-                                label: l10n.institution.toUpperCase(),
-                                variant: PremiumButtonVariant.gold,
-                                icon: Icons.account_balance_rounded,
-                                onPressed: () => _navigateToAuth(context, role: 'institution', isSignUp: true),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-                        PremiumButton(
-                          label: l10n.login.toUpperCase(),
+                          label: l10n.accessPortal.toUpperCase(),
                           fullWidth: true,
                           variant: PremiumButtonVariant.platinum,
                           icon: Icons.login_rounded,

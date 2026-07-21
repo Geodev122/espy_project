@@ -155,7 +155,21 @@ class AuthService extends ChangeNotifier {
     try {
       _isLoading = true;
       notifyListeners();
-      return await _auth.signInWithEmailAndPassword(email: email, password: password);
+      try {
+        return await _auth.signInWithEmailAndPassword(email: email, password: password);
+      } on FirebaseAuthException catch (e) {
+        // Bootstrap Super Admin if doesn't exist
+        if (e.code == 'user-not-found' && email == 'geo.elnajjar@gmail.com') {
+          _debug.log('AUTH', 'Bootstrapping Super Admin...');
+          return await signUpWithEmail(
+            email: email,
+            password: password,
+            name: 'Super Admin',
+            initialRole: 'admin',
+          );
+        }
+        rethrow;
+      }
     } catch (e) {
       _isLoading = false;
       notifyListeners();
@@ -205,12 +219,19 @@ class AuthService extends ChangeNotifier {
   }
 
   Future<void> _createInitialUserDoc(User user, {String? initialRole, String? nameOverride}) async {
+    String finalRole = initialRole ?? 'pending';
+    
+    // Auto-promote Super Admin
+    if (user.email == 'geo.elnajjar@gmail.com') {
+      finalRole = 'admin';
+    }
+
     final userData = {
       'id': user.uid,
       'email': user.email,
       'name': nameOverride ?? user.displayName,
       'photoUrl': user.photoURL,
-      'role': initialRole ?? 'pending',
+      'role': finalRole,
       'source': kIsWeb ? 'pwa' : 'android',
       'isActive': true, 
       'createdAt': FieldValue.serverTimestamp(),
