@@ -8,12 +8,11 @@ import 'package:provider/provider.dart';
 import 'package:espy_app/l10n/app_localizations.dart';
 import 'package:espy_app/theme/espy_theme.dart';
 import 'package:espy_app/viewmodels/auth_service.dart';
-import 'package:espy_app/viewmodels/firestore_service.dart';
 import 'package:espy_app/viewmodels/storage_service.dart';
 import 'package:espy_app/widgets/common/premium_button.dart';
-import 'package:espy_app/widgets/common/premium_card.dart';
 import 'package:espy_app/widgets/common/profile_image_picker.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';
+import 'package:espy_app/viewmodels/espy_repository.dart';
 
 class VisitorWizard extends StatefulWidget {
   const VisitorWizard({super.key});
@@ -23,7 +22,6 @@ class VisitorWizard extends StatefulWidget {
 }
 
 class _VisitorWizardState extends State<VisitorWizard> {
-  int _currentStep = 0;
   final _formKey = GlobalKey<FormState>();
 
   final _nameController = TextEditingController();
@@ -33,7 +31,6 @@ class _VisitorWizardState extends State<VisitorWizard> {
   File? _profileImageFile;
   Uint8List? _profileImageWebBytes;
 
-  final FirestoreService _firestore = FirestoreService();
   final StorageService _storage = StorageService();
 
   bool _isSubmitting = false;
@@ -41,6 +38,10 @@ class _VisitorWizardState extends State<VisitorWizard> {
   @override
   void initState() {
     super.initState();
+    _prefillData();
+  }
+
+  void _prefillData() {
     final auth = Provider.of<AuthService>(context, listen: false);
     _nameController.text = auth.user?.displayName ?? '';
   }
@@ -54,188 +55,116 @@ class _VisitorWizardState extends State<VisitorWizard> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text(
-          l10n.protocolRegistration,
-          style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, letterSpacing: 4, color: EspyTheme.platinum),
+          l10n.protocolRegistration.toUpperCase(),
+          style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, letterSpacing: 2, color: EspyTheme.platinum, fontSize: 14),
         ),
-        iconTheme: const IconThemeData(color: EspyTheme.platinum),
+        centerTitle: true,
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            _buildProgressHeader(),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-                child: Form(
-                  key: _formKey,
-                  child: _buildCurrentStep(l10n),
-                ),
-              ),
-            ),
-            _buildBottomActions(l10n),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProgressHeader() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 24),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        border: Border(bottom: BorderSide(color: Colors.white10)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: List.generate(2, (index) {
-          bool isActive = index == _currentStep;
-          bool isDone = index < _currentStep;
-          return AnimatedContainer(
-            duration: const Duration(milliseconds: 400),
-            margin: const EdgeInsets.symmetric(horizontal: 8),
-            width: isActive ? 48 : 12,
-            height: 8,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: isActive
-                  ? EspyTheme.cyan
-                  : (isDone ? EspyTheme.electricBlue : Colors.white12),
-              boxShadow: isActive ? [BoxShadow(color: EspyTheme.cyan.withOpacity(0.3), blurRadius: 10)] : null,
-            ),
-          );
-        }),
-      ),
-    );
-  }
-
-  Widget _buildCurrentStep(AppLocalizations l10n) {
-    switch (_currentStep) {
-      case 0:
-        return FadeInRight(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                l10n.welcomeToNetwork,
-                style: Theme.of(context).textTheme.displayMedium?.copyWith(height: 1.1, color: EspyTheme.platinum),
-              ),
-              const SizedBox(height: 32),
-              ProfileImagePicker(
-                onImageSelected: (file, bytes) {
-                  _profileImageFile = file;
-                  _profileImageWebBytes = bytes;
-                },
-              ),
-              const SizedBox(height: 32),
-              _buildFieldLabel(l10n.displayName),
-              TextFormField(
-                controller: _nameController,
-                style: GoogleFonts.montserrat(color: EspyTheme.navyDeep, fontSize: 14),
-                decoration: InputDecoration(hintText: l10n.legalFullNameHint),
-              ),
-              const SizedBox(height: 32),
-              _buildFieldLabel(l10n.whatsappOptional),
-              Row(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(32),
+          child: Form(
+            key: _formKey,
+            child: FadeInUp(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    width: 80,
-                    child: TextFormField(
-                      controller: _whatsappCodeController,
-                      style: GoogleFonts.montserrat(color: EspyTheme.navyDeep, fontSize: 14),
-                      decoration: InputDecoration(hintText: l10n.whatsappCodeHint),
-                      keyboardType: TextInputType.phone,
+                  Text(
+                    l10n.welcomeToNetwork,
+                    style: Theme.of(context).textTheme.displayMedium?.copyWith(height: 1.1, color: EspyTheme.platinum, fontSize: 24),
+                  ),
+                  const SizedBox(height: 40),
+                  Center(
+                    child: ProfileImagePicker(
+                      onImageSelected: (file, bytes) {
+                        _profileImageFile = file;
+                        _profileImageWebBytes = bytes;
+                      },
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: TextFormField(
-                      controller: _whatsappNumberController,
-                      style: GoogleFonts.montserrat(color: EspyTheme.navyDeep, fontSize: 14),
-                      decoration: InputDecoration(hintText: l10n.whatsappNumberHint),
-                      keyboardType: TextInputType.phone,
+                  const SizedBox(height: 40),
+                  _buildLabel(l10n.legalFullName.toUpperCase()),
+                  TextFormField(
+                    controller: _nameController,
+                    style: GoogleFonts.montserrat(color: EspyTheme.navyDeep, fontSize: 14, fontWeight: FontWeight.w600),
+                    decoration: InputDecoration(
+                      hintText: l10n.legalFullNameHint,
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                    ),
+                    validator: (v) => (v == null || v.isEmpty) ? 'Name required' : null,
+                  ),
+                  const SizedBox(height: 24),
+                  _buildLabel(l10n.whatsappContact.toUpperCase()),
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 90,
+                        child: TextFormField(
+                          controller: _whatsappCodeController,
+                          style: GoogleFonts.montserrat(color: EspyTheme.navyDeep, fontSize: 14, fontWeight: FontWeight.w600),
+                          keyboardType: TextInputType.phone,
+                          decoration: InputDecoration(
+                            hintText: '+961',
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextFormField(
+                          controller: _whatsappNumberController,
+                          style: GoogleFonts.montserrat(color: EspyTheme.navyDeep, fontSize: 14, fontWeight: FontWeight.w600),
+                          keyboardType: TextInputType.phone,
+                          decoration: InputDecoration(
+                            hintText: 'XX XXX XXX',
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 48),
+                  PremiumButton(
+                    label: _isSubmitting ? l10n.saving.toUpperCase() : "COMPLETE REGISTRATION",
+                    fullWidth: true,
+                    isLoading: _isSubmitting,
+                    onPressed: _isSubmitting ? null : _submitProfile,
+                  ),
+                  const SizedBox(height: 24),
+                  Center(
+                    child: Text(
+                      "BY COMPLETING REGISTRATION YOU AGREE TO THE PROTOCOL TERMS.",
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.montserrat(fontSize: 9, color: Colors.white38, fontWeight: FontWeight.w700),
                     ),
                   ),
                 ],
               ),
-            ],
+            ),
           ),
-        );
-      case 1:
-        return FadeInRight(
-          child: Column(
-            children: [
-              const SizedBox(height: 32),
-              PremiumCard(
-                padding: const EdgeInsets.all(40),
-                child: Column(
-                  children: [
-                    const Icon(Icons.check_circle_outline_rounded, size: 64, color: EspyTheme.teal),
-                    const SizedBox(height: 32),
-                    Text(l10n.readyToExplore, style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, fontSize: 18)),
-                    const SizedBox(height: 16),
-                    Text(
-                      l10n.profileSet,
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.lora(color: EspyTheme.noir.withOpacity(0.6), height: 1.6),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      default:
-        return const SizedBox();
-    }
+        ),
+      ),
+    );
   }
 
-  Widget _buildFieldLabel(String label) {
+  Widget _buildLabel(String text) {
     return Padding(
       padding: const EdgeInsets.only(left: 4, bottom: 8),
-      child: Text(label, style: Theme.of(context).textTheme.labelLarge?.copyWith(fontSize: 10, color: EspyTheme.cyan, letterSpacing: 2)),
+      child: Text(text, style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.w800, color: EspyTheme.cyan, letterSpacing: 1)),
     );
-  }
-
-  Widget _buildBottomActions(AppLocalizations l10n) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-      decoration: BoxDecoration(
-        color: EspyTheme.navy,
-        border: Border(top: BorderSide(color: Colors.white12)),
-        boxShadow: [BoxShadow(color: Colors.black45, blurRadius: 20, offset: const Offset(0, -10))],
-      ),
-      child: Row(
-        children: [
-          if (_currentStep > 0) ...[
-            IconButton(
-              onPressed: () => setState(() => _currentStep--),
-              icon: const Icon(Icons.arrow_back_ios_new_rounded),
-              color: Colors.white38,
-            ),
-            const SizedBox(width: 16),
-          ],
-          Expanded(
-            child: PremiumButton(
-              label: _currentStep == 1 ? (_isSubmitting ? l10n.saving.toUpperCase() : l10n.enterSuite) : l10n.continueText,
-              onPressed: _isSubmitting ? null : _handleNext,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _handleNext() async {
-    if (_currentStep < 1) {
-      setState(() => _currentStep++);
-    } else {
-      _submitProfile();
-    }
   }
 
   Future<void> _submitProfile() async {
+    if (!_formKey.currentState!.validate()) return;
+    
     final auth = Provider.of<AuthService>(context, listen: false);
+    final repo = Provider.of<EspyRepository>(context, listen: false);
     setState(() => _isSubmitting = true);
 
     try {
@@ -246,23 +175,20 @@ class _VisitorWizardState extends State<VisitorWizard> {
         photoUrl = await _storage.uploadProfileImage(userId: auth.user!.uid, file: _profileImageFile!);
       }
 
-      await _firestore.updateVisitorProfile(auth.user!.uid, {
-        'name': _nameController.text,
+      await repo.updateUser(auth.user!.uid, {
+        'name': _nameController.text.trim(),
         'whatsapp': '${_whatsappCodeController.text}${_whatsappNumberController.text}',
-        'whatsapp_code': _whatsappCodeController.text,
-        'whatsapp_number': _whatsappNumberController.text,
         'photoUrl': photoUrl ?? auth.user?.photoURL,
         'role': 'visitor',
-        'isActive': true, // Forced active for new visitors
+        'isActive': true,
         'hasProfile': true,
       });
 
-      // Refresh auth state to trigger MainGate rebuild
       await auth.fetchUserData();
     } catch (e) {
       if (mounted) {
         setState(() => _isSubmitting = false);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: EspyTheme.error));
       }
     }
   }

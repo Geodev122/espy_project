@@ -27,6 +27,7 @@ class GetProfessionalDetailsProfessionalProfile {
   final String? bioAr;
   final bool isApproved;
   final bool isHonorVerified;
+  final bool isProfileValidated;
   final EnumValue<MembershipTier>? membershipTier;
   final int serviceSlots;
   final int practicePins;
@@ -42,6 +43,7 @@ class GetProfessionalDetailsProfessionalProfile {
   bioAr = json['bioAr'] == null ? null : nativeFromJson<String>(json['bioAr']),
   isApproved = nativeFromJson<bool>(json['isApproved']),
   isHonorVerified = nativeFromJson<bool>(json['isHonorVerified']),
+  isProfileValidated = nativeFromJson<bool>(json['isProfileValidated']),
   membershipTier = json['membershipTier'] == null ? null : membershipTierDeserializer(json['membershipTier']),
   serviceSlots = nativeFromJson<int>(json['serviceSlots']),
   practicePins = nativeFromJson<int>(json['practicePins']),
@@ -65,6 +67,7 @@ class GetProfessionalDetailsProfessionalProfile {
     bioAr == otherTyped.bioAr && 
     isApproved == otherTyped.isApproved && 
     isHonorVerified == otherTyped.isHonorVerified && 
+    isProfileValidated == otherTyped.isProfileValidated && 
     membershipTier == otherTyped.membershipTier && 
     serviceSlots == otherTyped.serviceSlots && 
     practicePins == otherTyped.practicePins && 
@@ -73,7 +76,7 @@ class GetProfessionalDetailsProfessionalProfile {
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, fullNameAr.hashCode, specialty.hashCode, specialtyAr.hashCode, bioEn.hashCode, bioAr.hashCode, isApproved.hashCode, isHonorVerified.hashCode, membershipTier.hashCode, serviceSlots.hashCode, practicePins.hashCode, visibilityExpiresAt.hashCode, user.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, fullNameAr.hashCode, specialty.hashCode, specialtyAr.hashCode, bioEn.hashCode, bioAr.hashCode, isApproved.hashCode, isHonorVerified.hashCode, isProfileValidated.hashCode, membershipTier.hashCode, serviceSlots.hashCode, practicePins.hashCode, visibilityExpiresAt.hashCode, user.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -96,6 +99,7 @@ class GetProfessionalDetailsProfessionalProfile {
     }
     json['isApproved'] = nativeToJson<bool>(isApproved);
     json['isHonorVerified'] = nativeToJson<bool>(isHonorVerified);
+    json['isProfileValidated'] = nativeToJson<bool>(isProfileValidated);
     if (membershipTier != null) {
       json['membershipTier'] = 
     membershipTierSerializer(membershipTier!)
@@ -119,6 +123,7 @@ class GetProfessionalDetailsProfessionalProfile {
     this.bioAr,
     required this.isApproved,
     required this.isHonorVerified,
+    required this.isProfileValidated,
     this.membershipTier,
     required this.serviceSlots,
     required this.practicePins,

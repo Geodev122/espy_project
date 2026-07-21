@@ -1,4 +1,4 @@
-# ESPY PROTOCOL - DATA CONNECT QUERIES v6.0
+# ESPY PROTOCOL - DATA CONNECT QUERIES v6.1
 
 # --- 1. Identity & Profile ---
 
@@ -14,12 +14,14 @@ query GetUser($uid: String!) @auth(expr: "auth.uid == uid") {
     professionalProfile_on_user {
       specialty
       isApproved
+      isProfileValidated
       membershipTier
       visibilityExpiresAt
     }
     institutionProfile_on_user {
       nameAr
       isApproved
+      isProfileValidated
       visibilityExpiresAt
     }
   }
@@ -35,6 +37,7 @@ query GetProfessionalDetails($uid: String!) @auth(level: PUBLIC) {
     bioAr
     isApproved
     isHonorVerified
+    isProfileValidated
     membershipTier
     serviceSlots
     practicePins
@@ -71,7 +74,8 @@ query ListActiveServices($categoryId: String) @auth(level: PUBLIC) {
   services(where: {
     _and: [
       { isActive: { eq: true } },
-      { category: { id: { eq: $categoryId } } }
+      { category: { id: { eq: $categoryId } } },
+      { visibilityExpiresAt: { gt_expr: "request.time" } }
     ]
   }) {
     id
@@ -94,7 +98,8 @@ query SearchServices($query: String, $minPrice: Int, $maxPrice: Int) @auth(level
       { isActive: { eq: true } },
       { titleEn: { contains: $query } },
       { price: { ge: $minPrice } },
-      { price: { le: $maxPrice } }
+      { price: { le: $maxPrice } },
+      { visibilityExpiresAt: { gt_expr: "request.time" } }
     ]
   }) {
     id
@@ -174,7 +179,7 @@ query ListCommunityRequests($sectorId: String, $status: CommunityRequestStatus =
   }
 }
 
-# --- 4. Financial & Ledger ---
+# --- 4. Ledger & Resource Orders ---
 
 query GetWalletTransactions($userId: String!) @auth(expr: "auth.uid == userId") {
   walletTransactions(where: { user: { id: { eq: $userId } } }, orderBy: [{ createdAt: DESC }]) {
@@ -183,6 +188,24 @@ query GetWalletTransactions($userId: String!) @auth(expr: "auth.uid == userId") 
     amount
     referenceId
     description
+    createdAt
+  }
+}
+
+query GetActiveResourceOrder($userId: String!) @auth(expr: "auth.uid == userId") {
+  resourceOrders(where: {
+    _and: [
+      { user: { id: { eq: $userId } } },
+      { status: { ne: PAID } },
+      { status: { ne: CANCELLED } }
+    ]
+  }, orderBy: [{ createdAt: DESC }], limit: 1) {
+    id
+    pinsCount
+    slotsCount
+    broadcastsCount
+    totalCost
+    status
     createdAt
   }
 }
@@ -203,6 +226,22 @@ query ListPendingApprovals @auth(level: NO_ACCESS) {
     user {
       email
       createdAt
+    }
+  }
+}
+
+query ListPendingOrders @auth(level: NO_ACCESS) {
+  resourceOrders(where: { status: { eq: PENDING } }, orderBy: [{ createdAt: DESC }]) {
+    id
+    pinsCount
+    slotsCount
+    broadcastsCount
+    totalCost
+    status
+    user {
+      id
+      email
+      name
     }
   }
 }

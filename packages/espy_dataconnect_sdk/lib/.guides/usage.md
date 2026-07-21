@@ -7,10 +7,10 @@ EspyConnector.instance.UpsertProfessionalProfile(upsertProfessionalProfileVariab
 EspyConnector.instance.CreateService(createServiceVariables).execute();
 EspyConnector.instance.UpdateService(updateServiceVariables).execute();
 EspyConnector.instance.CreateLocationNode(createLocationNodeVariables).execute();
+EspyConnector.instance.CreateResourceOrder(createResourceOrderVariables).execute();
+EspyConnector.instance.UpdateResourceOrder(updateResourceOrderVariables).execute();
 EspyConnector.instance.SpendTokens(spendTokensVariables).execute();
 EspyConnector.instance.PostCommunityRequest(postCommunityRequestVariables).execute();
-EspyConnector.instance.RecordInteraction(recordInteractionVariables).execute();
-EspyConnector.instance.ApproveProfessional(approveProfessionalVariables).execute();
 
 ```
 

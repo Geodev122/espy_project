@@ -105,12 +105,14 @@ class GetUserUser {
 class GetUserUserProfessionalProfileOnUser {
   final String? specialty;
   final bool isApproved;
+  final bool isProfileValidated;
   final EnumValue<MembershipTier>? membershipTier;
   final Timestamp? visibilityExpiresAt;
   GetUserUserProfessionalProfileOnUser.fromJson(dynamic json):
   
   specialty = json['specialty'] == null ? null : nativeFromJson<String>(json['specialty']),
   isApproved = nativeFromJson<bool>(json['isApproved']),
+  isProfileValidated = nativeFromJson<bool>(json['isProfileValidated']),
   membershipTier = json['membershipTier'] == null ? null : membershipTierDeserializer(json['membershipTier']),
   visibilityExpiresAt = json['visibilityExpiresAt'] == null ? null : Timestamp.fromJson(json['visibilityExpiresAt']);
   @override
@@ -125,12 +127,13 @@ class GetUserUserProfessionalProfileOnUser {
     final GetUserUserProfessionalProfileOnUser otherTyped = other as GetUserUserProfessionalProfileOnUser;
     return specialty == otherTyped.specialty && 
     isApproved == otherTyped.isApproved && 
+    isProfileValidated == otherTyped.isProfileValidated && 
     membershipTier == otherTyped.membershipTier && 
     visibilityExpiresAt == otherTyped.visibilityExpiresAt;
     
   }
   @override
-  int get hashCode => Object.hashAll([specialty.hashCode, isApproved.hashCode, membershipTier.hashCode, visibilityExpiresAt.hashCode]);
+  int get hashCode => Object.hashAll([specialty.hashCode, isApproved.hashCode, isProfileValidated.hashCode, membershipTier.hashCode, visibilityExpiresAt.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -139,6 +142,7 @@ class GetUserUserProfessionalProfileOnUser {
       json['specialty'] = nativeToJson<String?>(specialty);
     }
     json['isApproved'] = nativeToJson<bool>(isApproved);
+    json['isProfileValidated'] = nativeToJson<bool>(isProfileValidated);
     if (membershipTier != null) {
       json['membershipTier'] = 
     membershipTierSerializer(membershipTier!)
@@ -153,6 +157,7 @@ class GetUserUserProfessionalProfileOnUser {
   GetUserUserProfessionalProfileOnUser({
     this.specialty,
     required this.isApproved,
+    required this.isProfileValidated,
     this.membershipTier,
     this.visibilityExpiresAt,
   });
@@ -162,11 +167,13 @@ class GetUserUserProfessionalProfileOnUser {
 class GetUserUserInstitutionProfileOnUser {
   final String? nameAr;
   final bool isApproved;
+  final bool isProfileValidated;
   final Timestamp? visibilityExpiresAt;
   GetUserUserInstitutionProfileOnUser.fromJson(dynamic json):
   
   nameAr = json['nameAr'] == null ? null : nativeFromJson<String>(json['nameAr']),
   isApproved = nativeFromJson<bool>(json['isApproved']),
+  isProfileValidated = nativeFromJson<bool>(json['isProfileValidated']),
   visibilityExpiresAt = json['visibilityExpiresAt'] == null ? null : Timestamp.fromJson(json['visibilityExpiresAt']);
   @override
   bool operator ==(Object other) {
@@ -180,11 +187,12 @@ class GetUserUserInstitutionProfileOnUser {
     final GetUserUserInstitutionProfileOnUser otherTyped = other as GetUserUserInstitutionProfileOnUser;
     return nameAr == otherTyped.nameAr && 
     isApproved == otherTyped.isApproved && 
+    isProfileValidated == otherTyped.isProfileValidated && 
     visibilityExpiresAt == otherTyped.visibilityExpiresAt;
     
   }
   @override
-  int get hashCode => Object.hashAll([nameAr.hashCode, isApproved.hashCode, visibilityExpiresAt.hashCode]);
+  int get hashCode => Object.hashAll([nameAr.hashCode, isApproved.hashCode, isProfileValidated.hashCode, visibilityExpiresAt.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -193,6 +201,7 @@ class GetUserUserInstitutionProfileOnUser {
       json['nameAr'] = nativeToJson<String?>(nameAr);
     }
     json['isApproved'] = nativeToJson<bool>(isApproved);
+    json['isProfileValidated'] = nativeToJson<bool>(isProfileValidated);
     if (visibilityExpiresAt != null) {
       json['visibilityExpiresAt'] = visibilityExpiresAt!.toJson();
     }
@@ -202,6 +211,7 @@ class GetUserUserInstitutionProfileOnUser {
   GetUserUserInstitutionProfileOnUser({
     this.nameAr,
     required this.isApproved,
+    required this.isProfileValidated,
     this.visibilityExpiresAt,
   });
 }

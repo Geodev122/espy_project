@@ -16,6 +16,10 @@ part 'update_service.dart';
 
 part 'create_location_node.dart';
 
+part 'create_resource_order.dart';
+
+part 'update_resource_order.dart';
+
 part 'spend_tokens.dart';
 
 part 'post_community_request.dart';
@@ -23,6 +27,10 @@ part 'post_community_request.dart';
 part 'record_interaction.dart';
 
 part 'approve_professional.dart';
+
+part 'validate_profile.dart';
+
+part 'approve_resource_order.dart';
 
 part 'resolve_support_ticket.dart';
 
@@ -50,7 +58,11 @@ part 'list_community_requests.dart';
 
 part 'get_wallet_transactions.dart';
 
+part 'get_active_resource_order.dart';
+
 part 'list_pending_approvals.dart';
+
+part 'list_pending_orders.dart';
 
 part 'list_support_tickets.dart';
 
@@ -162,6 +174,42 @@ part 'list_support_tickets.dart';
       
       case 'PLATINUM':
         return const Known(MembershipTier.PLATINUM);
+      
+      default:
+        return Unknown(data);
+    }
+  }
+  
+
+  enum OrderStatus {
+    
+      PENDING,
+    
+      APPROVED,
+    
+      PAID,
+    
+      CANCELLED,
+    
+  }
+  
+  String orderStatusSerializer(EnumValue<OrderStatus> e) {
+    return e.stringValue;
+  }
+  EnumValue<OrderStatus> orderStatusDeserializer(dynamic data) {
+    switch (data) {
+      
+      case 'PENDING':
+        return const Known(OrderStatus.PENDING);
+      
+      case 'APPROVED':
+        return const Known(OrderStatus.APPROVED);
+      
+      case 'PAID':
+        return const Known(OrderStatus.PAID);
+      
+      case 'CANCELLED':
+        return const Known(OrderStatus.CANCELLED);
       
       default:
         return Unknown(data);
@@ -361,6 +409,16 @@ class EspyConnector {
   }
   
   
+  CreateResourceOrderVariablesBuilder createResourceOrder ({required int pins, required int slots, required int broadcasts, required int total, }) {
+    return CreateResourceOrderVariablesBuilder(dataConnect, pins: pins,slots: slots,broadcasts: broadcasts,total: total,);
+  }
+  
+  
+  UpdateResourceOrderVariablesBuilder updateResourceOrder ({required String id, required int pins, required int slots, required int broadcasts, required int total, }) {
+    return UpdateResourceOrderVariablesBuilder(dataConnect, id: id,pins: pins,slots: slots,broadcasts: broadcasts,total: total,);
+  }
+  
+  
   SpendTokensVariablesBuilder spendTokens ({required String userId, required int cost, required int ledgerAmount, required String description, }) {
     return SpendTokensVariablesBuilder(dataConnect, userId: userId,cost: cost,ledgerAmount: ledgerAmount,description: description,);
   }
@@ -378,6 +436,16 @@ class EspyConnector {
   
   ApproveProfessionalVariablesBuilder approveProfessional ({required String id, required bool isApproved, }) {
     return ApproveProfessionalVariablesBuilder(dataConnect, id: id,isApproved: isApproved,);
+  }
+  
+  
+  ValidateProfileVariablesBuilder validateProfile ({required String id, }) {
+    return ValidateProfileVariablesBuilder(dataConnect, id: id,);
+  }
+  
+  
+  ApproveResourceOrderVariablesBuilder approveResourceOrder ({required String id, }) {
+    return ApproveResourceOrderVariablesBuilder(dataConnect, id: id,);
   }
   
   
@@ -446,8 +514,18 @@ class EspyConnector {
   }
   
   
+  GetActiveResourceOrderVariablesBuilder getActiveResourceOrder ({required String userId, }) {
+    return GetActiveResourceOrderVariablesBuilder(dataConnect, userId: userId,);
+  }
+  
+  
   ListPendingApprovalsVariablesBuilder listPendingApprovals () {
     return ListPendingApprovalsVariablesBuilder(dataConnect, );
+  }
+  
+  
+  ListPendingOrdersVariablesBuilder listPendingOrders () {
+    return ListPendingOrdersVariablesBuilder(dataConnect, );
   }
   
   

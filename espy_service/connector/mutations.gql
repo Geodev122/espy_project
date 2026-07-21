@@ -1,4 +1,4 @@
-# ESPY PROTOCOL - DATA CONNECT MUTATIONS v6.0
+# ESPY PROTOCOL - DATA CONNECT MUTATIONS v6.1
 
 # --- 1. Identity & Profile ---
 
@@ -68,7 +68,28 @@ mutation CreateLocationNode($countryId: String!, $label: String!, $lat: Float!, 
   })
 }
 
-# --- 3. Financial Operations ---
+# --- 3. Financial & Resource Orders ---
+
+mutation CreateResourceOrder($pins: Int!, $slots: Int!, $broadcasts: Int!, $total: Int!) @auth(level: USER) {
+  resourceOrder_insert(data: {
+    userId_expr: "auth.uid",
+    pinsCount: $pins,
+    slotsCount: $slots,
+    broadcastsCount: $broadcasts,
+    totalCost: $total,
+    status: PENDING
+  })
+}
+
+mutation UpdateResourceOrder($id: UUID!, $pins: Int!, $slots: Int!, $broadcasts: Int!, $total: Int!) @auth(level: USER) {
+  resourceOrder_update(key: { id: $id }, data: {
+    pinsCount: $pins,
+    slotsCount: $slots,
+    broadcastsCount: $broadcasts,
+    totalCost: $total,
+    updatedAt_expr: "request.time"
+  })
+}
 
 mutation SpendTokens($userId: String!, $cost: Int!, $ledgerAmount: Int!, $type: TransactionType = PURCHASE, $description: String!) @auth(expr: "auth.uid == userId") {
   user_update(key: { id: $userId }, data: {
@@ -108,6 +129,18 @@ mutation RecordInteraction($targetId: String!, $type: InteractionType!) @auth(le
 mutation ApproveProfessional($id: String!, $isApproved: Boolean!) @auth(level: NO_ACCESS) {
   professionalProfile_update(key: { id: $id }, data: {
     isApproved: $isApproved
+  })
+}
+
+mutation ValidateProfile($id: String!) @auth(level: NO_ACCESS) {
+  professionalProfile_update(key: { id: $id }, data: {
+    isProfileValidated: true
+  })
+}
+
+mutation ApproveResourceOrder($id: UUID!) @auth(level: NO_ACCESS) {
+  resourceOrder_update(key: { id: $id }, data: {
+    status: APPROVED
   })
 }
 

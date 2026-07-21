@@ -644,6 +644,55 @@ ref.subscribe(...);
 ```
 
 
+### GetActiveResourceOrder
+#### Required Arguments
+```dart
+String userId = ...;
+EspyConnector.instance.getActiveResourceOrder(
+  userId: userId,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `QueryResult<GetActiveResourceOrderData, GetActiveResourceOrderVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+/// Result of a query request. Created to hold extra variables in the future.
+class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
+  QueryResult(super.dataConnect, super.data, super.ref);
+}
+
+final result = await EspyConnector.instance.getActiveResourceOrder(
+  userId: userId,
+);
+GetActiveResourceOrderData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+String userId = ...;
+
+final ref = EspyConnector.instance.getActiveResourceOrder(
+  userId: userId,
+).ref();
+ref.execute();
+
+ref.subscribe(...);
+```
+
+
 ### ListPendingApprovals
 #### Required Arguments
 ```dart
@@ -679,6 +728,47 @@ Each builder returns an `execute` function, which is a helper function that crea
 An example of how to use the `Ref` object is shown below:
 ```dart
 final ref = EspyConnector.instance.listPendingApprovals().ref();
+ref.execute();
+
+ref.subscribe(...);
+```
+
+
+### ListPendingOrders
+#### Required Arguments
+```dart
+// No required arguments
+EspyConnector.instance.listPendingOrders().execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `QueryResult<ListPendingOrdersData, void>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+/// Result of a query request. Created to hold extra variables in the future.
+class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
+  QueryResult(super.dataConnect, super.data, super.ref);
+}
+
+final result = await EspyConnector.instance.listPendingOrders();
+ListPendingOrdersData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+final ref = EspyConnector.instance.listPendingOrders().ref();
 ref.execute();
 
 ref.subscribe(...);
@@ -1150,6 +1240,125 @@ ref.execute();
 ```
 
 
+### CreateResourceOrder
+#### Required Arguments
+```dart
+int pins = ...;
+int slots = ...;
+int broadcasts = ...;
+int total = ...;
+EspyConnector.instance.createResourceOrder(
+  pins: pins,
+  slots: slots,
+  broadcasts: broadcasts,
+  total: total,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `OperationResult<CreateResourceOrderData, CreateResourceOrderVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await EspyConnector.instance.createResourceOrder(
+  pins: pins,
+  slots: slots,
+  broadcasts: broadcasts,
+  total: total,
+);
+CreateResourceOrderData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+int pins = ...;
+int slots = ...;
+int broadcasts = ...;
+int total = ...;
+
+final ref = EspyConnector.instance.createResourceOrder(
+  pins: pins,
+  slots: slots,
+  broadcasts: broadcasts,
+  total: total,
+).ref();
+ref.execute();
+```
+
+
+### UpdateResourceOrder
+#### Required Arguments
+```dart
+String id = ...;
+int pins = ...;
+int slots = ...;
+int broadcasts = ...;
+int total = ...;
+EspyConnector.instance.updateResourceOrder(
+  id: id,
+  pins: pins,
+  slots: slots,
+  broadcasts: broadcasts,
+  total: total,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `OperationResult<UpdateResourceOrderData, UpdateResourceOrderVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await EspyConnector.instance.updateResourceOrder(
+  id: id,
+  pins: pins,
+  slots: slots,
+  broadcasts: broadcasts,
+  total: total,
+);
+UpdateResourceOrderData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+String id = ...;
+int pins = ...;
+int slots = ...;
+int broadcasts = ...;
+int total = ...;
+
+final ref = EspyConnector.instance.updateResourceOrder(
+  id: id,
+  pins: pins,
+  slots: slots,
+  broadcasts: broadcasts,
+  total: total,
+).ref();
+ref.execute();
+```
+
+
 ### SpendTokens
 #### Required Arguments
 ```dart
@@ -1369,6 +1578,90 @@ bool isApproved = ...;
 final ref = EspyConnector.instance.approveProfessional(
   id: id,
   isApproved: isApproved,
+).ref();
+ref.execute();
+```
+
+
+### ValidateProfile
+#### Required Arguments
+```dart
+String id = ...;
+EspyConnector.instance.validateProfile(
+  id: id,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `OperationResult<ValidateProfileData, ValidateProfileVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await EspyConnector.instance.validateProfile(
+  id: id,
+);
+ValidateProfileData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+String id = ...;
+
+final ref = EspyConnector.instance.validateProfile(
+  id: id,
+).ref();
+ref.execute();
+```
+
+
+### ApproveResourceOrder
+#### Required Arguments
+```dart
+String id = ...;
+EspyConnector.instance.approveResourceOrder(
+  id: id,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `OperationResult<ApproveResourceOrderData, ApproveResourceOrderVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await EspyConnector.instance.approveResourceOrder(
+  id: id,
+);
+ApproveResourceOrderData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+String id = ...;
+
+final ref = EspyConnector.instance.approveResourceOrder(
+  id: id,
 ).ref();
 ref.execute();
 ```
