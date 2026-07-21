@@ -1,4 +1,4 @@
-# ESPY PROTOCOL - DATA CONNECT MUTATIONS v6.1
+# ESPY PROTOCOL - DATA CONNECT MUTATIONS v6.2
 
 # --- 1. Identity & Profile ---
 
@@ -50,11 +50,16 @@ mutation CreateService($categoryId: String!, $titleEn: String!, $price: Int!) @a
   })
 }
 
+# Strict Ownership for Service Update
 mutation UpdateService($id: UUID!, $isActive: Boolean, $isAllocated: Boolean) @auth(level: USER) {
-  service_update(key: { id: $id }, data: {
-    isActive: $isActive,
-    isAllocated: $isAllocated
-  })
+  service_update(
+    # We identify by ID but only allow if provider matches auth.uid
+    first: { where: { id: { eq: $id }, provider: { id: { eq_expr: "auth.uid" } } } },
+    data: {
+      isActive: $isActive,
+      isAllocated: $isAllocated
+    }
+  )
 }
 
 mutation CreateLocationNode($countryId: String!, $label: String!, $lat: Float!, $lng: Float!, $isMain: Boolean!) @auth(level: USER) {
@@ -81,14 +86,18 @@ mutation CreateResourceOrder($pins: Int!, $slots: Int!, $broadcasts: Int!, $tota
   })
 }
 
+# Strict Ownership for Order Update
 mutation UpdateResourceOrder($id: UUID!, $pins: Int!, $slots: Int!, $broadcasts: Int!, $total: Int!) @auth(level: USER) {
-  resourceOrder_update(key: { id: $id }, data: {
-    pinsCount: $pins,
-    slotsCount: $slots,
-    broadcastsCount: $broadcasts,
-    totalCost: $total,
-    updatedAt_expr: "request.time"
-  })
+  resourceOrder_update(
+    first: { where: { id: { eq: $id }, user: { id: { eq_expr: "auth.uid" } } } },
+    data: {
+      pinsCount: $pins,
+      slotsCount: $slots,
+      broadcastsCount: $broadcasts,
+      totalCost: $total,
+      updatedAt_expr: "request.time"
+    }
+  )
 }
 
 mutation SpendTokens($userId: String!, $cost: Int!, $ledgerAmount: Int!, $type: TransactionType = PURCHASE, $description: String!) @auth(expr: "auth.uid == userId") {

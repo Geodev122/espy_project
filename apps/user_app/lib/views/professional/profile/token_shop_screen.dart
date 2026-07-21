@@ -183,6 +183,7 @@ class _TokenShopScreenState extends State<TokenShopScreen> with SingleTickerProv
 
   Widget _buildCompactStoreItem(Map<String, dynamic> item, WalletViewModel vm, AppLocalizations l10n, {bool isRenew = false}) {
     final bool canAfford = vm.balance >= (item['cost'] as int);
+    final int remaining = vm.daysUntilExpiry;
 
     return FadeInUp(
       child: Container(
@@ -200,9 +201,19 @@ class _TokenShopScreenState extends State<TokenShopScreen> with SingleTickerProv
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Icon(item['icon'] as IconData, color: isRenew ? EspyTheme.royalBlue : EspyTheme.gold, size: 20),
-                Text(
-                  '${item['cost']} \$E',
-                  style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      '${item['cost']} \$E',
+                      style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep),
+                    ),
+                    if (isRenew)
+                      Text(
+                        '$remaining DAYS LEFT',
+                        style: GoogleFonts.montserrat(fontSize: 7, fontWeight: FontWeight.w800, color: remaining < 5 ? Colors.red : EspyTheme.gold),
+                      ),
+                  ],
                 ),
               ],
             ),

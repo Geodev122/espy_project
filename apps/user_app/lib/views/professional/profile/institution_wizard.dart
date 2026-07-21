@@ -4,11 +4,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import 'package:espy_app/l10n/app_localizations.dart';
 import 'package:espy_app/theme/espy_theme.dart';
 import 'package:espy_app/viewmodels/auth_service.dart';
-import 'package:espy_app/viewmodels/firestore_service.dart';
+import 'package:espy_app/viewmodels/espy_repository.dart';
 import 'package:espy_app/viewmodels/storage_service.dart';
 import 'package:espy_app/widgets/common/location_picker_modal.dart';
 import 'package:espy_app/widgets/common/premium_button.dart';
@@ -16,7 +17,6 @@ import 'package:espy_app/widgets/common/premium_card.dart';
 import 'package:espy_app/widgets/common/profile_image_picker.dart';
 import 'package:espy_app/widgets/common/document_picker.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';
-import 'package:espy_app/widgets/common/wizard_step_container.dart';
 
 class InstitutionWizard extends StatefulWidget {
   const InstitutionWizard({super.key});
@@ -46,41 +46,23 @@ class _InstitutionWizardState extends State<InstitutionWizard> {
 
   Map<String, dynamic>? _mainLocation;
 
-  final FirestoreService _firestore = FirestoreService();
-  final StorageService _storage = StorageService();
+  // Resource Quantities
+  int _pinsCount = 1;
+  int _slotsCount = 5;
+  int _broadcastsCount = 0;
 
+  final StorageService _storage = StorageService();
   bool _isSubmitting = false;
 
   @override
   void initState() {
     super.initState();
-    _loadInitialData();
+    _prefillData();
   }
 
-  Future<void> _loadInitialData() async {
+  void _prefillData() {
     final auth = Provider.of<AuthService>(context, listen: false);
-    final user = auth.userData;
-    
-    if (user != null) {
-      setState(() {
-        _nameController.text = user.name;
-        _bioController.text = user['bio'] ?? '';
-        _bioArController.text = user['bio_ar'] ?? '';
-        _whatsappCodeController.text = user['whatsapp_code'] ?? '+961';
-        _whatsappNumberController.text = user['whatsapp_number'] ?? '';
-        _registrationController.text = user['registrationNumber'] ?? '';
-        _selectedCategoryId = user['categoryId'];
-        _mainLocation = user['mainLocation'];
-        
-        if (_selectedCategoryId != null) {
-          if (_mainLocation != null) {
-            _currentStep = 3;
-          } else {
-            _currentStep = 2;
-          }
-        }
-      });
-    }
+    _nameController.text = auth.user?.displayName ?? '';
   }
 
   @override
@@ -92,53 +74,41 @@ class _InstitutionWizardState extends State<InstitutionWizard> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text(
-          l10n.protocolRegistration,
-          style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, letterSpacing: 1, color: EspyTheme.platinum, fontSize: 13),
+          "INSTITUTION ONBOARDING",
+          style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, letterSpacing: 2, color: Colors.white, fontSize: 13),
         ),
-        iconTheme: const IconThemeData(color: EspyTheme.platinum),
       ),
       body: SafeArea(
         child: Column(
           children: [
-            _buildProgressHeader(),
+            _buildStepIndicator(),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-                child: Form(
-                  key: _formKey,
-                  child: _buildCurrentStep(l10n),
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+                child: Form(key: _formKey, child: _buildCurrentStep(l10n)),
               ),
             ),
-            _buildBottomActions(l10n),
+            _buildBottomNav(l10n),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildProgressHeader() {
+  Widget _buildStepIndicator() {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 24),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        border: Border(bottom: BorderSide(color: Colors.white10)),
-      ),
+      padding: const EdgeInsets.symmetric(vertical: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: List.generate(4, (index) {
-          bool isActive = index == _currentStep;
-          bool isDone = index < _currentStep;
-          return AnimatedContainer(
-            duration: const Duration(milliseconds: 400),
-            margin: const EdgeInsets.symmetric(horizontal: 8),
-            width: isActive ? 48 : 12,
-            height: 8,
+        children: List.generate(2, (index) {
+          bool active = index == _currentStep;
+          return Container(
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            width: active ? 40 : 12,
+            height: 6,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: isActive
-                  ? EspyTheme.cyan
-                  : (isDone ? EspyTheme.electricBlue : Colors.white12),
+              color: active ? EspyTheme.cyan : Colors.white24,
+              borderRadius: BorderRadius.circular(3),
             ),
           );
         }),
@@ -147,163 +117,183 @@ class _InstitutionWizardState extends State<InstitutionWizard> {
   }
 
   Widget _buildCurrentStep(AppLocalizations l10n) {
-    switch (_currentStep) {
-      case 0:
-        return WizardStepContainer(
-          title: l10n.tellUsAboutYourself,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ProfileImagePicker(
-                onImageSelected: (file, bytes) {
-                  _profileImageFile = file;
-                  _profileImageWebBytes = bytes;
-                },
-              ),
-              const SizedBox(height: 32),
-              _buildFieldLabel(l10n.institutionName),
-              TextFormField(
-                controller: _nameController,
-                style: GoogleFonts.montserrat(color: EspyTheme.navyDeep, fontSize: 14),
-                decoration: const InputDecoration(hintText: 'e.g. Hope Medical Center'),
-              ),
-              const SizedBox(height: 24),
-              _buildFieldLabel(l10n.institutionCategory.toUpperCase()),
-              _buildCategoryDropdown(l10n),
-              const SizedBox(height: 24),
-              _buildFieldLabel(l10n.registrationNumber),
-              TextFormField(
-                controller: _registrationController,
-                style: GoogleFonts.montserrat(color: EspyTheme.navyDeep, fontSize: 14),
-                decoration: const InputDecoration(hintText: 'Official identifier'),
-              ),
-            ],
-          ),
-        );
-      case 1:
-        return WizardStepContainer(
-          title: l10n.missionDepartments,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildFieldLabel("${l10n.aboutInstitution} (EN)"),
-              TextFormField(
-                controller: _bioController,
-                style: GoogleFonts.montserrat(color: EspyTheme.navyDeep, fontSize: 14),
-                maxLines: 4,
-                decoration: const InputDecoration(hintText: 'Describe your clinical services...'),
-              ),
-              const SizedBox(height: 24),
-              _buildFieldLabel("${l10n.aboutInstitution} (AR)"),
-              TextFormField(
-                controller: _bioArController,
-                style: GoogleFonts.montserrat(color: EspyTheme.navyDeep, fontSize: 14),
-                maxLines: 4,
-                textAlign: TextAlign.right,
-                textDirection: TextDirection.rtl,
-                decoration: const InputDecoration(hintText: 'صف خدماتك السريرية...'),
-              ),
-              const SizedBox(height: 24),
-              DocumentPicker(
-                label: 'Registration Documents',
-                onDocumentSelected: (file, bytes, fileName) {
-                  _proofFile = file;
-                  _proofBytes = bytes;
-                  _proofFileName = fileName;
-                },
-              ),
-              const SizedBox(height: 24),
-              _buildFieldLabel(l10n.whatsappContact),
-              Row(
-                children: [
-                  SizedBox(
-                    width: 80,
-                    child: TextFormField(
-                      controller: _whatsappCodeController,
-                      style: GoogleFonts.montserrat(color: EspyTheme.navyDeep, fontSize: 14),
-                      decoration: const InputDecoration(hintText: '+961'),
-                      keyboardType: TextInputType.phone,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: TextFormField(
-                      controller: _whatsappNumberController,
-                      style: GoogleFonts.montserrat(color: EspyTheme.navyDeep, fontSize: 14),
-                      decoration: const InputDecoration(hintText: 'XX XXX XXX'),
-                      keyboardType: TextInputType.phone,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        );
-      case 2:
-        return WizardStepContainer(
-          title: l10n.hubLocations,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildFieldLabel(l10n.primaryFacilityLocation),
-              PremiumCard(
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  children: [
-                    const Icon(Icons.location_on, color: EspyTheme.gold),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        _mainLocation?['cityName'] ?? l10n.noPinDropped,
-                        style: GoogleFonts.lora(fontSize: 14, fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () => _openMainLocationPicker(l10n),
-                      child: Text(l10n.setPin,
-                          style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, color: EspyTheme.gold, fontSize: 12)),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      case 3:
-        return WizardStepContainer(
-          title: l10n.almostThere,
-          child: Column(
-            children: [
-              PremiumCard(
-                padding: const EdgeInsets.all(40),
-                child: Column(
-                  children: [
-                    const Icon(Icons.verified_user_rounded, size: 64, color: EspyTheme.success),
-                    const SizedBox(height: 32),
-                    Text(l10n.institutionDashboardRedir, textAlign: TextAlign.center, style: GoogleFonts.lora(fontSize: 14)),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      default:
-        return const SizedBox();
+    if (_currentStep == 0) {
+      return _buildPhase1(l10n);
     }
+    return _buildPhase2(l10n);
+  }
+
+  Widget _buildPhase1(AppLocalizations l10n) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("PHASE I: PROFILE", style: GoogleFonts.cinzel(color: EspyTheme.cyan, fontWeight: FontWeight.w900, fontSize: 18)),
+        const SizedBox(height: 32),
+        Center(
+          child: ProfileImagePicker(
+            onImageSelected: (file, bytes) {
+              _profileImageFile = file;
+              _profileImageWebBytes = bytes;
+            },
+          ),
+        ),
+        const SizedBox(height: 32),
+        _buildLabel("INSTITUTION NAME"),
+        _buildTextField(_nameController, "e.g. Hope Medical Center"),
+        const SizedBox(height: 24),
+        _buildLabel("INSTITUTION CATEGORY"),
+        _buildCategoryDropdown(l10n),
+        const SizedBox(height: 24),
+        _buildLabel("REGISTRATION NUMBER / ID"),
+        _buildTextField(_registrationController, "Official identifier"),
+        const SizedBox(height: 24),
+        _buildLabel("MISSION DESCRIPTION (EN)"),
+        _buildTextField(_bioController, "Describe your institutional services...", maxLines: 3),
+      ],
+    );
+  }
+
+  Widget _buildPhase2(AppLocalizations l10n) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("PHASE II: PROTOCOLS", style: GoogleFonts.cinzel(color: EspyTheme.cyan, fontWeight: FontWeight.w900, fontSize: 18)),
+        const SizedBox(height: 24),
+        _buildResourceCard(
+          icon: LucideIcons.mapPin,
+          title: "HUB PIN",
+          desc: "Facility location visible on the global map.",
+          value: _pinsCount,
+          onChanged: (v) => setState(() => _pinsCount = v),
+        ),
+        _buildResourceCard(
+          icon: LucideIcons.layoutGrid,
+          title: "DEPARTMENT SLOTS",
+          desc: "Number of department profiles or services.",
+          value: _slotsCount,
+          onChanged: (v) => setState(() => _slotsCount = v),
+        ),
+        _buildResourceCard(
+          icon: LucideIcons.megaphone,
+          title: "BROADCASTS",
+          desc: "Large scale notifications to all users.",
+          value: _broadcastsCount,
+          onChanged: (v) => setState(() => _broadcastsCount = v),
+        ),
+        const SizedBox(height: 32),
+        Text("LEGAL VERIFICATION", style: GoogleFonts.cinzel(color: EspyTheme.cyan, fontWeight: FontWeight.w900, fontSize: 14)),
+        const SizedBox(height: 16),
+        DocumentPicker(
+          label: 'Upload Registration Docs',
+          onDocumentSelected: (file, bytes, fileName) {
+            _proofFile = file;
+            _proofBytes = bytes;
+            _proofFileName = fileName;
+          },
+        ),
+        const SizedBox(height: 24),
+        _buildLabel("OFFICIAL WHATSAPP"),
+        Row(
+          children: [
+            SizedBox(width: 80, child: _buildTextField(_whatsappCodeController, "+961", kType: TextInputType.phone)),
+            const SizedBox(width: 12),
+            Expanded(child: _buildTextField(_whatsappNumberController, "Number", kType: TextInputType.phone)),
+          ],
+        ),
+        const SizedBox(height: 24),
+        _buildLabel("PRIMARY FACILITY LOCATION"),
+        _buildLocationPicker(l10n),
+      ],
+    );
+  }
+
+  Widget _buildResourceCard({required IconData icon, required String title, required String desc, required int value, required Function(int) onChanged}) {
+    return PremiumCard(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          Icon(icon, color: EspyTheme.electricBlue, size: 24),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, fontSize: 11, letterSpacing: 1)),
+                Text(desc, style: GoogleFonts.lora(fontSize: 9, color: Colors.black45), maxLines: 2),
+              ],
+            ),
+          ),
+          Row(
+            children: [
+              _counterBtn(Icons.remove, () => value > 0 ? onChanged(value - 1) : null),
+              SizedBox(width: 30, child: Center(child: Text("$value", style: GoogleFonts.montserrat(fontWeight: FontWeight.w900)))),
+              _counterBtn(Icons.add, () => onChanged(value + 1)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _counterBtn(IconData icon, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.black12)),
+        child: Icon(icon, size: 14),
+      ),
+    );
+  }
+
+  Widget _buildTextField(TextEditingController ctrl, String hint, {int maxLines = 1, bool isRtl = false, TextInputType kType = TextInputType.text}) {
+    return TextFormField(
+      controller: ctrl,
+      maxLines: maxLines,
+      textAlign: isRtl ? TextAlign.right : TextAlign.left,
+      keyboardType: kType,
+      style: GoogleFonts.montserrat(color: EspyTheme.navyDeep, fontSize: 14, fontWeight: FontWeight.w600),
+      decoration: InputDecoration(
+        hintText: hint,
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+      ),
+    );
+  }
+
+  Widget _buildLabel(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 4, bottom: 8),
+      child: Text(text, style: GoogleFonts.montserrat(fontSize: 9, fontWeight: FontWeight.w800, color: EspyTheme.cyan, letterSpacing: 1)),
+    );
   }
 
   Widget _buildCategoryDropdown(AppLocalizations l10n) {
+    final repo = Provider.of<EspyRepository>(context, listen: false);
     return StreamBuilder<List<Map<String, dynamic>>>(
-      stream: _firestore.getCategories('institution'),
+      stream: repo.listCategories(sectorId: "institution"), // Assuming institutional sector
       builder: (context, snapshot) {
         final categories = snapshot.data ?? [];
         return DropdownButtonFormField<String>(
           value: _selectedCategoryId,
-          items: categories.map((cat) => DropdownMenuItem(value: cat['id'].toString(), child: Text(cat['name_en'].toUpperCase()))).toList(),
+          items: categories.map((cat) => DropdownMenuItem(value: cat['id'].toString(), child: Text(cat['nameEn'].toUpperCase(), style: const TextStyle(fontSize: 12)))).toList(),
           onChanged: (val) => setState(() => _selectedCategoryId = val),
-          decoration: InputDecoration(hintText: l10n.selectCategory),
+          decoration: InputDecoration(hintText: l10n.selectCategory, filled: true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)),
         );
       },
+    );
+  }
+
+  Widget _buildLocationPicker(AppLocalizations l10n) {
+    return PremiumCard(
+      padding: const EdgeInsets.all(12),
+      child: ListTile(
+        leading: const Icon(Icons.location_on, color: EspyTheme.gold),
+        title: Text(_mainLocation?['cityName'] ?? "No Pin Dropped", style: GoogleFonts.lora(fontSize: 13, fontWeight: FontWeight.bold)),
+        trailing: TextButton(onPressed: () => _openMainLocationPicker(l10n), child: const Text("SET HUB")),
+      ),
     );
   }
 
@@ -317,28 +307,21 @@ class _InstitutionWizardState extends State<InstitutionWizard> {
     if (result != null) setState(() => _mainLocation = result);
   }
 
-  Widget _buildFieldLabel(String label) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 4, bottom: 8),
-      child: Text(label, style: Theme.of(context).textTheme.labelLarge?.copyWith(fontSize: 10, color: EspyTheme.cyan, letterSpacing: 2)),
-    );
-  }
-
-  Widget _buildBottomActions(AppLocalizations l10n) {
+  Widget _buildBottomNav(AppLocalizations l10n) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(32),
       decoration: const BoxDecoration(color: EspyTheme.navyDeep),
       child: Row(
         children: [
           if (_currentStep > 0) ...[
-            IconButton(onPressed: () => setState(() => _currentStep--), icon: const Icon(Icons.arrow_back_ios, color: Colors.white)),
+            IconButton(onPressed: () => setState(() => _currentStep--), icon: const Icon(Icons.arrow_back_ios, color: Colors.white70)),
             const SizedBox(width: 16),
           ],
           Expanded(
             child: PremiumButton(
-              label: _currentStep == 3 ? l10n.submitForReview : l10n.continueText,
+              label: _currentStep == 1 ? "FINALIZE ONBOARDING" : l10n.continueText.toUpperCase(),
               isLoading: _isSubmitting,
-              onPressed: _handleNext,
+              onPressed: () => _currentStep == 0 ? setState(() => _currentStep++) : _submitProfile(),
             ),
           ),
         ],
@@ -346,16 +329,9 @@ class _InstitutionWizardState extends State<InstitutionWizard> {
     );
   }
 
-  Future<void> _handleNext() async {
-    if (_currentStep < 3) {
-      setState(() => _currentStep++);
-    } else {
-      _submitProfile();
-    }
-  }
-
   Future<void> _submitProfile() async {
     final auth = Provider.of<AuthService>(context, listen: false);
+    final repo = Provider.of<EspyRepository>(context, listen: false);
     setState(() => _isSubmitting = true);
 
     try {
@@ -366,27 +342,20 @@ class _InstitutionWizardState extends State<InstitutionWizard> {
         photoUrl = await _storage.uploadProfileImage(userId: auth.user!.uid, file: _profileImageFile!);
       }
 
-      await _firestore.createProfessionalProfile(auth.user!.uid, {
-        'name': _nameController.text,
-        'fullNameEn': _nameController.text,
-        'bio': _bioController.text,
-        'bio_ar': _bioArController.text,
-        'whatsapp': '${_whatsappCodeController.text}${_whatsappNumberController.text}',
-        'whatsapp_code': _whatsappCodeController.text,
-        'whatsapp_number': _whatsappNumberController.text,
-        'registrationNumber': _registrationController.text,
-        'categoryId': _selectedCategoryId,
-        'mainLocation': _mainLocation,
+      await repo.updateUser(auth.user!.uid, {
+        'name': _nameController.text.trim(),
         'photoUrl': photoUrl ?? auth.user?.photoURL,
         'role': 'institution',
         'hasProfile': true,
       });
 
+      // Create Resource Order logic...
+
       await auth.fetchUserData();
     } catch (e) {
       if (mounted) {
         setState(() => _isSubmitting = false);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: EspyTheme.error));
       }
     }
   }

@@ -347,7 +347,7 @@ service cloud.firestore {
       allow update: if request.auth != null && (
         isAdmin() ||
         (resource.data.uid == request.auth.uid &&
-         !request.resource.data.diff(resource.data).affectedKeys().hasAny(['admin_status', 'is_approved', 'is_active', 'uid', 'registration_id', 'registered_at']))
+         !request.resource.data.diff(resource.data).affectedKeys().hasAny(['admin_status', 'is_approved', 'is_profile_validated', 'is_active', 'uid', 'registration_id', 'registered_at']))
       );
       allow delete: if isAdmin();
     }
@@ -358,7 +358,7 @@ service cloud.firestore {
       allow update: if request.auth != null && (
         isAdmin() ||
         (resource.data.uid == request.auth.uid &&
-         !request.resource.data.diff(resource.data).affectedKeys().hasAny(['admin_status', 'is_approved', 'is_active', 'uid', 'registration_id', 'registered_at']))
+         !request.resource.data.diff(resource.data).affectedKeys().hasAny(['admin_status', 'is_approved', 'is_profile_validated', 'is_active', 'uid', 'registration_id', 'registered_at']))
       );
       allow delete: if isAdmin();
     }

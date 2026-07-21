@@ -88,10 +88,10 @@ class _PremiumButtonState extends State<PremiumButton> with SingleTickerProvider
 
     final Color contentColor = isOutline ? EspyTheme.electricBlue : (isPlatinum ? EspyTheme.navyDeep : Colors.white);
 
-    final double verticalPadding = widget.size == PremiumButtonSize.small ? 12 : (widget.size == PremiumButtonSize.large ? 22 : 18);
-    final double horizontalPadding = widget.size == PremiumButtonSize.small ? 16 : 24;
-    final double fontSize = widget.size == PremiumButtonSize.small ? 10 : (widget.size == PremiumButtonSize.large ? 14 : 12);
-    final double borderRadius = 20.0;
+    final double verticalPadding = widget.size == PremiumButtonSize.small ? 10 : (widget.size == PremiumButtonSize.large ? 20 : 16);
+    final double horizontalPadding = widget.size == PremiumButtonSize.small ? 14 : 24;
+    final double fontSize = widget.size == PremiumButtonSize.small ? 9 : (widget.size == PremiumButtonSize.large ? 13 : 11);
+    final double borderRadius = 16.0;
 
     Widget buttonContent = Row(
       mainAxisSize: MainAxisSize.min,
@@ -99,10 +99,10 @@ class _PremiumButtonState extends State<PremiumButton> with SingleTickerProvider
       children: [
         if (widget.isLoading)
           Padding(
-            padding: const EdgeInsets.only(right: 12),
+            padding: const EdgeInsets.only(right: 10),
             child: SizedBox(
-              width: fontSize * 1.5,
-              height: fontSize * 1.5,
+              width: fontSize * 1.4,
+              height: fontSize * 1.4,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
                 valueColor: AlwaysStoppedAnimation<Color>(contentColor),
@@ -111,20 +111,23 @@ class _PremiumButtonState extends State<PremiumButton> with SingleTickerProvider
           )
         else if (widget.icon != null)
           Padding(
-            padding: const EdgeInsets.only(right: 12),
+            padding: const EdgeInsets.only(right: 10),
             child: Icon(
               widget.icon,
-              size: fontSize * 1.6,
+              size: fontSize * 1.5,
               color: contentColor,
             ),
           ),
-        Text(
-          widget.label.toUpperCase(),
-          style: GoogleFonts.cinzel(
-            fontWeight: FontWeight.w900,
-            fontSize: fontSize,
-            letterSpacing: 2.5,
-            color: contentColor,
+        Flexible(
+          child: Text(
+            widget.label.toUpperCase(),
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.cinzel(
+              fontWeight: FontWeight.w900,
+              fontSize: fontSize,
+              letterSpacing: 2.0,
+              color: contentColor,
+            ),
           ),
         ),
       ],
@@ -158,15 +161,15 @@ class _PremiumButtonState extends State<PremiumButton> with SingleTickerProvider
     if (widget.variant == PremiumButtonVariant.outline) {
       return BoxDecoration(
         borderRadius: BorderRadius.circular(radius),
-        border: Border.all(color: EspyTheme.electricBlue.withOpacity(0.5), width: 2),
+        border: Border.all(color: EspyTheme.electricBlue.withOpacity(0.4), width: 1.5),
       );
     }
 
     if (widget.variant == PremiumButtonVariant.glass) {
       return BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: Colors.white.withOpacity(0.12),
         borderRadius: BorderRadius.circular(radius),
-        border: Border.all(color: Colors.white.withOpacity(0.2)),
+        border: Border.all(color: Colors.white.withOpacity(0.15)),
       );
     }
 
@@ -177,8 +180,8 @@ class _PremiumButtonState extends State<PremiumButton> with SingleTickerProvider
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
           ),
         ],
       );
@@ -189,10 +192,10 @@ class _PremiumButtonState extends State<PremiumButton> with SingleTickerProvider
       borderRadius: BorderRadius.circular(radius),
       boxShadow: [
         BoxShadow(
-          color: _getShadowColor().withOpacity(0.35),
-          blurRadius: 20,
-          spreadRadius: -5,
-          offset: const Offset(0, 10),
+          color: _getShadowColor().withOpacity(0.3),
+          blurRadius: 15,
+          spreadRadius: -4,
+          offset: const Offset(0, 8),
         ),
       ],
     );

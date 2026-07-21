@@ -64,24 +64,24 @@ class _AppShellState extends State<AppShell> {
         index: _selectedIndex,
         children: screens,
       ),
-      bottomNavigationBar: _buildBottomNav(items),
+      bottomNavigationBar: _buildBottomNavLayer(items),
     );
   }
 
-  Widget _buildBottomNav(List<NavItem> items) {
+  Widget _buildBottomNavLayer(List<NavItem> items) {
     return Container(
-      width: double.infinity,
-      height: 80,
-      color: EspyTheme.navyDeep.withOpacity(0.9),
-      child: ClipRect(
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 12, left: 24, right: 24),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(30),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
-            margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-            height: 60,
+            height: 70,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(20),
+              color: EspyTheme.navyDeep.withOpacity(0.85),
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(color: Colors.white10),
+              boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 20)],
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -99,7 +99,7 @@ class _AppShellState extends State<AppShell> {
       onTap: () => setState(() => _selectedIndex = item.index),
       behavior: HitTestBehavior.opaque,
       child: Column(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(item.icon, color: isActive ? EspyTheme.gold : Colors.white38, size: 20),
           const SizedBox(height: 4),
@@ -119,37 +119,34 @@ class _AppShellState extends State<AppShell> {
 
     return Container(
       width: double.infinity,
-      height: MediaQuery.of(context).padding.top + 70,
+      padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).padding.top + 10, 20, 10),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.95),
-        border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.08), width: 1.5)),
+        border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.05))),
       ),
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(16, MediaQuery.of(context).padding.top, 16, 8),
-        child: Row(
-          children: [
-            GestureDetector(
-              onTap: () => _scaffoldKey.currentState?.openDrawer(),
-              child: Container(
-                width: 38, height: 38,
-                decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: EspyTheme.royalBlue.withOpacity(0.15))),
-                child: const Icon(Icons.person_rounded, color: EspyTheme.royalBlue, size: 20),
-              ),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () => _scaffoldKey.currentState?.openDrawer(),
+            child: CircleAvatar(
+              radius: 18,
+              backgroundColor: EspyTheme.platinum,
+              child: const Icon(Icons.person_rounded, color: EspyTheme.royalBlue, size: 20),
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(currentLabel, style: GoogleFonts.montserrat(fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 1.5, color: EspyTheme.navyDeep)),
-                  Text(user.name.toUpperCase(), style: GoogleFonts.montserrat(fontSize: 8, fontWeight: FontWeight.w700, color: EspyTheme.gold)),
-                ],
-              ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(currentLabel, style: GoogleFonts.montserrat(fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 1.2, color: EspyTheme.navyDeep)),
+                Text(user.name.toUpperCase(), style: GoogleFonts.montserrat(fontSize: 8, fontWeight: FontWeight.w700, color: EspyTheme.gold)),
+              ],
             ),
-            _buildLocaleToggle(localeService),
-          ],
-        ),
+          ),
+          _buildLocaleToggle(localeService),
+        ],
       ),
     );
   }
@@ -157,10 +154,17 @@ class _AppShellState extends State<AppShell> {
   Widget _buildLocaleToggle(LocaleService localeService) {
     return InkWell(
       onTap: () => localeService.toggleLocale(),
+      borderRadius: BorderRadius.circular(8),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(color: EspyTheme.gold.withOpacity(0.08), borderRadius: BorderRadius.circular(10)),
-        child: Text(localeService.locale.languageCode.toUpperCase(), style: GoogleFonts.montserrat(fontSize: 9, fontWeight: FontWeight.w900, color: EspyTheme.gold)),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: EspyTheme.gold.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(
+          localeService.locale.languageCode.toUpperCase(),
+          style: GoogleFonts.montserrat(fontSize: 9, fontWeight: FontWeight.w900, color: EspyTheme.gold),
+        ),
       ),
     );
   }

@@ -7,6 +7,7 @@ class PremiumCard extends StatelessWidget {
   final double? width;
   final double? height;
   final EdgeInsetsGeometry? padding;
+  final EdgeInsetsGeometry? margin;
   final Color? accentColor;
   final bool isGlass;
   final double borderRadius;
@@ -17,9 +18,10 @@ class PremiumCard extends StatelessWidget {
     this.width,
     this.height,
     this.padding,
+    this.margin,
     this.accentColor,
     this.isGlass = false,
-    this.borderRadius = 32.0,
+    this.borderRadius = 24.0,
   });
 
   @override
@@ -27,14 +29,15 @@ class PremiumCard extends StatelessWidget {
     return Container(
       width: width,
       height: height,
+      margin: margin,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(borderRadius),
         boxShadow: [
           BoxShadow(
-            color: (accentColor ?? EspyTheme.navy).withValues(alpha: isGlass ? 0.2 : 0.08),
-            blurRadius: 40,
-            spreadRadius: isGlass ? -10 : 0,
-            offset: const Offset(0, 20),
+            color: (accentColor ?? EspyTheme.navyDeep).withOpacity(isGlass ? 0.2 : 0.06),
+            blurRadius: 30,
+            spreadRadius: isGlass ? -8 : 0,
+            offset: const Offset(0, 15),
           ),
         ],
       ),
@@ -50,28 +53,28 @@ class PremiumCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: isGlass
                   ? Colors.white.withOpacity(0.08)
-                  : EspyTheme.white,
+                  : Colors.white,
               borderRadius: BorderRadius.circular(borderRadius),
               border: Border.all(
-                color: accentColor?.withOpacity(0.4) ??
-                    (isGlass ? Colors.white.withOpacity(0.15) : EspyTheme.cyan.withOpacity(0.1)),
-                width: 1.5,
+                color: accentColor?.withOpacity(0.3) ??
+                    (isGlass ? Colors.white.withOpacity(0.15) : EspyTheme.platinum),
+                width: 1.2,
               ),
             ),
             child: Stack(
               children: [
-                // Premium light edge highlight
+                // Subtle edge highlight
                 Positioned(
                   top: 0,
-                  left: 40,
-                  right: 40,
+                  left: 30,
+                  right: 30,
                   child: Container(
                     height: 1,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
                           Colors.transparent,
-                          Colors.white.withValues(alpha: isGlass ? 0.3 : 0.6),
+                          Colors.white.withOpacity(isGlass ? 0.2 : 0.5),
                           Colors.transparent,
                         ],
                       ),

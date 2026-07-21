@@ -1,6 +1,58 @@
 {
   "indexes": [
     {
+      "collectionGroup": "directory_services",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "categoryId", "order": "ASCENDING" },
+        { "fieldPath": "visibilityExpiresAt", "order": "DESCENDING" },
+        { "fieldPath": "isActive", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "directory_services",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "sectorId", "order": "ASCENDING" },
+        { "fieldPath": "visibilityExpiresAt", "order": "DESCENDING" },
+        { "fieldPath": "isActive", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "directory_professionals",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "isApproved", "order": "ASCENDING" },
+        { "fieldPath": "isProfileValidated", "order": "ASCENDING" },
+        { "fieldPath": "membershipTier", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "directory_institutions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "isApproved", "order": "ASCENDING" },
+        { "fieldPath": "isProfileValidated", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "directory_community_requests",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "sectorId", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "wallet_ledger",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "timestamp", "order": "DESCENDING" }
+      ]
+    },
+    {
       "collectionGroup": "honorees",
       "queryScope": "COLLECTION",
       "fields": [
@@ -17,442 +69,12 @@
       ]
     },
     {
-      "collectionGroup": "contacts",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "subscribed", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "contacts",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "categories", "arrayConfig": "CONTAINS" },
-        { "fieldPath": "subscribed", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "emailTemplates",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "category", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "bulkEmailJobs",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "submissions",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "inquiry_type", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "selectiveTierPromoCodes",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "code", "order": "ASCENDING" },
-        { "fieldPath": "isActive", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "selectiveTierPromoCodes",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "isActive", "order": "ASCENDING" },
-        { "fieldPath": "expiresAt", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "emailQueue",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "campaignId", "order": "ASCENDING" },
-        { "fieldPath": "status", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "emailCampaigns",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "activityLogs",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "action", "order": "ASCENDING" },
-        { "fieldPath": "timestamp", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "activityLogs",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "userId", "order": "ASCENDING" },
-        { "fieldPath": "timestamp", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "activityLogs",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "collectionName", "order": "ASCENDING" },
-        { "fieldPath": "timestamp", "order": "DESCENDING" }
-      ]
-    },
-    {
       "collectionGroup": "contactMessages",
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "status", "order": "ASCENDING" },
         { "fieldPath": "read", "order": "ASCENDING" },
         { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "contactMessages",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "priority", "order": "DESCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_professionals",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "type", "order": "ASCENDING" },
-        { "fieldPath": "is_approved", "order": "ASCENDING" },
-        { "fieldPath": "registered_at", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_professionals",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "category_id", "order": "ASCENDING" },
-        { "fieldPath": "is_approved", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_professionals",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "governorate_id", "order": "ASCENDING" },
-        { "fieldPath": "is_approved", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_professionals",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "is_approved", "order": "ASCENDING" },
-        { "fieldPath": "is_active", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_services",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "category_id", "order": "ASCENDING" },
-        { "fieldPath": "created_at", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_services",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "governorate_id", "order": "ASCENDING" },
-        { "fieldPath": "city_id", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_interactions",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "professional_id", "order": "ASCENDING" },
-        { "fieldPath": "timestamp", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_interactions",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "action_type", "order": "ASCENDING" },
-        { "fieldPath": "timestamp", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_payments",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "professional_id", "order": "ASCENDING" },
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "timestamp", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_admin_logs",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "action", "order": "ASCENDING" },
-        { "fieldPath": "timestamp", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_cities",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "governorate_id", "order": "ASCENDING" },
-        { "fieldPath": "name_en", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_professionals",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "type", "order": "ASCENDING" },
-        { "fieldPath": "category_id", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_professionals",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "type", "order": "ASCENDING" },
-        { "fieldPath": "governorate_id", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_services",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "category_id", "order": "ASCENDING" },
-        { "fieldPath": "governorate_id", "order": "ASCENDING" },
-        { "fieldPath": "city_id", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_services",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "professional_id", "order": "ASCENDING" },
-        { "fieldPath": "created_at", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_purchases",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "userId", "order": "ASCENDING" },
-        { "fieldPath": "purchased_at", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_purchases",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "visitor_id", "order": "ASCENDING" },
-        { "fieldPath": "purchased_at", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_community_requests",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "visitor_id", "order": "ASCENDING" },
-        { "fieldPath": "status", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_community_requests",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_community_requests",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "sector_id", "order": "ASCENDING" },
-        { "fieldPath": "status", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_community_requests",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "is_approved", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_community_requests",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "is_approved", "order": "ASCENDING" },
-        { "fieldPath": "category_id", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_community_requests",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "category_id", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_community_requests",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "requester_id", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_professionals",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "governorate_id", "order": "ASCENDING" },
-        { "fieldPath": "is_approved", "order": "ASCENDING" },
-        { "fieldPath": "is_active", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_professionals",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "category_id", "order": "ASCENDING" },
-        { "fieldPath": "is_approved", "order": "ASCENDING" },
-        { "fieldPath": "is_active", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_membership_transactions",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "userId", "order": "ASCENDING" },
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "timestamp", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_favorites",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "visitor_id", "order": "ASCENDING" },
-        { "fieldPath": "created_at", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_favorites",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "professional_id", "order": "ASCENDING" },
-        { "fieldPath": "created_at", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_slots",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "professional_id", "order": "ASCENDING" },
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "expires_at", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_slots",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "expires_at", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_professionals",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "type", "order": "ASCENDING" },
-        { "fieldPath": "is_active", "order": "ASCENDING" },
-        { "fieldPath": "registered_at", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_professionals",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "is_featured", "order": "ASCENDING" },
-        { "fieldPath": "is_approved", "order": "ASCENDING" },
-        { "fieldPath": "registered_at", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_visitor_profiles",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "uid", "order": "ASCENDING" },
-        { "fieldPath": "created_at", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "app_config",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "type", "order": "ASCENDING" },
-        { "fieldPath": "updated_at", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_services",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "isActive", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_professionals",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "isActive", "order": "ASCENDING" },
-        { "fieldPath": "membershipTier", "order": "DESCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_community_requests",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "userId", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "directory_notifications",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "target", "order": "ASCENDING" },
-        { "fieldPath": "timestamp", "order": "DESCENDING" }
       ]
     }
   ],
