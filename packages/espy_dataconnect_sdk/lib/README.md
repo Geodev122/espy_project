@@ -119,6 +119,105 @@ ref.subscribe(...);
 ```
 
 
+### ListSectors
+#### Required Arguments
+```dart
+// No required arguments
+EspyConnector.instance.listSectors().execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `QueryResult<ListSectorsData, void>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+/// Result of a query request. Created to hold extra variables in the future.
+class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
+  QueryResult(super.dataConnect, super.data, super.ref);
+}
+
+final result = await EspyConnector.instance.listSectors();
+ListSectorsData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+final ref = EspyConnector.instance.listSectors().ref();
+ref.execute();
+
+ref.subscribe(...);
+```
+
+
+### ListCategories
+#### Required Arguments
+```dart
+// No required arguments
+EspyConnector.instance.listCategories().execute();
+```
+
+#### Optional Arguments
+We return a builder for each query. For ListCategories, we created `ListCategoriesBuilder`. For queries and mutations with optional parameters, we return a builder class.
+The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
+```dart
+class ListCategoriesVariablesBuilder {
+  ...
+ 
+  ListCategoriesVariablesBuilder sectorId(String? t) {
+   _sectorId.value = t;
+   return this;
+  }
+
+  ...
+}
+EspyConnector.instance.listCategories()
+.sectorId(sectorId)
+.execute();
+```
+
+#### Return Type
+`execute()` returns a `QueryResult<ListCategoriesData, ListCategoriesVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+/// Result of a query request. Created to hold extra variables in the future.
+class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
+  QueryResult(super.dataConnect, super.data, super.ref);
+}
+
+final result = await EspyConnector.instance.listCategories();
+ListCategoriesData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+final ref = EspyConnector.instance.listCategories().ref();
+ref.execute();
+
+ref.subscribe(...);
+```
+
+
 ### ListActiveServices
 #### Required Arguments
 ```dart
@@ -245,6 +344,47 @@ ref.subscribe(...);
 ```
 
 
+### ListCountries
+#### Required Arguments
+```dart
+// No required arguments
+EspyConnector.instance.listCountries().execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `QueryResult<ListCountriesData, void>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+/// Result of a query request. Created to hold extra variables in the future.
+class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
+  QueryResult(super.dataConnect, super.data, super.ref);
+}
+
+final result = await EspyConnector.instance.listCountries();
+ListCountriesData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+final ref = EspyConnector.instance.listCountries().ref();
+ref.execute();
+
+ref.subscribe(...);
+```
+
+
 ### ListLocationNodes
 #### Required Arguments
 ```dart
@@ -294,37 +434,19 @@ ref.subscribe(...);
 ```
 
 
-### ListInteractions
+### ListFavoriteIds
 #### Required Arguments
 ```dart
 String actorId = ...;
-EspyConnector.instance.listInteractions(
+EspyConnector.instance.listFavoriteIds(
   actorId: actorId,
 ).execute();
 ```
 
-#### Optional Arguments
-We return a builder for each query. For ListInteractions, we created `ListInteractionsBuilder`. For queries and mutations with optional parameters, we return a builder class.
-The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
-```dart
-class ListInteractionsVariablesBuilder {
-  ...
-   ListInteractionsVariablesBuilder type(InteractionType? t) {
-   _type.value = t;
-   return this;
-  }
 
-  ...
-}
-EspyConnector.instance.listInteractions(
-  actorId: actorId,
-)
-.type(type)
-.execute();
-```
 
 #### Return Type
-`execute()` returns a `QueryResult<ListInteractionsData, ListInteractionsVariables>`
+`execute()` returns a `QueryResult<ListFavoriteIdsData, ListFavoriteIdsVariables>`
 ```dart
 /// Result of an Operation Request (query/mutation).
 class OperationResult<Data, Variables> {
@@ -339,10 +461,10 @@ class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
   QueryResult(super.dataConnect, super.data, super.ref);
 }
 
-final result = await EspyConnector.instance.listInteractions(
+final result = await EspyConnector.instance.listFavoriteIds(
   actorId: actorId,
 );
-ListInteractionsData data = result.data;
+ListFavoriteIdsData data = result.data;
 final ref = result.ref;
 ```
 
@@ -352,7 +474,7 @@ An example of how to use the `Ref` object is shown below:
 ```dart
 String actorId = ...;
 
-final ref = EspyConnector.instance.listInteractions(
+final ref = EspyConnector.instance.listFavoriteIds(
   actorId: actorId,
 ).ref();
 ref.execute();
@@ -361,19 +483,19 @@ ref.subscribe(...);
 ```
 
 
-### GetWalletTransactions
+### ListContactedIds
 #### Required Arguments
 ```dart
-String userId = ...;
-EspyConnector.instance.getWalletTransactions(
-  userId: userId,
+String actorId = ...;
+EspyConnector.instance.listContactedIds(
+  actorId: actorId,
 ).execute();
 ```
 
 
 
 #### Return Type
-`execute()` returns a `QueryResult<GetWalletTransactionsData, GetWalletTransactionsVariables>`
+`execute()` returns a `QueryResult<ListContactedIdsData, ListContactedIdsVariables>`
 ```dart
 /// Result of an Operation Request (query/mutation).
 class OperationResult<Data, Variables> {
@@ -388,10 +510,10 @@ class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
   QueryResult(super.dataConnect, super.data, super.ref);
 }
 
-final result = await EspyConnector.instance.getWalletTransactions(
-  userId: userId,
+final result = await EspyConnector.instance.listContactedIds(
+  actorId: actorId,
 );
-GetWalletTransactionsData data = result.data;
+ListContactedIdsData data = result.data;
 final ref = result.ref;
 ```
 
@@ -399,10 +521,10 @@ final ref = result.ref;
 Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
 An example of how to use the `Ref` object is shown below:
 ```dart
-String userId = ...;
+String actorId = ...;
 
-final ref = EspyConnector.instance.getWalletTransactions(
-  userId: userId,
+final ref = EspyConnector.instance.listContactedIds(
+  actorId: actorId,
 ).ref();
 ref.execute();
 
@@ -473,6 +595,55 @@ ref.subscribe(...);
 ```
 
 
+### GetWalletTransactions
+#### Required Arguments
+```dart
+String userId = ...;
+EspyConnector.instance.getWalletTransactions(
+  userId: userId,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `QueryResult<GetWalletTransactionsData, GetWalletTransactionsVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+/// Result of a query request. Created to hold extra variables in the future.
+class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
+  QueryResult(super.dataConnect, super.data, super.ref);
+}
+
+final result = await EspyConnector.instance.getWalletTransactions(
+  userId: userId,
+);
+GetWalletTransactionsData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+String userId = ...;
+
+final ref = EspyConnector.instance.getWalletTransactions(
+  userId: userId,
+).ref();
+ref.execute();
+
+ref.subscribe(...);
+```
+
+
 ### ListPendingApprovals
 #### Required Arguments
 ```dart
@@ -508,6 +679,64 @@ Each builder returns an `execute` function, which is a helper function that crea
 An example of how to use the `Ref` object is shown below:
 ```dart
 final ref = EspyConnector.instance.listPendingApprovals().ref();
+ref.execute();
+
+ref.subscribe(...);
+```
+
+
+### ListSupportTickets
+#### Required Arguments
+```dart
+// No required arguments
+EspyConnector.instance.listSupportTickets().execute();
+```
+
+#### Optional Arguments
+We return a builder for each query. For ListSupportTickets, we created `ListSupportTicketsBuilder`. For queries and mutations with optional parameters, we return a builder class.
+The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
+```dart
+class ListSupportTicketsVariablesBuilder {
+  ...
+ 
+  ListSupportTicketsVariablesBuilder status(SupportTicketStatus? t) {
+   _status.value = t;
+   return this;
+  }
+
+  ...
+}
+EspyConnector.instance.listSupportTickets()
+.status(status)
+.execute();
+```
+
+#### Return Type
+`execute()` returns a `QueryResult<ListSupportTicketsData, ListSupportTicketsVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+/// Result of a query request. Created to hold extra variables in the future.
+class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
+  QueryResult(super.dataConnect, super.data, super.ref);
+}
+
+final result = await EspyConnector.instance.listSupportTickets();
+ListSupportTicketsData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+final ref = EspyConnector.instance.listSupportTickets().ref();
 ref.execute();
 
 ref.subscribe(...);
@@ -610,6 +839,14 @@ class UpdateUserProfileVariablesBuilder {
    _photoUrl.value = t;
    return this;
   }
+  UpdateUserProfileVariablesBuilder phone(String? t) {
+   _phone.value = t;
+   return this;
+  }
+  UpdateUserProfileVariablesBuilder whatsapp(String? t) {
+   _whatsapp.value = t;
+   return this;
+  }
 
   ...
 }
@@ -618,6 +855,8 @@ EspyConnector.instance.updateUserProfile(
 )
 .name(name)
 .photoUrl(photoUrl)
+.phone(phone)
+.whatsapp(whatsapp)
 .execute();
 ```
 
@@ -646,6 +885,86 @@ An example of how to use the `Ref` object is shown below:
 String id = ...;
 
 final ref = EspyConnector.instance.updateUserProfile(
+  id: id,
+).ref();
+ref.execute();
+```
+
+
+### UpsertProfessionalProfile
+#### Required Arguments
+```dart
+String id = ...;
+EspyConnector.instance.upsertProfessionalProfile(
+  id: id,
+).execute();
+```
+
+#### Optional Arguments
+We return a builder for each query. For UpsertProfessionalProfile, we created `UpsertProfessionalProfileBuilder`. For queries and mutations with optional parameters, we return a builder class.
+The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
+```dart
+class UpsertProfessionalProfileVariablesBuilder {
+  ...
+   UpsertProfessionalProfileVariablesBuilder fullNameAr(String? t) {
+   _fullNameAr.value = t;
+   return this;
+  }
+  UpsertProfessionalProfileVariablesBuilder specialty(String? t) {
+   _specialty.value = t;
+   return this;
+  }
+  UpsertProfessionalProfileVariablesBuilder specialtyAr(String? t) {
+   _specialtyAr.value = t;
+   return this;
+  }
+  UpsertProfessionalProfileVariablesBuilder bioEn(String? t) {
+   _bioEn.value = t;
+   return this;
+  }
+  UpsertProfessionalProfileVariablesBuilder bioAr(String? t) {
+   _bioAr.value = t;
+   return this;
+  }
+
+  ...
+}
+EspyConnector.instance.upsertProfessionalProfile(
+  id: id,
+)
+.fullNameAr(fullNameAr)
+.specialty(specialty)
+.specialtyAr(specialtyAr)
+.bioEn(bioEn)
+.bioAr(bioAr)
+.execute();
+```
+
+#### Return Type
+`execute()` returns a `OperationResult<UpsertProfessionalProfileData, UpsertProfessionalProfileVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await EspyConnector.instance.upsertProfessionalProfile(
+  id: id,
+);
+UpsertProfessionalProfileData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+String id = ...;
+
+final ref = EspyConnector.instance.upsertProfessionalProfile(
   id: id,
 ).ref();
 ref.execute();
@@ -1050,6 +1369,66 @@ bool isApproved = ...;
 final ref = EspyConnector.instance.approveProfessional(
   id: id,
   isApproved: isApproved,
+).ref();
+ref.execute();
+```
+
+
+### ResolveSupportTicket
+#### Required Arguments
+```dart
+String id = ...;
+EspyConnector.instance.resolveSupportTicket(
+  id: id,
+).execute();
+```
+
+#### Optional Arguments
+We return a builder for each query. For ResolveSupportTicket, we created `ResolveSupportTicketBuilder`. For queries and mutations with optional parameters, we return a builder class.
+The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
+```dart
+class ResolveSupportTicketVariablesBuilder {
+  ...
+   ResolveSupportTicketVariablesBuilder adminNote(String? t) {
+   _adminNote.value = t;
+   return this;
+  }
+
+  ...
+}
+EspyConnector.instance.resolveSupportTicket(
+  id: id,
+)
+.adminNote(adminNote)
+.execute();
+```
+
+#### Return Type
+`execute()` returns a `OperationResult<ResolveSupportTicketData, ResolveSupportTicketVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await EspyConnector.instance.resolveSupportTicket(
+  id: id,
+);
+ResolveSupportTicketData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+String id = ...;
+
+final ref = EspyConnector.instance.resolveSupportTicket(
+  id: id,
 ).ref();
 ref.execute();
 ```

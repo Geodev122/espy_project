@@ -1,4 +1,4 @@
-# ESPY PROTOCOL - UNIFIED SCHEMA v5.14
+# ESPY PROTOCOL - UNIFIED SCHEMA v6.0
 
 # --- Enums ---
 
@@ -7,6 +7,7 @@ enum UserRole {
   PROFESSIONAL
   INSTITUTION
   ADMIN
+  PENDING
 }
 
 enum MembershipTier {
@@ -28,6 +29,7 @@ enum InteractionType {
   VIEW
   FAVORITE
   SHARE
+  CONTACT
 }
 
 enum CommunityRequestStatus {
@@ -37,10 +39,16 @@ enum CommunityRequestStatus {
   PENDING
 }
 
+enum SupportTicketStatus {
+  OPEN
+  CLOSED
+  PENDING
+}
+
 # --- 1. Identity & Profiles ---
 
 type User @table(key: "id") {
-  id: String!
+  id: String! # Firebase UID
   email: String! @unique
   name: String
   role: UserRole! @default(value: VISITOR)
@@ -155,6 +163,14 @@ type CommunityRequest @table(key: "id") {
   createdAt: Timestamp! @default(expr: "request.time")
 }
 
+type Match @table(key: "id") {
+  id: UUID! @default(expr: "uuidV4()")
+  visitor: User!
+  professional: User!
+  status: String! @default(value: "requested") # requested, accepted, rejected
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
 # --- 4. Ledger & Analytics ---
 
 type WalletTransaction @table(key: "id") {
@@ -167,11 +183,43 @@ type WalletTransaction @table(key: "id") {
   createdAt: Timestamp! @default(expr: "request.time")
 }
 
+type RechargeCard @table(key: "id") {
+  id: String! # Code
+  tokenValue: Int!
+  status: String! @default(value: "active") # active, used
+  redeemedBy: User
+  redeemedAt: Timestamp
+}
+
 type Interaction @table(key: "id") {
   id: UUID! @default(expr: "uuidV4()")
   actor: User!
-  targetId: String!
+  targetId: String! # UserID or ServiceID
   type: InteractionType!
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+# --- 5. Reputation & Safety ---
+
+type Review @table(key: "id") {
+  id: UUID! @default(expr: "uuidV4()")
+  author: User!
+  targetUser: User
+  targetService: Service
+  rating: Int! # 1-5
+  comment: String
+  isApproved: Boolean! @default(value: true)
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+type Report @table(key: "id") {
+  id: UUID! @default(expr: "uuidV4()")
+  reporter: User!
+  targetId: String!
+  targetType: String! # USER, SERVICE, REQUEST
+  reason: String!
+  status: String! @default(value: "pending") # pending, resolved, dismissed
+  adminNote: String
   createdAt: Timestamp! @default(expr: "request.time")
 }
 
@@ -184,7 +232,7 @@ type SosAlert @table(key: "id") {
   timestamp: Timestamp! @default(expr: "request.time")
 }
 
-# --- 5. Communications ---
+# --- 6. Communications ---
 
 type SystemNotification @table(key: "id") {
   id: UUID! @default(expr: "uuidV4()")
@@ -217,7 +265,17 @@ type Announcement @table(key: "id") {
   createdAt: Timestamp! @default(expr: "request.time")
 }
 
-# --- 6. Administration ---
+type SupportTicket @table(key: "id") {
+  id: UUID! @default(expr: "uuidV4()")
+  user: User!
+  subject: String!
+  message: String!
+  status: SupportTicketStatus! @default(value: OPEN)
+  adminNote: String
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+# --- 7. Administration ---
 
 type AdminLog @table(key: "id") {
   id: UUID! @default(expr: "uuidV4()")

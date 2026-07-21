@@ -8,6 +8,8 @@ part 'create_user.dart';
 
 part 'update_user_profile.dart';
 
+part 'upsert_professional_profile.dart';
+
 part 'create_service.dart';
 
 part 'update_service.dart';
@@ -22,23 +24,35 @@ part 'record_interaction.dart';
 
 part 'approve_professional.dart';
 
+part 'resolve_support_ticket.dart';
+
 part 'get_user.dart';
 
 part 'get_professional_details.dart';
+
+part 'list_sectors.dart';
+
+part 'list_categories.dart';
 
 part 'list_active_services.dart';
 
 part 'search_services.dart';
 
+part 'list_countries.dart';
+
 part 'list_location_nodes.dart';
 
-part 'list_interactions.dart';
+part 'list_favorite_ids.dart';
 
-part 'get_wallet_transactions.dart';
+part 'list_contacted_ids.dart';
 
 part 'list_community_requests.dart';
 
+part 'get_wallet_transactions.dart';
+
 part 'list_pending_approvals.dart';
+
+part 'list_support_tickets.dart';
 
 
 
@@ -90,6 +104,8 @@ part 'list_pending_approvals.dart';
     
       SHARE,
     
+      CONTACT,
+    
   }
   
   String interactionTypeSerializer(EnumValue<InteractionType> e) {
@@ -112,6 +128,9 @@ part 'list_pending_approvals.dart';
       
       case 'SHARE':
         return const Known(InteractionType.SHARE);
+      
+      case 'CONTACT':
+        return const Known(InteractionType.CONTACT);
       
       default:
         return Unknown(data);
@@ -143,6 +162,37 @@ part 'list_pending_approvals.dart';
       
       case 'PLATINUM':
         return const Known(MembershipTier.PLATINUM);
+      
+      default:
+        return Unknown(data);
+    }
+  }
+  
+
+  enum SupportTicketStatus {
+    
+      OPEN,
+    
+      CLOSED,
+    
+      PENDING,
+    
+  }
+  
+  String supportTicketStatusSerializer(EnumValue<SupportTicketStatus> e) {
+    return e.stringValue;
+  }
+  EnumValue<SupportTicketStatus> supportTicketStatusDeserializer(dynamic data) {
+    switch (data) {
+      
+      case 'OPEN':
+        return const Known(SupportTicketStatus.OPEN);
+      
+      case 'CLOSED':
+        return const Known(SupportTicketStatus.CLOSED);
+      
+      case 'PENDING':
+        return const Known(SupportTicketStatus.PENDING);
       
       default:
         return Unknown(data);
@@ -196,6 +246,8 @@ part 'list_pending_approvals.dart';
     
       ADMIN,
     
+      PENDING,
+    
   }
   
   String userRoleSerializer(EnumValue<UserRole> e) {
@@ -215,6 +267,9 @@ part 'list_pending_approvals.dart';
       
       case 'ADMIN':
         return const Known(UserRole.ADMIN);
+      
+      case 'PENDING':
+        return const Known(UserRole.PENDING);
       
       default:
         return Unknown(data);
@@ -286,6 +341,11 @@ class EspyConnector {
   }
   
   
+  UpsertProfessionalProfileVariablesBuilder upsertProfessionalProfile ({required String id, }) {
+    return UpsertProfessionalProfileVariablesBuilder(dataConnect, id: id,);
+  }
+  
+  
   CreateServiceVariablesBuilder createService ({required String categoryId, required String titleEn, required int price, }) {
     return CreateServiceVariablesBuilder(dataConnect, categoryId: categoryId,titleEn: titleEn,price: price,);
   }
@@ -321,6 +381,11 @@ class EspyConnector {
   }
   
   
+  ResolveSupportTicketVariablesBuilder resolveSupportTicket ({required String id, }) {
+    return ResolveSupportTicketVariablesBuilder(dataConnect, id: id,);
+  }
+  
+  
   GetUserVariablesBuilder getUser ({required String uid, }) {
     return GetUserVariablesBuilder(dataConnect, uid: uid,);
   }
@@ -328,6 +393,16 @@ class EspyConnector {
   
   GetProfessionalDetailsVariablesBuilder getProfessionalDetails ({required String uid, }) {
     return GetProfessionalDetailsVariablesBuilder(dataConnect, uid: uid,);
+  }
+  
+  
+  ListSectorsVariablesBuilder listSectors () {
+    return ListSectorsVariablesBuilder(dataConnect, );
+  }
+  
+  
+  ListCategoriesVariablesBuilder listCategories () {
+    return ListCategoriesVariablesBuilder(dataConnect, );
   }
   
   
@@ -341,18 +416,23 @@ class EspyConnector {
   }
   
   
+  ListCountriesVariablesBuilder listCountries () {
+    return ListCountriesVariablesBuilder(dataConnect, );
+  }
+  
+  
   ListLocationNodesVariablesBuilder listLocationNodes ({required String userId, }) {
     return ListLocationNodesVariablesBuilder(dataConnect, userId: userId,);
   }
   
   
-  ListInteractionsVariablesBuilder listInteractions ({required String actorId, }) {
-    return ListInteractionsVariablesBuilder(dataConnect, actorId: actorId,);
+  ListFavoriteIdsVariablesBuilder listFavoriteIds ({required String actorId, }) {
+    return ListFavoriteIdsVariablesBuilder(dataConnect, actorId: actorId,);
   }
   
   
-  GetWalletTransactionsVariablesBuilder getWalletTransactions ({required String userId, }) {
-    return GetWalletTransactionsVariablesBuilder(dataConnect, userId: userId,);
+  ListContactedIdsVariablesBuilder listContactedIds ({required String actorId, }) {
+    return ListContactedIdsVariablesBuilder(dataConnect, actorId: actorId,);
   }
   
   
@@ -361,8 +441,18 @@ class EspyConnector {
   }
   
   
+  GetWalletTransactionsVariablesBuilder getWalletTransactions ({required String userId, }) {
+    return GetWalletTransactionsVariablesBuilder(dataConnect, userId: userId,);
+  }
+  
+  
   ListPendingApprovalsVariablesBuilder listPendingApprovals () {
     return ListPendingApprovalsVariablesBuilder(dataConnect, );
+  }
+  
+  
+  ListSupportTicketsVariablesBuilder listSupportTickets () {
+    return ListSupportTicketsVariablesBuilder(dataConnect, );
   }
   
 

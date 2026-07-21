@@ -1,4 +1,4 @@
-# ESPY PROTOCOL - DATA CONNECT MUTATIONS v5.12
+# ESPY PROTOCOL - DATA CONNECT MUTATIONS v6.0
 
 # --- 1. Identity & Profile ---
 
@@ -11,11 +11,31 @@ mutation CreateUser($id: String!, $email: String!, $name: String, $role: UserRol
   })
 }
 
-mutation UpdateUserProfile($id: String!, $name: String, $photoUrl: String) @auth(expr: "auth.uid == id") {
+mutation UpdateUserProfile($id: String!, $name: String, $photoUrl: String, $phone: String, $whatsapp: String) @auth(expr: "auth.uid == id") {
   user_update(key: { id: $id }, data: {
     name: $name,
     photoUrl: $photoUrl,
+    phone: $phone,
+    whatsapp: $whatsapp,
     updatedAt_expr: "request.time"
+  })
+}
+
+mutation UpsertProfessionalProfile(
+  $id: String!,
+  $fullNameAr: String,
+  $specialty: String,
+  $specialtyAr: String,
+  $bioEn: String,
+  $bioAr: String
+) @auth(expr: "auth.uid == id") {
+  professionalProfile_upsert(data: {
+    id: $id,
+    fullNameAr: $fullNameAr,
+    specialty: $specialty,
+    specialtyAr: $specialtyAr,
+    bioEn: $bioEn,
+    bioAr: $bioAr
   })
 }
 
@@ -85,8 +105,15 @@ mutation RecordInteraction($targetId: String!, $type: InteractionType!) @auth(le
 
 # --- 5. Administration ---
 
-mutation ApproveProfessional($id: String!, $isApproved: Boolean!) @auth(expr: "auth.token.role == 'ADMIN'") {
+mutation ApproveProfessional($id: String!, $isApproved: Boolean!) @auth(level: NO_ACCESS) {
   professionalProfile_update(key: { id: $id }, data: {
     isApproved: $isApproved
+  })
+}
+
+mutation ResolveSupportTicket($id: UUID!, $adminNote: String) @auth(level: NO_ACCESS) {
+  supportTicket_update(key: { id: $id }, data: {
+    status: CLOSED,
+    adminNote: $adminNote
   })
 }

@@ -42,6 +42,8 @@ class DataConnectEspyRepository implements EspyRepository {
       id: id,
       name: data['name'],
       photoUrl: data['photoUrl'],
+      phone: data['phone'],
+      whatsapp: data['whatsapp'],
     ).execute();
   }
 
@@ -69,31 +71,63 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Future<InstitutionProfile?> getInstitutionProfile(String id) async {
-    // Similar to professional details if a query exists
-    return null; 
+    final result = await _db.getUser(uid: id).execute();
+    final inst = result.data.user?.institutionProfile_on_user;
+    if (inst == null) return null;
+
+    return InstitutionProfile(
+      id: id,
+      nameAr: inst.nameAr,
+      isApproved: inst.isApproved,
+      serviceSlots: inst.serviceSlots,
+      visibilityExpiresAt: inst.visibilityExpiresAt,
+    );
   }
 
   @override
   Future<VisitorProfile?> getVisitorProfile(String id) async {
-    return null;
+    final result = await _db.getUser(uid: id).execute();
+    final visitor = result.data.user?.visitorProfile_on_user;
+    if (visitor == null) return null;
+    return VisitorProfile(id: id, interests: visitor.interests ?? []);
   }
 
   // ─── 2. Taxonomy & Location ──────────────────────────────────────────────
 
   @override
   Stream<List<Map<String, dynamic>>> listSectors() {
-    // Standard query for sectors
-    return Stream.value([]);
+    return _db.listSectors().subscribe().map((snap) => 
+      snap.data.sectors.map((s) => {
+        'id': s.id,
+        'nameEn': s.nameEn,
+        'nameAr': s.nameAr,
+        'displayOrder': s.displayOrder,
+      }).toList()
+    );
   }
 
   @override
   Stream<List<Map<String, dynamic>>> listCategories({String? sectorId}) {
-    return Stream.value([]);
+    return _db.listCategories(sectorId: sectorId).subscribe().map((snap) =>
+      snap.data.categories.map((c) => {
+        'id': c.id,
+        'nameEn': c.nameEn,
+        'nameAr': c.nameAr,
+        'targetRole': c.targetRole.name.toLowerCase(),
+      }).toList()
+    );
   }
 
   @override
   Stream<List<Map<String, dynamic>>> listCountries() {
-    return Stream.value([]);
+    return _db.listCountries().subscribe().map((snap) =>
+      snap.data.countries.map((c) => {
+        'id': c.id,
+        'nameEn': c.nameEn,
+        'nameAr': c.nameAr,
+        'flagEmoji': c.flagEmoji,
+      }).toList()
+    );
   }
 
   @override
@@ -126,6 +160,7 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Stream<List<Map<String, dynamic>>> listProfessionalServices(String professionalId) {
+    // Requires a query for professional specific services
     return Stream.value([]);
   }
 
@@ -143,6 +178,7 @@ class DataConnectEspyRepository implements EspyRepository {
         'description': cr.description,
         'status': cr.status.name,
         'userName': cr.user.name,
+        'createdAt': cr.createdAt,
       }).toList()
     );
   }
@@ -150,7 +186,6 @@ class DataConnectEspyRepository implements EspyRepository {
   @override
   Future<void> createCommunityRequest(Map<String, dynamic> data) async {
     await _db.postCommunityRequest(
-      userId: data['userId'],
       sectorId: data['sectorId'],
       title: data['title'],
       description: data['description'],
@@ -174,7 +209,7 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Future<Map<String, dynamic>> spendTokens({required String userId, required String itemId, required int cost, required String role}) async {
-    final result = await _db.spendTokens(
+    await _db.spendTokens(
       userId: userId,
       cost: cost,
       ledgerAmount: -cost,
@@ -187,7 +222,6 @@ class DataConnectEspyRepository implements EspyRepository {
   @override
   Future<void> recordInteraction({required String userId, required String targetId, required String type}) async {
     await _db.recordInteraction(
-      actorId: userId,
       targetId: targetId,
       type: InteractionType.values.byName(type.toUpperCase()),
     ).execute();
@@ -198,8 +232,6 @@ class DataConnectEspyRepository implements EspyRepository {
     if (isFavorite) {
       await recordInteraction(userId: userId, targetId: targetId, type: 'FAVORITE');
     }
-    // Note: To "un-favorite" in relational schema, we'd delete the interaction record
-    // or add a specialized favorite table.
   }
 
   @override
@@ -216,11 +248,38 @@ class DataConnectEspyRepository implements EspyRepository {
         .map((snap) => snap.data.interactions.map((i) => i.targetId).toList());
   }
 
-  // ─── 5. Discovery & Helpers ──────────────────────────────────────────────
+  // ─── 5. Admin Operations ─────────────────────────────────────────────────
 
   @override
   Stream<List<Map<String, dynamic>>> listAllProviders() {
-    // Implementation for combined view if needed
+    return Stream.value([]);
+  }
+
+  @override
+  Future<void> approveProfessional(String id, bool isApproved, String role) async {
+    await _db.approveProfessional(id: id, isApproved: isApproved).execute();
+  }
+
+  @override
+  Stream<List<Map<String, dynamic>>> listSupportTickets({String? status}) {
+     SupportTicketStatus? gqlStatus;
+     if (status != null) gqlStatus = SupportTicketStatus.values.byName(status.toUpperCase());
+     return _db.listSupportTickets(status: gqlStatus).subscribe().map((snap) =>
+        snap.data.supportTickets.map((st) => {
+          'id': st.id,
+          'subject': st.subject,
+          'message': st.message,
+          'status': st.status.name,
+          'userEmail': st.user.email,
+        }).toList()
+     );
+  }
+
+  // ─── 6. Discovery & Helpers ──────────────────────────────────────────────
+
+  @override
+  Stream<List<Map<String, dynamic>>> getSystemStats() {
+    // Currently disabled in queries.gql until redeployed
     return Stream.value([]);
   }
 }

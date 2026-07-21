@@ -3,6 +3,7 @@
 ```dart
 EspyConnector.instance.CreateUser(createUserVariables).execute();
 EspyConnector.instance.UpdateUserProfile(updateUserProfileVariables).execute();
+EspyConnector.instance.UpsertProfessionalProfile(upsertProfessionalProfileVariables).execute();
 EspyConnector.instance.CreateService(createServiceVariables).execute();
 EspyConnector.instance.UpdateService(updateServiceVariables).execute();
 EspyConnector.instance.CreateLocationNode(createLocationNodeVariables).execute();
@@ -10,7 +11,6 @@ EspyConnector.instance.SpendTokens(spendTokensVariables).execute();
 EspyConnector.instance.PostCommunityRequest(postCommunityRequestVariables).execute();
 EspyConnector.instance.RecordInteraction(recordInteractionVariables).execute();
 EspyConnector.instance.ApproveProfessional(approveProfessionalVariables).execute();
-EspyConnector.instance.GetUser(getUserVariables).execute();
 
 ```
 
@@ -23,8 +23,8 @@ Optional fields can be discovered based on classes that have `Optional` object t
 This is an example of a mutation with an optional field:
 
 ```dart
-await EspyConnector.instance.ListCommunityRequests({ ... })
-.sectorId(...)
+await EspyConnector.instance.ListSupportTickets({ ... })
+.status(...)
 .execute();
 ```
 

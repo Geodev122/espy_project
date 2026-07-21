@@ -35,6 +35,11 @@ abstract class EspyRepository {
   Stream<List<String>> listFavoriteIds(String userId);
   Stream<List<String>> listContactedIds(String userId);
 
-  // ─── 5. Discovery & Helpers ──────────────────────────────────────────────
+  // ─── 5. Admin Operations ─────────────────────────────────────────────────
   Stream<List<Map<String, dynamic>>> listAllProviders(); // Combines Pros & Insts
+  Future<void> approveProfessional(String id, bool isApproved, String role);
+  Stream<List<Map<String, dynamic>>> listSupportTickets({String? status});
+
+  // ─── 6. Discovery & Helpers ──────────────────────────────────────────────
+  Stream<List<Map<String, dynamic>>> getSystemStats();
 }

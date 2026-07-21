@@ -27,6 +27,7 @@ class GetUserUser {
   final String? photoUrl;
   final bool isActive;
   final GetUserUserProfessionalProfileOnUser? professionalProfile_on_user;
+  final GetUserUserInstitutionProfileOnUser? institutionProfile_on_user;
   GetUserUser.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']),
@@ -36,7 +37,8 @@ class GetUserUser {
   walletBalance = nativeFromJson<int>(json['walletBalance']),
   photoUrl = json['photoUrl'] == null ? null : nativeFromJson<String>(json['photoUrl']),
   isActive = nativeFromJson<bool>(json['isActive']),
-  professionalProfile_on_user = json['professionalProfile_on_user'] == null ? null : GetUserUserProfessionalProfileOnUser.fromJson(json['professionalProfile_on_user']);
+  professionalProfile_on_user = json['professionalProfile_on_user'] == null ? null : GetUserUserProfessionalProfileOnUser.fromJson(json['professionalProfile_on_user']),
+  institutionProfile_on_user = json['institutionProfile_on_user'] == null ? null : GetUserUserInstitutionProfileOnUser.fromJson(json['institutionProfile_on_user']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -54,11 +56,12 @@ class GetUserUser {
     walletBalance == otherTyped.walletBalance && 
     photoUrl == otherTyped.photoUrl && 
     isActive == otherTyped.isActive && 
-    professionalProfile_on_user == otherTyped.professionalProfile_on_user;
+    professionalProfile_on_user == otherTyped.professionalProfile_on_user && 
+    institutionProfile_on_user == otherTyped.institutionProfile_on_user;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, email.hashCode, name.hashCode, role.hashCode, walletBalance.hashCode, photoUrl.hashCode, isActive.hashCode, professionalProfile_on_user.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, email.hashCode, name.hashCode, role.hashCode, walletBalance.hashCode, photoUrl.hashCode, isActive.hashCode, professionalProfile_on_user.hashCode, institutionProfile_on_user.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -79,6 +82,9 @@ class GetUserUser {
     if (professionalProfile_on_user != null) {
       json['professionalProfile_on_user'] = professionalProfile_on_user!.toJson();
     }
+    if (institutionProfile_on_user != null) {
+      json['institutionProfile_on_user'] = institutionProfile_on_user!.toJson();
+    }
     return json;
   }
 
@@ -91,6 +97,7 @@ class GetUserUser {
     this.photoUrl,
     required this.isActive,
     this.professionalProfile_on_user,
+    this.institutionProfile_on_user,
   });
 }
 
@@ -147,6 +154,54 @@ class GetUserUserProfessionalProfileOnUser {
     this.specialty,
     required this.isApproved,
     this.membershipTier,
+    this.visibilityExpiresAt,
+  });
+}
+
+@immutable
+class GetUserUserInstitutionProfileOnUser {
+  final String? nameAr;
+  final bool isApproved;
+  final Timestamp? visibilityExpiresAt;
+  GetUserUserInstitutionProfileOnUser.fromJson(dynamic json):
+  
+  nameAr = json['nameAr'] == null ? null : nativeFromJson<String>(json['nameAr']),
+  isApproved = nativeFromJson<bool>(json['isApproved']),
+  visibilityExpiresAt = json['visibilityExpiresAt'] == null ? null : Timestamp.fromJson(json['visibilityExpiresAt']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final GetUserUserInstitutionProfileOnUser otherTyped = other as GetUserUserInstitutionProfileOnUser;
+    return nameAr == otherTyped.nameAr && 
+    isApproved == otherTyped.isApproved && 
+    visibilityExpiresAt == otherTyped.visibilityExpiresAt;
+    
+  }
+  @override
+  int get hashCode => Object.hashAll([nameAr.hashCode, isApproved.hashCode, visibilityExpiresAt.hashCode]);
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    if (nameAr != null) {
+      json['nameAr'] = nativeToJson<String?>(nameAr);
+    }
+    json['isApproved'] = nativeToJson<bool>(isApproved);
+    if (visibilityExpiresAt != null) {
+      json['visibilityExpiresAt'] = visibilityExpiresAt!.toJson();
+    }
+    return json;
+  }
+
+  GetUserUserInstitutionProfileOnUser({
+    this.nameAr,
+    required this.isApproved,
     this.visibilityExpiresAt,
   });
 }

@@ -1,4 +1,4 @@
-# ESPY PROTOCOL - DATA CONNECT QUERIES v5.13
+# ESPY PROTOCOL - DATA CONNECT QUERIES v6.0
 
 # --- 1. Identity & Profile ---
 
@@ -15,6 +15,11 @@ query GetUser($uid: String!) @auth(expr: "auth.uid == uid") {
       specialty
       isApproved
       membershipTier
+      visibilityExpiresAt
+    }
+    institutionProfile_on_user {
+      nameAr
+      isApproved
       visibilityExpiresAt
     }
   }
@@ -43,6 +48,24 @@ query GetProfessionalDetails($uid: String!) @auth(level: PUBLIC) {
 }
 
 # --- 2. Discovery & Search ---
+
+query ListSectors @auth(level: PUBLIC) {
+  sectors(orderBy: [{ displayOrder: ASC }]) {
+    id
+    nameEn
+    nameAr
+    displayOrder
+  }
+}
+
+query ListCategories($sectorId: String) @auth(level: PUBLIC) {
+  categories(where: { sector: { id: { eq: $sectorId } } }) {
+    id
+    nameEn
+    nameAr
+    targetRole
+  }
+}
 
 query ListActiveServices($categoryId: String) @auth(level: PUBLIC) {
   services(where: {
@@ -85,6 +108,15 @@ query SearchServices($query: String, $minPrice: Int, $maxPrice: Int) @auth(level
   }
 }
 
+query ListCountries @auth(level: PUBLIC) {
+  countries {
+    id
+    nameEn
+    nameAr
+    flagEmoji
+  }
+}
+
 query ListLocationNodes($userId: String!) @auth(level: PUBLIC) {
   locationNodes(where: { user: { id: { eq: $userId } } }) {
     id
@@ -96,31 +128,29 @@ query ListLocationNodes($userId: String!) @auth(level: PUBLIC) {
   }
 }
 
-query ListInteractions($actorId: String!, $type: InteractionType) @auth(expr: "auth.uid == actorId") {
+# --- 3. Interactions & Community ---
+
+query ListFavoriteIds($actorId: String!) @auth(expr: "auth.uid == actorId") {
   interactions(where: {
     _and: [
       { actor: { id: { eq: $actorId } } },
-      { type: { eq: $type } }
+      { type: { eq: FAVORITE } }
     ]
   }) {
     targetId
   }
 }
 
-# --- 3. Financial & Ledger ---
-
-query GetWalletTransactions($userId: String!) @auth(expr: "auth.uid == userId") {
-  walletTransactions(where: { user: { id: { eq: $userId } } }, orderBy: [{ createdAt: DESC }]) {
-    id
-    type
-    amount
-    referenceId
-    description
-    createdAt
+query ListContactedIds($actorId: String!) @auth(expr: "auth.uid == actorId") {
+  interactions(where: {
+    _and: [
+      { actor: { id: { eq: $actorId } } },
+      { type: { eq: CONTACT } }
+    ]
+  }) {
+    targetId
   }
 }
-
-# --- 4. Community & Comms ---
 
 query ListCommunityRequests($sectorId: String, $status: CommunityRequestStatus = ACTIVE) @auth(level: USER) {
   communityRequests(
@@ -144,22 +174,29 @@ query ListCommunityRequests($sectorId: String, $status: CommunityRequestStatus =
   }
 }
 
+# --- 4. Financial & Ledger ---
+
+query GetWalletTransactions($userId: String!) @auth(expr: "auth.uid == userId") {
+  walletTransactions(where: { user: { id: { eq: $userId } } }, orderBy: [{ createdAt: DESC }]) {
+    id
+    type
+    amount
+    referenceId
+    description
+    createdAt
+  }
+}
+
 # --- 5. Administration & Audit ---
 
 # Aggregates disabled temporarily to ensure deployment success
-# query GetSystemStats @auth(expr: "auth.token.role == 'ADMIN'") {
-#   users_aggregate {
-#     _count
-#   }
-#   services_aggregate(where: { isActive: { eq: true } }) {
-#     _count
-#   }
-#   communityRequests_aggregate(where: { status: { eq: ACTIVE } }) {
-#     _count
-#   }
+# query GetSystemStats @auth(level: NO_ACCESS) {
+#   users_aggregate { _count }
+#   services_aggregate(where: { isActive: { eq: true } }) { _count }
+#   communityRequests_aggregate(where: { status: { eq: ACTIVE } }) { _count }
 # }
 
-query ListPendingApprovals @auth(expr: "auth.token.role == 'ADMIN'") {
+query ListPendingApprovals @auth(level: NO_ACCESS) {
   professionalProfiles(where: { isApproved: { eq: false } }) {
     id
     fullNameAr
@@ -167,5 +204,16 @@ query ListPendingApprovals @auth(expr: "auth.token.role == 'ADMIN'") {
       email
       createdAt
     }
+  }
+}
+
+query ListSupportTickets($status: SupportTicketStatus) @auth(level: NO_ACCESS) {
+  supportTickets(where: { status: { eq: $status } }, orderBy: [{ createdAt: DESC }]) {
+    id
+    subject
+    message
+    status
+    createdAt
+    user { email name }
   }
 }

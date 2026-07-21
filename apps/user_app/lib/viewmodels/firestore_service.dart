@@ -1,4 +1,4 @@
-// ESPY PROTOCOL - FIRESTORE SERVICE v1.1
+// ESPY PROTOCOL - FIRESTORE SERVICE v1.2
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:rxdart/rxdart.dart';
@@ -16,10 +16,10 @@ class FirestoreService {
   Stream<List<Map<String, dynamic>>> getSectors() {
     _debug.log('FIRESTORE', 'Watch: directory_sectors');
     return _db
-        .collection('directory_sectors')
+        .collection<Map<String, dynamic>>('directory_sectors')
         .snapshots()
-        .map((snap) {
-          final sectors = snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList();
+        .map<List<Map<String, dynamic>>>((snap) {
+          final sectors = snap.docs.map<Map<String, dynamic>>((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList();
           return sectors.where((s) => s['isActive'] == true || s['is_active'] == true).toList()
             ..sort((a, b) => (a['displayOrder'] as num? ?? 999).compareTo(b['displayOrder'] as num? ?? 999));
         });
@@ -28,12 +28,12 @@ class FirestoreService {
   Stream<List<Map<String, dynamic>>> getCategories(String type) {
     _debug.log('FIRESTORE', 'Watch: directory_categories ($type)');
     return _db
-        .collection('directory_categories')
+        .collection<Map<String, dynamic>>('directory_categories')
         .where('type', isEqualTo: type)
         .snapshots()
-        .map((snap) =>
-            snap.docs.map((doc) {
-              final data = doc.data();
+        .map<List<Map<String, dynamic>>>((snap) =>
+            snap.docs.map<Map<String, dynamic>>((doc) {
+              final data = doc.data() as Map<String, dynamic>;
               return {
                 'id': doc.id, 
                 ...data,
@@ -47,43 +47,43 @@ class FirestoreService {
 
   Stream<List<Map<String, dynamic>>> getCountries() {
     return _db
-        .collection('directory_countries')
+        .collection<Map<String, dynamic>>('directory_countries')
         .snapshots()
-        .map((snap) =>
-            snap.docs.map((doc) => {'id': doc.id, ...doc.data()})
+        .map<List<Map<String, dynamic>>>((snap) =>
+            snap.docs.map<Map<String, dynamic>>((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>})
             .toList()
             ..sort((a, b) => (a['name_en'] as String? ?? '').compareTo(b['name_en'] as String? ?? '')));
   }
 
   Stream<List<Map<String, dynamic>>> getGovernorates({String? countryId}) {
-    Query<Map<String, dynamic>> query = _db.collection('directory_governorates');
+    Query<Map<String, dynamic>> query = _db.collection<Map<String, dynamic>>('directory_governorates');
     if (countryId != null && countryId != 'ALL') {
       query = query.where('country_id', isEqualTo: countryId);
     }
     return query.snapshots()
-        .map((snap) =>
-            snap.docs.map((doc) => {'id': doc.id, ...doc.data()})
+        .map<List<Map<String, dynamic>>>((snap) =>
+            snap.docs.map<Map<String, dynamic>>((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>})
             .toList()
             ..sort((a, b) => (a['name_en'] as String? ?? '').compareTo(b['name_en'] as String? ?? '')));
   }
 
   Stream<List<Map<String, dynamic>>> getCities({String? governorateId}) {
-    Query<Map<String, dynamic>> query = _db.collection('directory_cities');
+    Query<Map<String, dynamic>> query = _db.collection<Map<String, dynamic>>('directory_cities');
     if (governorateId != null && governorateId != 'ALL') {
       query = query.where('governorate_id', isEqualTo: governorateId);
     }
     return query.snapshots()
-        .map((snap) =>
-            snap.docs.map((doc) => {'id': doc.id, ...doc.data()})
+        .map<List<Map<String, dynamic>>>((snap) =>
+            snap.docs.map<Map<String, dynamic>>((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>})
             .toList()
             ..sort((a, b) => (a['name_en'] as String? ?? '').compareTo(b['name_en'] as String? ?? '')));
   }
 
   Stream<List<Map<String, dynamic>>> getServicePricingTags() {
     return _db
-        .collection('directory_service_pricing_tags')
+        .collection<Map<String, dynamic>>('directory_service_pricing_tags')
         .snapshots()
-        .map((snap) => snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList());
+        .map<List<Map<String, dynamic>>>((snap) => snap.docs.map<Map<String, dynamic>>((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList());
   }
 
   // ─── 2. User & Roles ──────────────────────────────────────────────────────
@@ -94,12 +94,12 @@ class FirestoreService {
     if (role != null) targets.add(role);
     
     return _db
-        .collection('directory_notifications')
+        .collection<Map<String, dynamic>>('directory_notifications')
         .where('target', whereIn: targets)
         .snapshots()
         .handleError((e) => _debug.log('FIRESTORE', 'Error in notifications: $e'))
-        .map((snap) {
-          final items = snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList();
+        .map<List<Map<String, dynamic>>>((snap) {
+          final items = snap.docs.map<Map<String, dynamic>>((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList();
           items.sort((a, b) {
             final t1 = (a['timestamp'] as Timestamp?)?.millisecondsSinceEpoch ?? 0;
             final t2 = (b['timestamp'] as Timestamp?)?.millisecondsSinceEpoch ?? 0;
@@ -118,7 +118,7 @@ class FirestoreService {
     Map<String, dynamic>? clusterData,
   }) async {
     _debug.log('FIRESTORE', 'Send Notification: $userId');
-    await _db.collection('directory_notifications').add({
+    await _db.collection<Map<String, dynamic>>('directory_notifications').add({
       'target': userId,
       'title': title,
       'message': message,
@@ -132,7 +132,7 @@ class FirestoreService {
 
   Future<void> submitSupportMessage(Map<String, dynamic> data) async {
     _debug.log('FIRESTORE', 'Write: directory_support_inbox');
-    await _db.collection('directory_support_inbox').add({
+    await _db.collection<Map<String, dynamic>>('directory_support_inbox').add({
       ...data,
       'status': 'unread',
       'timestamp': FieldValue.serverTimestamp(),
@@ -145,14 +145,14 @@ class FirestoreService {
     _debug.log('FIRESTORE', 'Watch: directory_services (Active Join + Expiry)');
     final now = DateTime.now();
     return Rx.combineLatest2<QuerySnapshot<Map<String, dynamic>>, List<Map<String, dynamic>>, List<Map<String, dynamic>>>(
-      _db.collection('directory_services').where('isActive', isEqualTo: true).snapshots()
+      _db.collection<Map<String, dynamic>>('directory_services').where('isActive', isEqualTo: true).snapshots()
           .handleError((e) => _debug.log('FIRESTORE', 'Error in active services snap: $e')),
       getAllProviders(),
       (QuerySnapshot<Map<String, dynamic>> serviceSnap, List<Map<String, dynamic>> providers) {
         final providerIds = providers.map((p) => p['id']).toSet();
         return serviceSnap.docs
-            .map((doc) {
-              final data = doc.data();
+            .map<Map<String, dynamic>>((doc) {
+              final data = doc.data() as Map<String, dynamic>;
               return {'id': doc.id, ...data};
             })
             .where((s) {
@@ -182,7 +182,7 @@ class FirestoreService {
     required String type, 
   }) async {
     _debug.log('FIRESTORE', 'Interaction: $type on $targetId');
-    await _db.collection('directory_interactions').add({
+    await _db.collection<Map<String, dynamic>>('directory_interactions').add({
       'userId': userId,
       'targetId': targetId,
       'type': type,
@@ -195,22 +195,22 @@ class FirestoreService {
     _debug.log('FIRESTORE', 'Favorite: $professionalId -> $isFavorite');
     final favId = '${userId}_$professionalId';
     if (isFavorite) {
-      await _db.collection('directory_favorites').doc(favId).set({
+      await _db.collection<Map<String, dynamic>>('directory_favorites').doc(favId).set({
         'userId': userId,
         'professionalId': professionalId,
         'createdAt': FieldValue.serverTimestamp(),
       });
     } else {
-      await _db.collection('directory_favorites').doc(favId).delete();
+      await _db.collection<Map<String, dynamic>>('directory_favorites').doc(favId).delete();
     }
   }
 
   Stream<List<Map<String, dynamic>>> getUserFavorites(String userId) {
     return _db
-        .collection('directory_favorites')
+        .collection<Map<String, dynamic>>('directory_favorites')
         .where('userId', isEqualTo: userId)
         .snapshots()
-        .map((snap) => snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList());
+        .map<List<Map<String, dynamic>>>((snap) => snap.docs.map<Map<String, dynamic>>((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList());
   }
 
   // ─── 4. Transactions ──────────────────────────────────────────────────────
@@ -218,11 +218,11 @@ class FirestoreService {
   Stream<List<Map<String, dynamic>>> getUserTransactions(String userId) {
     _debug.log('FIRESTORE', 'Watch: directory_membership_transactions for $userId');
     return _db
-        .collection('directory_membership_transactions')
+        .collection<Map<String, dynamic>>('directory_membership_transactions')
         .where('userId', isEqualTo: userId)
         .snapshots()
-        .map((snap) {
-           final items = snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList();
+        .map<List<Map<String, dynamic>>>((snap) {
+           final items = snap.docs.map<Map<String, dynamic>>((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList();
            items.sort((a, b) {
              final t1 = (a['createdAt'] as Timestamp?)?.millisecondsSinceEpoch ?? 0;
              final t2 = (b['createdAt'] as Timestamp?)?.millisecondsSinceEpoch ?? 0;
@@ -236,16 +236,16 @@ class FirestoreService {
 
   Stream<List<Map<String, dynamic>>> getProfessionalServices(String professionalId) {
     return _db
-        .collection('directory_services')
+        .collection<Map<String, dynamic>>('directory_services')
         .where('professionalId', isEqualTo: professionalId)
         .snapshots()
-        .map((snap) => snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList());
+        .map<List<Map<String, dynamic>>>((snap) => snap.docs.map<Map<String, dynamic>>((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList());
   }
 
   Future<void> createService(Map<String, dynamic> data) async {
     _debug.log('FIRESTORE', 'Create Service');
     final timestamp = FieldValue.serverTimestamp();
-    await _db.collection('directory_services').add({
+    await _db.collection<Map<String, dynamic>>('directory_services').add({
       ...data,
       'isActive': true,
       'createdAt': timestamp,
@@ -254,7 +254,7 @@ class FirestoreService {
   }
 
   Future<void> toggleServiceSlot(String serviceId, bool allocate) async {
-    await _db.collection('directory_services').doc(serviceId).update({
+    await _db.collection<Map<String, dynamic>>('directory_services').doc(serviceId).update({
       'isAllocated': allocate,
       'updatedAt': FieldValue.serverTimestamp(),
     });
@@ -262,35 +262,35 @@ class FirestoreService {
 
   Stream<List<Map<String, dynamic>>> getUserSlots(String userId) {
     return _db
-        .collection('directory_slots')
+        .collection<Map<String, dynamic>>('directory_slots')
         .where('userId', isEqualTo: userId)
         .snapshots()
-        .map((snap) => snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList());
+        .map<List<Map<String, dynamic>>>((snap) => snap.docs.map<Map<String, dynamic>>((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList());
   }
 
   Future<void> createBroadcast(Map<String, dynamic> data) async {
-    await _db.collection('directory_broadcasts').add({
+    await _db.collection<Map<String, dynamic>>('directory_broadcasts').add({
       ...data,
       'createdAt': FieldValue.serverTimestamp(),
     });
   }
 
   Stream<List<Map<String, dynamic>>> getBroadcasts({String? country}) {
-    Query<Map<String, dynamic>> query = _db.collection('directory_broadcasts');
+    Query<Map<String, dynamic>> query = _db.collection<Map<String, dynamic>>('directory_broadcasts');
     if (country != null && country != 'GLOBAL') {
       // TODO: Implement country targeting logic
     }
     return query.orderBy('createdAt', descending: true).snapshots()
-        .map((snap) => snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList());
+        .map<List<Map<String, dynamic>>>((snap) => snap.docs.map<Map<String, dynamic>>((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList());
   }
 
   Stream<List<Map<String, dynamic>>> getAnnouncements() {
     return _db
-        .collection('directory_announcements')
+        .collection<Map<String, dynamic>>('directory_announcements')
         .where('status', isEqualTo: 'approved')
         .snapshots()
-        .map((snap) {
-          final items = snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList();
+        .map<List<Map<String, dynamic>>>((snap) {
+          final items = snap.docs.map<Map<String, dynamic>>((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList();
           return items;
         });
   }
@@ -298,7 +298,7 @@ class FirestoreService {
   // ─── 6. User Profiles ──────────────────────────────────────────────────────
 
   Future<void> updateUserProfile(String uid, Map<String, dynamic> data) async {
-    await _db.collection('users').doc(uid).set({...data, 'updatedAt': FieldValue.serverTimestamp()}, SetOptions(merge: true));
+    await _db.collection<Map<String, dynamic>>('users').doc(uid).set({...data, 'updatedAt': FieldValue.serverTimestamp()}, SetOptions(merge: true));
   }
 
   Future<void> updateVisitorProfile(String uid, Map<String, dynamic> data) async {
@@ -306,14 +306,14 @@ class FirestoreService {
     final finalData = {
       ...data,
       'uid': uid,
-      'isActive': true,
+      'isActive': true, 
       'isVerified': true,
       'countryId': data['countryId'] ?? 'lebanon',
       'last_active': timestamp,
       'updatedAt': timestamp
     };
-    await _db.collection('users').doc(uid).set(finalData, SetOptions(merge: true));
-    await _db.collection('directory_visitors').doc(uid).set(finalData, SetOptions(merge: true));
+    await _db.collection<Map<String, dynamic>>('users').doc(uid).set(finalData, SetOptions(merge: true));
+    await _db.collection<Map<String, dynamic>>('directory_visitors').doc(uid).set(finalData, SetOptions(merge: true));
   }
 
   Future<void> createProfessionalProfile(String uid, Map<String, dynamic> data) async {
@@ -338,20 +338,20 @@ class FirestoreService {
       'updatedAt': timestamp
     };
 
-    await _db.collection('users').doc(uid).set(finalData, SetOptions(merge: true));
-    await _db.collection(collection).doc(uid).set(finalData, SetOptions(merge: true));
+    await _db.collection<Map<String, dynamic>>('users').doc(uid).set(finalData, SetOptions(merge: true));
+    await _db.collection<Map<String, dynamic>>(collection).doc(uid).set(finalData, SetOptions(merge: true));
   }
 
   Stream<List<Map<String, dynamic>>> getAllProviders() {
     return Rx.combineLatest2<QuerySnapshot<Map<String, dynamic>>, QuerySnapshot<Map<String, dynamic>>, List<Map<String, dynamic>>>(
-      _db.collection('directory_professionals').snapshots()
+      _db.collection<Map<String, dynamic>>('directory_professionals').snapshots()
           .handleError((e) => _debug.log('FIRESTORE', 'Error in professionals snap: $e')),
-      _db.collection('directory_institutions').snapshots()
+      _db.collection<Map<String, dynamic>>('directory_institutions').snapshots()
           .handleError((e) => _debug.log('FIRESTORE', 'Error in institutions snap: $e')),
       (QuerySnapshot<Map<String, dynamic>> profs, QuerySnapshot<Map<String, dynamic>> insts) {
         final List<Map<String, dynamic>> all = [];
-        all.addAll(profs.docs.map((doc) => {'id': doc.id, ...doc.data()}).where((p) => p['isActive'] != false));
-        all.addAll(insts.docs.map((doc) => {'id': doc.id, ...doc.data()}).where((p) => p['isActive'] != false));
+        all.addAll(profs.docs.map<Map<String, dynamic>>((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).where((p) => p['isActive'] != false));
+        all.addAll(insts.docs.map<Map<String, dynamic>>((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).where((p) => p['isActive'] != false));
         return all;
       },
     ).handleError((e) => _debug.log('FIRESTORE', 'Error in combineLatest providers: $e'));
@@ -364,50 +364,50 @@ class FirestoreService {
     final batch = _db.batch();
     final timestamp = FieldValue.serverTimestamp();
     final data = {'isApproved': isApproved, 'verificationStatus': isApproved ? 'verified' : 'rejected', 'updatedAt': timestamp};
-    batch.update(_db.collection(col).doc(id), data);
-    batch.update(_db.collection('users').doc(id), data);
+    batch.update(_db.collection<Map<String, dynamic>>(col).doc(id), data);
+    batch.update(_db.collection<Map<String, dynamic>>('users').doc(id), data);
     await batch.commit();
   }
 
   Future<void> toggleHonorBadge(String id, bool current, String role) async {
     final col = role == 'institution' ? 'directory_institutions' : 'directory_professionals';
-    await _db.collection(col).doc(id).update({'isHonorVerified': !current, 'updatedAt': FieldValue.serverTimestamp()});
-    await _db.collection('users').doc(id).update({'isHonorVerified': !current, 'updatedAt': FieldValue.serverTimestamp()});
+    await _db.collection<Map<String, dynamic>>(col).doc(id).update({'isHonorVerified': !current, 'updatedAt': FieldValue.serverTimestamp()});
+    await _db.collection<Map<String, dynamic>>('users').doc(id).update({'isHonorVerified': !current, 'updatedAt': FieldValue.serverTimestamp()});
   }
 
   Future<void> deleteItem(String collection, String id) async {
-    await _db.collection(collection).doc(id).delete();
+    await _db.collection<Map<String, dynamic>>(collection).doc(id).delete();
   }
 
   Future<List<Map<String, dynamic>>> listCollection(String collection) async {
-    final snap = await _db.collection(collection).get();
-    return snap.docs.map((doc) => {...doc.data(), 'id': doc.id}).toList();
+    final snap = await _db.collection<Map<String, dynamic>>(collection).get();
+    return snap.docs.map<Map<String, dynamic>>((doc) => {...doc.data() as Map<String, dynamic>, 'id': doc.id}).toList();
   }
 
   Future<void> toggleCommunityRequestStatus(String id, bool isActive) async {
-    await _db.collection('directory_community_requests').doc(id).update({'status': isActive ? 'active' : 'pending', 'updatedAt': FieldValue.serverTimestamp()});
+    await _db.collection<Map<String, dynamic>>('directory_community_requests').doc(id).update({'status': isActive ? 'active' : 'pending', 'updatedAt': FieldValue.serverTimestamp()});
   }
 
   Future<void> updateUser(String id, String role, Map<String, dynamic> data) async {
     final col = role == 'institution' ? 'directory_institutions' : (role == 'professional' ? 'directory_professionals' : 'directory_visitors');
-    await _db.collection('users').doc(id).set({...data, 'updatedAt': FieldValue.serverTimestamp()}, SetOptions(merge: true));
-    await _db.collection(col).doc(id).set({...data, 'updatedAt': FieldValue.serverTimestamp()}, SetOptions(merge: true));
+    await _db.collection<Map<String, dynamic>>('users').doc(id).set({...data, 'updatedAt': FieldValue.serverTimestamp()}, SetOptions(merge: true));
+    await _db.collection<Map<String, dynamic>>(col).doc(id).set({...data, 'updatedAt': FieldValue.serverTimestamp()}, SetOptions(merge: true));
   }
 
   Stream<List<Map<String, dynamic>>> watchCommunityRequests() {
-    return _db.collection('directory_community_requests').orderBy('createdAt', descending: true).snapshots()
-        .map((snap) => snap.docs.map((doc) => {...doc.data(), 'id': doc.id}).toList());
+    return _db.collection<Map<String, dynamic>>('directory_community_requests').orderBy('createdAt', descending: true).snapshots()
+        .map<List<Map<String, dynamic>>>((snap) => snap.docs.map<Map<String, dynamic>>((doc) => {...doc.data() as Map<String, dynamic>, 'id': doc.id}).toList());
   }
 
   Future<void> createCommunityRequest(Map<String, dynamic> data) async {
     _debug.log('FIRESTORE', 'Write: community_request');
-    final docRef = _db.collection('directory_community_requests').doc();
+    final docRef = _db.collection<Map<String, dynamic>>('directory_community_requests').doc();
     final timestamp = FieldValue.serverTimestamp();
     await docRef.set({...data, 'id': docRef.id, 'status': 'pending', 'is_approved': false, 'createdAt': timestamp, 'updatedAt': timestamp});
   }
 
   Stream<List<Map<String, dynamic>>> getCommunityRequests({String? status = 'active', String? userId, String? sectionId, bool newestFirst = true}) {
-    Query<Map<String, dynamic>> query = _db.collection('directory_community_requests');
+    Query<Map<String, dynamic>> query = _db.collection<Map<String, dynamic>>('directory_community_requests');
     if (userId != null) {
       query = query.where('userId', isEqualTo: userId);
     } else {
@@ -415,8 +415,8 @@ class FirestoreService {
       if (sectionId != null && sectionId != 'All') query = query.where('sectionId', isEqualTo: sectionId);
     }
 
-    return query.snapshots().map((snapshot) {
-       final items = snapshot.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList();
+    return query.snapshots().map<List<Map<String, dynamic>>>((snapshot) {
+       final items = snapshot.docs.map<Map<String, dynamic>>((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList();
        items.sort((a, b) {
          final t1 = (a['createdAt'] as Timestamp?)?.millisecondsSinceEpoch ?? 0;
          final t2 = (b['createdAt'] as Timestamp?)?.millisecondsSinceEpoch ?? 0;
