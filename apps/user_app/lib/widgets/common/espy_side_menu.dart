@@ -8,12 +8,18 @@ import 'package:espy_app/theme/espy_theme.dart';
 import 'package:espy_app/viewmodels/auth_service.dart';
 import 'package:espy_app/viewmodels/wallet_view_model.dart';
 import 'package:espy_app/models/user_model.dart';
+
+// User Screens
 import '../../views/professional/profile/edit_profile_screen.dart';
 import '../../views/professional/profile/location_manager_screen.dart';
 import '../../views/professional/profile/vault_favorites_screen.dart';
 import '../../views/professional/profile/wallet_screen.dart';
-import '../../views/professional/profile/token_shop_screen.dart';
 import '../../views/professional/profile/payment_history_screen.dart';
+
+// Admin Screens (Conditional import or dynamic navigation)
+import '../../views/admin/modules/verifications_screen.dart';
+import '../../views/admin/modules/orders_manager_screen.dart';
+import '../../views/admin/modules/support_inbox_screen.dart';
 
 class EspySideMenu extends StatelessWidget {
   const EspySideMenu({super.key});
@@ -22,7 +28,8 @@ class EspySideMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthService>(context);
     final user = auth.userData;
-    final bool isProvider = user != null && user.role != UserRole.visitor;
+    final bool isProvider = user != null && user.role != UserRole.visitor && user.role != UserRole.admin;
+    final bool isAdmin = user != null && user.role == UserRole.admin;
 
     return Drawer(
       backgroundColor: EspyTheme.navyDeep,
@@ -35,20 +42,27 @@ class EspySideMenu extends StatelessWidget {
               child: ListView(
                 padding: const EdgeInsets.all(24),
                 children: [
-                  _buildSectionHeader('CORE PROTOCOLS'),
-                  _buildMenuItem(context, LucideIcons.user, 'MY IDENTITY', const EditProfileScreen()),
-                  if (isProvider)
-                    _buildMenuItem(context, LucideIcons.mapPin, 'LOCATION NODES', const LocationManagerScreen()),
-                  _buildMenuItem(context, Icons.favorite_border_rounded, 'FAVORITE BASKET', const VaultFavoritesScreen()),
-                  
-                  const SizedBox(height: 32),
-                  _buildSectionHeader('FINANCIAL & ORDERS'),
-                  _buildMenuItem(context, LucideIcons.wallet, 'WALLET', const WalletScreen()),
-                  _buildMenuItem(context, LucideIcons.shoppingCart, 'MY ORDERS', const PaymentHistoryScreen()),
-                  
-                  if (isProvider) ...[
+                  if (isAdmin) ...[
+                    _buildSectionHeader('ADMINISTRATIVE'),
+                    _buildMenuItem(context, LucideIcons.shieldCheck, 'VALIDATIONS', const VerificationsScreen()),
+                    _buildMenuItem(context, LucideIcons.shoppingBag, 'RESOURCES', const OrdersManagerScreen()),
+                    _buildMenuItem(context, LucideIcons.inbox, 'SUPPORT', const SupportInboxScreen()),
+                  ] else ...[
+                    _buildSectionHeader('CORE PROTOCOLS'),
+                    _buildMenuItem(context, LucideIcons.user, 'MY IDENTITY', const EditProfileScreen()),
+                    if (isProvider)
+                      _buildMenuItem(context, LucideIcons.mapPin, 'LOCATION NODES', const LocationManagerScreen()),
+                    _buildMenuItem(context, Icons.favorite_border_rounded, 'FAVORITE BASKET', const VaultFavoritesScreen()),
+                    
                     const SizedBox(height: 32),
-                    _buildValidationNotice(user),
+                    _buildSectionHeader('FINANCIAL & ORDERS'),
+                    _buildMenuItem(context, LucideIcons.wallet, 'WALLET', const WalletScreen()),
+                    _buildMenuItem(context, LucideIcons.shoppingCart, 'MY ORDERS', const PaymentHistoryScreen()),
+                    
+                    if (isProvider) ...[
+                      const SizedBox(height: 32),
+                      _buildValidationNotice(context, user),
+                    ],
                   ],
                 ],
               ),
@@ -102,7 +116,10 @@ class EspySideMenu extends StatelessWidget {
 
   Widget _buildMenuItem(BuildContext context, IconData icon, String label, Widget screen) {
     return ListTile(
-      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => screen)),
+      onTap: () {
+        Navigator.pop(context);
+        Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
+      },
       leading: Icon(icon, color: Colors.white70, size: 20),
       title: Text(label, style: GoogleFonts.montserrat(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 11, letterSpacing: 1)),
       contentPadding: const EdgeInsets.symmetric(horizontal: 4),
@@ -110,7 +127,7 @@ class EspySideMenu extends StatelessWidget {
     );
   }
 
-  Widget _buildValidationNotice(UserModel? user) {
+  Widget _buildValidationNotice(BuildContext context, UserModel? user) {
     // Logic for validation notice or recharge button
     final bool isValidated = user != null && (user['isProfileValidated'] == true);
 
@@ -136,7 +153,9 @@ class EspySideMenu extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {}, // Navigate to Token Shop
+                onPressed: () {
+                  // Navigate to Token Shop
+                },
                 style: ElevatedButton.styleFrom(backgroundColor: EspyTheme.gold, foregroundColor: EspyTheme.navyDeep),
                 child: const Text("RECHARGE COINS", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 10)),
               ),

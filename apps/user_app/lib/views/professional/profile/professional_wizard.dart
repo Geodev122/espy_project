@@ -380,7 +380,13 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
       // For brevity, assuming a unified profile update in this context
       
       // 3. Create Resource Order (Pending)
-      // await repo.createResourceOrder(pins: _pinsCount, slots: _slotsCount, broadcasts: _broadcastsCount);
+      await repo.createResourceOrder(
+        userId: auth.user!.uid,
+        pins: _pinsCount,
+        slots: _slotsCount,
+        broadcasts: _broadcastsCount,
+        total: (_pinsCount * 500) + (_slotsCount * 300) + (_broadcastsCount * 1000), // Hardcoded pricing for now
+      );
 
       await auth.fetchUserData();
     } catch (e) {

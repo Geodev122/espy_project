@@ -3,7 +3,6 @@ import '../models/user_model.dart';
 import '../models/professional_profile.dart';
 import '../models/institution_profile.dart';
 import '../models/visitor_profile.dart';
-// Note: This import will be valid after running 'firebase dataconnect:sdk:generate'
 import 'package:espy_dataconnect_sdk/espy_dataconnect_sdk.dart';
 
 /**
@@ -20,7 +19,6 @@ class DataConnectEspyRepository implements EspyRepository {
     final result = await _db.getUser(uid: id).execute();
     if (result.data.user == null) return null;
     
-    // Mapping DataConnect Data to local UserModel
     final user = result.data.user!;
     return UserModel(
       id: user.id,
@@ -160,7 +158,6 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Stream<List<Map<String, dynamic>>> listProfessionalServices(String professionalId) {
-    // Requires a query for professional specific services
     return Stream.value([]);
   }
 
@@ -192,7 +189,7 @@ class DataConnectEspyRepository implements EspyRepository {
     ).execute();
   }
 
-  // ─── 4. Ledger & Analytics ───────────────────────────────────────────────
+  // ─── 4. Ledger & Resource Orders ─────────────────────────────────────────
 
   @override
   Stream<List<Map<String, dynamic>>> listWalletTransactions(String userId) {
@@ -248,6 +245,32 @@ class DataConnectEspyRepository implements EspyRepository {
         .map((snap) => snap.data.interactions.map((i) => i.targetId).toList());
   }
 
+  @override
+  Future<void> createResourceOrder({required String userId, required int pins, required int slots, required int broadcasts, required int total}) async {
+    await _db.createResourceOrder(pins: pins, slots: slots, broadcasts: broadcasts, total: total).execute();
+  }
+
+  @override
+  Future<void> updateResourceOrder({required String id, required int pins, required int slots, required int broadcasts, required int total}) async {
+    await _db.updateResourceOrder(id: id, pins: pins, slots: slots, broadcasts: broadcasts, total: total).execute();
+  }
+
+  @override
+  Stream<Map<String, dynamic>?> getActiveResourceOrder(String userId) {
+    return _db.getActiveResourceOrder(userId: userId).subscribe().map((snap) {
+      if (snap.data.resourceOrders.isEmpty) return null;
+      final o = snap.data.resourceOrders.first;
+      return {
+        'id': o.id,
+        'pinsCount': o.pinsCount,
+        'slotsCount': o.slotsCount,
+        'broadcastsCount': o.broadcastsCount,
+        'totalCost': o.totalCost,
+        'status': o.status.name,
+      };
+    });
+  }
+
   // ─── 5. Admin Operations ─────────────────────────────────────────────────
 
   @override
@@ -275,11 +298,29 @@ class DataConnectEspyRepository implements EspyRepository {
      );
   }
 
+  @override
+  Stream<List<Map<String, dynamic>>> listPendingOrders() {
+    return _db.listPendingOrders().subscribe().map((snap) =>
+      snap.data.resourceOrders.map((o) => {
+        'id': o.id,
+        'pinsCount': o.pinsCount,
+        'slotsCount': o.slotsCount,
+        'broadcastsCount': o.broadcastsCount,
+        'totalCost': o.totalCost,
+        'userEmail': o.user.email,
+      }).toList()
+    );
+  }
+
+  @override
+  Future<void> approveResourceOrder(String orderId) async {
+    await _db.approveResourceOrder(id: orderId).execute();
+  }
+
   // ─── 6. Discovery & Helpers ──────────────────────────────────────────────
 
   @override
   Stream<List<Map<String, dynamic>>> getSystemStats() {
-    // Currently disabled in queries.gql until redeployed
     return Stream.value([]);
   }
 }

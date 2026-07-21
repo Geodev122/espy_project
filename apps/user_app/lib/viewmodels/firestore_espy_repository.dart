@@ -132,7 +132,7 @@ class FirestoreEspyRepository implements EspyRepository {
      });
   }
 
-  // ─── 4. Ledger & Analytics ───────────────────────────────────────────────
+  // ─── 4. Ledger & Resource Orders ─────────────────────────────────────────
 
   @override
   Stream<List<Map<String, dynamic>>> listWalletTransactions(String userId) {
@@ -201,6 +201,44 @@ class FirestoreEspyRepository implements EspyRepository {
             }).where((id) => id.isNotEmpty).toList());
   }
 
+  // --- Resource Orders ---
+
+  @override
+  Future<void> createResourceOrder({required String userId, required int pins, required int slots, required int broadcasts, required int total}) async {
+    await _db.collection<Map<String, dynamic>>('directory_resource_orders').add({
+      'userId': userId,
+      'pinsCount': pins,
+      'slotsCount': slots,
+      'broadcastsCount': broadcasts,
+      'totalCost': total,
+      'status': 'PENDING',
+      'createdAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  @override
+  Future<void> updateResourceOrder({required String id, required int pins, required int slots, required int broadcasts, required int total}) async {
+    await _db.collection<Map<String, dynamic>>('directory_resource_orders').doc(id).update({
+      'pinsCount': pins,
+      'slotsCount': slots,
+      'broadcastsCount': broadcasts,
+      'totalCost': total,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  @override
+  Stream<Map<String, dynamic>?> getActiveResourceOrder(String userId) {
+    return _db.collection<Map<String, dynamic>>('directory_resource_orders')
+        .where('userId', isEqualTo: userId)
+        .where('status', whereIn: ['PENDING', 'APPROVED'])
+        .orderBy('createdAt', descending: true)
+        .limit(1)
+        .snapshots()
+        .map((snap) => snap.docs.isEmpty ? null : {'id': snap.docs.first.id, ...snap.docs.first.data() as Map<String, dynamic>});
+  }
+
   // ─── 5. Admin Operations ─────────────────────────────────────────────────
 
   @override
@@ -236,11 +274,26 @@ class FirestoreEspyRepository implements EspyRepository {
         snap.docs.map<Map<String, dynamic>>((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList());
   }
 
+  @override
+  Stream<List<Map<String, dynamic>>> listPendingOrders() {
+    return _db.collection<Map<String, dynamic>>('directory_resource_orders')
+        .where('status', isEqualTo: 'PENDING')
+        .snapshots()
+        .map<List<Map<String, dynamic>>>((snap) => snap.docs.map<Map<String, dynamic>>((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList());
+  }
+
+  @override
+  Future<void> approveResourceOrder(String orderId) async {
+    await _db.collection<Map<String, dynamic>>('directory_resource_orders').doc(orderId).update({
+      'status': 'APPROVED',
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
   // ─── 6. Discovery & Helpers ──────────────────────────────────────────────
 
   @override
   Stream<List<Map<String, dynamic>>> getSystemStats() {
-    // In Firestore, we often use a dedicated stats doc
     return _db.collection<Map<String, dynamic>>('metadata').doc('system_stats').snapshots().map<List<Map<String, dynamic>>>((snap) => [snap.data() ?? {}]);
   }
 }

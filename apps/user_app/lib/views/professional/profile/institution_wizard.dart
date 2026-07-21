@@ -349,7 +349,14 @@ class _InstitutionWizardState extends State<InstitutionWizard> {
         'hasProfile': true,
       });
 
-      // Create Resource Order logic...
+      // Create Resource Order (Pending)
+      await repo.createResourceOrder(
+        userId: auth.user!.uid,
+        pins: _pinsCount,
+        slots: _slotsCount,
+        broadcasts: _broadcastsCount,
+        total: (_pinsCount * 500) + (_slotsCount * 300) + (_broadcastsCount * 1000),
+      );
 
       await auth.fetchUserData();
     } catch (e) {

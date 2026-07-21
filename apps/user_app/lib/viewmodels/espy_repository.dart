@@ -26,7 +26,7 @@ abstract class EspyRepository {
   Stream<List<Map<String, dynamic>>> listCommunityRequests({String? sectorId, bool newestFirst = true, String? userId});
   Future<void> createCommunityRequest(Map<String, dynamic> data);
 
-  // ─── 4. Ledger & Analytics ───────────────────────────────────────────────
+  // ─── 4. Ledger & Resource Orders ─────────────────────────────────────────
   Stream<List<Map<String, dynamic>>> listWalletTransactions(String userId);
   Future<Map<String, dynamic>> spendTokens({required String userId, required String itemId, required int cost, required String role});
 
@@ -35,10 +35,17 @@ abstract class EspyRepository {
   Stream<List<String>> listFavoriteIds(String userId);
   Stream<List<String>> listContactedIds(String userId);
 
+  // --- Resource Orders ---
+  Future<void> createResourceOrder({required String userId, required int pins, required int slots, required int broadcasts, required int total});
+  Future<void> updateResourceOrder({required String id, required int pins, required int slots, required int broadcasts, required int total});
+  Stream<Map<String, dynamic>?> getActiveResourceOrder(String userId);
+
   // ─── 5. Admin Operations ─────────────────────────────────────────────────
   Stream<List<Map<String, dynamic>>> listAllProviders(); // Combines Pros & Insts
   Future<void> approveProfessional(String id, bool isApproved, String role);
   Stream<List<Map<String, dynamic>>> listSupportTickets({String? status});
+  Stream<List<Map<String, dynamic>>> listPendingOrders();
+  Future<void> approveResourceOrder(String orderId);
 
   // ─── 6. Discovery & Helpers ──────────────────────────────────────────────
   Stream<List<Map<String, dynamic>>> getSystemStats();
