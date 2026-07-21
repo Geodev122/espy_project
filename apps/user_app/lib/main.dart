@@ -19,6 +19,7 @@ import 'viewmodels/wallet_view_model.dart';
 import 'viewmodels/matching_view_model.dart';
 import 'viewmodels/requests_view_model.dart';
 import 'viewmodels/services_view_model.dart';
+import 'viewmodels/registration_view_model.dart';
 import 'viewmodels/espy_repository.dart';
 import 'viewmodels/firestore_espy_repository.dart';
 
@@ -96,6 +97,10 @@ void main() async {
         ChangeNotifierProxyProvider2<EspyRepository, AuthService, ServicesViewModel>(
           create: (context) => ServicesViewModel(context.read<EspyRepository>(), context.read<AuthService>()),
           update: (context, repo, auth, previous) => ServicesViewModel(repo, auth),
+        ),
+        ChangeNotifierProxyProvider2<EspyRepository, AuthService, RegistrationViewModel>(
+          create: (context) => RegistrationViewModel(context.read<EspyRepository>(), context.read<AuthService>(), context.read<StorageService>()),
+          update: (context, repo, auth, previous) => RegistrationViewModel(repo, auth, context.read<StorageService>()),
         ),
         Provider(create: (_) => FirestoreService()),
         Provider(create: (_) => StorageService()),

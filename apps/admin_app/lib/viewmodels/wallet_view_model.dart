@@ -8,29 +8,54 @@ class WalletViewModel extends ChangeNotifier {
   final EspyRepository _repository;
 
   List<Map<String, dynamic>> _transactions = [];
+  Map<String, dynamic>? _activeOrder;
   bool _isLoadingTransactions = false;
   bool _isProcessing = false;
 
   WalletViewModel(this._authService, this._repository) {
     if (_authService.user != null) {
-      _loadTransactions();
+      _loadData();
     }
   }
 
   int get balance => _authService.userData?.walletBalance ?? 0;
   List<Map<String, dynamic>> get transactions => _transactions;
+  Map<String, dynamic>? get activeOrder => _activeOrder;
   bool get isLoadingTransactions => _isLoadingTransactions;
   bool get isProcessing => _isProcessing;
 
-  void _loadTransactions() {
+  void _loadData() {
     _isLoadingTransactions = true;
     notifyListeners();
 
+    // Load Transactions
     _repository.listWalletTransactions(_authService.user!.uid).listen((data) {
       _transactions = data;
       _isLoadingTransactions = false;
       notifyListeners();
     });
+
+    // Load Active Resource Order
+    _repository.getActiveResourceOrder(_authService.user!.uid).listen((order) {
+      _activeOrder = order;
+      notifyListeners();
+    });
+  }
+
+  int get daysUntilExpiry {
+    final dynamic expiry = _authService.userData?.rawData['visibilityExpiresAt'];
+    if (expiry == null) return 0;
+    
+    DateTime? date;
+    if (expiry is DateTime) {
+      date = expiry;
+    } else {
+      date = DateTime.tryParse(expiry.toString());
+    }
+    
+    if (date == null) return 0;
+    final diff = date.difference(DateTime.now()).inDays;
+    return diff > 0 ? diff : 0;
   }
 
   Future<void> refreshBalance() async {

@@ -26,9 +26,17 @@ part 'post_community_request.dart';
 
 part 'record_interaction.dart';
 
+part 'create_recharge_card.dart';
+
+part 'update_sector.dart';
+
+part 'update_category.dart';
+
 part 'approve_professional.dart';
 
 part 'validate_profile.dart';
+
+part 'validate_institution_profile.dart';
 
 part 'approve_resource_order.dart';
 
@@ -59,6 +67,8 @@ part 'list_community_requests.dart';
 part 'get_wallet_transactions.dart';
 
 part 'get_active_resource_order.dart';
+
+part 'list_recharge_cards.dart';
 
 part 'list_pending_approvals.dart';
 
@@ -434,6 +444,21 @@ class EspyConnector {
   }
   
   
+  CreateRechargeCardVariablesBuilder createRechargeCard ({required String code, required int value, required int pins, required int slots, }) {
+    return CreateRechargeCardVariablesBuilder(dataConnect, code: code,value: value,pins: pins,slots: slots,);
+  }
+  
+  
+  UpdateSectorVariablesBuilder updateSector ({required String id, }) {
+    return UpdateSectorVariablesBuilder(dataConnect, id: id,);
+  }
+  
+  
+  UpdateCategoryVariablesBuilder updateCategory ({required String id, }) {
+    return UpdateCategoryVariablesBuilder(dataConnect, id: id,);
+  }
+  
+  
   ApproveProfessionalVariablesBuilder approveProfessional ({required String id, required bool isApproved, }) {
     return ApproveProfessionalVariablesBuilder(dataConnect, id: id,isApproved: isApproved,);
   }
@@ -441,6 +466,11 @@ class EspyConnector {
   
   ValidateProfileVariablesBuilder validateProfile ({required String id, }) {
     return ValidateProfileVariablesBuilder(dataConnect, id: id,);
+  }
+  
+  
+  ValidateInstitutionProfileVariablesBuilder validateInstitutionProfile ({required String id, }) {
+    return ValidateInstitutionProfileVariablesBuilder(dataConnect, id: id,);
   }
   
   
@@ -516,6 +546,11 @@ class EspyConnector {
   
   GetActiveResourceOrderVariablesBuilder getActiveResourceOrder ({required String userId, }) {
     return GetActiveResourceOrderVariablesBuilder(dataConnect, userId: userId,);
+  }
+  
+  
+  ListRechargeCardsVariablesBuilder listRechargeCards () {
+    return ListRechargeCardsVariablesBuilder(dataConnect, );
   }
   
   

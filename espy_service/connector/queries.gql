@@ -1,4 +1,4 @@
-# ESPY PROTOCOL - DATA CONNECT QUERIES v6.1
+# ESPY PROTOCOL - DATA CONNECT QUERIES v6.2
 
 # --- 1. Identity & Profile ---
 
@@ -218,6 +218,16 @@ query GetActiveResourceOrder($userId: String!) @auth(expr: "auth.uid == userId")
 #   services_aggregate(where: { isActive: { eq: true } }) { _count }
 #   communityRequests_aggregate(where: { status: { eq: ACTIVE } }) { _count }
 # }
+
+query ListRechargeCards @auth(level: NO_ACCESS) {
+  rechargeCards(orderBy: [{ redeemedAt: DESC }]) {
+    id
+    tokenValue
+    status
+    redeemedAt
+    redeemedBy { email }
+  }
+}
 
 query ListPendingApprovals @auth(level: NO_ACCESS) {
   professionalProfiles(where: { isApproved: { eq: false } }) {

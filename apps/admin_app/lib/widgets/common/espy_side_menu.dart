@@ -154,7 +154,8 @@ class EspySideMenu extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  // Navigate to Token Shop
+                  Navigator.pop(context);
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const TokenShopScreen(initialTab: 0)));
                 },
                 style: ElevatedButton.styleFrom(backgroundColor: EspyTheme.gold, foregroundColor: EspyTheme.navyDeep),
                 child: const Text("RECHARGE COINS", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 10)),

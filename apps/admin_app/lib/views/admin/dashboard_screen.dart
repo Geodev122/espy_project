@@ -4,15 +4,21 @@ import 'package:provider/provider.dart';
 import 'package:espy_app/theme/espy_theme.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';
 import 'package:espy_app/widgets/common/premium_card.dart';
+import 'package:espy_app/viewmodels/admin_dashboard_view_model.dart';
 
 import 'modules/verifications_screen.dart';
 import 'modules/support_inbox_screen.dart';
+import 'modules/orders_manager_screen.dart';
+import 'modules/recharge_cards_screen.dart';
+import 'modules/taxonomy_manager_screen.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = Provider.of<AdminDashboardViewModel>(context);
+
     return EspyScaffold(
       useCinematicBackground: false,
       body: SingleChildScrollView(
@@ -24,9 +30,9 @@ class AdminDashboardScreen extends StatelessWidget {
             const SizedBox(height: 24),
             Row(
               children: [
-                _buildStatCard("TOTAL USERS", "1,240", Icons.people_rounded),
+                _buildStatCard("TOTAL USERS", viewModel.stats['users']!, Icons.people_rounded),
                 const SizedBox(width: 16),
-                _buildStatCard("ACTIVE SERVICES", "856", Icons.medical_services_rounded),
+                _buildStatCard("ACTIVE SERVICES", viewModel.stats['services']!, Icons.medical_services_rounded),
               ],
             ),
             const SizedBox(height: 32),
@@ -59,12 +65,19 @@ class AdminDashboardScreen extends StatelessWidget {
         _adminTile("PENDING VERIFICATIONS", Icons.verified_user_rounded, () {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const VerificationsScreen()));
         }),
+        _adminTile("RESOURCE ORDERS", Icons.shopping_bag_rounded, () {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const OrdersManagerScreen()));
+        }),
+        _adminTile("RECHARGE CARD GEN", Icons.qr_code_rounded, () {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const RechargeCardsScreen()));
+        }),
         _adminTile("SUPPORT INBOX", Icons.support_agent_rounded, () {
            Navigator.push(context, MaterialPageRoute(builder: (_) => const SupportInboxScreen()));
         }),
+        _adminTile("TAXONOMY MANAGEMENT", Icons.category_rounded, () {
+           Navigator.push(context, MaterialPageRoute(builder: (_) => const TaxonomyManagerScreen()));
+        }),
         _adminTile("SYSTEM ANNOUNCEMENTS", Icons.campaign_rounded, () {}),
-        _adminTile("WALLET LEDGER AUDIT", Icons.account_balance_wallet_rounded, () {}),
-        _adminTile("TAXONOMY MANAGEMENT", Icons.category_rounded, () {}),
       ],
     );
   }

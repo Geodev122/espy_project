@@ -35,17 +35,24 @@ class WalletViewModel extends ChangeNotifier {
       notifyListeners();
     });
 
-    // Load Active Order (Conceptual mapping for now)
-    // _repository.getActiveResourceOrder(_authService.user!.uid).listen((order) {
-    //   _activeOrder = order;
-    //   notifyListeners();
-    // });
+    // Load Active Resource Order
+    _repository.getActiveResourceOrder(_authService.user!.uid).listen((order) {
+      _activeOrder = order;
+      notifyListeners();
+    });
   }
 
   int get daysUntilExpiry {
-    final expiry = _authService.userData?['visibilityExpiresAt'];
+    final dynamic expiry = _authService.userData?.rawData['visibilityExpiresAt'];
     if (expiry == null) return 0;
-    final date = expiry is DateTime ? expiry : DateTime.tryParse(expiry.toString());
+    
+    DateTime? date;
+    if (expiry is DateTime) {
+      date = expiry;
+    } else {
+      date = DateTime.tryParse(expiry.toString());
+    }
+    
     if (date == null) return 0;
     final diff = date.difference(DateTime.now()).inDays;
     return diff > 0 ? diff : 0;

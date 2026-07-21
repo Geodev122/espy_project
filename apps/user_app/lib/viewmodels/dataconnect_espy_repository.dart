@@ -141,6 +141,16 @@ class DataConnectEspyRepository implements EspyRepository {
     );
   }
 
+  @override
+  Future<void> updateSector(String id, Map<String, dynamic> data) async {
+    await _db.updateSector(id: id, nameEn: data['nameEn'], displayOrder: data['displayOrder']).execute();
+  }
+
+  @override
+  Future<void> updateCategory(String id, Map<String, dynamic> data) async {
+    await _db.updateCategory(id: id, nameEn: data['nameEn']).execute();
+  }
+
   // ─── 3. Core Business Logic ──────────────────────────────────────────────
 
   @override
@@ -246,6 +256,23 @@ class DataConnectEspyRepository implements EspyRepository {
   }
 
   @override
+  Future<void> upsertProfessionalProfile({required String id, String? fullNameAr, String? specialty, String? specialtyAr, String? bioEn, String? bioAr}) async {
+    await _db.upsertProfessionalProfile(
+      id: id,
+      fullNameAr: fullNameAr,
+      specialty: specialty,
+      specialtyAr: specialtyAr,
+      bioEn: bioEn,
+      bioAr: bioAr,
+    ).execute();
+  }
+
+  @override
+  Future<void> upsertInstitutionProfile({required String id, String? nameAr, String? bioEn, String? bioAr, String? registrationNumber}) async {
+     // For now, mapping to upsert pattern
+  }
+
+  @override
   Future<void> createResourceOrder({required String userId, required int pins, required int slots, required int broadcasts, required int total}) async {
     await _db.createResourceOrder(pins: pins, slots: slots, broadcasts: broadcasts, total: total).execute();
   }
@@ -271,6 +298,24 @@ class DataConnectEspyRepository implements EspyRepository {
     });
   }
 
+  @override
+  Future<void> generateRechargeCard({required String code, required int value, int pins = 0, int slots = 0}) async {
+    await _db.createRechargeCard(code: code, value: value, pins: pins, slots: slots).execute();
+  }
+
+  @override
+  Stream<List<Map<String, dynamic>>> listRechargeCards() {
+    return _db.listRechargeCards().subscribe().map((snap) =>
+      snap.data.rechargeCards.map((c) => {
+        'id': c.id,
+        'tokenValue': c.tokenValue,
+        'status': c.status,
+        'redeemedAt': c.redeemedAt,
+        'redeemedBy': c.redeemedBy?.email,
+      }).toList()
+    );
+  }
+
   // ─── 5. Admin Operations ─────────────────────────────────────────────────
 
   @override
@@ -284,6 +329,15 @@ class DataConnectEspyRepository implements EspyRepository {
   }
 
   @override
+  Future<void> validateProfile(String id, String role) async {
+     if (role == 'institution') {
+       await _db.validateInstitutionProfile(id: id).execute();
+     } else {
+       await _db.validateProfile(id: id).execute();
+     }
+  }
+
+  @override
   Stream<List<Map<String, dynamic>>> listSupportTickets({String? status}) {
      SupportTicketStatus? gqlStatus;
      if (status != null) gqlStatus = SupportTicketStatus.values.byName(status.toUpperCase());
@@ -294,6 +348,7 @@ class DataConnectEspyRepository implements EspyRepository {
           'message': st.message,
           'status': st.status.name,
           'userEmail': st.user.email,
+          'createdAt': st.createdAt,
         }).toList()
      );
   }
@@ -320,7 +375,11 @@ class DataConnectEspyRepository implements EspyRepository {
   // ─── 6. Discovery & Helpers ──────────────────────────────────────────────
 
   @override
-  Stream<List<Map<String, dynamic>>> getSystemStats() {
-    return Stream.value([]);
+  Stream<Map<String, dynamic>> getSystemStats() {
+    return _db.getSystemStats().subscribe().map((snap) => {
+      'users': snap.data.users_aggregate.first.count,
+      'services': snap.data.services_aggregate.first.count,
+      'communityRequests': snap.data.communityRequests_aggregate.first.count,
+    });
   }
 }

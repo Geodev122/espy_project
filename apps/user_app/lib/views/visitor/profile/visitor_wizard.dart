@@ -32,7 +32,6 @@ class _VisitorWizardState extends State<VisitorWizard> {
   Uint8List? _profileImageWebBytes;
 
   final StorageService _storage = StorageService();
-
   bool _isSubmitting = false;
 
   @override

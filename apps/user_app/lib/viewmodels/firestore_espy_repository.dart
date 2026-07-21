@@ -73,6 +73,16 @@ class FirestoreEspyRepository implements EspyRepository {
         snap.docs.map<Map<String, dynamic>>((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList());
   }
 
+  @override
+  Future<void> updateSector(String id, Map<String, dynamic> data) async {
+    await _db.collection<Map<String, dynamic>>('directory_sectors').doc(id).update({...data, 'updatedAt': FieldValue.serverTimestamp()});
+  }
+
+  @override
+  Future<void> updateCategory(String id, Map<String, dynamic> data) async {
+    await _db.collection<Map<String, dynamic>>('directory_categories').doc(id).update({...data, 'updatedAt': FieldValue.serverTimestamp()});
+  }
+
   // ─── 3. Core Business Logic ──────────────────────────────────────────────
 
   @override
@@ -204,6 +214,29 @@ class FirestoreEspyRepository implements EspyRepository {
   // --- Resource Orders ---
 
   @override
+  Future<void> upsertProfessionalProfile({required String id, String? fullNameAr, String? specialty, String? specialtyAr, String? bioEn, String? bioAr}) async {
+    await _db.collection<Map<String, dynamic>>('directory_professionals').doc(id).set({
+      'fullNameAr': fullNameAr,
+      'specialty': specialty,
+      'specialtyAr': specialtyAr,
+      'bioEn': bioEn,
+      'bioAr': bioAr,
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
+  @override
+  Future<void> upsertInstitutionProfile({required String id, String? nameAr, String? bioEn, String? bioAr, String? registrationNumber}) async {
+    await _db.collection<Map<String, dynamic>>('directory_institutions').doc(id).set({
+      'nameAr': nameAr,
+      'bioEn': bioEn,
+      'bioAr': bioAr,
+      'registrationNumber': registrationNumber,
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
+  @override
   Future<void> createResourceOrder({required String userId, required int pins, required int slots, required int broadcasts, required int total}) async {
     await _db.collection<Map<String, dynamic>>('directory_resource_orders').add({
       'userId': userId,
@@ -239,6 +272,25 @@ class FirestoreEspyRepository implements EspyRepository {
         .map((snap) => snap.docs.isEmpty ? null : {'id': snap.docs.first.id, ...snap.docs.first.data() as Map<String, dynamic>});
   }
 
+  // --- Recharge Cards ---
+
+  @override
+  Future<void> generateRechargeCard({required String code, required int value, int pins = 0, int slots = 0}) async {
+    await _db.collection<Map<String, dynamic>>('recharge_cards').doc(code).set({
+      'tokenValue': value,
+      'extraPins': pins,
+      'extraSlots': slots,
+      'status': 'active',
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  @override
+  Stream<List<Map<String, dynamic>>> listRechargeCards() {
+    return _db.collection<Map<String, dynamic>>('recharge_cards').snapshots().map<List<Map<String, dynamic>>>((snap) =>
+        snap.docs.map<Map<String, dynamic>>((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList());
+  }
+
   // ─── 5. Admin Operations ─────────────────────────────────────────────────
 
   @override
@@ -264,6 +316,13 @@ class FirestoreEspyRepository implements EspyRepository {
     batch.update(_db.collection<Map<String, dynamic>>(col).doc(id), data);
     batch.update(_db.collection<Map<String, dynamic>>('users').doc(id), data);
     await batch.commit();
+  }
+
+  @override
+  Future<void> validateProfile(String id, String role) async {
+    final col = role == 'institution' ? 'directory_institutions' : 'directory_professionals';
+    await _db.collection<Map<String, dynamic>>(col).doc(id).update({'isProfileValidated': true, 'updatedAt': FieldValue.serverTimestamp()});
+    await _db.collection<Map<String, dynamic>>('users').doc(id).update({'isProfileValidated': true, 'updatedAt': FieldValue.serverTimestamp()});
   }
 
   @override
@@ -293,7 +352,7 @@ class FirestoreEspyRepository implements EspyRepository {
   // ─── 6. Discovery & Helpers ──────────────────────────────────────────────
 
   @override
-  Stream<List<Map<String, dynamic>>> getSystemStats() {
-    return _db.collection<Map<String, dynamic>>('metadata').doc('system_stats').snapshots().map<List<Map<String, dynamic>>>((snap) => [snap.data() ?? {}]);
+  Stream<Map<String, dynamic>> getSystemStats() {
+    return _db.collection<Map<String, dynamic>>('metadata').doc('system_stats').snapshots().map<Map<String, dynamic>>((snap) => snap.data() ?? {});
   }
 }

@@ -14,6 +14,7 @@ import 'viewmodels/storage_service.dart';
 import 'viewmodels/whish_pay_service.dart';
 import 'viewmodels/locale_service.dart';
 import 'viewmodels/directory_view_model.dart';
+import 'viewmodels/admin_dashboard_view_model.dart';
 import 'viewmodels/dashboard_view_model.dart';
 import 'viewmodels/wallet_view_model.dart';
 import 'viewmodels/matching_view_model.dart';
@@ -76,6 +77,10 @@ void main() async {
         ChangeNotifierProxyProvider<EspyRepository, DirectoryViewModel>(
           create: (context) => DirectoryViewModel(context.read<EspyRepository>()),
           update: (context, repo, previous) => DirectoryViewModel(repo),
+        ),
+        ChangeNotifierProxyProvider<EspyRepository, AdminDashboardViewModel>(
+          create: (context) => AdminDashboardViewModel(context.read<EspyRepository>()),
+          update: (context, repo, previous) => AdminDashboardViewModel(repo),
         ),
         ChangeNotifierProxyProvider2<AuthService, EspyRepository, DashboardViewModel>(
           create: (context) => DashboardViewModel(context.read<AuthService>(), context.read<EspyRepository>()),

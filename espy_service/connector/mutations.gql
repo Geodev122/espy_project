@@ -50,10 +50,8 @@ mutation CreateService($categoryId: String!, $titleEn: String!, $price: Int!) @a
   })
 }
 
-# Strict Ownership for Service Update
 mutation UpdateService($id: UUID!, $isActive: Boolean, $isAllocated: Boolean) @auth(level: USER) {
   service_update(
-    # We identify by ID but only allow if provider matches auth.uid
     first: { where: { id: { eq: $id }, provider: { id: { eq_expr: "auth.uid" } } } },
     data: {
       isActive: $isActive,
@@ -86,7 +84,6 @@ mutation CreateResourceOrder($pins: Int!, $slots: Int!, $broadcasts: Int!, $tota
   })
 }
 
-# Strict Ownership for Order Update
 mutation UpdateResourceOrder($id: UUID!, $pins: Int!, $slots: Int!, $broadcasts: Int!, $total: Int!) @auth(level: USER) {
   resourceOrder_update(
     first: { where: { id: { eq: $id }, user: { id: { eq_expr: "auth.uid" } } } },
@@ -135,6 +132,27 @@ mutation RecordInteraction($targetId: String!, $type: InteractionType!) @auth(le
 
 # --- 5. Administration ---
 
+mutation CreateRechargeCard($code: String!, $value: Int!, $pins: Int!, $slots: Int!) @auth(level: NO_ACCESS) {
+  rechargeCard_insert(data: {
+    id: $code,
+    tokenValue: $value,
+    status: "active"
+  })
+}
+
+mutation UpdateSector($id: String!, $nameEn: String, $displayOrder: Int) @auth(level: NO_ACCESS) {
+  sector_update(key: { id: $id }, data: {
+    nameEn: $nameEn,
+    displayOrder: $displayOrder
+  })
+}
+
+mutation UpdateCategory($id: String!, $nameEn: String) @auth(level: NO_ACCESS) {
+  category_update(key: { id: $id }, data: {
+    nameEn: $nameEn
+  })
+}
+
 mutation ApproveProfessional($id: String!, $isApproved: Boolean!) @auth(level: NO_ACCESS) {
   professionalProfile_update(key: { id: $id }, data: {
     isApproved: $isApproved
@@ -143,6 +161,12 @@ mutation ApproveProfessional($id: String!, $isApproved: Boolean!) @auth(level: N
 
 mutation ValidateProfile($id: String!) @auth(level: NO_ACCESS) {
   professionalProfile_update(key: { id: $id }, data: {
+    isProfileValidated: true
+  })
+}
+
+mutation ValidateInstitutionProfile($id: String!) @auth(level: NO_ACCESS) {
+  institutionProfile_update(key: { id: $id }, data: {
     isProfileValidated: true
   })
 }
