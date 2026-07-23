@@ -1424,6 +1424,120 @@ ref.execute();
 ```
 
 
+### UpsertUser
+#### Required Arguments
+```dart
+String id = ...;
+String email = ...;
+UserRole role = ...;
+EspyConnector.instance.upsertUser(
+  id: id,
+  email: email,
+  role: role,
+).execute();
+```
+
+#### Optional Arguments
+We return a builder for each query. For UpsertUser, we created `UpsertUserBuilder`. For queries and mutations with optional parameters, we return a builder class.
+The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
+```dart
+class UpsertUserVariablesBuilder {
+  ...
+   UpsertUserVariablesBuilder name(String? t) {
+   _name.value = t;
+   return this;
+  }
+
+  ...
+}
+EspyConnector.instance.upsertUser(
+  id: id,
+  email: email,
+  role: role,
+)
+.name(name)
+.execute();
+```
+
+#### Return Type
+`execute()` returns a `OperationResult<UpsertUserData, UpsertUserVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await EspyConnector.instance.upsertUser(
+  id: id,
+  email: email,
+  role: role,
+);
+UpsertUserData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+String id = ...;
+String email = ...;
+UserRole role = ...;
+
+final ref = EspyConnector.instance.upsertUser(
+  id: id,
+  email: email,
+  role: role,
+).ref();
+ref.execute();
+```
+
+
+### UpdateUserLastActive
+#### Required Arguments
+```dart
+String id = ...;
+EspyConnector.instance.updateUserLastActive(
+  id: id,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `OperationResult<UpdateUserLastActiveData, UpdateUserLastActiveVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await EspyConnector.instance.updateUserLastActive(
+  id: id,
+);
+UpdateUserLastActiveData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+String id = ...;
+
+final ref = EspyConnector.instance.updateUserLastActive(
+  id: id,
+).ref();
+ref.execute();
+```
+
+
 ### UpdateUserProfile
 #### Required Arguments
 ```dart

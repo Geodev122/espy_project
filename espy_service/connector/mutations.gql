@@ -11,6 +11,24 @@ mutation CreateUser($id: String!, $email: String!, $name: String, $role: UserRol
   })
 }
 
+mutation UpsertUser($id: String!, $email: String!, $name: String, $role: UserRole!) @auth(expr: "auth.uid == id") {
+  user_upsert(data: {
+    id: $id,
+    email: $email,
+    name: $name,
+    role: $role,
+    isActive: true,
+    hasProfile: false
+  })
+}
+
+mutation UpdateUserLastActive($id: String!) @auth(expr: "auth.uid == id") {
+  user_update(key: { id: $id }, data: {
+    lastActiveAt_expr: "request.time",
+    updatedAt_expr: "request.time"
+  })
+}
+
 mutation UpdateUserProfile($id: String!, $name: String, $photoUrl: String, $phone: String, $whatsapp: String) @auth(expr: "auth.uid == id") {
   user_update(key: { id: $id }, data: {
     name: $name,

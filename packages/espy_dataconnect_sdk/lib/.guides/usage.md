@@ -2,6 +2,8 @@
 
 ```dart
 EspyConnector.instance.CreateUser(createUserVariables).execute();
+EspyConnector.instance.UpsertUser(upsertUserVariables).execute();
+EspyConnector.instance.UpdateUserLastActive(updateUserLastActiveVariables).execute();
 EspyConnector.instance.UpdateUserProfile(updateUserProfileVariables).execute();
 EspyConnector.instance.UpsertProfessionalProfile(upsertProfessionalProfileVariables).execute();
 EspyConnector.instance.UpsertInstitutionProfile(upsertInstitutionProfileVariables).execute();
@@ -9,8 +11,6 @@ EspyConnector.instance.CreateService(createServiceVariables).execute();
 EspyConnector.instance.UpdateService(updateServiceVariables).execute();
 EspyConnector.instance.CreateLocationNode(createLocationNodeVariables).execute();
 EspyConnector.instance.CreateResourceOrder(createResourceOrderVariables).execute();
-EspyConnector.instance.UpdateResourceOrder(updateResourceOrderVariables).execute();
-EspyConnector.instance.SpendTokens(spendTokensVariables).execute();
 
 ```
 

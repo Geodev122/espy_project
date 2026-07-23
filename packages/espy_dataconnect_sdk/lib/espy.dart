@@ -6,6 +6,10 @@ import 'package:flutter/foundation.dart';
 
 part 'create_user.dart';
 
+part 'upsert_user.dart';
+
+part 'update_user_last_active.dart';
+
 part 'update_user_profile.dart';
 
 part 'upsert_professional_profile.dart';
@@ -544,6 +548,16 @@ class EspyConnector {
   
   CreateUserVariablesBuilder createUser ({required String id, required String email, required UserRole role, }) {
     return CreateUserVariablesBuilder(dataConnect, id: id,email: email,role: role,);
+  }
+  
+  
+  UpsertUserVariablesBuilder upsertUser ({required String id, required String email, required UserRole role, }) {
+    return UpsertUserVariablesBuilder(dataConnect, id: id,email: email,role: role,);
+  }
+  
+  
+  UpdateUserLastActiveVariablesBuilder updateUserLastActive ({required String id, }) {
+    return UpdateUserLastActiveVariablesBuilder(dataConnect, id: id,);
   }
   
   

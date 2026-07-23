@@ -61,11 +61,25 @@ class AuthService extends ChangeNotifier {
     
     _user = user;
     if (user != null) {
-      await fetchUserData();
-      await _repository.updateUser(user.uid, {
-        'last_active': FieldValue.serverTimestamp(),
-        'last_login': FieldValue.serverTimestamp(),
-      });
+      try {
+        await fetchUserData();
+        
+        // If still no data and it's a super admin, bootstrap
+        if (_userData == null) {
+           final bool isSuperAdmin = ['geo.elnajjar@gmail.com', 'admin@espy.com'].contains(user.email);
+           if (isSuperAdmin) {
+             _debug.log('AUTH', 'Super Admin missing profile in state change. Bootstrapping...');
+             await _createInitialUserDoc(user);
+             await fetchUserData();
+           }
+        }
+
+        if (_userData != null) {
+          await _repository.updateLastActive(user.uid);
+        }
+      } catch (e) {
+        _debug.log('AUTH', 'State Change Sync Error', data: e);
+      }
       
       _recordAdminLog('USER_LOGIN', user.uid, 'user', 'Logged in');
     } else {
@@ -262,7 +276,7 @@ class AuthService extends ChangeNotifier {
       'hasProfile': false,
     };
 
-    await _repository.updateUser(user.uid, userData);
+    await _repository.upsertUser(userData);
     _debug.log('AUTH', 'Initial doc created via repo for ${user.uid}');
 
     // --- Phase 1 Migration: Dual-Write ---

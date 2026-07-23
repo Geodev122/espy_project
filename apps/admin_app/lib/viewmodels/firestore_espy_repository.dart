@@ -24,8 +24,26 @@ class FirestoreEspyRepository implements EspyRepository {
   }
 
   @override
+  Future<void> createUser(Map<String, dynamic> data) async {
+    await _db.collection('users').doc(data['id']).set(data);
+  }
+
+  @override
+  Future<void> upsertUser(Map<String, dynamic> data) async {
+    await _db.collection('users').doc(data['id']).set(data, SetOptions(merge: true));
+  }
+
+  @override
   Future<void> updateUser(String id, Map<String, dynamic> data) async {
     await _db.collection('users').doc(id).set({...data, 'updatedAt': FieldValue.serverTimestamp()}, SetOptions(merge: true));
+  }
+
+  @override
+  Future<void> updateLastActive(String id) async {
+    await _db.collection('users').doc(id).update({
+      'lastActiveAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
   }
 
   @override

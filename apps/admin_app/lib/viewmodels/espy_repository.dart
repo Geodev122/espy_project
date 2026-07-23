@@ -6,7 +6,10 @@ import '../models/visitor_profile.dart';
 abstract class EspyRepository {
   // ─── 1. Identity & Profiles ──────────────────────────────────────────────
   Future<UserModel?> getUser(String id);
+  Future<void> createUser(Map<String, dynamic> data);
+  Future<void> upsertUser(Map<String, dynamic> data);
   Future<void> updateUser(String id, Map<String, dynamic> data);
+  Future<void> updateLastActive(String id);
 
   Future<ProfessionalProfile?> getProfessionalProfile(String id);
   Future<InstitutionProfile?> getInstitutionProfile(String id);

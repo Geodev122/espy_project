@@ -41,7 +41,36 @@ class MainGate extends StatelessWidget {
         }
 
         if (auth.userData == null) {
-          return const SplashScreen(); 
+          if (auth.isLoading || auth.isProvisioning) {
+            return const SplashScreen();
+          }
+          // If not loading and no data, we are in a "Missing Profile" state
+          return Scaffold(
+            body: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.account_circle_outlined, size: 64, color: EspyTheme.gold),
+                    const SizedBox(height: 24),
+                    Text("PROFILE NOT FOUND", style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, fontSize: 18)),
+                    const SizedBox(height: 12),
+                    const Text("Your account is authenticated but no protocol profile exists.", textAlign: TextAlign.center),
+                    const SizedBox(height: 32),
+                    ElevatedButton(
+                      onPressed: () => auth.fetchUserData(),
+                      child: const Text("RETRY SYNCHRONIZATION"),
+                    ),
+                    TextButton(
+                      onPressed: () => auth.signOut(),
+                      child: const Text("TERMINATE SESSION"),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
         }
 
         final user = auth.userData!;

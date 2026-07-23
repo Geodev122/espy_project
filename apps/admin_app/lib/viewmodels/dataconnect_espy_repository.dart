@@ -35,6 +35,24 @@ class DataConnectEspyRepository implements EspyRepository {
   }
 
   @override
+  Future<void> createUser(Map<String, dynamic> data) async {
+    await _db.createUser(
+      id: data['id'],
+      email: data['email'],
+      role: sdk.UserRole.values.byName(data['role'].toString().toUpperCase()),
+    ).name(data['name']).execute();
+  }
+
+  @override
+  Future<void> upsertUser(Map<String, dynamic> data) async {
+    await _db.upsertUser(
+      id: data['id'],
+      email: data['email'],
+      role: sdk.UserRole.values.byName(data['role'].toString().toUpperCase()),
+    ).name(data['name']).execute();
+  }
+
+  @override
   Future<void> updateUser(String id, Map<String, dynamic> data) async {
     final builder = _db.updateUserProfile(id: id);
     if (data.containsKey('name')) builder.name(data['name']);
@@ -42,6 +60,11 @@ class DataConnectEspyRepository implements EspyRepository {
     if (data.containsKey('phone')) builder.phone(data['phone']);
     if (data.containsKey('whatsapp')) builder.whatsapp(data['whatsapp']);
     await builder.execute();
+  }
+
+  @override
+  Future<void> updateLastActive(String id) async {
+    await _db.updateUserLastActive(id: id).execute();
   }
 
   @override
