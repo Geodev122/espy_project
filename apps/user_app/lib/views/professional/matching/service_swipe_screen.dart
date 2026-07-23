@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,6 +7,7 @@ import 'package:espy_app/theme/espy_theme.dart';
 import 'package:espy_app/viewmodels/matching_view_model.dart';
 import 'package:espy_app/l10n/app_localizations.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';
+import 'package:espy_app/widgets/matching/adaptive_slot_card.dart';
 
 class ServiceSwipeScreen extends StatefulWidget {
   const ServiceSwipeScreen({super.key});
@@ -32,66 +32,29 @@ class _ServiceSwipeScreenState extends State<ServiceSwipeScreen> {
               ? Center(child: Text(l10n.noActiveServicesFound.toUpperCase(), style: GoogleFonts.cinzel(color: EspyTheme.navyDeep.withValues(alpha: 0.3), fontWeight: FontWeight.w900)))
               : Stack(
                   children: [
-                    CardSwiper(
-                      controller: _controller,
-                      cardsCount: viewModel.services.length,
-                      numberOfCardsDisplayed: 3,
-                      backCardOffset: const Offset(0, 40),
-                      cardBuilder: (context, index, _, __) {
-                        return _buildServiceCard(viewModel.services[index]);
-                      },
-                      onSwipe: (previousIndex, _, direction) async {
-                        final target = viewModel.services[previousIndex];
-                        if (direction == CardSwiperDirection.right) {
-                          await viewModel.recordInteraction(target['id'], 'service_like');
-                          // WhatsApp logic...
-                        }
-                        return true;
-                      },
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(8, 20, 8, 160),
+                      child: CardSwiper(
+                        controller: _controller,
+                        cardsCount: viewModel.services.length,
+                        numberOfCardsDisplayed: viewModel.services.length > 3 ? 3 : viewModel.services.length,
+                        backCardOffset: const Offset(0, 40),
+                        cardBuilder: (context, index, _, __) {
+                          return AdaptiveSlotCard(service: viewModel.services[index]);
+                        },
+                        onSwipe: (previousIndex, _, direction) async {
+                          final target = viewModel.services[previousIndex];
+                          if (direction == CardSwiperDirection.right) {
+                            await viewModel.recordInteraction(target['id'], 'service_like');
+                            // Connect logic...
+                          }
+                          return true;
+                        },
+                      ),
                     ),
                     Positioned(bottom: 20, left: 0, right: 0, child: _buildActionButtons()),
                   ],
                 ),
-    );
-  }
-
-  Widget _buildServiceCard(Map<String, dynamic> service) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(32),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 30)],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(32),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            if (service['photoUrl'] != null)
-              CachedNetworkImage(imageUrl: service['photoUrl'], fit: BoxFit.cover)
-            else
-              Container(color: Colors.white10, child: const Icon(Icons.medical_services, size: 48, color: EspyTheme.royalBlue)),
-            Positioned.fill(
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(begin: Alignment.bottomCenter, end: Alignment.topCenter, colors: [EspyTheme.navyDeep.withValues(alpha: 0.9), Colors.transparent]),
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 28, left: 28, right: 28,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(service['title']?.toString().toUpperCase() ?? 'SERVICE', style: GoogleFonts.cinzel(fontSize: 24, fontWeight: FontWeight.w900, color: Colors.white)),
-                  const SizedBox(height: 8),
-                  Text('\$${service['price'] ?? '0'}', style: GoogleFonts.cinzel(color: EspyTheme.gold, fontWeight: FontWeight.w900, fontSize: 18)),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 

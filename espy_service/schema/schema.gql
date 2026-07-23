@@ -1,4 +1,4 @@
-# ESPY PROTOCOL - UNIFIED SCHEMA v8.0
+# ESPY PROTOCOL - UNIFIED SCHEMA v8.1 (Adaptive Branding)
 
 # --- Enums ---
 
@@ -158,6 +158,8 @@ type Category @table(key: "id") {
 type Template @table(key: "id") {
   id: String! # Links to CategoryID
   category: Category! @ref(fields: ["id"])
+  accentColor: String # Branding Hex
+  iconName: String # Branding Icon
   visibleFields: [String] # e.g. ["title", "price", "location", "tags"]
   configJson: String # Extended layout configuration
   updatedAt: Timestamp @default(expr: "request.time")
@@ -394,6 +396,8 @@ type Broadcast @table(key: "id") {
   title: String!
   message: String!
   targetCountry: String @default(value: "GLOBAL")
+  targetRegion: UUID
+  targetCity: UUID
   status: String! @default(value: "queued")
   createdAt: Timestamp! @default(expr: "request.time")
 }

@@ -42,8 +42,36 @@ class ServiceManagementViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> approveService(String id) async {
+  Future<void> approveService(String id, {String? broadcastScope, Map<String, dynamic>? serviceData}) async {
     await _repository.moderateService(id, 'APPROVED');
+    
+    if (broadcastScope != null && serviceData != null && broadcastScope != 'NONE') {
+      await _dispatchLocalizedBroadcast(serviceData, broadcastScope);
+    }
+  }
+
+  Future<void> _dispatchLocalizedBroadcast(Map<String, dynamic> service, String scope) async {
+    final title = "NEW SERVICE: ${service['titleEn']}";
+    final message = "A new ${service['categoryName']} protocol is now active in your area.";
+    
+    // Geographical filters
+    String? country;
+    String? region;
+    String? city;
+
+    // Extraction logic... for now passing GLOBAL if scope is COUNTRY and country is null
+    // Ideally serviceData should include its location IDs
+    if (scope == 'COUNTRY') country = service['countryId'] ?? 'LEBANON';
+    if (scope == 'REGION') region = service['regionId'];
+    if (scope == 'CITY') city = service['cityId'];
+
+    await _repository.createLocalizedBroadcast(
+      title: title,
+      message: message,
+      country: country,
+      region: region,
+      city: city,
+    );
   }
 
   Future<void> rejectService(String id, String reason) async {
@@ -58,7 +86,12 @@ class ServiceManagementViewModel extends ChangeNotifier {
     await _repository.moderateRequest(id, 'FLAGGED', reason: reason);
   }
 
-  Future<void> updateTemplate(String categoryId, List<String> visibleFields) async {
-    await _repository.upsertTemplate(categoryId, visibleFields);
+  Future<void> updateTemplate({
+    required String categoryId, 
+    required List<String> visibleFields,
+    String? accentColor,
+    String? iconName,
+  }) async {
+    await _repository.upsertTemplate(categoryId, visibleFields, accentColor: accentColor, iconName: iconName);
   }
 }

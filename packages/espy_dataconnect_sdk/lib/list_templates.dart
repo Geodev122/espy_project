@@ -19,12 +19,16 @@ class ListTemplatesVariablesBuilder {
 @immutable
 class ListTemplatesTemplates {
   final String id;
+  final String? accentColor;
+  final String? iconName;
   final List<String>? visibleFields;
   final String? configJson;
   final ListTemplatesTemplatesCategory category;
   ListTemplatesTemplates.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']),
+  accentColor = json['accentColor'] == null ? null : nativeFromJson<String>(json['accentColor']),
+  iconName = json['iconName'] == null ? null : nativeFromJson<String>(json['iconName']),
   visibleFields = json['visibleFields'] == null ? null : (json['visibleFields'] as List<dynamic>)
         .map((e) => nativeFromJson<String>(e))
         .toList(),
@@ -41,18 +45,26 @@ class ListTemplatesTemplates {
 
     final ListTemplatesTemplates otherTyped = other as ListTemplatesTemplates;
     return id == otherTyped.id && 
+    accentColor == otherTyped.accentColor && 
+    iconName == otherTyped.iconName && 
     visibleFields == otherTyped.visibleFields && 
     configJson == otherTyped.configJson && 
     category == otherTyped.category;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, visibleFields.hashCode, configJson.hashCode, category.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, accentColor.hashCode, iconName.hashCode, visibleFields.hashCode, configJson.hashCode, category.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
     json['id'] = nativeToJson<String>(id);
+    if (accentColor != null) {
+      json['accentColor'] = nativeToJson<String?>(accentColor);
+    }
+    if (iconName != null) {
+      json['iconName'] = nativeToJson<String?>(iconName);
+    }
     if (visibleFields != null) {
       json['visibleFields'] = visibleFields?.map((e) => nativeToJson<String>(e)).toList();
     }
@@ -65,6 +77,8 @@ class ListTemplatesTemplates {
 
   ListTemplatesTemplates({
     required this.id,
+    this.accentColor,
+    this.iconName,
     this.visibleFields,
     this.configJson,
     required this.category,

@@ -86,10 +86,11 @@ class _ListingModerationPanel extends StatelessWidget {
             cardBuilder: (context, index, _, __) {
               final item = vm.listingQueue[index];
               return _buildModerationCard(
+                context,
                 title: item['titleEn'] ?? 'SERVICE',
                 subtitle: "${item['categoryName']} | ${item['providerName']}",
                 description: item['descriptionEn'] ?? '',
-                onApprove: () => vm.approveService(item['id']),
+                onApprove: () => _showBroadcastCriteriaDialog(context, (scope) => vm.approveService(item['id'], broadcastScope: scope, serviceData: item)),
                 onReject: () => _showRejectDialog(context, (reason) => vm.rejectService(item['id'], reason)),
               );
             },
@@ -103,7 +104,7 @@ class _ListingModerationPanel extends StatelessWidget {
     return Center(child: Text(msg.toUpperCase(), style: GoogleFonts.cinzel(color: Colors.black26, fontSize: 12, fontWeight: FontWeight.bold)));
   }
 
-  Widget _buildModerationCard({required String title, required String subtitle, required String description, required VoidCallback onApprove, required VoidCallback onReject}) {
+  Widget _buildModerationCard(BuildContext context, {required String title, required String subtitle, required String description, required VoidCallback onApprove, required VoidCallback onReject}) {
     return PremiumCard(
       padding: const EdgeInsets.all(32),
       child: Column(
@@ -123,6 +124,24 @@ class _ListingModerationPanel extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  void _showBroadcastCriteriaDialog(BuildContext context, Function(String) onConfirm) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("BROADCAST SCOPE"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(title: const Text("NO BROADCAST"), onTap: () { onConfirm('NONE'); Navigator.pop(context); }),
+            ListTile(title: const Text("SAME COUNTRY"), onTap: () { onConfirm('COUNTRY'); Navigator.pop(context); }),
+            ListTile(title: const Text("SAME REGION"), onTap: () { onConfirm('REGION'); Navigator.pop(context); }),
+            ListTile(title: const Text("SAME CITY"), onTap: () { onConfirm('CITY'); Navigator.pop(context); }),
+          ],
+        ),
       ),
     );
   }
@@ -188,7 +207,6 @@ class _TemplateManagementPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final vm = Provider.of<ServiceManagementViewModel>(context);
-    // For demo, list all professional categories
     final repo = context.read<EspyRepository>();
 
     return StreamBuilder<List<Map<String, dynamic>>>(
@@ -200,11 +218,20 @@ class _TemplateManagementPanel extends StatelessWidget {
           itemCount: categories.length,
           itemBuilder: (context, index) {
             final cat = categories[index];
+            final t = cat['template'] as Map<String, dynamic>?;
+            
             return PremiumCard(
               margin: const EdgeInsets.only(bottom: 12),
               child: ListTile(
+                leading: Container(
+                   width: 12, height: 12,
+                   decoration: BoxDecoration(
+                     color: Color(int.tryParse(t?['accentColor'] ?? '0xFF1565C0') ?? 0xFF1565C0),
+                     shape: BoxShape.circle,
+                   ),
+                ),
                 title: Text(cat['nameEn'].toString().toUpperCase(), style: GoogleFonts.montserrat(fontWeight: FontWeight.bold, fontSize: 13)),
-                subtitle: const Text("Card Layout: Standard", style: TextStyle(fontSize: 10)),
+                subtitle: Text("Fields: ${t?['visibleFields']?.length ?? 0}", style: const TextStyle(fontSize: 10)),
                 trailing: IconButton(
                   icon: const Icon(Icons.settings_suggest_rounded, color: EspyTheme.gold),
                   onPressed: () => _showTemplateEditor(context, cat, vm),
@@ -219,28 +246,48 @@ class _TemplateManagementPanel extends StatelessWidget {
 
   void _showTemplateEditor(BuildContext context, Map<String, dynamic> cat, ServiceManagementViewModel vm) {
     final List<String> fields = ['Title', 'Price', 'Location', 'Tags', 'Image', 'Provider Profile'];
-    List<String> selected = ['Title', 'Price', 'Location'];
+    final t = cat['template'] as Map<String, dynamic>?;
+    
+    List<String> selected = List<String>.from(t?['visibleFields'] ?? ['Title', 'Price', 'Location']);
+    final colorController = TextEditingController(text: t?['accentColor'] ?? '0xFF1565C0');
+    final iconController = TextEditingController(text: t?['iconName'] ?? 'medical_services');
 
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setModalState) => AlertDialog(
           title: Text("TEMPLATE: ${cat['nameEn']}"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: fields.map((f) => CheckboxListTile(
-              title: Text(f),
-              value: selected.contains(f),
-              onChanged: (val) {
-                setModalState(() {
-                  if (val == true) selected.add(f); else selected.remove(f);
-                });
-              },
-            )).toList(),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(controller: colorController, decoration: const InputDecoration(labelText: "ACCENT COLOR (HEX)")),
+                const SizedBox(height: 12),
+                TextField(controller: iconController, decoration: const InputDecoration(labelText: "ICON NAME")),
+                const SizedBox(height: 12),
+                ...fields.map((f) => CheckboxListTile(
+                  title: Text(f),
+                  value: selected.contains(f),
+                  onChanged: (val) {
+                    setModalState(() {
+                      if (val == true) selected.add(f); else selected.remove(f);
+                    });
+                  },
+                )).toList(),
+              ],
+            ),
           ),
           actions: [
             TextButton(onPressed: () => Navigator.pop(context), child: const Text("CANCEL")),
-            ElevatedButton(onPressed: () { vm.updateTemplate(cat['id'], selected); Navigator.pop(context); }, child: const Text("SAVE TEMPLATE")),
+            ElevatedButton(onPressed: () { 
+              vm.updateTemplate(
+                categoryId: cat['id'], 
+                visibleFields: selected,
+                accentColor: colorController.text,
+                iconName: iconController.text,
+              ); 
+              Navigator.pop(context); 
+            }, child: const Text("SAVE TEMPLATE")),
           ],
         ),
       ),

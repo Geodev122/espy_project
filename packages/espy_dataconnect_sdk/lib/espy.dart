@@ -56,13 +56,15 @@ part 'upsert_presence_tag.dart';
 
 part 'create_recharge_card.dart';
 
-part 'approve_resource_order.dart';
-
 part 'moderate_service.dart';
 
 part 'moderate_request.dart';
 
 part 'upsert_template.dart';
+
+part 'create_localized_broadcast.dart';
+
+part 'approve_resource_order.dart';
 
 part 'approve_professional.dart';
 
@@ -670,11 +672,6 @@ class EspyConnector {
   }
   
   
-  ApproveResourceOrderVariablesBuilder approveResourceOrder ({required String id, }) {
-    return ApproveResourceOrderVariablesBuilder(dataConnect, id: id,);
-  }
-  
-  
   ModerateServiceVariablesBuilder moderateService ({required String id, required ModerationStatus status, }) {
     return ModerateServiceVariablesBuilder(dataConnect, id: id,status: status,);
   }
@@ -687,6 +684,16 @@ class EspyConnector {
   
   UpsertTemplateVariablesBuilder upsertTemplate ({required String id, }) {
     return UpsertTemplateVariablesBuilder(dataConnect, id: id,);
+  }
+  
+  
+  CreateLocalizedBroadcastVariablesBuilder createLocalizedBroadcast ({required String title, required String message, }) {
+    return CreateLocalizedBroadcastVariablesBuilder(dataConnect, title: title,message: message,);
+  }
+  
+  
+  ApproveResourceOrderVariablesBuilder approveResourceOrder ({required String id, }) {
+    return ApproveResourceOrderVariablesBuilder(dataConnect, id: id,);
   }
   
   

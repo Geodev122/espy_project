@@ -36,6 +36,7 @@ class ListActiveServicesServices {
   final String? imageUrl;
   final EnumValue<DeliveryMode>? deliveryMode;
   final ListActiveServicesServicesPriceTag? priceTag;
+  final ListActiveServicesServicesCategory category;
   final List<ListActiveServicesServicesServiceListingTagsOnService> serviceListingTags_on_service;
   final ListActiveServicesServicesProvider provider;
   ListActiveServicesServices.fromJson(dynamic json):
@@ -47,6 +48,7 @@ class ListActiveServicesServices {
   imageUrl = json['imageUrl'] == null ? null : nativeFromJson<String>(json['imageUrl']),
   deliveryMode = json['deliveryMode'] == null ? null : deliveryModeDeserializer(json['deliveryMode']),
   priceTag = json['priceTag'] == null ? null : ListActiveServicesServicesPriceTag.fromJson(json['priceTag']),
+  category = ListActiveServicesServicesCategory.fromJson(json['category']),
   serviceListingTags_on_service = (json['serviceListingTags_on_service'] as List<dynamic>)
         .map((e) => ListActiveServicesServicesServiceListingTagsOnService.fromJson(e))
         .toList(),
@@ -68,12 +70,13 @@ class ListActiveServicesServices {
     imageUrl == otherTyped.imageUrl && 
     deliveryMode == otherTyped.deliveryMode && 
     priceTag == otherTyped.priceTag && 
+    category == otherTyped.category && 
     serviceListingTags_on_service == otherTyped.serviceListingTags_on_service && 
     provider == otherTyped.provider;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, titleEn.hashCode, titleAr.hashCode, price.hashCode, imageUrl.hashCode, deliveryMode.hashCode, priceTag.hashCode, serviceListingTags_on_service.hashCode, provider.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, titleEn.hashCode, titleAr.hashCode, price.hashCode, imageUrl.hashCode, deliveryMode.hashCode, priceTag.hashCode, category.hashCode, serviceListingTags_on_service.hashCode, provider.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -97,6 +100,7 @@ class ListActiveServicesServices {
     if (priceTag != null) {
       json['priceTag'] = priceTag!.toJson();
     }
+    json['category'] = category.toJson();
     json['serviceListingTags_on_service'] = serviceListingTags_on_service.map((e) => e.toJson()).toList();
     json['provider'] = provider.toJson();
     return json;
@@ -110,6 +114,7 @@ class ListActiveServicesServices {
     this.imageUrl,
     this.deliveryMode,
     this.priceTag,
+    required this.category,
     required this.serviceListingTags_on_service,
     required this.provider,
   });
@@ -153,6 +158,94 @@ class ListActiveServicesServicesPriceTag {
   ListActiveServicesServicesPriceTag({
     required this.nameEn,
     this.nameAr,
+  });
+}
+
+@immutable
+class ListActiveServicesServicesCategory {
+  final ListActiveServicesServicesCategoryTemplate? template;
+  ListActiveServicesServicesCategory.fromJson(dynamic json):
+  
+  template = json['template'] == null ? null : ListActiveServicesServicesCategoryTemplate.fromJson(json['template']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final ListActiveServicesServicesCategory otherTyped = other as ListActiveServicesServicesCategory;
+    return template == otherTyped.template;
+    
+  }
+  @override
+  int get hashCode => template.hashCode;
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    if (template != null) {
+      json['template'] = template!.toJson();
+    }
+    return json;
+  }
+
+  ListActiveServicesServicesCategory({
+    this.template,
+  });
+}
+
+@immutable
+class ListActiveServicesServicesCategoryTemplate {
+  final String? accentColor;
+  final String? iconName;
+  final List<String>? visibleFields;
+  ListActiveServicesServicesCategoryTemplate.fromJson(dynamic json):
+  
+  accentColor = json['accentColor'] == null ? null : nativeFromJson<String>(json['accentColor']),
+  iconName = json['iconName'] == null ? null : nativeFromJson<String>(json['iconName']),
+  visibleFields = json['visibleFields'] == null ? null : (json['visibleFields'] as List<dynamic>)
+        .map((e) => nativeFromJson<String>(e))
+        .toList();
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final ListActiveServicesServicesCategoryTemplate otherTyped = other as ListActiveServicesServicesCategoryTemplate;
+    return accentColor == otherTyped.accentColor && 
+    iconName == otherTyped.iconName && 
+    visibleFields == otherTyped.visibleFields;
+    
+  }
+  @override
+  int get hashCode => Object.hashAll([accentColor.hashCode, iconName.hashCode, visibleFields.hashCode]);
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    if (accentColor != null) {
+      json['accentColor'] = nativeToJson<String?>(accentColor);
+    }
+    if (iconName != null) {
+      json['iconName'] = nativeToJson<String?>(iconName);
+    }
+    if (visibleFields != null) {
+      json['visibleFields'] = visibleFields?.map((e) => nativeToJson<String>(e)).toList();
+    }
+    return json;
+  }
+
+  ListActiveServicesServicesCategoryTemplate({
+    this.accentColor,
+    this.iconName,
+    this.visibleFields,
   });
 }
 

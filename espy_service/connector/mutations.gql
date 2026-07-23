@@ -1,4 +1,4 @@
-# ESPY PROTOCOL - DATA CONNECT MUTATIONS v8.0
+# ESPY PROTOCOL - DATA CONNECT MUTATIONS v8.1 (Adaptive Branding)
 
 # --- 1. Identity & Profile ---
 
@@ -139,7 +139,7 @@ mutation PostServiceRequest($sectorId: String!, $descriptionEn: String!, $urgenc
     descriptionEn: $descriptionEn,
     urgency: $urgency,
     preferredMode: $preferredMode,
-    moderationStatus: APPROVED # Auto-approve visitors for now, can be changed to PENDING
+    moderationStatus: APPROVED
   })
 }
 
@@ -229,12 +229,6 @@ mutation CreateRechargeCard($code: String!, $value: Int!, $pins: Int!, $slots: I
   })
 }
 
-mutation ApproveResourceOrder($id: UUID!) @auth(level: NO_ACCESS) {
-  resourceOrder_update(key: { id: $id }, data: {
-    status: APPROVED
-  })
-}
-
 mutation ModerateService($id: UUID!, $status: ModerationStatus!, $reason: String) @auth(level: NO_ACCESS) {
   service_update(key: { id: $id }, data: {
     moderationStatus: $status,
@@ -249,11 +243,31 @@ mutation ModerateRequest($id: UUID!, $status: ModerationStatus!, $reason: String
   })
 }
 
-mutation UpsertTemplate($id: String!, $visibleFields: [String!], $configJson: String) @auth(level: NO_ACCESS) {
+mutation UpsertTemplate($id: String!, $visibleFields: [String!], $accentColor: String, $iconName: String, $configJson: String) @auth(level: NO_ACCESS) {
   template_upsert(data: {
     id: $id,
     visibleFields: $visibleFields,
+    accentColor: $accentColor,
+    iconName: $iconName,
     configJson: $configJson
+  })
+}
+
+mutation CreateLocalizedBroadcast($title: String!, $message: String!, $country: String, $region: UUID, $city: UUID) @auth(level: NO_ACCESS) {
+  broadcast_insert(data: {
+    senderId_expr: "auth.uid",
+    title: $title,
+    message: $message,
+    targetCountry: $country,
+    targetRegion: $region,
+    targetCity: $city,
+    status: "queued"
+  })
+}
+
+mutation ApproveResourceOrder($id: UUID!) @auth(level: NO_ACCESS) {
+  resourceOrder_update(key: { id: $id }, data: {
+    status: APPROVED
   })
 }
 
