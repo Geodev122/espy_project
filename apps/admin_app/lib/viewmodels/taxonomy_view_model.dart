@@ -34,11 +34,17 @@ class TaxonomyViewModel extends ChangeNotifier {
       _sectors = data;
       _isLoading = false;
       notifyListeners();
+    }, onError: (e) {
+      print("Error listening to sectors: $e");
+      _isLoading = false;
+      notifyListeners();
     });
 
     _countrySub = _repository.listCountries().listen((data) {
       _countries = data;
       notifyListeners();
+    }, onError: (e) {
+      print("Error listening to countries: $e");
     });
 
     _loadTags();

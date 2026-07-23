@@ -34,9 +34,9 @@ class AdminDashboardScreen extends StatelessWidget {
             const SizedBox(height: 24),
             Row(
               children: [
-                _buildStatCard("TOTAL USERS", viewModel.stats['users']!, Icons.people_rounded),
+                _buildStatCard("TOTAL USERS", viewModel.stats['users'] ?? '0', Icons.people_rounded),
                 const SizedBox(width: 16),
-                _buildStatCard("ACTIVE SERVICES", viewModel.stats['services']!, Icons.medical_services_rounded),
+                _buildStatCard("ACTIVE SERVICES", viewModel.stats['services'] ?? '0', Icons.medical_services_rounded),
               ],
             ),
             const SizedBox(height: 32),
@@ -75,17 +75,14 @@ class AdminDashboardScreen extends StatelessWidget {
         _adminTile("RESOURCE ORDERS", Icons.shopping_bag_rounded, () {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const OrdersManagerScreen()));
         }),
-        _adminTile("TAXONOMY", LucideIcons.layers, () {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const TaxonomyManagerScreen()));
+        _adminTile("TAXONOMY MANAGEMENT", Icons.category_rounded, () {
+           Navigator.push(context, MaterialPageRoute(builder: (_) => const TaxonomyManagerScreen()));
         }),
         _adminTile("SEED DATA", LucideIcons.database, () {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const SeedManagerPage()));
         }),
         _adminTile("SUPPORT INBOX", Icons.support_agent_rounded, () {
            Navigator.push(context, MaterialPageRoute(builder: (_) => const SupportInboxScreen()));
-        }),
-        _adminTile("TAXONOMY MANAGEMENT", Icons.category_rounded, () {
-           Navigator.push(context, MaterialPageRoute(builder: (_) => const TaxonomyManagerScreen()));
         }),
         _adminTile("SYSTEM ANNOUNCEMENTS", Icons.campaign_rounded, () {}),
       ],

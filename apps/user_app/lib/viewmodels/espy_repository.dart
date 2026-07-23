@@ -28,6 +28,7 @@ abstract class EspyRepository {
 
   // Admin Taxonomy Ops
   Future<void> updateSectorBranding(String id, Map<String, dynamic> data);
+  Future<void> updateCategory(String id, Map<String, dynamic> data);
   Future<void> upsertServiceTag(Map<String, dynamic> data);
   Future<void> upsertPriceTag(Map<String, dynamic> data);
   Future<void> upsertPinCategory(Map<String, dynamic> data);

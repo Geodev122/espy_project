@@ -56,7 +56,7 @@ class FirestoreEspyRepository implements EspyRepository {
     return _db.collection('directory_sectors').snapshots().map((snap) =>
         snap.docs.map((doc) {
           final data = doc.data() as Map<String, dynamic>?;
-          return <String, dynamic>{'id': doc.id, ...?data};
+          return <String, dynamic>{'id': doc.id, ...data ?? <String, dynamic>{}};
         }).toList());
   }
 
@@ -67,7 +67,7 @@ class FirestoreEspyRepository implements EspyRepository {
     return query.snapshots().map((snap) =>
         snap.docs.map((doc) {
           final data = doc.data() as Map<String, dynamic>?;
-          return <String, dynamic>{'id': doc.id, ...?data};
+          return <String, dynamic>{'id': doc.id, ...data ?? <String, dynamic>{}};
         }).toList());
   }
 
@@ -76,7 +76,7 @@ class FirestoreEspyRepository implements EspyRepository {
     return _db.collection('directory_countries').snapshots().map((snap) =>
         snap.docs.map((doc) {
           final data = doc.data() as Map<String, dynamic>?;
-          return <String, dynamic>{'id': doc.id, ...?data};
+          return <String, dynamic>{'id': doc.id, ...data ?? <String, dynamic>{}};
         }).toList());
   }
 
@@ -85,7 +85,7 @@ class FirestoreEspyRepository implements EspyRepository {
     return _db.collection('directory_regions').where('countryId', isEqualTo: countryId).snapshots().map((snap) =>
         snap.docs.map((doc) {
           final data = doc.data() as Map<String, dynamic>?;
-          return <String, dynamic>{'id': doc.id, ...?data};
+          return <String, dynamic>{'id': doc.id, ...data ?? <String, dynamic>{}};
         }).toList());
   }
 
@@ -94,7 +94,7 @@ class FirestoreEspyRepository implements EspyRepository {
     return _db.collection('directory_cities').where('regionId', isEqualTo: regionId).snapshots().map((snap) =>
         snap.docs.map((doc) {
           final data = doc.data() as Map<String, dynamic>?;
-          return <String, dynamic>{'id': doc.id, ...?data};
+          return <String, dynamic>{'id': doc.id, ...data ?? <String, dynamic>{}};
         }).toList());
   }
 
@@ -103,7 +103,7 @@ class FirestoreEspyRepository implements EspyRepository {
      return _db.collection('directory_locations').where('userId', isEqualTo: userId).snapshots().map((snap) =>
         snap.docs.map((doc) {
           final data = doc.data() as Map<String, dynamic>?;
-          return <String, dynamic>{'id': doc.id, ...?data};
+          return <String, dynamic>{'id': doc.id, ...data ?? <String, dynamic>{}};
         }).toList());
   }
 
@@ -130,7 +130,7 @@ class FirestoreEspyRepository implements EspyRepository {
 
   @override
   Future<void> updateSectorBranding(String id, Map<String, dynamic> data) async {
-    await _db.collection('directory_sectors').doc(id).update(data);
+    await _db.collection('directory_sectors').doc(id).set(data, SetOptions(merge: true));
   }
 
   @override
@@ -164,7 +164,7 @@ class FirestoreEspyRepository implements EspyRepository {
     return query.snapshots().map((snap) =>
         snap.docs.map((doc) {
           final data = doc.data() as Map<String, dynamic>?;
-          return <String, dynamic>{'id': doc.id, ...?data};
+          return <String, dynamic>{'id': doc.id, ...data ?? <String, dynamic>{}};
         }).toList());
   }
 
@@ -175,7 +175,7 @@ class FirestoreEspyRepository implements EspyRepository {
         .snapshots()
         .map((snap) => snap.docs.map((doc) {
           final data = doc.data() as Map<String, dynamic>?;
-          return <String, dynamic>{'id': doc.id, ...?data};
+          return <String, dynamic>{'id': doc.id, ...data ?? <String, dynamic>{}};
         }).toList());
   }
 
@@ -201,7 +201,7 @@ class FirestoreEspyRepository implements EspyRepository {
     return query.snapshots().map((snap) {
       final items = snap.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>?;
-        return <String, dynamic>{'id': doc.id, ...?data};
+        return <String, dynamic>{'id': doc.id, ...data ?? <String, dynamic>{}};
       }).toList();
       items.sort((a, b) {
         final t1 = (a['createdAt'] as Timestamp?)?.millisecondsSinceEpoch ?? 0;
@@ -253,7 +253,7 @@ class FirestoreEspyRepository implements EspyRepository {
         .snapshots()
         .map((snap) => snap.docs.map((doc) {
           final data = doc.data() as Map<String, dynamic>?;
-          return <String, dynamic>{'id': doc.id, ...?data};
+          return <String, dynamic>{'id': doc.id, ...data ?? <String, dynamic>{}};
         }).toList());
   }
 
@@ -394,7 +394,7 @@ class FirestoreEspyRepository implements EspyRepository {
     return _db.collection('recharge_cards').snapshots().map((snap) =>
         snap.docs.map((doc) {
           final data = doc.data() as Map<String, dynamic>?;
-          return <String, dynamic>{'id': doc.id, ...?data};
+          return <String, dynamic>{'id': doc.id, ...data ?? <String, dynamic>{}};
         }).toList());
   }
 
@@ -410,7 +410,7 @@ class FirestoreEspyRepository implements EspyRepository {
     return q.orderBy('createdAt', descending: true).snapshots().map((snap) {
       final docs = snap.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>?;
-        return <String, dynamic>{'id': doc.id, ...?data};
+        return <String, dynamic>{'id': doc.id, ...data ?? <String, dynamic>{}};
       });
       if (query != null && query.isNotEmpty) {
         final low = query.toLowerCase();
@@ -499,7 +499,7 @@ class FirestoreEspyRepository implements EspyRepository {
     return query.snapshots().map((snap) =>
         snap.docs.map((doc) {
           final data = doc.data() as Map<String, dynamic>?;
-          return <String, dynamic>{'id': doc.id, ...?data};
+          return <String, dynamic>{'id': doc.id, ...data ?? <String, dynamic>{}};
         }).toList());
   }
 
@@ -510,7 +510,7 @@ class FirestoreEspyRepository implements EspyRepository {
         .snapshots()
         .map((snap) => snap.docs.map((doc) {
           final data = doc.data() as Map<String, dynamic>?;
-          return <String, dynamic>{'id': doc.id, ...?data};
+          return <String, dynamic>{'id': doc.id, ...data ?? <String, dynamic>{}};
         }).toList());
   }
 

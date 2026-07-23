@@ -25,19 +25,21 @@ class DataConnectEspyRepository implements EspyRepository {
       role: models.UserRole.values.byName(user.role.stringValue.toLowerCase()),
       isActive: user.isActive,
       walletBalance: user.walletBalance,
-      tokensUsed: 0, // Fallback if field missing in SDK
+      tokensUsed: user.tokensUsed,
       photoUrl: user.photoUrl,
-      createdAt: DateTime.now(), // Fallback
-      updatedAt: DateTime.now(), // Fallback
+      createdAt: user.createdAt.asDateTime,
+      updatedAt: user.updatedAt.asDateTime,
     );
   }
 
   @override
   Future<void> updateUser(String id, Map<String, dynamic> data) async {
-    await _db.updateUserProfile(
-      id: id,
-      // Field names might have changed in SDK, using dynamic check or safe mapping
-    ).execute();
+    final builder = _db.updateUserProfile(id: id);
+    if (data.containsKey('name')) builder.name(data['name']);
+    if (data.containsKey('photoUrl')) builder.photoUrl(data['photoUrl']);
+    if (data.containsKey('phone')) builder.phone(data['phone']);
+    if (data.containsKey('whatsapp')) builder.whatsapp(data['whatsapp']);
+    await builder.execute();
   }
 
   @override
@@ -58,7 +60,7 @@ class DataConnectEspyRepository implements EspyRepository {
       membershipTier: prof.membershipTier?.stringValue.toLowerCase() ?? 'basic',
       serviceSlots: prof.serviceSlots,
       practicePins: prof.practicePins,
-      visibilityExpiresAt: DateTime.now(), // Fallback
+      visibilityExpiresAt: prof.visibilityExpiresAt?.asDateTime,
     );
   }
 
@@ -73,7 +75,7 @@ class DataConnectEspyRepository implements EspyRepository {
       nameAr: inst.nameAr,
       isApproved: inst.isApproved,
       serviceSlots: 0, // Fallback
-      visibilityExpiresAt: DateTime.now(), // Fallback
+      visibilityExpiresAt: inst.visibilityExpiresAt?.asDateTime,
     );
   }
 
@@ -283,7 +285,7 @@ class DataConnectEspyRepository implements EspyRepository {
         'descriptionAr': cr.descriptionAr,
         'status': cr.status.stringValue,
         'userName': cr.user.name,
-        'createdAt': DateTime.now(), // Fallback
+        'createdAt': cr.createdAt.asDateTime,
         'sectorId': sectorId, // Fallback
       }).toList()
     );
@@ -315,7 +317,7 @@ class DataConnectEspyRepository implements EspyRepository {
         'type': t.type.stringValue,
         'amount': t.amount,
         'description': t.description,
-        'createdAt': DateTime.now(), // Fallback
+        'createdAt': t.createdAt.asDateTime,
       }).toList()
     );
   }
@@ -416,7 +418,7 @@ class DataConnectEspyRepository implements EspyRepository {
         'id': c.id,
         'tokenValue': c.tokenValue,
         'status': c.status,
-        'redeemedAt': DateTime.now(), // Fallback
+        'redeemedAt': c.redeemedAt?.asDateTime,
         'redeemedBy': c.redeemedBy?.email,
       }).toList()
     );
@@ -444,7 +446,7 @@ class DataConnectEspyRepository implements EspyRepository {
         'hasProfile': u.hasProfile,
         'phone': u.phone,
         'whatsapp': u.whatsapp,
-        'createdAt': DateTime.now(), // Fallback
+        'createdAt': u.createdAt.asDateTime,
       }).toList()
     );
   }
@@ -467,14 +469,14 @@ class DataConnectEspyRepository implements EspyRepository {
       'whatsapp': u.whatsapp,
       'walletBalance': u.walletBalance,
       'adminNotes': u.adminNotes,
-      'createdAt': DateTime.now(), // Fallback
-      'updatedAt': DateTime.now(), // Fallback
+      'createdAt': u.createdAt.asDateTime,
+      'updatedAt': u.updatedAt.asDateTime,
       'transactions': u.walletTransactions_on_user.map((t) => {
         'id': t.id,
         'amount': t.amount,
         'type': t.type.stringValue,
         'description': t.description,
-        'createdAt': DateTime.now(), // Fallback
+        'createdAt': t.createdAt.asDateTime,
       }).toList(),
     };
 
@@ -487,7 +489,7 @@ class DataConnectEspyRepository implements EspyRepository {
         'isProfileValidated': p.isProfileValidated,
         'verificationDocUrl': p.verificationDocUrl,
         'membershipTier': p.membershipTier?.stringValue,
-        'visibilityExpiresAt': DateTime.now(), // Fallback
+        'visibilityExpiresAt': p.visibilityExpiresAt?.asDateTime,
       };
     }
 
@@ -499,7 +501,7 @@ class DataConnectEspyRepository implements EspyRepository {
         'isApproved': i.isApproved,
         'isProfileValidated': i.isProfileValidated,
         'verificationDocUrl': i.verificationDocUrl,
-        'visibilityExpiresAt': DateTime.now(), // Fallback
+        'visibilityExpiresAt': i.visibilityExpiresAt?.asDateTime,
       };
     }
 
@@ -508,19 +510,20 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Future<void> adminUpdateUser(String id, Map<String, dynamic> data) async {
-    sdk.UserRole? gqlRole;
-    if (data['role'] != null) gqlRole = sdk.UserRole.values.byName(data['role'].toString().toUpperCase());
-
-    await _db.updateUserAdmin(
-      id: id,
-      name: data['name'],
-      phone: data['phone'],
-      whatsapp: data['whatsapp'],
-      isActive: data['isActive'],
-      role: gqlRole,
-      notes: data['adminNotes'],
-      balance: data['walletBalance'],
-    ).execute();
+    final builder = _db.updateUserAdmin(id: id);
+    if (data.containsKey('name')) builder.name(data['name']);
+    if (data.containsKey('isActive')) builder.isActive(data['isActive']);
+    if (data.containsKey('phone')) builder.phone(data['phone']);
+    if (data.containsKey('whatsapp')) builder.whatsapp(data['whatsapp']);
+    if (data.containsKey('adminNotes')) builder.notes(data['adminNotes']);
+    if (data.containsKey('walletBalance')) builder.balance(data['walletBalance']);
+    
+    if (data.containsKey('role')) {
+       final roleStr = data['role'].toString().toUpperCase();
+       builder.role(sdk.UserRole.values.byName(roleStr));
+    }
+    
+    await builder.execute();
   }
 
   @override
@@ -571,7 +574,7 @@ class DataConnectEspyRepository implements EspyRepository {
           'message': st.message,
           'status': st.status.stringValue,
           'userEmail': st.user.email,
-          'createdAt': DateTime.now(), // Fallback
+          'createdAt': st.createdAt.asDateTime,
         }).toList()
      );
   }

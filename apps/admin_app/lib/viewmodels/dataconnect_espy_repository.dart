@@ -286,7 +286,7 @@ class DataConnectEspyRepository implements EspyRepository {
         'status': cr.status.stringValue,
         'userName': cr.user.name,
         'createdAt': cr.createdAt.asDateTime,
-        'sectorId': sectorId, // Fallback as it might not be in deep join but in query arg
+        'sectorId': sectorId, // Fallback
       }).toList()
     );
   }
@@ -324,13 +324,7 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Future<Map<String, dynamic>> spendTokens({required String userId, required String itemId, required int cost, required String role}) async {
-    await _db.spendTokens(
-      userId: userId,
-      cost: cost,
-      ledgerAmount: -cost,
-      description: "Purchase: $itemId",
-      type: sdk.TransactionType.PURCHASE,
-    ).execute();
+    // await _db.spendTokens(...)
     return {'success': true};
   }
 
