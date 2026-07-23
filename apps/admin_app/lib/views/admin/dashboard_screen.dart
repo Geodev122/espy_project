@@ -16,6 +16,8 @@ import 'modules/users_manager_screen.dart';
 
 import 'modules/seed_manager_page.dart';
 
+import 'modules/service_management_screen.dart';
+
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({super.key});
 
@@ -74,6 +76,9 @@ class AdminDashboardScreen extends StatelessWidget {
         }),
         _adminTile("RESOURCE ORDERS", Icons.shopping_bag_rounded, () {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const OrdersManagerScreen()));
+        }),
+        _adminTile("SERVICE MANAGEMENT", Icons.settings_suggest_rounded, () {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const ServiceManagementScreen()));
         }),
         _adminTile("TAXONOMY MANAGEMENT", Icons.category_rounded, () {
            Navigator.push(context, MaterialPageRoute(builder: (_) => const TaxonomyManagerScreen()));

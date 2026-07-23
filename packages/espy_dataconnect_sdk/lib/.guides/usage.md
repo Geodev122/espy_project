@@ -23,7 +23,7 @@ Optional fields can be discovered based on classes that have `Optional` object t
 This is an example of a mutation with an optional field:
 
 ```dart
-await EspyConnector.instance.ListSupportTickets({ ... })
+await EspyConnector.instance.ListRequestModerationQueue({ ... })
 .status(...)
 .execute();
 ```

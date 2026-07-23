@@ -324,7 +324,13 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Future<Map<String, dynamic>> spendTokens({required String userId, required String itemId, required int cost, required String role}) async {
-    // await _db.spendTokens(...)
+    await _db.spendTokens(
+      userId: userId,
+      cost: cost,
+      ledgerAmount: -cost,
+      description: "Purchase: $itemId",
+      type: sdk.TransactionType.PURCHASE,
+    ).execute();
     return {'success': true};
   }
 
@@ -596,6 +602,79 @@ class DataConnectEspyRepository implements EspyRepository {
   @override
   Future<void> approveResourceOrder(String orderId) async {
     await _db.approveResourceOrder(id: orderId).execute();
+  }
+
+  @override
+  Stream<List<Map<String, dynamic>>> listServiceModerationQueue({String status = 'PENDING'}) {
+    final sdkStatus = sdk.ModerationStatus.values.byName(status.toUpperCase());
+    return _db.listServiceModerationQueue(status: sdkStatus).subscribe().map((snap) =>
+      snap.data.services.map((s) => {
+        'id': s.id.toString(),
+        'titleEn': s.titleEn,
+        'titleAr': s.titleAr,
+        'price': s.price,
+        'imageUrl': s.imageUrl,
+        'deliveryMode': s.deliveryMode.stringValue,
+        'moderationStatus': s.moderationStatus.stringValue,
+        'flagReason': s.flagReason,
+        'categoryName': s.category.nameEn,
+        'sectorName': s.sector.nameEn,
+        'providerName': s.provider.name,
+        'providerEmail': s.provider.email,
+        'providerPhoto': s.provider.photoUrl,
+      }).toList()
+    );
+  }
+
+  @override
+  Stream<List<Map<String, dynamic>>> listRequestModerationQueue({String status = 'PENDING'}) {
+    final sdkStatus = sdk.ModerationStatus.values.byName(status.toUpperCase());
+    return _db.listRequestModerationQueue(status: sdkStatus).subscribe().map((snap) =>
+      snap.data.serviceRequests.map((r) => {
+        'id': r.id.toString(),
+        'descriptionEn': r.descriptionEn,
+        'descriptionAr': r.descriptionAr,
+        'urgency': r.urgency?.stringValue,
+        'preferredMode': r.preferredMode?.stringValue,
+        'status': r.status.stringValue,
+        'moderationStatus': r.moderationStatus.stringValue,
+        'flagReason': r.flagReason,
+        'createdAt': r.createdAt.asDateTime,
+        'sectorName': r.sector.nameEn,
+        'userName': r.user.name,
+        'userEmail': r.user.email,
+      }).toList()
+    );
+  }
+
+  @override
+  Future<void> moderateService(String id, String status, {String? reason}) async {
+    final sdkStatus = sdk.ModerationStatus.values.byName(status.toUpperCase());
+    await _db.moderateService(id: id, status: sdkStatus, reason: reason).execute();
+  }
+
+  @override
+  Future<void> moderateRequest(String id, String status, {String? reason}) async {
+    final sdkStatus = sdk.ModerationStatus.values.byName(status.toUpperCase());
+    await _db.moderateRequest(id: id, status: sdkStatus, reason: reason).execute();
+  }
+
+  @override
+  Stream<List<Map<String, dynamic>>> listTemplates() {
+    return _db.listTemplates().subscribe().map((snap) =>
+      snap.data.templates.map((t) => {
+        'id': t.id,
+        'visibleFields': t.visibleFields,
+        'configJson': t.configJson,
+        'categoryId': t.category.id,
+        'categoryName': t.category.nameEn,
+      }).toList()
+    );
+  }
+
+  @override
+  Future<void> upsertTemplate(String id, List<String> visibleFields, {String? configJson}) async {
+    await _db.upsertTemplate(id: id, visibleFields: visibleFields, configJson: configJson).execute();
   }
 
   // ─── 6. Discovery & Helpers ──────────────────────────────────────────────

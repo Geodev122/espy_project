@@ -1193,6 +1193,163 @@ ref.execute();
 ref.subscribe(...);
 ```
 
+
+### ListServiceModerationQueue
+#### Required Arguments
+```dart
+// No required arguments
+EspyConnector.instance.listServiceModerationQueue().execute();
+```
+
+#### Optional Arguments
+We return a builder for each query. For ListServiceModerationQueue, we created `ListServiceModerationQueueBuilder`. For queries and mutations with optional parameters, we return a builder class.
+The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
+```dart
+class ListServiceModerationQueueVariablesBuilder {
+  ...
+ 
+  ListServiceModerationQueueVariablesBuilder status(ModerationStatus? t) {
+   _status.value = t;
+   return this;
+  }
+
+  ...
+}
+EspyConnector.instance.listServiceModerationQueue()
+.status(status)
+.execute();
+```
+
+#### Return Type
+`execute()` returns a `QueryResult<ListServiceModerationQueueData, ListServiceModerationQueueVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+/// Result of a query request. Created to hold extra variables in the future.
+class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
+  QueryResult(super.dataConnect, super.data, super.ref);
+}
+
+final result = await EspyConnector.instance.listServiceModerationQueue();
+ListServiceModerationQueueData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+final ref = EspyConnector.instance.listServiceModerationQueue().ref();
+ref.execute();
+
+ref.subscribe(...);
+```
+
+
+### ListRequestModerationQueue
+#### Required Arguments
+```dart
+// No required arguments
+EspyConnector.instance.listRequestModerationQueue().execute();
+```
+
+#### Optional Arguments
+We return a builder for each query. For ListRequestModerationQueue, we created `ListRequestModerationQueueBuilder`. For queries and mutations with optional parameters, we return a builder class.
+The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
+```dart
+class ListRequestModerationQueueVariablesBuilder {
+  ...
+ 
+  ListRequestModerationQueueVariablesBuilder status(ModerationStatus? t) {
+   _status.value = t;
+   return this;
+  }
+
+  ...
+}
+EspyConnector.instance.listRequestModerationQueue()
+.status(status)
+.execute();
+```
+
+#### Return Type
+`execute()` returns a `QueryResult<ListRequestModerationQueueData, ListRequestModerationQueueVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+/// Result of a query request. Created to hold extra variables in the future.
+class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
+  QueryResult(super.dataConnect, super.data, super.ref);
+}
+
+final result = await EspyConnector.instance.listRequestModerationQueue();
+ListRequestModerationQueueData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+final ref = EspyConnector.instance.listRequestModerationQueue().ref();
+ref.execute();
+
+ref.subscribe(...);
+```
+
+
+### ListTemplates
+#### Required Arguments
+```dart
+// No required arguments
+EspyConnector.instance.listTemplates().execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `QueryResult<ListTemplatesData, void>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+/// Result of a query request. Created to hold extra variables in the future.
+class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
+  QueryResult(super.dataConnect, super.data, super.ref);
+}
+
+final result = await EspyConnector.instance.listTemplates();
+ListTemplatesData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+final ref = EspyConnector.instance.listTemplates().ref();
+ref.execute();
+
+ref.subscribe(...);
+```
+
 ## Mutations
 
 ### CreateUser
@@ -2949,6 +3106,203 @@ An example of how to use the `Ref` object is shown below:
 String id = ...;
 
 final ref = EspyConnector.instance.approveResourceOrder(
+  id: id,
+).ref();
+ref.execute();
+```
+
+
+### ModerateService
+#### Required Arguments
+```dart
+String id = ...;
+ModerationStatus status = ...;
+EspyConnector.instance.moderateService(
+  id: id,
+  status: status,
+).execute();
+```
+
+#### Optional Arguments
+We return a builder for each query. For ModerateService, we created `ModerateServiceBuilder`. For queries and mutations with optional parameters, we return a builder class.
+The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
+```dart
+class ModerateServiceVariablesBuilder {
+  ...
+   ModerateServiceVariablesBuilder reason(String? t) {
+   _reason.value = t;
+   return this;
+  }
+
+  ...
+}
+EspyConnector.instance.moderateService(
+  id: id,
+  status: status,
+)
+.reason(reason)
+.execute();
+```
+
+#### Return Type
+`execute()` returns a `OperationResult<ModerateServiceData, ModerateServiceVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await EspyConnector.instance.moderateService(
+  id: id,
+  status: status,
+);
+ModerateServiceData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+String id = ...;
+ModerationStatus status = ...;
+
+final ref = EspyConnector.instance.moderateService(
+  id: id,
+  status: status,
+).ref();
+ref.execute();
+```
+
+
+### ModerateRequest
+#### Required Arguments
+```dart
+String id = ...;
+ModerationStatus status = ...;
+EspyConnector.instance.moderateRequest(
+  id: id,
+  status: status,
+).execute();
+```
+
+#### Optional Arguments
+We return a builder for each query. For ModerateRequest, we created `ModerateRequestBuilder`. For queries and mutations with optional parameters, we return a builder class.
+The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
+```dart
+class ModerateRequestVariablesBuilder {
+  ...
+   ModerateRequestVariablesBuilder reason(String? t) {
+   _reason.value = t;
+   return this;
+  }
+
+  ...
+}
+EspyConnector.instance.moderateRequest(
+  id: id,
+  status: status,
+)
+.reason(reason)
+.execute();
+```
+
+#### Return Type
+`execute()` returns a `OperationResult<ModerateRequestData, ModerateRequestVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await EspyConnector.instance.moderateRequest(
+  id: id,
+  status: status,
+);
+ModerateRequestData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+String id = ...;
+ModerationStatus status = ...;
+
+final ref = EspyConnector.instance.moderateRequest(
+  id: id,
+  status: status,
+).ref();
+ref.execute();
+```
+
+
+### UpsertTemplate
+#### Required Arguments
+```dart
+String id = ...;
+EspyConnector.instance.upsertTemplate(
+  id: id,
+).execute();
+```
+
+#### Optional Arguments
+We return a builder for each query. For UpsertTemplate, we created `UpsertTemplateBuilder`. For queries and mutations with optional parameters, we return a builder class.
+The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
+```dart
+class UpsertTemplateVariablesBuilder {
+  ...
+   UpsertTemplateVariablesBuilder visibleFields(List<String>? t) {
+   _visibleFields.value = t;
+   return this;
+  }
+  UpsertTemplateVariablesBuilder configJson(String? t) {
+   _configJson.value = t;
+   return this;
+  }
+
+  ...
+}
+EspyConnector.instance.upsertTemplate(
+  id: id,
+)
+.visibleFields(visibleFields)
+.configJson(configJson)
+.execute();
+```
+
+#### Return Type
+`execute()` returns a `OperationResult<UpsertTemplateData, UpsertTemplateVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await EspyConnector.instance.upsertTemplate(
+  id: id,
+);
+UpsertTemplateData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+String id = ...;
+
+final ref = EspyConnector.instance.upsertTemplate(
   id: id,
 ).ref();
 ref.execute();

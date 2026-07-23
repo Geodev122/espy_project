@@ -58,6 +58,12 @@ part 'create_recharge_card.dart';
 
 part 'approve_resource_order.dart';
 
+part 'moderate_service.dart';
+
+part 'moderate_request.dart';
+
+part 'upsert_template.dart';
+
 part 'approve_professional.dart';
 
 part 'validate_profile.dart';
@@ -111,6 +117,12 @@ part 'list_pending_approvals.dart';
 part 'list_pending_orders.dart';
 
 part 'list_support_tickets.dart';
+
+part 'list_service_moderation_queue.dart';
+
+part 'list_request_moderation_queue.dart';
+
+part 'list_templates.dart';
 
 
 
@@ -251,6 +263,42 @@ part 'list_support_tickets.dart';
       
       case 'PLATINUM':
         return const Known(MembershipTier.PLATINUM);
+      
+      default:
+        return Unknown(data);
+    }
+  }
+  
+
+  enum ModerationStatus {
+    
+      PENDING,
+    
+      APPROVED,
+    
+      FLAGGED,
+    
+      ARCHIVED,
+    
+  }
+  
+  String moderationStatusSerializer(EnumValue<ModerationStatus> e) {
+    return e.stringValue;
+  }
+  EnumValue<ModerationStatus> moderationStatusDeserializer(dynamic data) {
+    switch (data) {
+      
+      case 'PENDING':
+        return const Known(ModerationStatus.PENDING);
+      
+      case 'APPROVED':
+        return const Known(ModerationStatus.APPROVED);
+      
+      case 'FLAGGED':
+        return const Known(ModerationStatus.FLAGGED);
+      
+      case 'ARCHIVED':
+        return const Known(ModerationStatus.ARCHIVED);
       
       default:
         return Unknown(data);
@@ -627,6 +675,21 @@ class EspyConnector {
   }
   
   
+  ModerateServiceVariablesBuilder moderateService ({required String id, required ModerationStatus status, }) {
+    return ModerateServiceVariablesBuilder(dataConnect, id: id,status: status,);
+  }
+  
+  
+  ModerateRequestVariablesBuilder moderateRequest ({required String id, required ModerationStatus status, }) {
+    return ModerateRequestVariablesBuilder(dataConnect, id: id,status: status,);
+  }
+  
+  
+  UpsertTemplateVariablesBuilder upsertTemplate ({required String id, }) {
+    return UpsertTemplateVariablesBuilder(dataConnect, id: id,);
+  }
+  
+  
   ApproveProfessionalVariablesBuilder approveProfessional ({required String id, required bool isApproved, }) {
     return ApproveProfessionalVariablesBuilder(dataConnect, id: id,isApproved: isApproved,);
   }
@@ -759,6 +822,21 @@ class EspyConnector {
   
   ListSupportTicketsVariablesBuilder listSupportTickets () {
     return ListSupportTicketsVariablesBuilder(dataConnect, );
+  }
+  
+  
+  ListServiceModerationQueueVariablesBuilder listServiceModerationQueue () {
+    return ListServiceModerationQueueVariablesBuilder(dataConnect, );
+  }
+  
+  
+  ListRequestModerationQueueVariablesBuilder listRequestModerationQueue () {
+    return ListRequestModerationQueueVariablesBuilder(dataConnect, );
+  }
+  
+  
+  ListTemplatesVariablesBuilder listTemplates () {
+    return ListTemplatesVariablesBuilder(dataConnect, );
   }
   
 

@@ -7,6 +7,7 @@ class PremiumCard extends StatelessWidget {
   final double? width;
   final double? height;
   final EdgeInsetsGeometry? padding;
+  final EdgeInsetsGeometry? margin;
   final Color? accentColor;
   final bool isGlass;
   final double borderRadius;
@@ -17,6 +18,7 @@ class PremiumCard extends StatelessWidget {
     this.width,
     this.height,
     this.padding,
+    this.margin,
     this.accentColor,
     this.isGlass = false,
     this.borderRadius = 32.0,
@@ -27,6 +29,7 @@ class PremiumCard extends StatelessWidget {
     return Container(
       width: width,
       height: height,
+      margin: margin,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(borderRadius),
         boxShadow: [

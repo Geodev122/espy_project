@@ -1,4 +1,4 @@
-# ESPY PROTOCOL - DATA CONNECT MUTATIONS v7.0
+# ESPY PROTOCOL - DATA CONNECT MUTATIONS v8.0
 
 # --- 1. Identity & Profile ---
 
@@ -64,7 +64,8 @@ mutation CreateService($categoryId: String!, $sectorId: String!, $titleEn: Strin
     sectorId: $sectorId,
     titleEn: $titleEn,
     price: $price,
-    priceTagId: $priceTagId
+    priceTagId: $priceTagId,
+    moderationStatus: PENDING
   })
 }
 
@@ -137,7 +138,8 @@ mutation PostServiceRequest($sectorId: String!, $descriptionEn: String!, $urgenc
     sectorId: $sectorId,
     descriptionEn: $descriptionEn,
     urgency: $urgency,
-    preferredMode: $preferredMode
+    preferredMode: $preferredMode,
+    moderationStatus: APPROVED # Auto-approve visitors for now, can be changed to PENDING
   })
 }
 
@@ -230,6 +232,28 @@ mutation CreateRechargeCard($code: String!, $value: Int!, $pins: Int!, $slots: I
 mutation ApproveResourceOrder($id: UUID!) @auth(level: NO_ACCESS) {
   resourceOrder_update(key: { id: $id }, data: {
     status: APPROVED
+  })
+}
+
+mutation ModerateService($id: UUID!, $status: ModerationStatus!, $reason: String) @auth(level: NO_ACCESS) {
+  service_update(key: { id: $id }, data: {
+    moderationStatus: $status,
+    flagReason: $reason
+  })
+}
+
+mutation ModerateRequest($id: UUID!, $status: ModerationStatus!, $reason: String) @auth(level: NO_ACCESS) {
+  serviceRequest_update(key: { id: $id }, data: {
+    moderationStatus: $status,
+    flagReason: $reason
+  })
+}
+
+mutation UpsertTemplate($id: String!, $visibleFields: [String!], $configJson: String) @auth(level: NO_ACCESS) {
+  template_upsert(data: {
+    id: $id,
+    visibleFields: $visibleFields,
+    configJson: $configJson
   })
 }
 

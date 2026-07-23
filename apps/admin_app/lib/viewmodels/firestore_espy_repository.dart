@@ -157,7 +157,7 @@ class FirestoreEspyRepository implements EspyRepository {
 
   @override
   Stream<List<Map<String, dynamic>>> listActiveServices({String? categoryId, String? sectorId}) {
-    Query query = _db.collection('directory_services').where('isActive', isEqualTo: true);
+    Query query = _db.collection('directory_services').where('isActive', isEqualTo: true).where('moderationStatus', isEqualTo: 'APPROVED');
     if (categoryId != null) query = query.where('categoryId', isEqualTo: categoryId);
     if (sectorId != null) query = query.where('sectorId', isEqualTo: sectorId);
 
@@ -189,7 +189,7 @@ class FirestoreEspyRepository implements EspyRepository {
 
   @override
   Stream<List<Map<String, dynamic>>> listCommunityRequests({String? sectorId, bool newestFirst = true, String? userId}) {
-    Query query = _db.collection('directory_service_requests');
+    Query query = _db.collection('directory_service_requests').where('moderationStatus', isEqualTo: 'APPROVED');
     if (userId != null) {
       query = query.where('userId', isEqualTo: userId);
     } else {
@@ -373,7 +373,7 @@ class FirestoreEspyRepository implements EspyRepository {
         .orderBy('createdAt', descending: true)
         .limit(1)
         .snapshots()
-        .map((snap) => snap.docs.isEmpty ? null : <String, dynamic>{'id': snap.docs.first.id, ...(snap.docs.first.data() as Map<String, dynamic>)});
+        .map((snap) => snap.docs.isEmpty ? null : <String, dynamic>{'id': snap.docs.first.id, ...snap.docs.first.data() as Map<String, dynamic>});
   }
 
   // --- Recharge Cards ---
@@ -520,6 +520,55 @@ class FirestoreEspyRepository implements EspyRepository {
       'status': 'APPROVED',
       'updatedAt': FieldValue.serverTimestamp(),
     });
+  }
+
+  @override
+  Stream<List<Map<String, dynamic>>> listServiceModerationQueue({String status = 'PENDING'}) {
+    return _db.collection('directory_services')
+        .where('moderationStatus', isEqualTo: status)
+        .snapshots()
+        .map((snap) => snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList());
+  }
+
+  @override
+  Stream<List<Map<String, dynamic>>> listRequestModerationQueue({String status = 'PENDING'}) {
+    return _db.collection('directory_service_requests')
+        .where('moderationStatus', isEqualTo: status)
+        .snapshots()
+        .map((snap) => snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList());
+  }
+
+  @override
+  Future<void> moderateService(String id, String status, {String? reason}) async {
+    await _db.collection('directory_services').doc(id).update({
+      'moderationStatus': status,
+      'flagReason': reason,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  @override
+  Future<void> moderateRequest(String id, String status, {String? reason}) async {
+    await _db.collection('directory_service_requests').doc(id).update({
+      'moderationStatus': status,
+      'flagReason': reason,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  @override
+  Stream<List<Map<String, dynamic>>> listTemplates() {
+    return _db.collection('directory_templates').snapshots().map((snap) =>
+        snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList());
+  }
+
+  @override
+  Future<void> upsertTemplate(String id, List<String> visibleFields, {String? configJson}) async {
+    await _db.collection('directory_templates').doc(id).set({
+      'visibleFields': visibleFields,
+      'configJson': configJson,
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
   }
 
   // ─── 6. Discovery & Helpers ──────────────────────────────────────────────

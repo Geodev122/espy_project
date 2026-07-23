@@ -1,4 +1,4 @@
-# ESPY PROTOCOL - UNIFIED SCHEMA v7.0
+# ESPY PROTOCOL - UNIFIED SCHEMA v8.0
 
 # --- Enums ---
 
@@ -63,6 +63,13 @@ enum UrgencyLevel {
   MEDIUM
   HIGH
   EMERGENCY
+}
+
+enum ModerationStatus {
+  PENDING
+  APPROVED
+  FLAGGED
+  ARCHIVED
 }
 
 # --- 1. Identity & Profiles ---
@@ -145,6 +152,15 @@ type Category @table(key: "id") {
   targetRole: UserRole!
   isOtherCategory: Boolean! @default(value: false)
   isActive: Boolean! @default(value: true)
+  template: Template @ref
+}
+
+type Template @table(key: "id") {
+  id: String! # Links to CategoryID
+  category: Category! @ref(fields: ["id"])
+  visibleFields: [String] # e.g. ["title", "price", "location", "tags"]
+  configJson: String # Extended layout configuration
+  updatedAt: Timestamp @default(expr: "request.time")
 }
 
 type Country @table(key: "id") {
@@ -241,6 +257,8 @@ type Service @table(key: "id") {
   deliveryMode: DeliveryMode @default(value: FACE_TO_FACE)
   isActive: Boolean! @default(value: true)
   isAllocated: Boolean! @default(value: false)
+  moderationStatus: ModerationStatus! @default(value: PENDING)
+  flagReason: String
   imageUrl: String
   visibilityExpiresAt: Timestamp
 }
@@ -264,6 +282,8 @@ type ServiceRequest @table(key: "id") {
   lng: Float
   city: City
   status: CommunityRequestStatus! @default(value: ACTIVE)
+  moderationStatus: ModerationStatus! @default(value: APPROVED) # Visitors usually auto-approved or pending?
+  flagReason: String
   createdAt: Timestamp! @default(expr: "request.time")
   updatedAt: Timestamp! @default(expr: "request.time")
 }

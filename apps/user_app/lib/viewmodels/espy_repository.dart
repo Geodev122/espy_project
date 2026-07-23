@@ -81,6 +81,15 @@ abstract class EspyRepository {
   Stream<List<Map<String, dynamic>>> listPendingOrders();
   Future<void> approveResourceOrder(String orderId);
 
+  // --- Service Management & Moderation ---
+  Stream<List<Map<String, dynamic>>> listServiceModerationQueue({String status = 'PENDING'});
+  Stream<List<Map<String, dynamic>>> listRequestModerationQueue({String status = 'PENDING'});
+  Future<void> moderateService(String id, String status, {String? reason});
+  Future<void> moderateRequest(String id, String status, {String? reason});
+  
+  Stream<List<Map<String, dynamic>>> listTemplates();
+  Future<void> upsertTemplate(String id, List<String> visibleFields, {String? configJson});
+
   // ─── 6. Discovery & Helpers ──────────────────────────────────────────────
   Stream<Map<String, dynamic>> getSystemStats();
 }
