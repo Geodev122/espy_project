@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:espy_app/viewmodels/debug_service.dart';
 import 'package:espy_app/viewmodels/platform/web_helper.dart';
 import 'package:espy_app/viewmodels/auth_service.dart';
-import 'package:espy_app/models/user_model.dart';
+import 'package:espy_app/models/user_model.dart' as models;
 
 import 'app_shell.dart';
 import 'onboarding/splash_screen.dart';
@@ -60,13 +60,13 @@ class MainGate extends StatelessWidget {
         // Check if user is fully onboarded
         if (!user.hasProfile) {
           final role = user.role;
-          if (role == UserRole.pending) {
+          if (role == models.UserRole.pending) {
             return const RoleSelectionScreen();
-          } else if (role == UserRole.professional) {
+          } else if (role == models.UserRole.professional) {
             return const ProfessionalWizard();
-          } else if (role == UserRole.institution) {
+          } else if (role == models.UserRole.institution) {
             return const InstitutionWizard();
-          } else if (role == UserRole.visitor) {
+          } else if (role == models.UserRole.visitor) {
             return const VisitorWizard();
           } else {
             return const RoleSelectionScreen();

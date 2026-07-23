@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:espy_app/viewmodels/debug_service.dart';
 import 'package:espy_app/viewmodels/auth_service.dart';
-import 'package:espy_app/models/user_model.dart';
+import 'package:espy_app/models/user_model.dart' as models;
 
 import 'app_shell.dart';
 import 'onboarding/splash_screen.dart';
@@ -34,7 +34,7 @@ class MainGate extends StatelessWidget {
 
         // Check for Admin Role or Super Admin Bypass
         final bool isSuperAdmin = ['geo.elnajjar@gmail.com', 'admin@espy.com'].contains(auth.user?.email);
-        if (user.role != UserRole.admin && !isSuperAdmin) {
+        if (user.role != models.UserRole.admin && !isSuperAdmin) {
            return const Scaffold(
              body: Center(child: Text("ACCESS RESTRICTED: ADMINS ONLY")),
            );

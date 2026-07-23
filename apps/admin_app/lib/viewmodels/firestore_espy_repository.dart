@@ -15,9 +15,7 @@ class FirestoreEspyRepository implements EspyRepository {
 
   @override
   Future<UserModel?> getUser(String id) async {
-    final CollectionReference users = _db.collection('users');
-    final DocumentReference userDoc = users.doc(id);
-    final DocumentSnapshot doc = await userDoc.get();
+    final doc = await _db.collection('users').doc(id).get();
     if (doc.exists && doc.data() != null) {
       return UserModel.fromMap(doc.data() as Map<String, dynamic>);
     }

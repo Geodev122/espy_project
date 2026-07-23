@@ -1,30 +1,28 @@
 import 'espy_repository.dart';
-import '../models/user_model.dart';
+import '../models/user_model.dart' as models;
 import '../models/professional_profile.dart';
 import '../models/institution_profile.dart';
 import '../models/visitor_profile.dart';
-import 'package:espy_dataconnect_sdk/espy_dataconnect_sdk.dart';
+import 'package:espy_dataconnect_sdk/espy_dataconnect_sdk.dart' as sdk;
 
-/**
- * Repository implementation for Firebase DataConnect (PostgreSQL)
- * Uses the auto-generated type-safe SDK for all database operations.
- */
+/// Repository implementation for Firebase DataConnect (PostgreSQL)
+/// Uses the auto-generated type-safe SDK for all database operations.
 class DataConnectEspyRepository implements EspyRepository {
-  final EspyConnector _db = EspyConnector.instance;
+  final sdk.EspyConnector _db = sdk.EspyConnector.instance;
 
   // ─── 1. Identity & Profiles ──────────────────────────────────────────────
 
   @override
-  Future<UserModel?> getUser(String id) async {
+  Future<models.UserModel?> getUser(String id) async {
     final result = await _db.getUser(uid: id).execute();
-    if (result.data.user == null) return null;
+    final user = result.data.user;
+    if (user == null) return null;
     
-    final user = result.data.user!;
-    return UserModel(
+    return models.UserModel(
       id: user.id,
       email: user.email,
       name: user.name ?? '',
-      role: UserRole.values.byName(user.role.name.toLowerCase()),
+      role: models.UserRole.values.byName(user.role.stringValue.toLowerCase()),
       isActive: user.isActive,
       walletBalance: user.walletBalance,
       tokensUsed: user.tokensUsed,
@@ -60,7 +58,7 @@ class DataConnectEspyRepository implements EspyRepository {
       bioAr: prof.bioAr,
       isApproved: prof.isApproved,
       isHonorVerified: prof.isHonorVerified,
-      membershipTier: prof.membershipTier?.name.toLowerCase() ?? 'basic',
+      membershipTier: prof.membershipTier.stringValue.toLowerCase(),
       serviceSlots: prof.serviceSlots,
       practicePins: prof.practicePins,
       visibilityExpiresAt: prof.visibilityExpiresAt,
@@ -111,7 +109,7 @@ class DataConnectEspyRepository implements EspyRepository {
         'id': c.id,
         'nameEn': c.nameEn,
         'nameAr': c.nameAr,
-        'targetRole': c.targetRole.name.toLowerCase(),
+        'targetRole': c.targetRole.stringValue.toLowerCase(),
       }).toList()
     );
   }
@@ -183,7 +181,7 @@ class DataConnectEspyRepository implements EspyRepository {
         'id': cr.id,
         'title': cr.title,
         'description': cr.description,
-        'status': cr.status.name,
+        'status': cr.status.stringValue,
         'userName': cr.user.name,
         'createdAt': cr.createdAt,
       }).toList()
@@ -206,7 +204,7 @@ class DataConnectEspyRepository implements EspyRepository {
     return _db.getWalletTransactions(userId: userId).subscribe().map((snap) =>
       snap.data.walletTransactions.map((t) => {
         'id': t.id,
-        'type': t.type.name,
+        'type': t.type.stringValue,
         'amount': t.amount,
         'description': t.description,
         'createdAt': t.createdAt,
@@ -221,7 +219,7 @@ class DataConnectEspyRepository implements EspyRepository {
       cost: cost,
       ledgerAmount: -cost,
       description: "Purchase: $itemId",
-      type: TransactionType.purchase,
+      type: sdk.TransactionType.PURCHASE,
     ).execute();
     return {'success': true};
   }
@@ -230,7 +228,7 @@ class DataConnectEspyRepository implements EspyRepository {
   Future<void> recordInteraction({required String userId, required String targetId, required String type}) async {
     await _db.recordInteraction(
       targetId: targetId,
-      type: InteractionType.values.byName(type.toUpperCase()),
+      type: sdk.InteractionType.values.byName(type.toUpperCase()),
     ).execute();
   }
 
@@ -243,14 +241,14 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Stream<List<String>> listFavoriteIds(String userId) {
-    return _db.listInteractions(actorId: userId, type: InteractionType.favorite)
+    return _db.listInteractions(actorId: userId, type: sdk.InteractionType.FAVORITE)
         .subscribe()
         .map((snap) => snap.data.interactions.map((i) => i.targetId).toList());
   }
 
   @override
   Stream<List<String>> listContactedIds(String userId) {
-    return _db.listInteractions(actorId: userId, type: InteractionType.like)
+    return _db.listInteractions(actorId: userId, type: sdk.InteractionType.CONTACT)
         .subscribe()
         .map((snap) => snap.data.interactions.map((i) => i.targetId).toList());
   }
@@ -293,7 +291,7 @@ class DataConnectEspyRepository implements EspyRepository {
         'slotsCount': o.slotsCount,
         'broadcastsCount': o.broadcastsCount,
         'totalCost': o.totalCost,
-        'status': o.status.name,
+        'status': o.status.stringValue,
       };
     });
   }
@@ -339,14 +337,18 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Stream<List<Map<String, dynamic>>> listSupportTickets({String? status}) {
-     SupportTicketStatus? gqlStatus;
-     if (status != null) gqlStatus = SupportTicketStatus.values.byName(status.toUpperCase());
+     sdk.SupportTicketStatus? gqlStatus;
+     if (status != null) {
+        if (status.toUpperCase() == 'OPEN') gqlStatus = sdk.SupportTicketStatus.OPEN;
+        if (status.toUpperCase() == 'CLOSED') gqlStatus = sdk.SupportTicketStatus.CLOSED;
+        if (status.toUpperCase() == 'PENDING') gqlStatus = sdk.SupportTicketStatus.PENDING;
+     }
      return _db.listSupportTickets(status: gqlStatus).subscribe().map((snap) =>
         snap.data.supportTickets.map((st) => {
           'id': st.id,
           'subject': st.subject,
           'message': st.message,
-          'status': st.status.name,
+          'status': st.status.stringValue,
           'userEmail': st.user.email,
           'createdAt': st.createdAt,
         }).toList()
