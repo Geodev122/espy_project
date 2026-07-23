@@ -22,19 +22,9 @@ part 'create_resource_order.dart';
 
 part 'update_resource_order.dart';
 
-part 'spend_tokens.dart';
-
 part 'post_service_request.dart';
 
 part 'record_interaction.dart';
-
-part 'update_user_admin.dart';
-
-part 'toggle_user_active_status.dart';
-
-part 'verify_user_professional.dart';
-
-part 'verify_user_institution.dart';
 
 part 'upsert_country.dart';
 
@@ -46,6 +36,8 @@ part 'delete_geography_entity.dart';
 
 part 'update_sector_branding.dart';
 
+part 'update_category.dart';
+
 part 'upsert_service_tag.dart';
 
 part 'upsert_price_tag.dart';
@@ -53,8 +45,6 @@ part 'upsert_price_tag.dart';
 part 'upsert_pin_category.dart';
 
 part 'upsert_presence_tag.dart';
-
-part 'create_recharge_card.dart';
 
 part 'moderate_service.dart';
 
@@ -65,14 +55,6 @@ part 'upsert_template.dart';
 part 'create_localized_broadcast.dart';
 
 part 'approve_resource_order.dart';
-
-part 'approve_professional.dart';
-
-part 'validate_profile.dart';
-
-part 'validate_institution_profile.dart';
-
-part 'resolve_support_ticket.dart';
 
 part 'get_user.dart';
 
@@ -90,35 +72,17 @@ part 'list_metadata_tags.dart';
 
 part 'list_active_services.dart';
 
-part 'search_services.dart';
-
 part 'list_countries.dart';
 
 part 'list_location_nodes.dart';
-
-part 'list_favorite_ids.dart';
-
-part 'list_contacted_ids.dart';
 
 part 'list_interactions.dart';
 
 part 'list_service_requests.dart';
 
-part 'get_wallet_transactions.dart';
-
-part 'get_active_resource_order.dart';
-
 part 'search_users_admin.dart';
 
 part 'get_audit_details.dart';
-
-part 'list_recharge_cards.dart';
-
-part 'list_pending_approvals.dart';
-
-part 'list_pending_orders.dart';
-
-part 'list_support_tickets.dart';
 
 part 'list_service_moderation_queue.dart';
 
@@ -301,73 +265,6 @@ part 'list_templates.dart';
       
       case 'ARCHIVED':
         return const Known(ModerationStatus.ARCHIVED);
-      
-      default:
-        return Unknown(data);
-    }
-  }
-  
-
-  enum OrderStatus {
-    
-      PENDING,
-    
-      APPROVED,
-    
-      PAID,
-    
-      CANCELLED,
-    
-  }
-  
-  String orderStatusSerializer(EnumValue<OrderStatus> e) {
-    return e.stringValue;
-  }
-  EnumValue<OrderStatus> orderStatusDeserializer(dynamic data) {
-    switch (data) {
-      
-      case 'PENDING':
-        return const Known(OrderStatus.PENDING);
-      
-      case 'APPROVED':
-        return const Known(OrderStatus.APPROVED);
-      
-      case 'PAID':
-        return const Known(OrderStatus.PAID);
-      
-      case 'CANCELLED':
-        return const Known(OrderStatus.CANCELLED);
-      
-      default:
-        return Unknown(data);
-    }
-  }
-  
-
-  enum SupportTicketStatus {
-    
-      OPEN,
-    
-      CLOSED,
-    
-      PENDING,
-    
-  }
-  
-  String supportTicketStatusSerializer(EnumValue<SupportTicketStatus> e) {
-    return e.stringValue;
-  }
-  EnumValue<SupportTicketStatus> supportTicketStatusDeserializer(dynamic data) {
-    switch (data) {
-      
-      case 'OPEN':
-        return const Known(SupportTicketStatus.OPEN);
-      
-      case 'CLOSED':
-        return const Known(SupportTicketStatus.CLOSED);
-      
-      case 'PENDING':
-        return const Known(SupportTicketStatus.PENDING);
       
       default:
         return Unknown(data);
@@ -587,11 +484,6 @@ class EspyConnector {
   }
   
   
-  SpendTokensVariablesBuilder spendTokens ({required String userId, required int cost, required int ledgerAmount, required String description, }) {
-    return SpendTokensVariablesBuilder(dataConnect, userId: userId,cost: cost,ledgerAmount: ledgerAmount,description: description,);
-  }
-  
-  
   PostServiceRequestVariablesBuilder postServiceRequest ({required String sectorId, required String descriptionEn, }) {
     return PostServiceRequestVariablesBuilder(dataConnect, sectorId: sectorId,descriptionEn: descriptionEn,);
   }
@@ -599,26 +491,6 @@ class EspyConnector {
   
   RecordInteractionVariablesBuilder recordInteraction ({required String targetId, required InteractionType type, }) {
     return RecordInteractionVariablesBuilder(dataConnect, targetId: targetId,type: type,);
-  }
-  
-  
-  UpdateUserAdminVariablesBuilder updateUserAdmin ({required String id, }) {
-    return UpdateUserAdminVariablesBuilder(dataConnect, id: id,);
-  }
-  
-  
-  ToggleUserActiveStatusVariablesBuilder toggleUserActiveStatus ({required String id, required bool isActive, }) {
-    return ToggleUserActiveStatusVariablesBuilder(dataConnect, id: id,isActive: isActive,);
-  }
-  
-  
-  VerifyUserProfessionalVariablesBuilder verifyUserProfessional ({required String id, required bool isApproved, }) {
-    return VerifyUserProfessionalVariablesBuilder(dataConnect, id: id,isApproved: isApproved,);
-  }
-  
-  
-  VerifyUserInstitutionVariablesBuilder verifyUserInstitution ({required String id, required bool isApproved, }) {
-    return VerifyUserInstitutionVariablesBuilder(dataConnect, id: id,isApproved: isApproved,);
   }
   
   
@@ -647,6 +519,11 @@ class EspyConnector {
   }
   
   
+  UpdateCategoryVariablesBuilder updateCategory ({required String id, required String sectorId, required String nameEn, required String nameAr, required UserRole targetRole, }) {
+    return UpdateCategoryVariablesBuilder(dataConnect, id: id,sectorId: sectorId,nameEn: nameEn,nameAr: nameAr,targetRole: targetRole,);
+  }
+  
+  
   UpsertServiceTagVariablesBuilder upsertServiceTag ({required String id, required String nameEn, required String nameAr, }) {
     return UpsertServiceTagVariablesBuilder(dataConnect, id: id,nameEn: nameEn,nameAr: nameAr,);
   }
@@ -664,11 +541,6 @@ class EspyConnector {
   
   UpsertPresenceTagVariablesBuilder upsertPresenceTag ({required String id, required String nameEn, required String nameAr, }) {
     return UpsertPresenceTagVariablesBuilder(dataConnect, id: id,nameEn: nameEn,nameAr: nameAr,);
-  }
-  
-  
-  CreateRechargeCardVariablesBuilder createRechargeCard ({required String code, required int value, required int pins, required int slots, }) {
-    return CreateRechargeCardVariablesBuilder(dataConnect, code: code,value: value,pins: pins,slots: slots,);
   }
   
   
@@ -694,26 +566,6 @@ class EspyConnector {
   
   ApproveResourceOrderVariablesBuilder approveResourceOrder ({required String id, }) {
     return ApproveResourceOrderVariablesBuilder(dataConnect, id: id,);
-  }
-  
-  
-  ApproveProfessionalVariablesBuilder approveProfessional ({required String id, required bool isApproved, }) {
-    return ApproveProfessionalVariablesBuilder(dataConnect, id: id,isApproved: isApproved,);
-  }
-  
-  
-  ValidateProfileVariablesBuilder validateProfile ({required String id, }) {
-    return ValidateProfileVariablesBuilder(dataConnect, id: id,);
-  }
-  
-  
-  ValidateInstitutionProfileVariablesBuilder validateInstitutionProfile ({required String id, }) {
-    return ValidateInstitutionProfileVariablesBuilder(dataConnect, id: id,);
-  }
-  
-  
-  ResolveSupportTicketVariablesBuilder resolveSupportTicket ({required String id, }) {
-    return ResolveSupportTicketVariablesBuilder(dataConnect, id: id,);
   }
   
   
@@ -757,11 +609,6 @@ class EspyConnector {
   }
   
   
-  SearchServicesVariablesBuilder searchServices () {
-    return SearchServicesVariablesBuilder(dataConnect, );
-  }
-  
-  
   ListCountriesVariablesBuilder listCountries () {
     return ListCountriesVariablesBuilder(dataConnect, );
   }
@@ -769,16 +616,6 @@ class EspyConnector {
   
   ListLocationNodesVariablesBuilder listLocationNodes ({required String userId, }) {
     return ListLocationNodesVariablesBuilder(dataConnect, userId: userId,);
-  }
-  
-  
-  ListFavoriteIdsVariablesBuilder listFavoriteIds ({required String actorId, }) {
-    return ListFavoriteIdsVariablesBuilder(dataConnect, actorId: actorId,);
-  }
-  
-  
-  ListContactedIdsVariablesBuilder listContactedIds ({required String actorId, }) {
-    return ListContactedIdsVariablesBuilder(dataConnect, actorId: actorId,);
   }
   
   
@@ -792,16 +629,6 @@ class EspyConnector {
   }
   
   
-  GetWalletTransactionsVariablesBuilder getWalletTransactions ({required String userId, }) {
-    return GetWalletTransactionsVariablesBuilder(dataConnect, userId: userId,);
-  }
-  
-  
-  GetActiveResourceOrderVariablesBuilder getActiveResourceOrder ({required String userId, }) {
-    return GetActiveResourceOrderVariablesBuilder(dataConnect, userId: userId,);
-  }
-  
-  
   SearchUsersAdminVariablesBuilder searchUsersAdmin () {
     return SearchUsersAdminVariablesBuilder(dataConnect, );
   }
@@ -809,26 +636,6 @@ class EspyConnector {
   
   GetAuditDetailsVariablesBuilder getAuditDetails ({required String id, }) {
     return GetAuditDetailsVariablesBuilder(dataConnect, id: id,);
-  }
-  
-  
-  ListRechargeCardsVariablesBuilder listRechargeCards () {
-    return ListRechargeCardsVariablesBuilder(dataConnect, );
-  }
-  
-  
-  ListPendingApprovalsVariablesBuilder listPendingApprovals () {
-    return ListPendingApprovalsVariablesBuilder(dataConnect, );
-  }
-  
-  
-  ListPendingOrdersVariablesBuilder listPendingOrders () {
-    return ListPendingOrdersVariablesBuilder(dataConnect, );
-  }
-  
-  
-  ListSupportTicketsVariablesBuilder listSupportTickets () {
-    return ListSupportTicketsVariablesBuilder(dataConnect, );
   }
   
   

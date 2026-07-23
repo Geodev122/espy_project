@@ -1,4 +1,4 @@
-# ESPY PROTOCOL - DATA CONNECT MUTATIONS v8.2 (Sector-Based Adaptive Branding)
+# ESPY PROTOCOL - DATA CONNECT MUTATIONS v9.0
 
 # --- 1. Identity & Profile ---
 
@@ -79,7 +79,7 @@ mutation UpdateService($id: UUID!, $isActive: Boolean, $isAllocated: Boolean) @a
   )
 }
 
-mutation CreateLocationNode($cityId: UUID!, $label: String!, $lat: Float!, $lng: Float!, $isMain: Boolean!) @auth(level: USER) {
+mutation CreateLocationNode($cityId: String!, $label: String!, $lat: Float!, $lng: Float!, $isMain: Boolean!) @auth(level: USER) {
   locationNode_insert(data: {
     userId_expr: "auth.uid",
     cityId: $cityId,
@@ -116,20 +116,6 @@ mutation UpdateResourceOrder($id: UUID!, $pins: Int!, $slots: Int!, $broadcasts:
   )
 }
 
-mutation SpendTokens($userId: String!, $cost: Int!, $ledgerAmount: Int!, $type: TransactionType = PURCHASE, $description: String!) @auth(expr: "auth.uid == userId") {
-  user_update(key: { id: $userId }, data: {
-    walletBalance_update: { dec: $cost },
-    tokensUsed_update: { inc: $cost },
-    updatedAt_expr: "request.time"
-  })
-  walletTransaction_insert(data: {
-    userId: $userId,
-    amount: $ledgerAmount,
-    type: $type,
-    description: $description
-  })
-}
-
 # --- 4. Community & Interaction ---
 
 mutation PostServiceRequest($sectorId: String!, $descriptionEn: String!, $urgency: UrgencyLevel, $preferredMode: DeliveryMode) @auth(level: USER) {
@@ -151,49 +137,17 @@ mutation RecordInteraction($targetId: String!, $type: InteractionType!) @auth(le
   })
 }
 
-mutation UpdateUserAdmin($id: String!, $name: String, $role: UserRole, $isActive: Boolean, $phone: String, $whatsapp: String, $notes: String, $balance: Int) @auth(level: NO_ACCESS) {
-  user_update(key: { id: $id }, data: {
-    name: $name,
-    role: $role,
-    isActive: $isActive,
-    phone: $phone,
-    whatsapp: $whatsapp,
-    adminNotes: $notes,
-    walletBalance: $balance,
-    updatedAt_expr: "request.time"
-  })
-}
-
-mutation ToggleUserActiveStatus($id: String!, $isActive: Boolean!) @auth(level: NO_ACCESS) {
-  user_update(key: { id: $id }, data: {
-    isActive: $isActive,
-    updatedAt_expr: "request.time"
-  })
-}
-
-mutation VerifyUserProfessional($id: String!, $isApproved: Boolean!) @auth(level: NO_ACCESS) {
-  professionalProfile_update(key: { id: $id }, data: {
-    isApproved: $isApproved
-  })
-}
-
-mutation VerifyUserInstitution($id: String!, $isApproved: Boolean!) @auth(level: NO_ACCESS) {
-  institutionProfile_update(key: { id: $id }, data: {
-    isApproved: $isApproved
-  })
-}
-
 # --- 5. Administration & Taxonomy ---
 
 mutation UpsertCountry($id: String!, $nameEn: String!, $nameAr: String!, $isoCode: String, $currency: String, $flagEmoji: String) @auth(level: NO_ACCESS) {
   country_upsert(data: { id: $id, nameEn: $nameEn, nameAr: $nameAr, isoCode: $isoCode, currency: $currency, flagEmoji: $flagEmoji })
 }
 
-mutation UpsertRegion($id: UUID!, $countryId: String!, $nameEn: String!, $nameAr: String!, $regionCode: String) @auth(level: NO_ACCESS) {
+mutation UpsertRegion($id: String!, $countryId: String!, $nameEn: String!, $nameAr: String!, $regionCode: String) @auth(level: NO_ACCESS) {
   region_upsert(data: { id: $id, countryId: $countryId, nameEn: $nameEn, nameAr: $nameAr, regionCode: $regionCode })
 }
 
-mutation UpsertCity($id: UUID!, $regionId: UUID!, $nameEn: String!, $nameAr: String!, $lat: Float, $lng: Float) @auth(level: NO_ACCESS) {
+mutation UpsertCity($id: String!, $regionId: String!, $nameEn: String!, $nameAr: String!, $lat: Float, $lng: Float) @auth(level: NO_ACCESS) {
   city_upsert(data: { id: $id, regionId: $regionId, nameEn: $nameEn, nameAr: $nameAr, lat: $lat, lng: $lng })
 }
 
@@ -203,6 +157,15 @@ mutation DeleteGeographyEntity($id: String!) @auth(level: NO_ACCESS) {
 
 mutation UpdateSectorBranding($id: String!, $iconName: String, $colorHex: String, $nameEn: String, $nameAr: String) @auth(level: NO_ACCESS) {
   sector_update(key: { id: $id }, data: { iconName: $iconName, colorHex: $colorHex, nameEn: $nameEn, nameAr: $nameAr })
+}
+
+mutation UpdateCategory($id: String!, $sectorId: String!, $nameEn: String!, $nameAr: String!, $targetRole: UserRole!) @auth(level: NO_ACCESS) {
+  category_update(key: { id: $id }, data: {
+    sectorId: $sectorId,
+    nameEn: $nameEn,
+    nameAr: $nameAr,
+    targetRole: $targetRole
+  })
 }
 
 mutation UpsertServiceTag($id: String!, $nameEn: String!, $nameAr: String!) @auth(level: NO_ACCESS) {
@@ -219,14 +182,6 @@ mutation UpsertPinCategory($id: String!, $nameEn: String!, $nameAr: String!, $ic
 
 mutation UpsertPresenceTag($id: String!, $nameEn: String!, $nameAr: String!) @auth(level: NO_ACCESS) {
   presenceTag_upsert(data: { id: $id, nameEn: $nameEn, nameAr: $nameAr })
-}
-
-mutation CreateRechargeCard($code: String!, $value: Int!, $pins: Int!, $slots: Int!) @auth(level: NO_ACCESS) {
-  rechargeCard_insert(data: {
-    id: $code,
-    tokenValue: $value,
-    status: "active"
-  })
 }
 
 mutation ModerateService($id: UUID!, $status: ModerationStatus!, $reason: String) @auth(level: NO_ACCESS) {
@@ -253,7 +208,7 @@ mutation UpsertTemplate($id: String!, $visibleFields: [String!], $accentColor: S
   })
 }
 
-mutation CreateLocalizedBroadcast($title: String!, $message: String!, $country: String, $region: UUID, $city: UUID) @auth(level: NO_ACCESS) {
+mutation CreateLocalizedBroadcast($title: String!, $message: String!, $country: String, $region: String, $city: String) @auth(level: NO_ACCESS) {
   broadcast_insert(data: {
     senderId_expr: "auth.uid",
     title: $title,
@@ -268,30 +223,5 @@ mutation CreateLocalizedBroadcast($title: String!, $message: String!, $country: 
 mutation ApproveResourceOrder($id: UUID!) @auth(level: NO_ACCESS) {
   resourceOrder_update(key: { id: $id }, data: {
     status: APPROVED
-  })
-}
-
-mutation ApproveProfessional($id: String!, $isApproved: Boolean!) @auth(level: NO_ACCESS) {
-  professionalProfile_update(key: { id: $id }, data: {
-    isApproved: $isApproved
-  })
-}
-
-mutation ValidateProfile($id: String!) @auth(level: NO_ACCESS) {
-  professionalProfile_update(key: { id: $id }, data: {
-    isProfileValidated: true
-  })
-}
-
-mutation ValidateInstitutionProfile($id: String!) @auth(level: NO_ACCESS) {
-  institutionProfile_update(key: { id: $id }, data: {
-    isProfileValidated: true
-  })
-}
-
-mutation ResolveSupportTicket($id: UUID!, $adminNote: String) @auth(level: NO_ACCESS) {
-  supportTicket_update(key: { id: $id }, data: {
-    status: CLOSED,
-    adminNote: $adminNote
   })
 }

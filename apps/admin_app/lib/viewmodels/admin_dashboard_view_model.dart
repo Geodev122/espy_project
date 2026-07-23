@@ -25,27 +25,25 @@ class AdminDashboardViewModel extends ChangeNotifier {
   void _init() {
     try {
       _statsSub = _repository.getSystemStats().listen((data) {
+        if (_disposed) return;
         _stats = {
           'users': data['users']?.toString() ?? '0',
           'services': data['services']?.toString() ?? '0',
           'communityRequests': data['communityRequests']?.toString() ?? '0',
         };
         _isLoading = false;
-        _safeNotify();
+        notifyListeners();
       }, onError: (e) {
         debugPrint("Stats Subscription Error: $e");
-        _isLoading = false;
-        _safeNotify();
+        if (!_disposed) {
+          _isLoading = false;
+          notifyListeners();
+        }
       });
     } catch (e) {
       debugPrint("Stats Init Error: $e");
       _isLoading = false;
-      _safeNotify();
     }
-  }
-
-  void _safeNotify() {
-    if (!_disposed) notifyListeners();
   }
 
   @override

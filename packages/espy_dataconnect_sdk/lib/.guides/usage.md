@@ -10,7 +10,7 @@ EspyConnector.instance.UpdateService(updateServiceVariables).execute();
 EspyConnector.instance.CreateLocationNode(createLocationNodeVariables).execute();
 EspyConnector.instance.CreateResourceOrder(createResourceOrderVariables).execute();
 EspyConnector.instance.UpdateResourceOrder(updateResourceOrderVariables).execute();
-EspyConnector.instance.SpendTokens(spendTokensVariables).execute();
+EspyConnector.instance.PostServiceRequest(postServiceRequestVariables).execute();
 
 ```
 

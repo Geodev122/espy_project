@@ -37,6 +37,7 @@ class ListServiceRequestsServiceRequests {
   final EnumValue<CommunityRequestStatus> status;
   final Timestamp createdAt;
   final ListServiceRequestsServiceRequestsUser user;
+  final ListServiceRequestsServiceRequestsSector sector;
   final List<ListServiceRequestsServiceRequestsServiceRequestTagsOnRequest> serviceRequestTags_on_request;
   ListServiceRequestsServiceRequests.fromJson(dynamic json):
   
@@ -48,6 +49,7 @@ class ListServiceRequestsServiceRequests {
   status = communityRequestStatusDeserializer(json['status']),
   createdAt = Timestamp.fromJson(json['createdAt']),
   user = ListServiceRequestsServiceRequestsUser.fromJson(json['user']),
+  sector = ListServiceRequestsServiceRequestsSector.fromJson(json['sector']),
   serviceRequestTags_on_request = (json['serviceRequestTags_on_request'] as List<dynamic>)
         .map((e) => ListServiceRequestsServiceRequestsServiceRequestTagsOnRequest.fromJson(e))
         .toList();
@@ -69,11 +71,12 @@ class ListServiceRequestsServiceRequests {
     status == otherTyped.status && 
     createdAt == otherTyped.createdAt && 
     user == otherTyped.user && 
+    sector == otherTyped.sector && 
     serviceRequestTags_on_request == otherTyped.serviceRequestTags_on_request;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, descriptionEn.hashCode, descriptionAr.hashCode, urgency.hashCode, preferredMode.hashCode, status.hashCode, createdAt.hashCode, user.hashCode, serviceRequestTags_on_request.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, descriptionEn.hashCode, descriptionAr.hashCode, urgency.hashCode, preferredMode.hashCode, status.hashCode, createdAt.hashCode, user.hashCode, sector.hashCode, serviceRequestTags_on_request.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -98,6 +101,7 @@ class ListServiceRequestsServiceRequests {
     ;
     json['createdAt'] = createdAt.toJson();
     json['user'] = user.toJson();
+    json['sector'] = sector.toJson();
     json['serviceRequestTags_on_request'] = serviceRequestTags_on_request.map((e) => e.toJson()).toList();
     return json;
   }
@@ -111,6 +115,7 @@ class ListServiceRequestsServiceRequests {
     required this.status,
     required this.createdAt,
     required this.user,
+    required this.sector,
     required this.serviceRequestTags_on_request,
   });
 }
@@ -148,6 +153,94 @@ class ListServiceRequestsServiceRequestsUser {
 
   ListServiceRequestsServiceRequestsUser({
     this.name,
+  });
+}
+
+@immutable
+class ListServiceRequestsServiceRequestsSector {
+  final ListServiceRequestsServiceRequestsSectorTemplate? template;
+  ListServiceRequestsServiceRequestsSector.fromJson(dynamic json):
+  
+  template = json['template'] == null ? null : ListServiceRequestsServiceRequestsSectorTemplate.fromJson(json['template']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final ListServiceRequestsServiceRequestsSector otherTyped = other as ListServiceRequestsServiceRequestsSector;
+    return template == otherTyped.template;
+    
+  }
+  @override
+  int get hashCode => template.hashCode;
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    if (template != null) {
+      json['template'] = template!.toJson();
+    }
+    return json;
+  }
+
+  ListServiceRequestsServiceRequestsSector({
+    this.template,
+  });
+}
+
+@immutable
+class ListServiceRequestsServiceRequestsSectorTemplate {
+  final String? accentColor;
+  final String? iconName;
+  final List<String>? visibleFields;
+  ListServiceRequestsServiceRequestsSectorTemplate.fromJson(dynamic json):
+  
+  accentColor = json['accentColor'] == null ? null : nativeFromJson<String>(json['accentColor']),
+  iconName = json['iconName'] == null ? null : nativeFromJson<String>(json['iconName']),
+  visibleFields = json['visibleFields'] == null ? null : (json['visibleFields'] as List<dynamic>)
+        .map((e) => nativeFromJson<String>(e))
+        .toList();
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final ListServiceRequestsServiceRequestsSectorTemplate otherTyped = other as ListServiceRequestsServiceRequestsSectorTemplate;
+    return accentColor == otherTyped.accentColor && 
+    iconName == otherTyped.iconName && 
+    visibleFields == otherTyped.visibleFields;
+    
+  }
+  @override
+  int get hashCode => Object.hashAll([accentColor.hashCode, iconName.hashCode, visibleFields.hashCode]);
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    if (accentColor != null) {
+      json['accentColor'] = nativeToJson<String?>(accentColor);
+    }
+    if (iconName != null) {
+      json['iconName'] = nativeToJson<String?>(iconName);
+    }
+    if (visibleFields != null) {
+      json['visibleFields'] = visibleFields?.map((e) => nativeToJson<String>(e)).toList();
+    }
+    return json;
+  }
+
+  ListServiceRequestsServiceRequestsSectorTemplate({
+    this.accentColor,
+    this.iconName,
+    this.visibleFields,
   });
 }
 
