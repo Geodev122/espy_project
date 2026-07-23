@@ -8,10 +8,10 @@ import 'package:espy_app/theme/espy_theme.dart';
 import 'package:espy_app/viewmodels/auth_service.dart';
 import 'package:espy_app/models/user_model.dart';
 
-// Admin Screens (Conditional import or dynamic navigation)
 import '../../views/admin/modules/verifications_screen.dart';
 import '../../views/admin/modules/orders_manager_screen.dart';
 import '../../views/admin/modules/support_inbox_screen.dart';
+import '../../views/admin/modules/users_manager_screen.dart';
 
 class EspySideMenu extends StatelessWidget {
   const EspySideMenu({super.key});
@@ -33,9 +33,10 @@ class EspySideMenu extends StatelessWidget {
                 padding: const EdgeInsets.all(24),
                 children: [
                     _buildSectionHeader('ADMINISTRATIVE'),
-                    _buildMenuItem(context, LucideIcons.shieldCheck, 'VALIDATIONS', VerificationsScreen()),
-                    _buildMenuItem(context, LucideIcons.shoppingBag, 'RESOURCES', OrdersManagerScreen()),
-                    _buildMenuItem(context, LucideIcons.inbox, 'SUPPORT', SupportInboxScreen()),
+                    _buildMenuItem(context, LucideIcons.users, 'USERS', const UsersManagerScreen()),
+                    _buildMenuItem(context, LucideIcons.shieldCheck, 'VALIDATIONS', const VerificationsScreen()),
+                    _buildMenuItem(context, LucideIcons.shoppingBag, 'RESOURCES', const OrdersManagerScreen()),
+                    _buildMenuItem(context, LucideIcons.inbox, 'SUPPORT', const SupportInboxScreen()),
                 ],
               ),
             ),

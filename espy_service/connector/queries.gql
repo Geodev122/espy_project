@@ -212,6 +212,54 @@ query GetActiveResourceOrder($userId: String!) @auth(expr: "auth.uid == userId")
 
 # --- 5. Administration & Audit ---
 
+query ListAllUsers @auth(level: NO_ACCESS) {
+  users(orderBy: [{ createdAt: DESC }]) {
+    id
+    email
+    name
+    role
+    isActive
+    hasProfile
+    phone
+    whatsapp
+    createdAt
+  }
+}
+
+query GetUserDetails($id: String!) @auth(level: NO_ACCESS) {
+  user(key: { id: $id }) {
+    id
+    email
+    name
+    role
+    isActive
+    hasProfile
+    photoUrl
+    phone
+    whatsapp
+    walletBalance
+    createdAt
+    updatedAt
+    professionalProfile_on_user {
+      fullNameAr
+      specialty
+      isApproved
+      isProfileValidated
+      verificationDocUrl
+      membershipTier
+      visibilityExpiresAt
+    }
+    institutionProfile_on_user {
+      nameAr
+      registrationNumber
+      isApproved
+      isProfileValidated
+      verificationDocUrl
+      visibilityExpiresAt
+    }
+  }
+}
+
 # Aggregates disabled temporarily to ensure deployment success
 # query GetSystemStats @auth(level: NO_ACCESS) {
 #   users_aggregate { _count }

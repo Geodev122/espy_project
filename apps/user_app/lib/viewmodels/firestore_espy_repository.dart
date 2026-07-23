@@ -294,6 +294,50 @@ class FirestoreEspyRepository implements EspyRepository {
   // ─── 5. Admin Operations ─────────────────────────────────────────────────
 
   @override
+  Stream<List<Map<String, dynamic>>> listAllUsers() {
+    return _db.collection('users')
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snap) => snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList());
+  }
+
+  @override
+  Future<Map<String, dynamic>> getUserDetails(String id) async {
+    final userDoc = await _db.collection('users').doc(id).get();
+    final data = userDoc.data() as Map<String, dynamic>? ?? {};
+    
+    final role = data['role']?.toString().toLowerCase();
+    if (role == 'professional') {
+      final profDoc = await _db.collection('directory_professionals').doc(id).get();
+      data['professionalProfile'] = profDoc.data();
+    } else if (role == 'institution') {
+      final instDoc = await _db.collection('directory_institutions').doc(id).get();
+      data['institutionProfile'] = instDoc.data();
+    }
+    
+    return data;
+  }
+
+  @override
+  Future<void> adminUpdateUser(String id, Map<String, dynamic> data) async {
+    await _db.collection('users').doc(id).update({...data, 'updatedAt': FieldValue.serverTimestamp()});
+  }
+
+  @override
+  Future<void> toggleUserActiveStatus(String id, bool isActive) async {
+    await _db.collection('users').doc(id).update({'isActive': isActive, 'updatedAt': FieldValue.serverTimestamp()});
+  }
+
+  @override
+  Future<void> verifyUserDocs(String id, String role, bool isApproved) async {
+    final col = role == 'institution' ? 'directory_institutions' : 'directory_professionals';
+    final batch = _db.batch();
+    batch.update(_db.collection(col).doc(id), {'isApproved': isApproved, 'updatedAt': FieldValue.serverTimestamp()});
+    batch.update(_db.collection('users').doc(id), {'isApproved': isApproved, 'updatedAt': FieldValue.serverTimestamp()});
+    await batch.commit();
+  }
+
+  @override
   Stream<List<Map<String, dynamic>>> listAllProviders() {
     return Rx.combineLatest2(
       _db.collection('directory_professionals').snapshots(),

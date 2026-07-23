@@ -317,6 +317,97 @@ class DataConnectEspyRepository implements EspyRepository {
   // ─── 5. Admin Operations ─────────────────────────────────────────────────
 
   @override
+  Stream<List<Map<String, dynamic>>> listAllUsers() {
+    return _db.listAllUsers().subscribe().map((snap) =>
+      snap.data.users.map((u) => {
+        'id': u.id,
+        'email': u.email,
+        'name': u.name,
+        'role': u.role.stringValue,
+        'isActive': u.isActive,
+        'hasProfile': u.hasProfile,
+        'phone': u.phone,
+        'whatsapp': u.whatsapp,
+        'createdAt': u.createdAt,
+      }).toList()
+    );
+  }
+
+  @override
+  Future<Map<String, dynamic>> getUserDetails(String id) async {
+    final result = await _db.getUserDetails(id: id).execute();
+    final u = result.data.user;
+    if (u == null) return {};
+
+    final Map<String, dynamic> data = {
+      'id': u.id,
+      'email': u.email,
+      'name': u.name,
+      'role': u.role.stringValue,
+      'isActive': u.isActive,
+      'hasProfile': u.hasProfile,
+      'photoUrl': u.photoUrl,
+      'phone': u.phone,
+      'whatsapp': u.whatsapp,
+      'walletBalance': u.walletBalance,
+      'createdAt': u.createdAt,
+      'updatedAt': u.updatedAt,
+    };
+
+    if (u.professionalProfile_on_user != null) {
+      final p = u.professionalProfile_on_user!;
+      data['professionalProfile'] = {
+        'fullNameAr': p.fullNameAr,
+        'specialty': p.specialty,
+        'isApproved': p.isApproved,
+        'isProfileValidated': p.isProfileValidated,
+        'verificationDocUrl': p.verificationDocUrl,
+        'membershipTier': p.membershipTier.stringValue,
+        'visibilityExpiresAt': p.visibilityExpiresAt,
+      };
+    }
+
+    if (u.institutionProfile_on_user != null) {
+      final i = u.institutionProfile_on_user!;
+      data['institutionProfile'] = {
+        'nameAr': i.nameAr,
+        'registrationNumber': i.registrationNumber,
+        'isApproved': i.isApproved,
+        'isProfileValidated': i.isProfileValidated,
+        'verificationDocUrl': i.verificationDocUrl,
+        'visibilityExpiresAt': i.visibilityExpiresAt,
+      };
+    }
+
+    return data;
+  }
+
+  @override
+  Future<void> adminUpdateUser(String id, Map<String, dynamic> data) async {
+    await _db.updateUserAdmin(
+      id: id,
+      name: data['name'],
+      phone: data['phone'],
+      whatsapp: data['whatsapp'],
+      isActive: data['isActive'],
+    ).execute();
+  }
+
+  @override
+  Future<void> toggleUserActiveStatus(String id, bool isActive) async {
+    await _db.toggleUserActiveStatus(id: id, isActive: isActive).execute();
+  }
+
+  @override
+  Future<void> verifyUserDocs(String id, String role, bool isApproved) async {
+    if (role == 'institution') {
+      await _db.verifyUserInstitution(id: id, isApproved: isApproved).execute();
+    } else {
+      await _db.verifyUserProfessional(id: id, isApproved: isApproved).execute();
+    }
+  }
+
+  @override
   Stream<List<Map<String, dynamic>>> listAllProviders() {
     return Stream.value([]);
   }

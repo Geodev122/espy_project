@@ -52,6 +52,12 @@ abstract class EspyRepository {
   Stream<List<Map<String, dynamic>>> listRechargeCards();
 
   // ─── 5. Admin Operations ─────────────────────────────────────────────────
+  Stream<List<Map<String, dynamic>>> listAllUsers();
+  Future<Map<String, dynamic>> getUserDetails(String id);
+  Future<void> adminUpdateUser(String id, Map<String, dynamic> data);
+  Future<void> toggleUserActiveStatus(String id, bool isActive);
+  Future<void> verifyUserDocs(String id, String role, bool isApproved);
+
   Stream<List<Map<String, dynamic>>> listAllProviders(); 
   Future<void> approveProfessional(String id, bool isApproved, String role);
   Future<void> validateProfile(String id, String role);

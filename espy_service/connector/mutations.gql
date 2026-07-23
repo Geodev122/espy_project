@@ -130,7 +130,35 @@ mutation RecordInteraction($targetId: String!, $type: InteractionType!) @auth(le
   })
 }
 
-# --- 5. Administration ---
+mutation UpdateUserAdmin($id: String!, $name: String, $role: UserRole, $isActive: Boolean, $phone: String, $whatsapp: String) @auth(level: NO_ACCESS) {
+  user_update(key: { id: $id }, data: {
+    name: $name,
+    role: $role,
+    isActive: $isActive,
+    phone: $phone,
+    whatsapp: $whatsapp,
+    updatedAt_expr: "request.time"
+  })
+}
+
+mutation ToggleUserActiveStatus($id: String!, $isActive: Boolean!) @auth(level: NO_ACCESS) {
+  user_update(key: { id: $id }, data: {
+    isActive: $isActive,
+    updatedAt_expr: "request.time"
+  })
+}
+
+mutation VerifyUserProfessional($id: String!, $isApproved: Boolean!) @auth(level: NO_ACCESS) {
+  professionalProfile_update(key: { id: $id }, data: {
+    isApproved: $isApproved
+  })
+}
+
+mutation VerifyUserInstitution($id: String!, $isApproved: Boolean!) @auth(level: NO_ACCESS) {
+  institutionProfile_update(key: { id: $id }, data: {
+    isApproved: $isApproved
+  })
+}
 
 mutation CreateRechargeCard($code: String!, $value: Int!, $pins: Int!, $slots: Int!) @auth(level: NO_ACCESS) {
   rechargeCard_insert(data: {

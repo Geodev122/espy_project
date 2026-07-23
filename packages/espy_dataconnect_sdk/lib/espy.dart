@@ -26,6 +26,14 @@ part 'post_community_request.dart';
 
 part 'record_interaction.dart';
 
+part 'update_user_admin.dart';
+
+part 'toggle_user_active_status.dart';
+
+part 'verify_user_professional.dart';
+
+part 'verify_user_institution.dart';
+
 part 'create_recharge_card.dart';
 
 part 'update_sector.dart';
@@ -67,6 +75,10 @@ part 'list_community_requests.dart';
 part 'get_wallet_transactions.dart';
 
 part 'get_active_resource_order.dart';
+
+part 'list_all_users.dart';
+
+part 'get_user_details.dart';
 
 part 'list_recharge_cards.dart';
 
@@ -444,6 +456,26 @@ class EspyConnector {
   }
   
   
+  UpdateUserAdminVariablesBuilder updateUserAdmin ({required String id, }) {
+    return UpdateUserAdminVariablesBuilder(dataConnect, id: id,);
+  }
+  
+  
+  ToggleUserActiveStatusVariablesBuilder toggleUserActiveStatus ({required String id, required bool isActive, }) {
+    return ToggleUserActiveStatusVariablesBuilder(dataConnect, id: id,isActive: isActive,);
+  }
+  
+  
+  VerifyUserProfessionalVariablesBuilder verifyUserProfessional ({required String id, required bool isApproved, }) {
+    return VerifyUserProfessionalVariablesBuilder(dataConnect, id: id,isApproved: isApproved,);
+  }
+  
+  
+  VerifyUserInstitutionVariablesBuilder verifyUserInstitution ({required String id, required bool isApproved, }) {
+    return VerifyUserInstitutionVariablesBuilder(dataConnect, id: id,isApproved: isApproved,);
+  }
+  
+  
   CreateRechargeCardVariablesBuilder createRechargeCard ({required String code, required int value, required int pins, required int slots, }) {
     return CreateRechargeCardVariablesBuilder(dataConnect, code: code,value: value,pins: pins,slots: slots,);
   }
@@ -546,6 +578,16 @@ class EspyConnector {
   
   GetActiveResourceOrderVariablesBuilder getActiveResourceOrder ({required String userId, }) {
     return GetActiveResourceOrderVariablesBuilder(dataConnect, userId: userId,);
+  }
+  
+  
+  ListAllUsersVariablesBuilder listAllUsers () {
+    return ListAllUsersVariablesBuilder(dataConnect, );
+  }
+  
+  
+  GetUserDetailsVariablesBuilder getUserDetails ({required String id, }) {
+    return GetUserDetailsVariablesBuilder(dataConnect, id: id,);
   }
   
   

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:espy_app/theme/espy_theme.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';
 import 'package:espy_app/widgets/common/premium_card.dart';
@@ -11,6 +12,7 @@ import 'modules/support_inbox_screen.dart';
 import 'modules/orders_manager_screen.dart';
 import 'modules/recharge_cards_screen.dart';
 import 'modules/taxonomy_manager_screen.dart';
+import 'modules/users_manager_screen.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({super.key});
@@ -62,6 +64,9 @@ class AdminDashboardScreen extends StatelessWidget {
   Widget _buildActionList(BuildContext context) {
     return Column(
       children: [
+        _adminTile("USER MANAGEMENT", LucideIcons.users, () {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => UsersManagerScreen()));
+        }),
         _adminTile("PENDING VERIFICATIONS", Icons.verified_user_rounded, () {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const VerificationsScreen()));
         }),

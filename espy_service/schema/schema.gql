@@ -60,6 +60,7 @@ type User @table(key: "id") {
   name: String
   role: UserRole! @default(value: VISITOR)
   isActive: Boolean! @default(value: true)
+  hasProfile: Boolean! @default(value: false) # Tracks wizard completion
   walletBalance: Int! @default(value: 0)
   tokensUsed: Int! @default(value: 0)
   photoUrl: String
@@ -80,7 +81,8 @@ type ProfessionalProfile @table(key: "id") {
   bioAr: String
   isApproved: Boolean! @default(value: false)
   isHonorVerified: Boolean! @default(value: false)
-  isProfileValidated: Boolean! @default(value: false) # New validation state
+  isProfileValidated: Boolean! @default(value: false)
+  verificationDocUrl: String # URL to uploaded credentials
   membershipTier: MembershipTier @default(value: BASIC)
   serviceSlots: Int! @default(value: 2)
   practicePins: Int! @default(value: 0)
@@ -93,7 +95,8 @@ type InstitutionProfile @table(key: "id") {
   nameAr: String
   registrationNumber: String
   isApproved: Boolean! @default(value: false)
-  isProfileValidated: Boolean! @default(value: false) # New validation state
+  isProfileValidated: Boolean! @default(value: false)
+  verificationDocUrl: String # URL to uploaded credentials
   serviceSlots: Int! @default(value: 5)
   visibilityExpiresAt: Timestamp
 }
