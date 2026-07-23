@@ -1,9 +1,7 @@
-import 'package:animate_do/animate_do.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 
 import 'package:espy_app/l10n/app_localizations.dart';
 import 'package:espy_app/theme/espy_theme.dart';
@@ -106,7 +104,7 @@ class _ProfessionalDetailsScreenState extends State<ProfessionalDetailsScreen> {
                   gradient: LinearGradient(
                     begin: Alignment.bottomCenter,
                     end: Alignment.topCenter,
-                    colors: [EspyTheme.navyDeep.withOpacity(0.9), Colors.transparent],
+                    colors: [EspyTheme.navyDeep.withValues(alpha: 0.9), Colors.transparent],
                   ),
                 ),
               ),
@@ -165,7 +163,7 @@ class _ProfessionalDetailsScreenState extends State<ProfessionalDetailsScreen> {
       spacing: 12, runSpacing: 12,
       children: tags.map((tag) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(color: Colors.white.withOpacity(0.05), borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.white10)),
+        decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.white10)),
         child: Text(tag.toString().toUpperCase(), style: GoogleFonts.montserrat(fontSize: 9, fontWeight: FontWeight.w800, color: Colors.white70)),
       )).toList(),
     );

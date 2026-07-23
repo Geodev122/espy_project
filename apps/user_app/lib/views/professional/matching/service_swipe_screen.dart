@@ -3,10 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'package:espy_app/theme/espy_theme.dart';
-import 'package:espy_app/viewmodels/auth_service.dart';
 import 'package:espy_app/viewmodels/matching_view_model.dart';
 import 'package:espy_app/l10n/app_localizations.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';
@@ -24,7 +22,6 @@ class _ServiceSwipeScreenState extends State<ServiceSwipeScreen> {
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<MatchingViewModel>(context);
-    final auth = Provider.of<AuthService>(context, listen: false);
     final l10n = AppLocalizations.of(context)!;
 
     return EspyScaffold(
@@ -32,7 +29,7 @@ class _ServiceSwipeScreenState extends State<ServiceSwipeScreen> {
       body: viewModel.isLoading
           ? const Center(child: CircularProgressIndicator(color: EspyTheme.gold))
           : viewModel.services.isEmpty
-              ? Center(child: Text(l10n.noActiveServicesFound.toUpperCase(), style: GoogleFonts.cinzel(color: EspyTheme.navyDeep.withOpacity(0.3), fontWeight: FontWeight.w900)))
+              ? Center(child: Text(l10n.noActiveServicesFound.toUpperCase(), style: GoogleFonts.cinzel(color: EspyTheme.navyDeep.withValues(alpha: 0.3), fontWeight: FontWeight.w900)))
               : Stack(
                   children: [
                     CardSwiper(
@@ -40,7 +37,7 @@ class _ServiceSwipeScreenState extends State<ServiceSwipeScreen> {
                       cardsCount: viewModel.services.length,
                       numberOfCardsDisplayed: 3,
                       backCardOffset: const Offset(0, 40),
-                      cardBuilder: (context, index, horizontalThreshold, verticalThreshold) {
+                      cardBuilder: (context, index, _, __) {
                         return _buildServiceCard(viewModel.services[index]);
                       },
                       onSwipe: (previousIndex, currentIndex, direction) async {
@@ -62,7 +59,7 @@ class _ServiceSwipeScreenState extends State<ServiceSwipeScreen> {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(32),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 30)],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 30)],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(32),
@@ -76,7 +73,7 @@ class _ServiceSwipeScreenState extends State<ServiceSwipeScreen> {
             Positioned.fill(
               child: Container(
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(begin: Alignment.bottomCenter, end: Alignment.topCenter, colors: [EspyTheme.navyDeep.withOpacity(0.9), Colors.transparent]),
+                  gradient: LinearGradient(begin: Alignment.bottomCenter, end: Alignment.topCenter, colors: [EspyTheme.navyDeep.withValues(alpha: 0.9), Colors.transparent]),
                 ),
               ),
             ),

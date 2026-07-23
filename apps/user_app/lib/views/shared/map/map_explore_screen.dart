@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,8 +14,8 @@ import 'package:espy_app/theme/espy_theme.dart';
 import 'package:espy_app/viewmodels/firestore_service.dart';
 import 'package:espy_app/viewmodels/auth_service.dart';
 import 'package:espy_app/viewmodels/sound_service.dart';
-import 'package:espy_app/models/user_model.dart';
 import 'package:espy_app/viewmodels/directory_view_model.dart';
+import 'package:espy_app/models/user_model.dart' as models;
 import 'package:espy_app/widgets/common/premium_button.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';
 
@@ -127,8 +126,8 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
               height: isMain ? 45 : 35,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: color.withOpacity(0.2),
-                border: Border.all(color: color.withOpacity(0.1), width: 1),
+                color: color.withValues(alpha: 0.2),
+                border: Border.all(color: color.withValues(alpha: 0.1), width: 1),
               ),
             ),
           ),
@@ -140,7 +139,7 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
               shape: BoxShape.circle,
               border: Border.all(color: Colors.white, width: isMain ? 3 : 2),
               boxShadow: [
-                BoxShadow(color: color.withOpacity(0.4), blurRadius: 10, spreadRadius: 2)
+                BoxShadow(color: color.withValues(alpha: 0.4), blurRadius: 10, spreadRadius: 2)
               ]
             ),
             child: Center(
@@ -161,7 +160,7 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: EspyTheme.navyDeep,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24), side: BorderSide(color: EspyTheme.cyan.withOpacity(0.3))),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24), side: BorderSide(color: EspyTheme.cyan.withValues(alpha: 0.3))),
         title: Text(
           (isAr ? p['fullNameAr'] : p['fullNameEn']) ?? p['fullNameEn'] ?? p['name'] ?? 'ESPY NODE', 
           style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, color: Colors.white, fontSize: 18)
@@ -218,7 +217,7 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
     final auth = Provider.of<AuthService>(context);
     final directoryVM = Provider.of<DirectoryViewModel>(context);
     final user = auth.userData;
-    final bool isVisitor = user?.role == UserRole.visitor;
+    final bool isVisitor = user?.role == models.UserRole.visitor;
     
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final bool filtersActive = directoryVM.selectedSectorId != null || directoryVM.selectedRole != null;
@@ -280,10 +279,10 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.95),
+                      color: Colors.white.withValues(alpha: 0.95),
                       borderRadius: BorderRadius.circular(24),
-                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 20, offset: const Offset(0, 4))],
-                      border: Border.all(color: EspyTheme.navyDeep.withOpacity(0.05)),
+                      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 20, offset: const Offset(0, 4))],
+                      border: Border.all(color: EspyTheme.navyDeep.withValues(alpha: 0.05)),
                     ),
                     child: Row(
                       children: [
@@ -416,7 +415,7 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
               },
               leading: Container(
                 padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(color: node['isMain'] ? EspyTheme.gold.withOpacity(0.1) : EspyTheme.royalBlue.withOpacity(0.1), shape: BoxShape.circle),
+                decoration: BoxDecoration(color: node['isMain'] ? EspyTheme.gold.withValues(alpha: 0.1) : EspyTheme.royalBlue.withValues(alpha: 0.1), shape: BoxShape.circle),
                 child: Icon(node['isMain'] ? Icons.stars_rounded : Icons.location_on_rounded, color: node['isMain'] ? EspyTheme.gold : EspyTheme.royalBlue, size: 20),
               ),
               title: Text(node['name'], style: GoogleFonts.cinzel(fontSize: 11, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep)),
@@ -442,10 +441,10 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
             Container(
               width: 54, height: 54,
               decoration: BoxDecoration(
-                color: isGold ? EspyTheme.gold.withOpacity(0.9) : Colors.white.withOpacity(0.2),
+                color: isGold ? EspyTheme.gold.withValues(alpha: 0.9) : Colors.white.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 15, offset: const Offset(0, 6))],
-                border: Border.all(color: (isGold ? Colors.white : EspyTheme.royalBlue).withOpacity(0.2), width: 1.5),
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 15, offset: const Offset(0, 6))],
+                border: Border.all(color: (isGold ? Colors.white : EspyTheme.royalBlue).withValues(alpha: 0.2), width: 1.5),
               ),
               child: Icon(icon, color: isGold ? Colors.white : EspyTheme.navyDeep, size: 24),
             ),
@@ -482,7 +481,7 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
               children: [
-                Center(child: Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: 24), decoration: BoxDecoration(color: EspyTheme.navyDeep.withOpacity(0.1), borderRadius: BorderRadius.circular(2)))),
+                Center(child: Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: 24), decoration: BoxDecoration(color: EspyTheme.navyDeep.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(2)))),
                 Text(l10n.mapFilters.toUpperCase(), style: GoogleFonts.cinzel(fontSize: 22, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep, letterSpacing: 2)),
                 const SizedBox(height: 32),
                 Text(l10n.country.toUpperCase(), style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.bold, color: EspyTheme.royalBlue, letterSpacing: 2)),
@@ -561,7 +560,7 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
                           selected: tempSectorId == null,
                           selectedColor: EspyTheme.royalBlue,
                           checkmarkColor: Colors.white,
-                          backgroundColor: Colors.black.withOpacity(0.05),
+                          backgroundColor: Colors.black.withValues(alpha: 0.05),
                           side: BorderSide.none,
                           labelStyle: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.w900, color: tempSectorId == null ? Colors.white : Colors.black54),
                           onSelected: (val) {
@@ -576,7 +575,7 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
                             selected: isSelected,
                             selectedColor: EspyTheme.royalBlue,
                             checkmarkColor: Colors.white,
-                            backgroundColor: Colors.black.withOpacity(0.05),
+                            backgroundColor: Colors.black.withValues(alpha: 0.05),
                             side: BorderSide.none,
                             labelStyle: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.w900, color: isSelected ? Colors.white : Colors.black54),
                             onSelected: (val) {
@@ -600,7 +599,7 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
                   value: tempRadius,
                   min: 1, max: 100,
                   activeColor: EspyTheme.gold,
-                  inactiveColor: EspyTheme.royalBlue.withOpacity(0.1),
+                  inactiveColor: EspyTheme.royalBlue.withValues(alpha: 0.1),
                   onChanged: (val) {
                     setModalState(() { tempRadius = val; tempRadiusActive = true; });
                   },

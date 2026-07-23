@@ -60,7 +60,7 @@ class AnnouncementsScreen extends StatelessWidget {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(
-                                color: EspyTheme.gold.withOpacity(0.1),
+                                color: EspyTheme.gold.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
@@ -83,7 +83,7 @@ class AnnouncementsScreen extends StatelessWidget {
                         const SizedBox(height: 12),
                         Text(
                           ann['content'] ?? ann['message'] ?? '',
-                          style: GoogleFonts.lora(fontSize: 14, color: EspyTheme.navyDeep.withOpacity(0.7), height: 1.6),
+                          style: GoogleFonts.lora(fontSize: 14, color: EspyTheme.navyDeep.withValues(alpha: 0.7), height: 1.6),
                         ),
                       ],
                     ),

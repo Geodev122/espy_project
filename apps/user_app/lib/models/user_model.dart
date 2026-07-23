@@ -66,7 +66,8 @@ class UserModel {
   dynamic operator [](String key) => rawData[key];
 
   static UserRole _parseRole(String? role) {
-    switch (role) {
+    final normalized = role?.toLowerCase() ?? 'pending';
+    switch (normalized) {
       case 'visitor': return UserRole.visitor;
       case 'professional': return UserRole.professional;
       case 'institution': return UserRole.institution;

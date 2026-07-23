@@ -4,12 +4,10 @@ import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:share_plus/share_plus.dart';
 
 import 'package:espy_app/l10n/app_localizations.dart';
 import 'package:espy_app/theme/espy_theme.dart';
 import 'package:espy_app/viewmodels/auth_service.dart';
-import 'package:espy_app/viewmodels/firestore_service.dart';
 import 'package:espy_app/viewmodels/matching_view_model.dart';
 import 'package:espy_app/widgets/common/premium_button.dart';
 
@@ -61,7 +59,7 @@ class _MatchingScreenState extends State<MatchingScreen> {
                   numberOfCardsDisplayed: displayCards.length > 3 ? 3 : displayCards.length,
                   backCardOffset: const Offset(0, 40),
                   padding: EdgeInsets.zero,
-                  cardBuilder: (context, index, horizontalThreshold, verticalThreshold) {
+                  cardBuilder: (context, index, _, __) {
                     final cardData = displayCards[index];
                     if (cardData['isInfo'] == true) return _buildInfoCard(cardData['hasResults'] as bool, l10n);
                     if (cardData['isEnd'] == true) return _buildEndCard(l10n);
@@ -118,7 +116,7 @@ class _MatchingScreenState extends State<MatchingScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(32),
-        border: Border.all(color: EspyTheme.gold.withOpacity(0.2), width: 2),
+        border: Border.all(color: EspyTheme.gold.withValues(alpha: 0.2), width: 2),
       ),
       padding: const EdgeInsets.all(32),
       child: Column(
@@ -144,7 +142,7 @@ class _MatchingScreenState extends State<MatchingScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(32),
-        border: Border.all(color: EspyTheme.gold.withOpacity(0.2), width: 2),
+        border: Border.all(color: EspyTheme.gold.withValues(alpha: 0.2), width: 2),
       ),
       padding: const EdgeInsets.all(32),
       child: Column(
@@ -176,7 +174,7 @@ class _MatchingScreenState extends State<MatchingScreen> {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(32),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 30, offset: const Offset(0, 15))],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 30, offset: const Offset(0, 15))],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(32),
@@ -205,7 +203,7 @@ class _MatchingScreenState extends State<MatchingScreen> {
                     begin: Alignment.bottomCenter,
                     end: Alignment.topCenter,
                     stops: const [0.0, 0.4],
-                    colors: [EspyTheme.navyDeep.withOpacity(0.9), Colors.transparent],
+                    colors: [EspyTheme.navyDeep.withValues(alpha: 0.9), Colors.transparent],
                   ),
                 ),
               ),

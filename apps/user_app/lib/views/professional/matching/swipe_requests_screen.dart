@@ -3,14 +3,12 @@ import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
-import 'package:animate_do/animate_do.dart';
 
 import 'package:espy_app/l10n/app_localizations.dart';
 import 'package:espy_app/viewmodels/auth_service.dart';
 import 'package:espy_app/theme/espy_theme.dart';
 import 'package:espy_app/viewmodels/requests_view_model.dart';
 import 'package:espy_app/widgets/common/premium_button.dart';
-import 'package:espy_app/l10n/app_localizations.dart';
 
 class SwipeRequestsScreen extends StatefulWidget {
   const SwipeRequestsScreen({super.key});
@@ -38,7 +36,7 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
       return Center(
         child: Text(
           l10n.noPendingRequests.toUpperCase(),
-          style: GoogleFonts.cinzel(color: EspyTheme.navyDeep.withOpacity(0.3), fontSize: 12, fontWeight: FontWeight.w900),
+          style: GoogleFonts.cinzel(color: EspyTheme.navyDeep.withValues(alpha: 0.3), fontSize: 12, fontWeight: FontWeight.w900),
         ),
       );
     }
@@ -65,7 +63,7 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
                   numberOfCardsDisplayed: displayCards.length > 3 ? 3 : displayCards.length,
                   backCardOffset: const Offset(0, 40),
                   padding: EdgeInsets.zero,
-                  cardBuilder: (context, index, horizontalThreshold, verticalThreshold) {
+                  cardBuilder: (context, index, _, __) {
                     final data = displayCards[index];
                     if (data['isEnd'] == true) return _buildEndCard(l10n);
                     return _buildRequestCard(data, l10n);
@@ -77,7 +75,6 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
                     if (direction == CardSwiperDirection.right) {
                       // Logic for recording interaction and launching WhatsApp
                       final userName = user?.name ?? "User";
-                      final userRole = (user?.role.name ?? "Provider").toUpperCase();
                       
                       final reqTitle = target['title'] ?? "Care Request";
                       final targetWhatsapp = target['whatsapp']?.toString().replaceAll(RegExp(r'\D'), '');
@@ -112,9 +109,9 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
   Widget _buildEndCard(AppLocalizations l10n) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.9),
+        color: Colors.white.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(36),
-        border: Border.all(color: EspyTheme.navyDeep.withOpacity(0.1)),
+        border: Border.all(color: EspyTheme.navyDeep.withValues(alpha: 0.1)),
       ),
       padding: const EdgeInsets.all(40),
       child: Column(
@@ -144,7 +141,7 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(36),
-        border: Border.all(color: isEmergency ? EspyTheme.error : EspyTheme.gold.withOpacity(0.15), width: 2),
+        border: Border.all(color: isEmergency ? EspyTheme.error : EspyTheme.gold.withValues(alpha: 0.15), width: 2),
       ),
       padding: const EdgeInsets.all(32),
       child: Column(
@@ -157,7 +154,7 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
                 children: [
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                    decoration: BoxDecoration(color: isEmergency ? EspyTheme.error.withOpacity(0.1) : EspyTheme.gold.withOpacity(0.1), borderRadius: BorderRadius.circular(30)),
+                    decoration: BoxDecoration(color: isEmergency ? EspyTheme.error.withValues(alpha: 0.1) : EspyTheme.gold.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(30)),
                     child: Text(
                       (request['section'] ?? request['category'] ?? 'CARE').toString().toUpperCase(),
                       style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.w900, color: isEmergency ? EspyTheme.error : EspyTheme.goldDark, letterSpacing: 2),
@@ -175,7 +172,7 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
           const SizedBox(height: 32),
           Text(request['title'] ?? 'Help Request', style: GoogleFonts.cinzel(fontSize: 26, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep, height: 1.1)),
           const SizedBox(height: 24),
-          Expanded(child: SingleChildScrollView(child: Text(request['description'] ?? '', style: GoogleFonts.lora(fontSize: 15, color: EspyTheme.navyDeep.withOpacity(0.7), height: 1.7, fontStyle: FontStyle.italic)))),
+          Expanded(child: SingleChildScrollView(child: Text(request['description'] ?? '', style: GoogleFonts.lora(fontSize: 15, color: EspyTheme.navyDeep.withValues(alpha: 0.7), height: 1.7, fontStyle: FontStyle.italic)))),
           const SizedBox(height: 32),
           Row(
             children: [
@@ -234,7 +231,7 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
       onTap: onTap,
       child: Container(
         width: size, height: size,
-        decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white, border: Border.all(color: color.withOpacity(0.2), width: 2)),
+        decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white, border: Border.all(color: color.withValues(alpha: 0.2), width: 2)),
         child: Icon(icon, color: color, size: isLarge ? 28 : (isSmall ? 18 : 22)),
       ),
     );

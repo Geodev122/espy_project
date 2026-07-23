@@ -34,7 +34,7 @@ class PremiumCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(borderRadius),
         boxShadow: [
           BoxShadow(
-            color: (accentColor ?? EspyTheme.navyDeep).withOpacity(isGlass ? 0.2 : 0.06),
+            color: (accentColor ?? EspyTheme.navyDeep).withValues(alpha: isGlass ? 0.2 : 0.06),
             blurRadius: 30,
             spreadRadius: isGlass ? -8 : 0,
             offset: const Offset(0, 15),
@@ -52,12 +52,12 @@ class PremiumCard extends StatelessWidget {
             padding: padding ?? const EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: isGlass
-                  ? Colors.white.withOpacity(0.08)
+                  ? Colors.white.withValues(alpha: 0.08)
                   : Colors.white,
               borderRadius: BorderRadius.circular(borderRadius),
               border: Border.all(
-                color: accentColor?.withOpacity(0.3) ??
-                    (isGlass ? Colors.white.withOpacity(0.15) : EspyTheme.platinum),
+                color: accentColor?.withValues(alpha: 0.3) ??
+                    (isGlass ? Colors.white.withValues(alpha: 0.15) : EspyTheme.platinum),
                 width: 1.2,
               ),
             ),
@@ -74,7 +74,7 @@ class PremiumCard extends StatelessWidget {
                       gradient: LinearGradient(
                         colors: [
                           Colors.transparent,
-                          Colors.white.withOpacity(isGlass ? 0.2 : 0.5),
+                          Colors.white.withValues(alpha: isGlass ? 0.2 : 0.5),
                           Colors.transparent,
                         ],
                       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:espy_app/viewmodels/debug_service.dart';
 import 'package:espy_app/viewmodels/platform/web_helper.dart';
 import 'package:espy_app/viewmodels/auth_service.dart';
 import 'package:espy_app/models/user_model.dart';
@@ -20,6 +21,7 @@ class MainGate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _debug = DebugService();
     return Consumer<AuthService>(
       builder: (context, auth, _) {
         if (auth.isLoading) {
@@ -48,6 +50,7 @@ class MainGate extends StatelessWidget {
         }
 
         final user = auth.userData!;
+        _debug.log('GATE', 'Role: ${user.role}, HasProfile: ${user.hasProfile}');
 
         // Check for account suspension
         if (!user.isActive) {
@@ -56,13 +59,14 @@ class MainGate extends StatelessWidget {
 
         // Check if user is fully onboarded
         if (!user.hasProfile) {
-          if (user.role == UserRole.pending) {
+          final role = user.role;
+          if (role == UserRole.pending) {
             return const RoleSelectionScreen();
-          } else if (user.role == UserRole.professional) {
+          } else if (role == UserRole.professional) {
             return const ProfessionalWizard();
-          } else if (user.role == UserRole.institution) {
+          } else if (role == UserRole.institution) {
             return const InstitutionWizard();
-          } else if (user.role == UserRole.visitor) {
+          } else if (role == UserRole.visitor) {
             return const VisitorWizard();
           } else {
             return const RoleSelectionScreen();

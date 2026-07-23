@@ -42,7 +42,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               builder: (context, localeService, _) {
                 return TextButton(
                   onPressed: () => localeService.toggleLocale(),
-                  style: TextButton.styleFrom(backgroundColor: Colors.white.withOpacity(0.1), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                  style: TextButton.styleFrom(backgroundColor: Colors.white.withValues(alpha: 0.1), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
                   child: Text(localeService.locale.languageCode == 'en' ? 'AR' : 'EN', style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, color: EspyTheme.gold, letterSpacing: 1)),
                 );
               },

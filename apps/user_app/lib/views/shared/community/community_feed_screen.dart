@@ -53,7 +53,7 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> with SingleTi
                     indicatorSize: TabBarIndicatorSize.label,
                     indicatorWeight: 3,
                     labelColor: EspyTheme.navyDeep,
-                    unselectedLabelColor: EspyTheme.navyDeep.withOpacity(0.3),
+                    unselectedLabelColor: EspyTheme.navyDeep.withValues(alpha: 0.3),
                     labelStyle: GoogleFonts.montserrat(fontWeight: FontWeight.w900, fontSize: 10, letterSpacing: 1),
                     tabs: [
                       Tab(text: l10n.communityFeed.toUpperCase()),
@@ -77,12 +77,12 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> with SingleTi
             child: FadeInUp(
               child: FloatingActionButton(
                 onPressed: () => _showPostRequestDialog(l10n),
-                backgroundColor: Colors.white.withOpacity(0.2),
+                backgroundColor: Colors.white.withValues(alpha: 0.2),
                 foregroundColor: EspyTheme.navyDeep,
                 elevation: 4,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
-                  side: BorderSide(color: EspyTheme.royalBlue.withOpacity(0.1)),
+                  side: BorderSide(color: EspyTheme.royalBlue.withValues(alpha: 0.1)),
                 ),
                 child: const Icon(Icons.settings_suggest_rounded, size: 28),
               ),
@@ -217,7 +217,7 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> with SingleTi
             child: Center(
               child: Text(
                 onlyMine ? l10n.noOwnRequests.toUpperCase() : l10n.noActiveRequests.toUpperCase(),
-                style: GoogleFonts.cinzel(color: EspyTheme.noir.withOpacity(0.3)),
+                style: GoogleFonts.cinzel(color: EspyTheme.noir.withValues(alpha: 0.3)),
               ),
             ),
           );
@@ -244,10 +244,10 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> with SingleTi
     return Container(
       margin: const EdgeInsets.only(bottom: 24),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.9),
+        color: Colors.white.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: EspyTheme.royalBlue.withOpacity(0.1)),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, 10))]
+        border: Border.all(color: EspyTheme.royalBlue.withValues(alpha: 0.1)),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 20, offset: const Offset(0, 10))]
       ),
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -259,9 +259,9 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> with SingleTi
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: EspyTheme.royalBlue.withOpacity(0.05),
+                    color: EspyTheme.royalBlue.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: EspyTheme.royalBlue.withOpacity(0.1)),
+                    border: Border.all(color: EspyTheme.royalBlue.withValues(alpha: 0.1)),
                   ),
                   child: Text(
                     (request['section'] ?? request['category'] ?? 'CARE').toString().toUpperCase(),
@@ -280,13 +280,13 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> with SingleTi
             const SizedBox(height: 20),
             Text(request['title'] ?? 'Care Request', style: GoogleFonts.montserrat(fontSize: 16, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep, height: 1.2)),
             const SizedBox(height: 12),
-            Text(request['description'] ?? '', style: GoogleFonts.montserrat(fontSize: 13, color: EspyTheme.navyDeep.withOpacity(0.6), height: 1.5, fontWeight: FontWeight.w500)),
+            Text(request['description'] ?? '', style: GoogleFonts.montserrat(fontSize: 13, color: EspyTheme.navyDeep.withValues(alpha: 0.6), height: 1.5, fontWeight: FontWeight.w500)),
             const SizedBox(height: 24),
             Row(
               children: [
                 const Icon(Icons.location_on_outlined, size: 14, color: EspyTheme.gold),
                 const SizedBox(width: 6),
-                Text(request['location'] ?? 'Lebanon', style: GoogleFonts.montserrat(fontSize: 11, color: EspyTheme.navyDeep.withOpacity(0.4), fontWeight: FontWeight.bold)),
+                Text(request['location'] ?? 'Lebanon', style: GoogleFonts.montserrat(fontSize: 11, color: EspyTheme.navyDeep.withValues(alpha: 0.4), fontWeight: FontWeight.bold)),
                 const Spacer(),
                 if (request['userId'] != _firestore.getCurrentUserId)
                   PremiumButton(
@@ -320,8 +320,8 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> with SingleTi
                 else
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                    decoration: BoxDecoration(border: Border.all(color: EspyTheme.navyDeep.withOpacity(0.1)), borderRadius: BorderRadius.circular(12)),
-                    child: Text(l10n.myPost.toUpperCase(), style: GoogleFonts.cinzel(fontSize: 9, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep.withOpacity(0.4), letterSpacing: 1.5)),
+                    decoration: BoxDecoration(border: Border.all(color: EspyTheme.navyDeep.withValues(alpha: 0.1)), borderRadius: BorderRadius.circular(12)),
+                    child: Text(l10n.myPost.toUpperCase(), style: GoogleFonts.cinzel(fontSize: 9, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep.withValues(alpha: 0.4), letterSpacing: 1.5)),
                   ),
               ],
             ),

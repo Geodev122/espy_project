@@ -161,15 +161,15 @@ class _PremiumButtonState extends State<PremiumButton> with SingleTickerProvider
     if (widget.variant == PremiumButtonVariant.outline) {
       return BoxDecoration(
         borderRadius: BorderRadius.circular(radius),
-        border: Border.all(color: EspyTheme.electricBlue.withOpacity(0.4), width: 1.5),
+        border: Border.all(color: EspyTheme.electricBlue.withValues(alpha: 0.4), width: 1.5),
       );
     }
 
     if (widget.variant == PremiumButtonVariant.glass) {
       return BoxDecoration(
-        color: Colors.white.withOpacity(0.12),
+        color: Colors.white.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(radius),
-        border: Border.all(color: Colors.white.withOpacity(0.15)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
       );
     }
 
@@ -179,7 +179,7 @@ class _PremiumButtonState extends State<PremiumButton> with SingleTickerProvider
         borderRadius: BorderRadius.circular(radius),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -192,7 +192,7 @@ class _PremiumButtonState extends State<PremiumButton> with SingleTickerProvider
       borderRadius: BorderRadius.circular(radius),
       boxShadow: [
         BoxShadow(
-          color: _getShadowColor().withOpacity(0.3),
+          color: _getShadowColor().withValues(alpha: 0.3),
           blurRadius: 15,
           spreadRadius: -4,
           offset: const Offset(0, 8),

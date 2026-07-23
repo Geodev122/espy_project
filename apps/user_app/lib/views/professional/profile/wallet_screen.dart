@@ -85,7 +85,7 @@ class WalletScreen extends StatelessWidget {
                       height: 80,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: EspyTheme.royalBlue.withOpacity(0.2), width: 3),
+                        border: Border.all(color: EspyTheme.royalBlue.withValues(alpha: 0.2), width: 3),
                         image: user.photoUrl != null
                             ? DecorationImage(
                                 image: CachedNetworkImageProvider(
@@ -160,7 +160,7 @@ class WalletScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
+                    color: Colors.white.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(LucideIcons.wallet, color: EspyTheme.gold, size: 28),
@@ -259,9 +259,9 @@ class WalletScreen extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.black.withOpacity(0.05)),
+            border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
             boxShadow: [
-              BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))
+              BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4))
             ],
           ),
           child: Column(
@@ -281,7 +281,7 @@ class WalletScreen extends StatelessWidget {
       child: ListTile(
         onTap: onTap,
         tileColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: BorderSide(color: Colors.black.withOpacity(0.05))),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: BorderSide(color: Colors.black.withValues(alpha: 0.05))),
         contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
         leading: Icon(icon, color: EspyTheme.royalBlue, size: 24),
         title: Text(label, style: GoogleFonts.montserrat(fontSize: 12, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep, letterSpacing: 1)),

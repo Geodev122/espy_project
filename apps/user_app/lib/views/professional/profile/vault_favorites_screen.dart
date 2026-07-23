@@ -150,7 +150,7 @@ class VaultFavoritesScreen extends StatelessWidget {
             children: [
               Container(
                 width: 56, height: 56,
-                decoration: BoxDecoration(color: EspyTheme.gold.withOpacity(0.1), shape: BoxShape.circle),
+                decoration: BoxDecoration(color: EspyTheme.gold.withValues(alpha: 0.1), shape: BoxShape.circle),
                 child: const Icon(Icons.help_outline_rounded, color: EspyTheme.gold),
               ),
               const SizedBox(width: 16),

@@ -87,7 +87,7 @@ class _RechargeCardsView extends StatelessWidget {
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(color: isUsed ? Colors.red.withOpacity(0.1) : EspyTheme.success.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+                  decoration: BoxDecoration(color: isUsed ? Colors.red.withValues(alpha: 0.1) : EspyTheme.success.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
                   child: Text(isUsed ? "USED" : "ACTIVE", style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: isUsed ? Colors.red : EspyTheme.success)),
                 ),
               ],

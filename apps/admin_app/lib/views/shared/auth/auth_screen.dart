@@ -99,7 +99,7 @@ class _AuthScreenState extends State<AuthScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(32),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 20)],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 20)],
       ),
       child: Form(
         key: _formKey,
@@ -153,7 +153,7 @@ class _AuthScreenState extends State<AuthScreen> {
       style: GoogleFonts.montserrat(fontSize: 14, fontWeight: FontWeight.w500, color: EspyTheme.navyDeep),
       decoration: InputDecoration(
         hintText: hint,
-        prefixIcon: Icon(icon, size: 20, color: EspyTheme.royalBlue.withOpacity(0.5)),
+        prefixIcon: Icon(icon, size: 20, color: EspyTheme.royalBlue.withValues(alpha: 0.5)),
         filled: true,
         fillColor: EspyTheme.platinum,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
@@ -170,7 +170,7 @@ class _AuthScreenState extends State<AuthScreen> {
       style: GoogleFonts.montserrat(fontSize: 14, fontWeight: FontWeight.w500, color: EspyTheme.navyDeep),
       decoration: InputDecoration(
         hintText: l10n.securePassword.toUpperCase(),
-        prefixIcon: Icon(Icons.lock_outline_rounded, size: 20, color: EspyTheme.royalBlue.withOpacity(0.5)),
+        prefixIcon: Icon(Icons.lock_outline_rounded, size: 20, color: EspyTheme.royalBlue.withValues(alpha: 0.5)),
         suffixIcon: IconButton(
           icon: Icon(_obscurePass ? Icons.visibility_off_outlined : Icons.visibility_outlined, size: 18, color: EspyTheme.textSecondary),
           onPressed: () => setState(() => _obscurePass = !_obscurePass),

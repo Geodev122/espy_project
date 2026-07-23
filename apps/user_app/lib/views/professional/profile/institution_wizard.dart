@@ -221,20 +221,20 @@ class _InstitutionWizardState extends State<InstitutionWizard> {
     if (result != null) setState(() => _mainLocation = result);
   }
 
-  Widget _buildBottomNav(AppLocalizations l10n, RegistrationViewModel vm) {
+  Widget _buildBottomNav(AppLocalizations l10n, RegistrationViewModel viewModel) {
     return Container(padding: const EdgeInsets.all(32), decoration: const BoxDecoration(color: EspyTheme.navyDeep), child: Row(children: [
-      if (vm.currentPhase > 0) ...[
-        IconButton(onPressed: () => vm.setPhase(0), icon: const Icon(Icons.arrow_back_ios, color: Colors.white70)),
+      if (viewModel.currentPhase > 0) ...[
+        IconButton(onPressed: () => viewModel.setPhase(0), icon: const Icon(Icons.arrow_back_ios, color: Colors.white70)),
         const SizedBox(width: 16),
       ],
       Expanded(child: PremiumButton(
-        label: vm.currentPhase == 1 ? "FINALIZE ONBOARDING" : l10n.continueText.toUpperCase(),
-        isLoading: vm.isSubmitting,
+        label: viewModel.currentPhase == 1 ? "FINALIZE ONBOARDING" : l10n.continueText.toUpperCase(),
+        isLoading: viewModel.isSubmitting,
         onPressed: () {
-          if (vm.currentPhase == 0) {
-             vm.setPhase(1);
+          if (viewModel.currentPhase == 0) {
+             viewModel.setPhase(1);
           } else {
-            vm.submitProfessionalRegistration(
+            viewModel.submitProfessionalRegistration(
               name: _nameController.text.trim(),
               bio: _bioController.text,
               bioAr: _bioArController.text,

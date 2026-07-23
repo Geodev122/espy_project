@@ -134,7 +134,7 @@ class EspyTheme {
     color: white,
     borderRadius: BorderRadius.circular(24),
     boxShadow: [
-      BoxShadow(color: navyDeep.withOpacity(0.05), blurRadius: 15, offset: const Offset(0, 4)),
+      BoxShadow(color: navyDeep.withValues(alpha: 0.05), blurRadius: 15, offset: const Offset(0, 4)),
     ],
   );
 
@@ -142,7 +142,7 @@ class EspyTheme {
     gradient: walletGradient,
     borderRadius: BorderRadius.circular(28),
     boxShadow: [
-      BoxShadow(color: navyDeep.withOpacity(0.3), blurRadius: 30, offset: const Offset(0, 15)),
+      BoxShadow(color: navyDeep.withValues(alpha: 0.3), blurRadius: 30, offset: const Offset(0, 15)),
     ],
   );
 
@@ -187,11 +187,11 @@ class EspyTheme {
         fillColor: Colors.white,
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: skyBlue.withOpacity(0.3))),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: skyBlue.withValues(alpha: 0.3))),
         focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: royalBlue, width: 1.5)),
         labelStyle: GoogleFonts.montserrat(fontSize: 12, fontWeight: FontWeight.w600, color: navyDeep),
-        hintStyle: GoogleFonts.montserrat(fontSize: 14, color: navyDeep.withOpacity(0.3)),
-        prefixIconColor: navyDeep.withOpacity(0.5),
+        hintStyle: GoogleFonts.montserrat(fontSize: 14, color: navyDeep.withValues(alpha: 0.3)),
+        prefixIconColor: navyDeep.withValues(alpha: 0.5),
       ),
     );
   }

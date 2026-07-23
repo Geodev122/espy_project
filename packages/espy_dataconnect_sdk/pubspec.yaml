@@ -11,3 +11,4 @@ dependencies:
     sdk: flutter
   firebase_core: ^4.11.0
   firebase_data_connect: ^0.3.0+7
+  meta: ^1.11.0

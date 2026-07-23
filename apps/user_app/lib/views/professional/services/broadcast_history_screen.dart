@@ -74,7 +74,7 @@ class BroadcastHistoryScreen extends StatelessWidget {
                                 ),
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(color: EspyTheme.royalBlue.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+                                  decoration: BoxDecoration(color: EspyTheme.royalBlue.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
                                   child: Text(
                                     "${data['targetAudience'] ?? 'ALL'}",
                                     style: GoogleFonts.cinzel(fontSize: 8, fontWeight: FontWeight.w900, color: EspyTheme.royalBlue),

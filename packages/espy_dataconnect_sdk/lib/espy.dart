@@ -2,7 +2,6 @@ library espy_dataconnect_sdk;
 import 'package:firebase_data_connect/firebase_data_connect.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 
 part 'create_user.dart';
 

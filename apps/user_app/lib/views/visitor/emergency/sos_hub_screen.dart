@@ -52,8 +52,8 @@ class _SOSHubScreenState extends State<SOSHubScreen> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.redAccent.withOpacity(0.1),
-                border: Border.all(color: Colors.redAccent.withOpacity(0.2), width: 1),
+                color: Colors.redAccent.withValues(alpha: 0.1),
+                border: Border.all(color: Colors.redAccent.withValues(alpha: 0.2), width: 1),
               ),
               child: const Icon(Icons.emergency_share_rounded, color: Colors.redAccent, size: 42),
             ),
@@ -73,7 +73,7 @@ class _SOSHubScreenState extends State<SOSHubScreen> {
             "Immediate network response units and medical assistance coordinates.",
             textAlign: TextAlign.center,
             style: GoogleFonts.lora(
-              color: Colors.white.withOpacity(0.5),
+              color: Colors.white.withValues(alpha: 0.5),
               fontSize: 12,
               height: 1.5,
             ),
@@ -125,13 +125,13 @@ class _SOSHubScreenState extends State<SOSHubScreen> {
     final String number = contact['number'] ?? '';
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(color: Colors.white.withOpacity(0.04), borderRadius: BorderRadius.circular(24), border: Border.all(color: Colors.white.withOpacity(0.08))),
+      decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.04), borderRadius: BorderRadius.circular(24), border: Border.all(color: Colors.white.withValues(alpha: 0.08))),
       child: ListTile(
         onTap: () {
           HapticFeedback.heavyImpact();
           _emergencyService.makeCall(number);
         },
-        leading: Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: Colors.redAccent.withOpacity(0.1), shape: BoxShape.circle), child: const Icon(Icons.phone_forwarded, color: Colors.redAccent)),
+        leading: Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: Colors.redAccent.withValues(alpha: 0.1), shape: BoxShape.circle), child: const Icon(Icons.phone_forwarded, color: Colors.redAccent)),
         title: Text(label.toUpperCase(), style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, fontSize: 12, color: Colors.white)),
         subtitle: Text(number, style: GoogleFonts.montserrat(fontSize: 18, fontWeight: FontWeight.w800, color: EspyTheme.gold)),
         trailing: const Icon(Icons.chevron_right, color: Colors.white24),

@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:animate_do/animate_do.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
 
 import 'package:espy_app/l10n/app_localizations.dart';
 import 'package:espy_app/theme/espy_theme.dart';
@@ -73,7 +70,7 @@ class _ServiceManagerScreenState extends State<ServiceManagerScreen> {
             const SizedBox(width: 12),
             _statNode(l10n.used.toUpperCase(), used.toString(), EspyTheme.royalBlue),
             const SizedBox(width: 12),
-            _statNode(l10n.available.toUpperCase(), (total - used).toString(), EspyTheme.navyDeep.withOpacity(0.3)),
+            _statNode(l10n.available.toUpperCase(), (total - used).toString(), EspyTheme.navyDeep.withValues(alpha: 0.3)),
           ],
         ),
       ),
@@ -84,11 +81,11 @@ class _ServiceManagerScreenState extends State<ServiceManagerScreen> {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16),
-        decoration: BoxDecoration(color: Colors.white.withOpacity(0.9), borderRadius: BorderRadius.circular(16)),
+        decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.9), borderRadius: BorderRadius.circular(16)),
         child: Column(
           children: [
             Text(value, style: GoogleFonts.cinzel(fontSize: 16, fontWeight: FontWeight.w900, color: color)),
-            Text(label, style: GoogleFonts.cinzel(fontSize: 8, fontWeight: FontWeight.bold, color: EspyTheme.navyDeep.withOpacity(0.5))),
+            Text(label, style: GoogleFonts.cinzel(fontSize: 8, fontWeight: FontWeight.bold, color: EspyTheme.navyDeep.withValues(alpha: 0.5))),
           ],
         ),
       ),

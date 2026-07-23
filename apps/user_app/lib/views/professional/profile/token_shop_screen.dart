@@ -191,8 +191,8 @@ class _TokenShopScreenState extends State<TokenShopScreen> with SingleTickerProv
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: isRenew ? EspyTheme.royalBlue.withOpacity(0.1) : EspyTheme.gold.withOpacity(0.1)),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10)],
+          border: Border.all(color: isRenew ? EspyTheme.royalBlue.withValues(alpha: 0.1) : EspyTheme.gold.withValues(alpha: 0.1)),
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10)],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -246,7 +246,7 @@ class _TokenShopScreenState extends State<TokenShopScreen> with SingleTickerProv
   }
 
   Widget _buildSectionHeader(String title) {
-    return Text(title, style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep.withOpacity(0.5), letterSpacing: 2));
+    return Text(title, style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep.withValues(alpha: 0.5), letterSpacing: 2));
   }
 
   Widget _buildBundleCard(Map<String, dynamic> bundle, WalletViewModel vm, AppLocalizations l10n) {
@@ -258,7 +258,7 @@ class _TokenShopScreenState extends State<TokenShopScreen> with SingleTickerProv
           children: [
             Container(
               padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: EspyTheme.royalBlue.withOpacity(0.1), shape: BoxShape.circle),
+              decoration: BoxDecoration(color: EspyTheme.royalBlue.withValues(alpha: 0.1), shape: BoxShape.circle),
               child: Icon(bundle['icon'] as IconData, color: EspyTheme.royalBlue, size: 24),
             ),
             const SizedBox(width: 16),
@@ -367,7 +367,7 @@ class _TokenShopScreenState extends State<TokenShopScreen> with SingleTickerProv
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.black.withOpacity(0.05)),
+          border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
         ),
         child: Row(
           children: [

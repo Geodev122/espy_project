@@ -140,7 +140,7 @@ class _LocationPickerModalState extends State<LocationPickerModal> {
                               color: EspyTheme.navy,
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(color: EspyTheme.electricBlue, width: 1.5),
-                              boxShadow: [BoxShadow(color: EspyTheme.electricBlue.withOpacity(0.3), blurRadius: 10)]
+                              boxShadow: [BoxShadow(color: EspyTheme.electricBlue.withValues(alpha: 0.3), blurRadius: 10)]
                             ),
                             child: Text('PICK PIN', style: GoogleFonts.cinzel(fontSize: 8, fontWeight: FontWeight.w900, color: Colors.white)),
                           ),
@@ -241,7 +241,7 @@ class _LocationPickerModalState extends State<LocationPickerModal> {
           decoration: InputDecoration(
             contentPadding: const EdgeInsets.symmetric(horizontal: 16),
             filled: true,
-            fillColor: Colors.white.withOpacity(0.05),
+            fillColor: Colors.white.withValues(alpha: 0.05),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
           ),
         );
@@ -264,7 +264,7 @@ class _LocationPickerModalState extends State<LocationPickerModal> {
           decoration: InputDecoration(
             contentPadding: const EdgeInsets.symmetric(horizontal: 16),
             filled: true,
-            fillColor: Colors.white.withOpacity(0.05),
+            fillColor: Colors.white.withValues(alpha: 0.05),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
           ),
         );
@@ -287,7 +287,7 @@ class _LocationPickerModalState extends State<LocationPickerModal> {
           decoration: InputDecoration(
             contentPadding: const EdgeInsets.symmetric(horizontal: 16),
             filled: true,
-            fillColor: Colors.white.withOpacity(0.05),
+            fillColor: Colors.white.withValues(alpha: 0.05),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
           ),
         );

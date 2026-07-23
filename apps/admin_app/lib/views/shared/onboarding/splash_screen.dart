@@ -211,8 +211,8 @@ class _HaloPainter extends CustomPainter {
   _HaloPainter({required this.center, required this.innerAlpha, required this.outerAlpha, required this.innerRadius, required this.outerRadius, required this.colour});
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.drawCircle(center, outerRadius, Paint()..shader = RadialGradient(colors: [colour.withOpacity(outerAlpha), Colors.transparent]).createShader(Rect.fromCircle(center: center, radius: outerRadius)));
-    canvas.drawCircle(center, innerRadius, Paint()..shader = RadialGradient(colors: [colour.withOpacity(innerAlpha), Colors.transparent]).createShader(Rect.fromCircle(center: center, radius: innerRadius)));
+    canvas.drawCircle(center, outerRadius, Paint()..shader = RadialGradient(colors: [colour.withValues(alpha: outerAlpha), Colors.transparent]).createShader(Rect.fromCircle(center: center, radius: outerRadius)));
+    canvas.drawCircle(center, innerRadius, Paint()..shader = RadialGradient(colors: [colour.withValues(alpha: innerAlpha), Colors.transparent]).createShader(Rect.fromCircle(center: center, radius: innerRadius)));
   }
   @override
   bool shouldRepaint(_HaloPainter old) => old.innerAlpha != innerAlpha || old.outerAlpha != outerAlpha;
@@ -224,7 +224,7 @@ class _ShimmerRingPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     if (opacity <= 0) return;
-    canvas.drawArc(Rect.fromCircle(center: center, radius: radius), angle - 1.5, 1.5, false, Paint()..style = PaintingStyle.stroke..strokeWidth = 1.5..color = colour.withOpacity(opacity));
+    canvas.drawArc(Rect.fromCircle(center: center, radius: radius), angle - 1.5, 1.5, false, Paint()..style = PaintingStyle.stroke..strokeWidth = 1.5..color = colour.withValues(alpha: opacity));
   }
   @override
   bool shouldRepaint(_ShimmerRingPainter old) => old.angle != angle || old.opacity != opacity;

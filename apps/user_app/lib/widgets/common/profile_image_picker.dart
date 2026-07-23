@@ -79,11 +79,11 @@ class _ProfileImagePickerState extends State<ProfileImagePicker> {
             height: 140,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: EspyTheme.navy.withOpacity(0.05),
-              border: Border.all(color: EspyTheme.electricBlue.withOpacity(0.3), width: 4),
+              color: EspyTheme.navy.withValues(alpha: 0.05),
+              border: Border.all(color: EspyTheme.electricBlue.withValues(alpha: 0.3), width: 4),
               boxShadow: [
                 BoxShadow(
-                  color: EspyTheme.electricBlue.withOpacity(0.15),
+                  color: EspyTheme.electricBlue.withValues(alpha: 0.15),
                   blurRadius: 30,
                   spreadRadius: 2,
                 )
@@ -97,7 +97,7 @@ class _ProfileImagePickerState extends State<ProfileImagePicker> {
                           : null)),
             ),
             child: (_webImage == null && _imageFile == null && widget.initialUrl == null)
-                ? Icon(Icons.person_add_rounded, size: 50, color: EspyTheme.electricBlue.withOpacity(0.4))
+                ? Icon(Icons.person_add_rounded, size: 50, color: EspyTheme.electricBlue.withValues(alpha: 0.4))
                 : null,
           ),
           Positioned(
@@ -111,7 +111,7 @@ class _ProfileImagePickerState extends State<ProfileImagePicker> {
                   shape: BoxShape.circle,
                   gradient: EspyTheme.flameBlue,
                   boxShadow: [
-                    BoxShadow(color: EspyTheme.electricBlue.withOpacity(0.4), blurRadius: 15, offset: const Offset(0, 4))
+                    BoxShadow(color: EspyTheme.electricBlue.withValues(alpha: 0.4), blurRadius: 15, offset: const Offset(0, 4))
                   ]
                 ),
                 child: const Icon(Icons.camera_enhance_rounded, size: 22, color: Colors.white),

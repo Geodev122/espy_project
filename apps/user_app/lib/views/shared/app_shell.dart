@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:ui';
 import 'package:animate_do/animate_do.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -17,7 +16,6 @@ import '../professional/home/dashboard_screen.dart';
 import '../professional/matching/matching_screen.dart';
 import '../professional/matching/swipe_requests_screen.dart';
 import 'community/community_feed_screen.dart';
-import 'community/announcements_screen.dart';
 import '../professional/profile/notifications_screen.dart';
 import 'map/map_explore_screen.dart';
 import '../professional/services/service_manager_screen.dart';
@@ -36,6 +34,8 @@ class AppShell extends StatefulWidget {
 class _AppShellState extends State<AppShell> {
   int _selectedIndex = 0;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  bool get isAr => Localizations.localeOf(context).languageCode == 'ar';
 
   List<Widget> _getScreens(UserRole role) {
     if (role == UserRole.visitor) {
@@ -116,7 +116,7 @@ class _AppShellState extends State<AppShell> {
           child: Container(
             height: 70,
             decoration: BoxDecoration(
-              color: EspyTheme.navyDeep.withOpacity(0.85),
+              color: EspyTheme.navyDeep.withValues(alpha: 0.85),
               borderRadius: BorderRadius.circular(30),
               border: Border.all(color: Colors.white10),
               boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 20)],
@@ -161,7 +161,7 @@ class _AppShellState extends State<AppShell> {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             gradient: const LinearGradient(colors: [Colors.redAccent, Color(0xFFB71C1C)]),
-            boxShadow: [BoxShadow(color: Colors.redAccent.withOpacity(0.4), blurRadius: 8)],
+            boxShadow: [BoxShadow(color: Colors.redAccent.withValues(alpha: 0.4), blurRadius: 8)],
           ),
           child: const Icon(Icons.emergency_rounded, color: Colors.white, size: 20),
         ),
@@ -214,8 +214,8 @@ class _AppShellState extends State<AppShell> {
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).padding.top + 10, 20, 10),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.95),
-        border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.05))),
+        color: Colors.white.withValues(alpha: 0.95),
+        border: Border(bottom: BorderSide(color: Colors.black.withValues(alpha: 0.05))),
       ),
       child: Row(
         children: [
@@ -256,7 +256,7 @@ class _AppShellState extends State<AppShell> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: EspyTheme.gold.withOpacity(0.1),
+          color: EspyTheme.gold.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Text(

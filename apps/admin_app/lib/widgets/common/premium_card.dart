@@ -49,12 +49,12 @@ class PremiumCard extends StatelessWidget {
             padding: padding ?? const EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: isGlass
-                  ? Colors.white.withOpacity(0.08)
+                  ? Colors.white.withValues(alpha: 0.08)
                   : EspyTheme.white,
               borderRadius: BorderRadius.circular(borderRadius),
               border: Border.all(
-                color: accentColor?.withOpacity(0.4) ??
-                    (isGlass ? Colors.white.withOpacity(0.15) : EspyTheme.cyan.withOpacity(0.1)),
+                color: accentColor?.withValues(alpha: 0.4) ??
+                    (isGlass ? Colors.white.withValues(alpha: 0.15) : EspyTheme.cyan.withValues(alpha: 0.1)),
                 width: 1.5,
               ),
             ),

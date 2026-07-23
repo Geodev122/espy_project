@@ -40,7 +40,7 @@ class _BroadcastsAndNotificationsScreenState extends State<BroadcastsAndNotifica
           controller: _tabController,
           indicatorColor: EspyTheme.royalBlue,
           labelColor: EspyTheme.navyDeep,
-          unselectedLabelColor: EspyTheme.navyDeep.withOpacity(0.3),
+          unselectedLabelColor: EspyTheme.navyDeep.withValues(alpha: 0.3),
           tabs: const [
             Tab(text: "ALERTS"),
             Tab(text: "BROADCASTS"),
@@ -133,7 +133,7 @@ class _ItemCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: isBroadcast ? EspyTheme.gold.withOpacity(0.1) : EspyTheme.royalBlue.withOpacity(0.1),
+                color: isBroadcast ? EspyTheme.gold.withValues(alpha: 0.1) : EspyTheme.royalBlue.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: isBroadcast ? EspyTheme.gold : EspyTheme.royalBlue, size: 20),
@@ -145,7 +145,7 @@ class _ItemCard extends StatelessWidget {
                 children: [
                   Text(data['title'] ?? 'Update', style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, fontSize: 13, color: EspyTheme.navyDeep)),
                   const SizedBox(height: 8),
-                  Text(data['message'] ?? '', style: GoogleFonts.lora(fontSize: 12, color: EspyTheme.navyDeep.withOpacity(0.7), height: 1.5)),
+                  Text(data['message'] ?? '', style: GoogleFonts.lora(fontSize: 12, color: EspyTheme.navyDeep.withValues(alpha: 0.7), height: 1.5)),
                 ],
               ),
             ),

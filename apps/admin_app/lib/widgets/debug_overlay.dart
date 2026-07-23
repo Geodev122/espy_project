@@ -26,14 +26,14 @@ class _DebugOverlayState extends State<DebugOverlay> {
             bottom: 100,
             child: FloatingActionButton(
               mini: true,
-              backgroundColor: Colors.redAccent.withOpacity(0.5),
+              backgroundColor: Colors.redAccent.withValues(alpha: 0.5),
               onPressed: () => setState(() => _isVisible = !_isVisible),
               child: const Icon(Icons.bug_report, size: 20),
             ),
           ),
         if (_isVisible)
           Material(
-            color: Colors.black.withOpacity(0.85),
+            color: Colors.black.withValues(alpha: 0.85),
             child: SafeArea(
               child: Column(
                 children: [

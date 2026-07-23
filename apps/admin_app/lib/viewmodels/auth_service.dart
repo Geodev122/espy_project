@@ -156,17 +156,31 @@ class AuthService extends ChangeNotifier {
       _isLoading = true;
       notifyListeners();
       try {
-        return await _auth.signInWithEmailAndPassword(email: email, password: password);
+        final credential = await _auth.signInWithEmailAndPassword(email: email, password: password);
+        // After successful login, check if super admin profile exists
+        if (email == 'geo.elnajjar@gmail.com') {
+          final existing = await _repository.getUser(credential.user!.uid);
+          if (existing == null) {
+            _debug.log('AUTH', 'Super Admin profile missing. Creating...');
+            await _createInitialUserDoc(credential.user!);
+          }
+        }
+        return credential;
       } on FirebaseAuthException catch (e) {
-        // Bootstrap Super Admin if doesn't exist
-        if (e.code == 'user-not-found' && email == 'geo.elnajjar@gmail.com') {
-          _debug.log('AUTH', 'Bootstrapping Super Admin...');
-          return await signUpWithEmail(
-            email: email,
-            password: password,
-            name: 'Super Admin',
-            initialRole: 'admin',
-          );
+        // Bootstrap Super Admin if doesn't exist in Auth
+        if (email == 'geo.elnajjar@gmail.com' && (e.code == 'user-not-found' || e.code == 'invalid-credential' || e.code == 'invalid-login-credentials')) {
+          _debug.log('AUTH', 'Attempting Super Admin Bootstrap (Auth + Profile)...');
+          try {
+            return await signUpWithEmail(
+              email: email,
+              password: password,
+              name: 'Super Admin',
+              initialRole: 'admin',
+            );
+          } catch (signUpError) {
+            _debug.log('AUTH', 'Bootstrap failed', data: signUpError);
+            rethrow;
+          }
         }
         rethrow;
       }

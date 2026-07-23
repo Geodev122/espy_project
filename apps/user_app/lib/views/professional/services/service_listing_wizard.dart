@@ -2,17 +2,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:provider/provider.dart';
 import 'package:espy_app/l10n/app_localizations.dart';
 
 import 'package:espy_app/theme/espy_theme.dart';
 import 'package:espy_app/viewmodels/firestore_service.dart';
 import 'package:espy_app/viewmodels/user_service.dart';
-import 'package:espy_app/viewmodels/storage_service.dart';
 import 'package:espy_app/viewmodels/sound_service.dart';
 import 'package:espy_app/widgets/common/premium_button.dart';
-import 'package:espy_app/widgets/common/whatsapp_input.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';
 
 import 'dart:io' as io;
@@ -26,7 +23,6 @@ class ServiceListingWizard extends StatefulWidget {
 }
 
 class _ServiceListingWizardState extends State<ServiceListingWizard> {
-  final FirestoreService _firestore = FirestoreService();
   int _currentStep = 0;
   XFile? _imageFile;
   Uint8List? _webImageBytes;
@@ -34,17 +30,7 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
   final _titleController = TextEditingController();
   final _descController = TextEditingController();
   
-  String? _selectedPricingTagId;
   String _allocationType = 'main';
-  String? _selectedSecondaryPinId;
-
-  String? _manualCountryId;
-  String? _manualGovernorateId;
-  String? _manualCityId;
-  
-  String _whatsappCode = '+961';
-  String _whatsappNumber = '';
-  bool _useDefaultWhatsapp = true;
 
   bool _isSubmitting = false;
 

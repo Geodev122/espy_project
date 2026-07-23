@@ -88,9 +88,9 @@ class DashboardScreen extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: Colors.black.withOpacity(0.05)),
+          border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))
+            BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4))
           ],
         ),
         child: Column(
@@ -115,7 +115,7 @@ class DashboardScreen extends StatelessWidget {
               child: TextButton(
                 onPressed: onTap,
                 style: TextButton.styleFrom(
-                  backgroundColor: EspyTheme.navyDeep.withOpacity(0.05),
+                  backgroundColor: EspyTheme.navyDeep.withValues(alpha: 0.05),
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
@@ -140,11 +140,11 @@ class DashboardScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: isExpired ? Colors.redAccent.withOpacity(0.05) : EspyTheme.navyDeep,
+          color: isExpired ? Colors.redAccent.withValues(alpha: 0.05) : EspyTheme.navyDeep,
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: Colors.white.withOpacity(0.1)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))
+            BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 4))
           ],
         ),
         child: Column(
