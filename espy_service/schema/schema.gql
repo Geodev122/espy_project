@@ -94,6 +94,8 @@ type InstitutionProfile @table(key: "id") {
   id: String!
   user: User! @ref(fields: ["id"])
   nameAr: String
+  bioEn: String
+  bioAr: String
   registrationNumber: String
   isApproved: Boolean! @default(value: false)
   isProfileValidated: Boolean! @default(value: false)

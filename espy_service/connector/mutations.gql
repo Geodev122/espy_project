@@ -39,6 +39,22 @@ mutation UpsertProfessionalProfile(
   })
 }
 
+mutation UpsertInstitutionProfile(
+  $id: String!,
+  $nameAr: String,
+  $bioEn: String,
+  $bioAr: String,
+  $registrationNumber: String
+) @auth(expr: "auth.uid == id") {
+  institutionProfile_upsert(data: {
+    id: $id,
+    nameAr: $nameAr,
+    bioEn: $bioEn,
+    bioAr: $bioAr,
+    registrationNumber: $registrationNumber
+  })
+}
+
 # --- 2. Service & Discovery ---
 
 mutation CreateService($categoryId: String!, $titleEn: String!, $price: Int!) @auth(level: USER) {

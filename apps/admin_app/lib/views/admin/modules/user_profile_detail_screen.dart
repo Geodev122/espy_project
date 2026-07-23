@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -45,7 +46,7 @@ class _UserProfileDetailViewState extends State<_UserProfileDetailView> {
 
   Future<void> _loadDetails() async {
     final vm = Provider.of<UserManagerViewModel>(context, listen: false);
-    final data = await vm.getUserDetails(widget.userId);
+    final data = await vm.getAuditDetails(widget.userId);
     if (mounted) {
       setState(() {
         _userDetails = data;

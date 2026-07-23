@@ -40,6 +40,8 @@ abstract class EspyRepository {
   Stream<List<String>> listContactedIds(String userId);
 
   // --- Resource Orders ---
+  Future<void> upsertProfessionalProfile({required String id, String? fullNameAr, String? specialty, String? specialtyAr, String? bioEn, String? bioAr});
+  Future<void> upsertInstitutionProfile({required String id, String? nameAr, String? bioEn, String? bioAr, String? registrationNumber});
   Future<void> createResourceOrder({required String userId, required int pins, required int slots, required int broadcasts, required int total});
   Future<void> updateResourceOrder({required String id, required int pins, required int slots, required int broadcasts, required int total});
   Stream<Map<String, dynamic>?> getActiveResourceOrder(String userId);

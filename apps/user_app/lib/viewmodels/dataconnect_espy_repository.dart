@@ -267,7 +267,13 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Future<void> upsertInstitutionProfile({required String id, String? nameAr, String? bioEn, String? bioAr, String? registrationNumber}) async {
-     // For now, mapping to upsert pattern
+    await _db.upsertInstitutionProfile(
+      id: id,
+      nameAr: nameAr,
+      bioEn: bioEn,
+      bioAr: bioAr,
+      registrationNumber: registrationNumber,
+    ).execute();
   }
 
   @override

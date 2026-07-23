@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../../theme/espy_theme.dart';
 import '../../../viewmodels/espy_repository.dart';
@@ -138,41 +140,76 @@ class _UsersManagerViewState extends State<_UsersManagerView> {
   }
 
   Widget _buildUserTile(BuildContext context, Map<String, dynamic> user) {
+    final bool isSuspended = user['isActive'] == false;
+    final bool isVerified = user['isApproved'] == true;
+    final bool isPending = user['hasProfile'] == false;
+    
+    final String dateStr = _formatDate(user['createdAt']);
+    final String phone = user['phone'] ?? user['whatsapp'] ?? 'N/A';
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       child: PremiumCard(
         padding: const EdgeInsets.all(16),
         child: InkWell(
           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => UserProfileDetailScreen(userId: user['id']))),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(user['name']?.toString().toUpperCase() ?? 'UNNAMED', style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, fontSize: 13)),
-                    Text(user['email'] ?? 'No Email', style: GoogleFonts.lora(fontSize: 10, color: Colors.black45)),
-                    const SizedBox(height: 8),
-                    Row(
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _tag(user['role']?.toString().toUpperCase() ?? 'VISITOR', EspyTheme.navyDeep),
-                        const SizedBox(width: 8),
-                        EspyStatusBadge.fromFlags(
-                          hasProfile: user['hasProfile'] == true,
-                          isActive: user['isActive'] != false,
-                          isApproved: user['isApproved'] == true,
-                        ),
+                        Text(user['name']?.toString().toUpperCase() ?? 'UNNAMED', style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, fontSize: 13)),
+                        Text(user['email'] ?? 'No Email', style: GoogleFonts.lora(fontSize: 10, color: Colors.black45)),
                       ],
                     ),
-                  ],
-                ),
+                  ),
+                  EspyStatusBadge.fromFlags(
+                    hasProfile: user['hasProfile'] == true,
+                    isActive: user['isActive'] != false,
+                    isApproved: user['isApproved'] == true,
+                  ),
+                ],
               ),
-              const Icon(Icons.chevron_right_rounded, color: EspyTheme.gold),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8),
+                child: Divider(height: 1, color: Colors.black12),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _infoBit("ID", user['id'].toString().substring(0, 8).toUpperCase()),
+                  _infoBit("PHONE", phone),
+                  _infoBit("JOINED", dateStr),
+                  _tag(user['role']?.toString().toUpperCase() ?? 'VISITOR', EspyTheme.navyDeep),
+                ],
+              ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  Widget _infoBit(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: GoogleFonts.cinzel(fontSize: 7, fontWeight: FontWeight.bold, color: Colors.black26)),
+        Text(value, style: GoogleFonts.montserrat(fontSize: 9, fontWeight: FontWeight.w700, color: EspyTheme.navyDeep)),
+      ],
+    );
+  }
+
+  String _formatDate(dynamic date) {
+    if (date == null) return "N/A";
+    if (date is DateTime) return DateFormat('dd/MM/yy').format(date);
+    if (date is Timestamp) return DateFormat('dd/MM/yy').format(date.toDate());
+    final d = DateTime.tryParse(date.toString());
+    return d != null ? DateFormat('dd/MM/yy').format(d) : "N/A";
   }
 
   Widget _tag(String label, Color color) {

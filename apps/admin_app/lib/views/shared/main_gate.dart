@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:espy_app/theme/espy_theme.dart';
 import 'package:espy_app/viewmodels/debug_service.dart';
 import 'package:espy_app/viewmodels/auth_service.dart';
 import 'package:espy_app/models/user_model.dart' as models;
@@ -23,10 +25,10 @@ class MainGate extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const CircularProgressIndicator(color: models.EspyTheme.gold),
+                  const CircularProgressIndicator(color: EspyTheme.gold),
                   if (auth.isProvisioning) ...[
                     const SizedBox(height: 24),
-                    Text("SYNCHRONIZING PROTOCOL...", style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, color: models.EspyTheme.gold, fontSize: 10, letterSpacing: 2)),
+                    Text("SYNCHRONIZING PROTOCOL...", style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, color: EspyTheme.gold, fontSize: 10, letterSpacing: 2)),
                   ],
                 ],
               ),

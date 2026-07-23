@@ -10,6 +10,8 @@ part 'update_user_profile.dart';
 
 part 'upsert_professional_profile.dart';
 
+part 'upsert_institution_profile.dart';
+
 part 'create_service.dart';
 
 part 'update_service.dart';
@@ -413,6 +415,11 @@ class EspyConnector {
   
   UpsertProfessionalProfileVariablesBuilder upsertProfessionalProfile ({required String id, }) {
     return UpsertProfessionalProfileVariablesBuilder(dataConnect, id: id,);
+  }
+  
+  
+  UpsertInstitutionProfileVariablesBuilder upsertInstitutionProfile ({required String id, }) {
+    return UpsertInstitutionProfileVariablesBuilder(dataConnect, id: id,);
   }
   
   

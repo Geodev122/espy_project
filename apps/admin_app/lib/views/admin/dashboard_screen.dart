@@ -65,7 +65,7 @@ class AdminDashboardScreen extends StatelessWidget {
     return Column(
       children: [
         _adminTile("USER MANAGEMENT", LucideIcons.users, () {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => UsersManagerScreen()));
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const UsersManagerScreen()));
         }),
         _adminTile("PENDING VERIFICATIONS", Icons.verified_user_rounded, () {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const VerificationsScreen()));

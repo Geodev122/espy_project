@@ -1224,6 +1224,81 @@ ref.execute();
 ```
 
 
+### UpsertInstitutionProfile
+#### Required Arguments
+```dart
+String id = ...;
+EspyConnector.instance.upsertInstitutionProfile(
+  id: id,
+).execute();
+```
+
+#### Optional Arguments
+We return a builder for each query. For UpsertInstitutionProfile, we created `UpsertInstitutionProfileBuilder`. For queries and mutations with optional parameters, we return a builder class.
+The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
+```dart
+class UpsertInstitutionProfileVariablesBuilder {
+  ...
+   UpsertInstitutionProfileVariablesBuilder nameAr(String? t) {
+   _nameAr.value = t;
+   return this;
+  }
+  UpsertInstitutionProfileVariablesBuilder bioEn(String? t) {
+   _bioEn.value = t;
+   return this;
+  }
+  UpsertInstitutionProfileVariablesBuilder bioAr(String? t) {
+   _bioAr.value = t;
+   return this;
+  }
+  UpsertInstitutionProfileVariablesBuilder registrationNumber(String? t) {
+   _registrationNumber.value = t;
+   return this;
+  }
+
+  ...
+}
+EspyConnector.instance.upsertInstitutionProfile(
+  id: id,
+)
+.nameAr(nameAr)
+.bioEn(bioEn)
+.bioAr(bioAr)
+.registrationNumber(registrationNumber)
+.execute();
+```
+
+#### Return Type
+`execute()` returns a `OperationResult<UpsertInstitutionProfileData, UpsertInstitutionProfileVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await EspyConnector.instance.upsertInstitutionProfile(
+  id: id,
+);
+UpsertInstitutionProfileData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+String id = ...;
+
+final ref = EspyConnector.instance.upsertInstitutionProfile(
+  id: id,
+).ref();
+ref.execute();
+```
+
+
 ### CreateService
 #### Required Arguments
 ```dart
