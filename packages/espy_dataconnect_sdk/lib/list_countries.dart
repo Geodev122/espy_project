@@ -22,12 +22,16 @@ class ListCountriesCountries {
   final String nameEn;
   final String? nameAr;
   final String? flagEmoji;
+  final String? isoCode;
+  final String? currency;
   ListCountriesCountries.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']),
   nameEn = nativeFromJson<String>(json['nameEn']),
   nameAr = json['nameAr'] == null ? null : nativeFromJson<String>(json['nameAr']),
-  flagEmoji = json['flagEmoji'] == null ? null : nativeFromJson<String>(json['flagEmoji']);
+  flagEmoji = json['flagEmoji'] == null ? null : nativeFromJson<String>(json['flagEmoji']),
+  isoCode = json['isoCode'] == null ? null : nativeFromJson<String>(json['isoCode']),
+  currency = json['currency'] == null ? null : nativeFromJson<String>(json['currency']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -41,11 +45,13 @@ class ListCountriesCountries {
     return id == otherTyped.id && 
     nameEn == otherTyped.nameEn && 
     nameAr == otherTyped.nameAr && 
-    flagEmoji == otherTyped.flagEmoji;
+    flagEmoji == otherTyped.flagEmoji && 
+    isoCode == otherTyped.isoCode && 
+    currency == otherTyped.currency;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, nameEn.hashCode, nameAr.hashCode, flagEmoji.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, nameEn.hashCode, nameAr.hashCode, flagEmoji.hashCode, isoCode.hashCode, currency.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -58,6 +64,12 @@ class ListCountriesCountries {
     if (flagEmoji != null) {
       json['flagEmoji'] = nativeToJson<String?>(flagEmoji);
     }
+    if (isoCode != null) {
+      json['isoCode'] = nativeToJson<String?>(isoCode);
+    }
+    if (currency != null) {
+      json['currency'] = nativeToJson<String?>(currency);
+    }
     return json;
   }
 
@@ -66,6 +78,8 @@ class ListCountriesCountries {
     required this.nameEn,
     this.nameAr,
     this.flagEmoji,
+    this.isoCode,
+    this.currency,
   });
 }
 

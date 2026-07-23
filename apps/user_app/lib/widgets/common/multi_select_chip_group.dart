@@ -42,8 +42,9 @@ class _MultiSelectChipGroupState extends State<MultiSelectChipGroup> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isAr = Localizations.localeOf(context).languageCode == 'ar';
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: 12),
@@ -55,10 +56,12 @@ class _MultiSelectChipGroupState extends State<MultiSelectChipGroup> {
         Wrap(
           spacing: 10,
           runSpacing: 10,
+          textDirection: isAr ? TextDirection.rtl : TextDirection.ltr,
           children: widget.options.map((opt) {
             final bool isSelected = _selectedIds.contains(opt['id']);
+            final String label = (isAr ? opt['nameAr'] : opt['nameEn']) ?? opt['nameEn'] ?? 'N/A';
             return FilterChip(
-              label: Text(opt['nameEn']?.toString().toUpperCase() ?? 'N/A'),
+              label: Text(label.toUpperCase()),
               selected: isSelected,
               onSelected: (_) => _toggle(opt['id']),
               selectedColor: EspyTheme.royalBlue,

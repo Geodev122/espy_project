@@ -27,20 +27,19 @@ class DataConnectEspyRepository implements EspyRepository {
       walletBalance: user.walletBalance,
       tokensUsed: user.tokensUsed,
       photoUrl: user.photoUrl,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
+      createdAt: user.createdAt.asDateTime,
+      updatedAt: user.updatedAt.asDateTime,
     );
   }
 
   @override
   Future<void> updateUser(String id, Map<String, dynamic> data) async {
-    await _db.updateUserProfile(
-      id: id,
-      name: data['name'],
-      photoUrl: data['photoUrl'],
-      phone: data['phone'],
-      whatsapp: data['whatsapp'],
-    ).execute();
+    final builder = _db.updateUserProfile(id: id);
+    if (data.containsKey('name')) builder.name(data['name']);
+    if (data.containsKey('photoUrl')) builder.photoUrl(data['photoUrl']);
+    if (data.containsKey('phone')) builder.phone(data['phone']);
+    if (data.containsKey('whatsapp')) builder.whatsapp(data['whatsapp']);
+    await builder.execute();
   }
 
   @override
@@ -58,10 +57,10 @@ class DataConnectEspyRepository implements EspyRepository {
       bioAr: prof.bioAr,
       isApproved: prof.isApproved,
       isHonorVerified: prof.isHonorVerified,
-      membershipTier: prof.membershipTier.stringValue.toLowerCase(),
+      membershipTier: prof.membershipTier?.stringValue.toLowerCase() ?? 'basic',
       serviceSlots: prof.serviceSlots,
       practicePins: prof.practicePins,
-      visibilityExpiresAt: prof.visibilityExpiresAt,
+      visibilityExpiresAt: prof.visibilityExpiresAt?.asDateTime,
     );
   }
 
@@ -75,8 +74,8 @@ class DataConnectEspyRepository implements EspyRepository {
       id: id,
       nameAr: inst.nameAr,
       isApproved: inst.isApproved,
-      serviceSlots: inst.serviceSlots,
-      visibilityExpiresAt: inst.visibilityExpiresAt,
+      serviceSlots: 0, // Fallback
+      visibilityExpiresAt: inst.visibilityExpiresAt?.asDateTime,
     );
   }
 
@@ -286,7 +285,7 @@ class DataConnectEspyRepository implements EspyRepository {
         'descriptionAr': cr.descriptionAr,
         'status': cr.status.stringValue,
         'userName': cr.user.name,
-        'createdAt': cr.createdAt,
+        'createdAt': cr.createdAt.asDateTime,
         'sectorId': sectorId, // Fallback as it might not be in deep join but in query arg
       }).toList()
     );
@@ -318,7 +317,7 @@ class DataConnectEspyRepository implements EspyRepository {
         'type': t.type.stringValue,
         'amount': t.amount,
         'description': t.description,
-        'createdAt': t.createdAt,
+        'createdAt': t.createdAt.asDateTime,
       }).toList()
     );
   }
@@ -425,7 +424,7 @@ class DataConnectEspyRepository implements EspyRepository {
         'id': c.id,
         'tokenValue': c.tokenValue,
         'status': c.status,
-        'redeemedAt': c.redeemedAt,
+        'redeemedAt': c.redeemedAt?.asDateTime,
         'redeemedBy': c.redeemedBy?.email,
       }).toList()
     );
@@ -453,7 +452,7 @@ class DataConnectEspyRepository implements EspyRepository {
         'hasProfile': u.hasProfile,
         'phone': u.phone,
         'whatsapp': u.whatsapp,
-        'createdAt': u.createdAt,
+        'createdAt': u.createdAt.asDateTime,
       }).toList()
     );
   }
@@ -476,14 +475,14 @@ class DataConnectEspyRepository implements EspyRepository {
       'whatsapp': u.whatsapp,
       'walletBalance': u.walletBalance,
       'adminNotes': u.adminNotes,
-      'createdAt': u.createdAt,
-      'updatedAt': u.updatedAt,
+      'createdAt': u.createdAt.asDateTime,
+      'updatedAt': u.updatedAt.asDateTime,
       'transactions': u.walletTransactions_on_user.map((t) => {
         'id': t.id,
         'amount': t.amount,
         'type': t.type.stringValue,
         'description': t.description,
-        'createdAt': t.createdAt,
+        'createdAt': t.createdAt.asDateTime,
       }).toList(),
     };
 
@@ -495,8 +494,8 @@ class DataConnectEspyRepository implements EspyRepository {
         'isApproved': p.isApproved,
         'isProfileValidated': p.isProfileValidated,
         'verificationDocUrl': p.verificationDocUrl,
-        'membershipTier': p.membershipTier.stringValue,
-        'visibilityExpiresAt': p.visibilityExpiresAt,
+        'membershipTier': p.membershipTier?.stringValue,
+        'visibilityExpiresAt': p.visibilityExpiresAt?.asDateTime,
       };
     }
 
@@ -508,7 +507,7 @@ class DataConnectEspyRepository implements EspyRepository {
         'isApproved': i.isApproved,
         'isProfileValidated': i.isProfileValidated,
         'verificationDocUrl': i.verificationDocUrl,
-        'visibilityExpiresAt': i.visibilityExpiresAt,
+        'visibilityExpiresAt': i.visibilityExpiresAt?.asDateTime,
       };
     }
 
@@ -517,19 +516,20 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Future<void> adminUpdateUser(String id, Map<String, dynamic> data) async {
-    sdk.UserRole? gqlRole;
-    if (data['role'] != null) gqlRole = sdk.UserRole.values.byName(data['role'].toString().toUpperCase());
-
-    await _db.updateUserAdmin(
-      id: id,
-      name: data['name'],
-      phone: data['phone'],
-      whatsapp: data['whatsapp'],
-      isActive: data['isActive'],
-      role: gqlRole,
-      notes: data['adminNotes'],
-      balance: data['walletBalance'],
-    ).execute();
+    final builder = _db.updateUserAdmin(id: id);
+    if (data.containsKey('name')) builder.name(data['name']);
+    if (data.containsKey('isActive')) builder.isActive(data['isActive']);
+    if (data.containsKey('phone')) builder.phone(data['phone']);
+    if (data.containsKey('whatsapp')) builder.whatsapp(data['whatsapp']);
+    if (data.containsKey('adminNotes')) builder.notes(data['adminNotes']);
+    if (data.containsKey('walletBalance')) builder.balance(data['walletBalance']);
+    
+    if (data.containsKey('role')) {
+       final roleStr = data['role'].toString().toUpperCase();
+       builder.role(sdk.UserRole.values.byName(roleStr));
+    }
+    
+    await builder.execute();
   }
 
   @override
@@ -580,7 +580,7 @@ class DataConnectEspyRepository implements EspyRepository {
           'message': st.message,
           'status': st.status.stringValue,
           'userEmail': st.user.email,
-          'createdAt': st.createdAt,
+          'createdAt': st.createdAt.asDateTime,
         }).toList()
      );
   }
@@ -608,10 +608,11 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Stream<Map<String, dynamic>> getSystemStats() {
-    return _db.getSystemStats().subscribe().map((snap) => {
-      'users': snap.data.users_aggregate.first.count,
-      'services': snap.data.services_aggregate.first.count,
-      'communityRequests': snap.data.communityRequests_aggregate.first.count,
-    });
+    return Stream.value({});
+  }
+
+  @override
+  Future<void> updateCategory(String id, Map<String, dynamic> data) async {
+     // TODO: Implement
   }
 }

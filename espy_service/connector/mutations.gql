@@ -195,6 +195,10 @@ mutation UpsertCity($id: UUID!, $regionId: UUID!, $nameEn: String!, $nameAr: Str
   city_upsert(data: { id: $id, regionId: $regionId, nameEn: $nameEn, nameAr: $nameAr, lat: $lat, lng: $lng })
 }
 
+mutation DeleteGeographyEntity($id: String!) @auth(level: NO_ACCESS) {
+  country_delete(key: { id: $id })
+}
+
 mutation UpdateSectorBranding($id: String!, $iconName: String, $colorHex: String, $nameEn: String, $nameAr: String) @auth(level: NO_ACCESS) {
   sector_update(key: { id: $id }, data: { iconName: $iconName, colorHex: $colorHex, nameEn: $nameEn, nameAr: $nameAr })
 }
@@ -226,6 +230,24 @@ mutation CreateRechargeCard($code: String!, $value: Int!, $pins: Int!, $slots: I
 mutation ApproveResourceOrder($id: UUID!) @auth(level: NO_ACCESS) {
   resourceOrder_update(key: { id: $id }, data: {
     status: APPROVED
+  })
+}
+
+mutation ApproveProfessional($id: String!, $isApproved: Boolean!) @auth(level: NO_ACCESS) {
+  professionalProfile_update(key: { id: $id }, data: {
+    isApproved: $isApproved
+  })
+}
+
+mutation ValidateProfile($id: String!) @auth(level: NO_ACCESS) {
+  professionalProfile_update(key: { id: $id }, data: {
+    isProfileValidated: true
+  })
+}
+
+mutation ValidateInstitutionProfile($id: String!) @auth(level: NO_ACCESS) {
+  institutionProfile_update(key: { id: $id }, data: {
+    isProfileValidated: true
   })
 }
 

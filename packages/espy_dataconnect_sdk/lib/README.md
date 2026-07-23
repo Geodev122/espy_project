@@ -676,6 +676,60 @@ ref.subscribe(...);
 ```
 
 
+### ListInteractions
+#### Required Arguments
+```dart
+String actorId = ...;
+InteractionType type = ...;
+EspyConnector.instance.listInteractions(
+  actorId: actorId,
+  type: type,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `QueryResult<ListInteractionsData, ListInteractionsVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+/// Result of a query request. Created to hold extra variables in the future.
+class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
+  QueryResult(super.dataConnect, super.data, super.ref);
+}
+
+final result = await EspyConnector.instance.listInteractions(
+  actorId: actorId,
+  type: type,
+);
+ListInteractionsData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+String actorId = ...;
+InteractionType type = ...;
+
+final ref = EspyConnector.instance.listInteractions(
+  actorId: actorId,
+  type: type,
+).ref();
+ref.execute();
+
+ref.subscribe(...);
+```
+
+
 ### ListServiceRequests
 #### Required Arguments
 ```dart
@@ -2437,6 +2491,48 @@ ref.execute();
 ```
 
 
+### DeleteGeographyEntity
+#### Required Arguments
+```dart
+String id = ...;
+EspyConnector.instance.deleteGeographyEntity(
+  id: id,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `OperationResult<DeleteGeographyEntityData, DeleteGeographyEntityVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await EspyConnector.instance.deleteGeographyEntity(
+  id: id,
+);
+DeleteGeographyEntityData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+String id = ...;
+
+final ref = EspyConnector.instance.deleteGeographyEntity(
+  id: id,
+).ref();
+ref.execute();
+```
+
+
 ### UpdateSectorBranding
 #### Required Arguments
 ```dart
@@ -2853,6 +2949,137 @@ An example of how to use the `Ref` object is shown below:
 String id = ...;
 
 final ref = EspyConnector.instance.approveResourceOrder(
+  id: id,
+).ref();
+ref.execute();
+```
+
+
+### ApproveProfessional
+#### Required Arguments
+```dart
+String id = ...;
+bool isApproved = ...;
+EspyConnector.instance.approveProfessional(
+  id: id,
+  isApproved: isApproved,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `OperationResult<ApproveProfessionalData, ApproveProfessionalVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await EspyConnector.instance.approveProfessional(
+  id: id,
+  isApproved: isApproved,
+);
+ApproveProfessionalData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+String id = ...;
+bool isApproved = ...;
+
+final ref = EspyConnector.instance.approveProfessional(
+  id: id,
+  isApproved: isApproved,
+).ref();
+ref.execute();
+```
+
+
+### ValidateProfile
+#### Required Arguments
+```dart
+String id = ...;
+EspyConnector.instance.validateProfile(
+  id: id,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `OperationResult<ValidateProfileData, ValidateProfileVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await EspyConnector.instance.validateProfile(
+  id: id,
+);
+ValidateProfileData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+String id = ...;
+
+final ref = EspyConnector.instance.validateProfile(
+  id: id,
+).ref();
+ref.execute();
+```
+
+
+### ValidateInstitutionProfile
+#### Required Arguments
+```dart
+String id = ...;
+EspyConnector.instance.validateInstitutionProfile(
+  id: id,
+).execute();
+```
+
+
+
+#### Return Type
+`execute()` returns a `OperationResult<ValidateInstitutionProfileData, ValidateInstitutionProfileVariables>`
+```dart
+/// Result of an Operation Request (query/mutation).
+class OperationResult<Data, Variables> {
+  OperationResult(this.dataConnect, this.data, this.ref);
+  Data data;
+  OperationRef<Data, Variables> ref;
+  FirebaseDataConnect dataConnect;
+}
+
+final result = await EspyConnector.instance.validateInstitutionProfile(
+  id: id,
+);
+ValidateInstitutionProfileData data = result.data;
+final ref = result.ref;
+```
+
+#### Getting the Ref
+Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
+An example of how to use the `Ref` object is shown below:
+```dart
+String id = ...;
+
+final ref = EspyConnector.instance.validateInstitutionProfile(
   id: id,
 ).ref();
 ref.execute();

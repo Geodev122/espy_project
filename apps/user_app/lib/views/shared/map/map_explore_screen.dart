@@ -245,15 +245,18 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
             const SizedBox(height: 12),
             Builder(builder: (context) {
               final Map<String, dynamic>? loc = p['mainLocation'] as Map<String, dynamic>?;
-              String cityName = 'Lebanon';
+              String cityName = isAr ? 'لبنان' : 'Lebanon';
               if (loc != null) {
-                if (isAr) {
-                  cityName = (loc['cityNameAr'] ?? loc['cityName'])?.toString() ?? 'Lebanon';
+                // Hierarchical v7 support
+                final city = loc['city'] as Map<String, dynamic>?;
+                if (city != null) {
+                  cityName = (isAr ? city['nameAr'] : city['nameEn']) ?? city['nameEn'] ?? cityName;
                 } else {
-                  cityName = (loc['cityNameEn'] ?? loc['cityName'])?.toString() ?? 'Lebanon';
+                  // Fallback to old flat model if exists
+                  cityName = (isAr ? (loc['cityNameAr'] ?? loc['cityName']) : (loc['cityNameEn'] ?? loc['cityName']))?.toString() ?? cityName;
                 }
               }
-              return Text(cityName, style: GoogleFonts.lora(color: Colors.white60));
+              return Text(cityName.toUpperCase(), style: GoogleFonts.lora(color: Colors.white60, fontSize: 12, fontWeight: FontWeight.bold));
             }),
           ],
         ),

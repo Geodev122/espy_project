@@ -9,8 +9,11 @@ query GetUser($uid: String!) @auth(expr: "auth.uid == uid") {
     name
     role
     walletBalance
+    tokensUsed
     photoUrl
     isActive
+    createdAt
+    updatedAt
     professionalProfile_on_user {
       specialty
       isApproved
@@ -23,6 +26,9 @@ query GetUser($uid: String!) @auth(expr: "auth.uid == uid") {
       isApproved
       isProfileValidated
       visibilityExpiresAt
+    }
+    visitorProfile_on_user {
+      interests
     }
   }
 }
@@ -152,6 +158,8 @@ query ListCountries @auth(level: PUBLIC) {
     nameEn
     nameAr
     flagEmoji
+    isoCode
+    currency
   }
 }
 
@@ -184,6 +192,17 @@ query ListContactedIds($actorId: String!) @auth(expr: "auth.uid == actorId") {
     _and: [
       { actor: { id: { eq: $actorId } } },
       { type: { eq: CONTACT } }
+    ]
+  }) {
+    targetId
+  }
+}
+
+query ListInteractions($actorId: String!, $type: InteractionType!) @auth(expr: "auth.uid == actorId") {
+  interactions(where: {
+    _and: [
+      { actor: { id: { eq: $actorId } } },
+      { type: { eq: $type } }
     ]
   }) {
     targetId
@@ -362,3 +381,9 @@ query ListSupportTickets($status: SupportTicketStatus) @auth(level: NO_ACCESS) {
     user { email name }
   }
 }
+
+# query GetSystemStats @auth(level: NO_ACCESS) {
+#   users_aggregate { count }
+#   services_aggregate(where: { isActive: { eq: true } }) { count }
+#   communityRequests_aggregate(where: { status: { eq: ACTIVE } }) { count }
+# }

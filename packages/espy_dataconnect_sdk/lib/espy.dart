@@ -42,6 +42,8 @@ part 'upsert_region.dart';
 
 part 'upsert_city.dart';
 
+part 'delete_geography_entity.dart';
+
 part 'update_sector_branding.dart';
 
 part 'upsert_service_tag.dart';
@@ -55,6 +57,12 @@ part 'upsert_presence_tag.dart';
 part 'create_recharge_card.dart';
 
 part 'approve_resource_order.dart';
+
+part 'approve_professional.dart';
+
+part 'validate_profile.dart';
+
+part 'validate_institution_profile.dart';
 
 part 'resolve_support_ticket.dart';
 
@@ -83,6 +91,8 @@ part 'list_location_nodes.dart';
 part 'list_favorite_ids.dart';
 
 part 'list_contacted_ids.dart';
+
+part 'list_interactions.dart';
 
 part 'list_service_requests.dart';
 
@@ -577,6 +587,11 @@ class EspyConnector {
   }
   
   
+  DeleteGeographyEntityVariablesBuilder deleteGeographyEntity ({required String id, }) {
+    return DeleteGeographyEntityVariablesBuilder(dataConnect, id: id,);
+  }
+  
+  
   UpdateSectorBrandingVariablesBuilder updateSectorBranding ({required String id, }) {
     return UpdateSectorBrandingVariablesBuilder(dataConnect, id: id,);
   }
@@ -609,6 +624,21 @@ class EspyConnector {
   
   ApproveResourceOrderVariablesBuilder approveResourceOrder ({required String id, }) {
     return ApproveResourceOrderVariablesBuilder(dataConnect, id: id,);
+  }
+  
+  
+  ApproveProfessionalVariablesBuilder approveProfessional ({required String id, required bool isApproved, }) {
+    return ApproveProfessionalVariablesBuilder(dataConnect, id: id,isApproved: isApproved,);
+  }
+  
+  
+  ValidateProfileVariablesBuilder validateProfile ({required String id, }) {
+    return ValidateProfileVariablesBuilder(dataConnect, id: id,);
+  }
+  
+  
+  ValidateInstitutionProfileVariablesBuilder validateInstitutionProfile ({required String id, }) {
+    return ValidateInstitutionProfileVariablesBuilder(dataConnect, id: id,);
   }
   
   
@@ -679,6 +709,11 @@ class EspyConnector {
   
   ListContactedIdsVariablesBuilder listContactedIds ({required String actorId, }) {
     return ListContactedIdsVariablesBuilder(dataConnect, actorId: actorId,);
+  }
+  
+  
+  ListInteractionsVariablesBuilder listInteractions ({required String actorId, required InteractionType type, }) {
+    return ListInteractionsVariablesBuilder(dataConnect, actorId: actorId,type: type,);
   }
   
   

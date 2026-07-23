@@ -14,6 +14,8 @@ import 'modules/recharge_cards_screen.dart';
 import 'modules/taxonomy_manager_screen.dart';
 import 'modules/users_manager_screen.dart';
 
+import 'modules/seed_manager_page.dart';
+
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({super.key});
 
@@ -73,8 +75,11 @@ class AdminDashboardScreen extends StatelessWidget {
         _adminTile("RESOURCE ORDERS", Icons.shopping_bag_rounded, () {
           Navigator.push(context, MaterialPageRoute(builder: (_) => const OrdersManagerScreen()));
         }),
-        _adminTile("RECHARGE CARD GEN", Icons.qr_code_rounded, () {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const RechargeCardsScreen()));
+        _adminTile("TAXONOMY", LucideIcons.layers, () {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const TaxonomyManagerScreen()));
+        }),
+        _adminTile("SEED DATA", LucideIcons.database, () {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const SeedManagerPage()));
         }),
         _adminTile("SUPPORT INBOX", Icons.support_agent_rounded, () {
            Navigator.push(context, MaterialPageRoute(builder: (_) => const SupportInboxScreen()));
