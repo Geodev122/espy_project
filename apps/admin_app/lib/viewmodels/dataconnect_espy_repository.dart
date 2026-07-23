@@ -24,7 +24,7 @@ class DataConnectEspyRepository implements EspyRepository {
       id: user.id,
       email: user.email,
       name: user.name ?? '',
-      role: models.UserRole.values.byName(user.role.value.name.toLowerCase()),
+      role: models.UserRole.values.byName(user.role.stringValue.toLowerCase()),
       isActive: user.isActive,
       walletBalance: user.walletBalance,
       tokensUsed: user.tokensUsed,
@@ -59,7 +59,7 @@ class DataConnectEspyRepository implements EspyRepository {
       bioAr: prof.bioAr,
       isApproved: prof.isApproved,
       isHonorVerified: prof.isHonorVerified,
-      membershipTier: prof.membershipTier?.value.name.toLowerCase() ?? 'basic',
+      membershipTier: prof.membershipTier?.stringValue.toLowerCase() ?? 'basic',
       serviceSlots: prof.serviceSlots,
       practicePins: prof.practicePins,
       visibilityExpiresAt: prof.visibilityExpiresAt?.toDateTime(),
@@ -120,7 +120,7 @@ class DataConnectEspyRepository implements EspyRepository {
         'id': c.id,
         'nameEn': c.nameEn,
         'nameAr': c.nameAr,
-        'targetRole': c.targetRole.value.name.toLowerCase(),
+        'targetRole': c.targetRole.stringValue.toLowerCase(),
       }).toList()
     );
   }
@@ -280,7 +280,7 @@ class DataConnectEspyRepository implements EspyRepository {
         'titleEn': s.titleEn,
         'price': s.price,
         'imageUrl': s.imageUrl,
-        'deliveryMode': s.deliveryMode?.value.name,
+        'deliveryMode': s.deliveryMode?.stringValue,
         'providerId': s.provider.id,
         'template': s.sector.template != null ? {
            'accentColor': s.sector.template!.accentColor,
@@ -311,7 +311,7 @@ class DataConnectEspyRepository implements EspyRepository {
         'id': cr.id.toString(),
         'descriptionEn': cr.descriptionEn,
         'descriptionAr': cr.descriptionAr,
-        'status': cr.status.value.name,
+        'status': cr.status.stringValue,
         'userName': cr.user.name,
         'createdAt': cr.createdAt.toDateTime(),
         'sectorId': sectorId,
@@ -342,7 +342,7 @@ class DataConnectEspyRepository implements EspyRepository {
     return _db.getWalletTransactions(userId: userId).ref().subscribe().map((snap) =>
       snap.data.walletTransactions.map((t) => {
         'id': t.id.toString(),
-        'type': t.type.value.name,
+        'type': t.type.stringValue,
         'amount': t.amount,
         'description': t.description,
         'createdAt': t.createdAt.toDateTime(),
@@ -432,7 +432,7 @@ class DataConnectEspyRepository implements EspyRepository {
         'slotsCount': o.slotsCount,
         'broadcastsCount': o.broadcastsCount,
         'totalCost': o.totalCost,
-        'status': o.status.value.name,
+        'status': o.status.stringValue,
       };
     });
   }
@@ -473,7 +473,7 @@ class DataConnectEspyRepository implements EspyRepository {
         'id': u.id,
         'email': u.email,
         'name': u.name,
-        'role': u.role.value.name,
+        'role': u.role.stringValue,
         'isActive': u.isActive,
         'hasProfile': u.hasProfile,
         'phone': u.phone,
@@ -493,7 +493,7 @@ class DataConnectEspyRepository implements EspyRepository {
       'id': u.id,
       'email': u.email,
       'name': u.name,
-      'role': u.role.value.name,
+      'role': u.role.stringValue,
       'isActive': u.isActive,
       'hasProfile': u.hasProfile,
       'photoUrl': u.photoUrl,
@@ -506,7 +506,7 @@ class DataConnectEspyRepository implements EspyRepository {
       'transactions': u.walletTransactions_on_user.map((t) => {
         'id': t.id.toString(),
         'amount': t.amount,
-        'type': t.type.value.name,
+        'type': t.type.stringValue,
         'description': t.description,
         'createdAt': t.createdAt.toDateTime(),
       }).toList(),
@@ -520,7 +520,7 @@ class DataConnectEspyRepository implements EspyRepository {
         'isApproved': p.isApproved,
         'isProfileValidated': p.isProfileValidated,
         'verificationDocUrl': p.verificationDocUrl,
-        'membershipTier': p.membershipTier?.value.name,
+        'membershipTier': p.membershipTier?.stringValue,
         'visibilityExpiresAt': p.visibilityExpiresAt?.toDateTime(),
       };
     }
@@ -606,7 +606,7 @@ class DataConnectEspyRepository implements EspyRepository {
           'id': st.id.toString(),
           'subject': st.subject,
           'message': st.message,
-          'status': st.status.value.name,
+          'status': st.status.stringValue,
           'userEmail': st.user.email,
           'createdAt': st.createdAt.toDateTime(),
         }).toList()
@@ -642,8 +642,8 @@ class DataConnectEspyRepository implements EspyRepository {
         'titleAr': s.titleAr,
         'price': s.price,
         'imageUrl': s.imageUrl,
-        'deliveryMode': s.deliveryMode?.value.name,
-        'moderationStatus': s.moderationStatus.value.name,
+        'deliveryMode': s.deliveryMode?.stringValue,
+        'moderationStatus': s.moderationStatus.stringValue,
         'flagReason': s.flagReason,
         'categoryName': s.category.nameEn,
         'sectorName': s.sector.nameEn,
@@ -667,10 +667,10 @@ class DataConnectEspyRepository implements EspyRepository {
         'id': r.id.toString(),
         'descriptionEn': r.descriptionEn,
         'descriptionAr': r.descriptionAr,
-        'urgency': r.urgency?.value.name,
-        'preferredMode': r.preferredMode?.value.name,
-        'status': r.status.value.name,
-        'moderationStatus': r.moderationStatus.value.name,
+        'urgency': r.urgency?.stringValue,
+        'preferredMode': r.preferredMode?.stringValue,
+        'status': r.status.stringValue,
+        'moderationStatus': r.moderationStatus.stringValue,
         'flagReason': r.flagReason,
         'createdAt': r.createdAt.toDateTime(),
         'sectorName': r.sector.nameEn,
