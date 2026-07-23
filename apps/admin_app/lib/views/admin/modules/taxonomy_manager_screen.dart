@@ -5,17 +5,23 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../theme/espy_theme.dart';
 import '../../../viewmodels/espy_repository.dart';
 import '../../../viewmodels/taxonomy_view_model.dart';
+import '../../../widgets/common/premium_button.dart';
 import '../../../widgets/common/premium_card.dart';
 import '../../../widgets/common/espy_scaffold.dart';
 import '../../../widgets/common/espy_icon.dart';
+
+import '../../../viewmodels/audit_view_model.dart';
 
 class TaxonomyManagerScreen extends StatelessWidget {
   const TaxonomyManagerScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => TaxonomyViewModel(context.read<EspyRepository>()),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => TaxonomyViewModel(context.read<EspyRepository>())),
+        ChangeNotifierProvider(create: (context) => AuditViewModel(context.read<EspyRepository>())),
+      ],
       child: const _TaxonomyManagerView(),
     );
   }
@@ -34,12 +40,13 @@ class _TaxonomyManagerViewState extends State<_TaxonomyManagerView> with SingleT
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<TaxonomyViewModel>(context);
+    final auditVM = Provider.of<AuditViewModel>(context);
 
     return EspyScaffold(
       useCinematicBackground: false,
@@ -56,6 +63,7 @@ class _TaxonomyManagerViewState extends State<_TaxonomyManagerView> with SingleT
             Tab(text: "GEOGRAPHY"),
             Tab(text: "SECTORS"),
             Tab(text: "METADATA"),
+            Tab(text: "AUDIT"),
           ],
         ),
       ),
@@ -67,6 +75,7 @@ class _TaxonomyManagerViewState extends State<_TaxonomyManagerView> with SingleT
                 _GeographyPanel(vm: viewModel),
                 _SectorsPanel(vm: viewModel),
                 _MetadataPanel(vm: viewModel),
+                _AuditPanel(vm: auditVM),
               ],
             ),
     );
@@ -375,6 +384,41 @@ class _MetadataPanelState extends State<_MetadataPanel> {
               if (mounted) Navigator.pop(context);
             },
             child: const Text("SAVE"),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AuditPanel extends StatelessWidget {
+  final AuditViewModel vm;
+  const _AuditPanel({required this.vm});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        children: [
+          PremiumButton(
+            label: vm.isChecking ? "AUDITING..." : "RUN TAXONOMY AUDIT",
+            onPressed: vm.isChecking ? null : vm.runTaxonomyAudit,
+            fullWidth: true,
+          ),
+          const SizedBox(height: 32),
+          Expanded(
+            child: vm.conflicts.isEmpty
+                ? Center(child: Text("NO AUDIT LOGS", style: GoogleFonts.lora(color: Colors.black26)))
+                : ListView.builder(
+                    itemCount: vm.conflicts.length,
+                    itemBuilder: (context, index) => Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(color: EspyTheme.platinum, borderRadius: BorderRadius.circular(16)),
+                      child: Text(vm.conflicts[index], style: GoogleFonts.montserrat(fontSize: 11, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
           ),
         ],
       ),

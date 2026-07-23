@@ -40,6 +40,8 @@ abstract class EspyRepository {
 
   Stream<List<Map<String, dynamic>>> listCommunityRequests({String? sectorId, bool newestFirst = true, String? userId});
   Future<void> createCommunityRequest(Map<String, dynamic> data);
+
+  Future<void> createLocationNode(Map<String, dynamic> data);
   
   // Metadata Tags
   Future<Map<String, List<Map<String, dynamic>>>> listMetadataTags();

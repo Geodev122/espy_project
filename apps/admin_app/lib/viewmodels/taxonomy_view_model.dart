@@ -51,16 +51,34 @@ class TaxonomyViewModel extends ChangeNotifier {
 
   // --- Geography Hierarchy ---
 
+  final Map<String, List<Map<String, dynamic>>> _regionCache = {};
+  final Map<String, List<Map<String, dynamic>>> _cityCache = {};
+
   Future<void> loadRegions(String countryId) async {
+    if (_regionCache.containsKey(countryId)) {
+      _regions = _regionCache[countryId]!;
+      _cities = [];
+      notifyListeners();
+      return;
+    }
+    
     _repository.listRegions(countryId).first.then((data) {
+      _regionCache[countryId] = data;
       _regions = data;
-      _cities = []; // Clear cities when region list changes
+      _cities = [];
       notifyListeners();
     });
   }
 
   Future<void> loadCities(String regionId) async {
+    if (_cityCache.containsKey(regionId)) {
+      _cities = _cityCache[regionId]!;
+      notifyListeners();
+      return;
+    }
+
     _repository.listCities(regionId).first.then((data) {
+      _cityCache[regionId] = data;
       _cities = data;
       notifyListeners();
     });

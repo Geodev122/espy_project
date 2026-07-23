@@ -205,8 +205,14 @@ class DataConnectEspyRepository implements EspyRepository {
   }
 
   @override
-  Future<void> deleteGeographyEntity(String id, String type) async {
-     // Generic delete via Data Connect if supported, or specialized mutations
+  Future<void> createLocationNode(Map<String, dynamic> data) async {
+    await _db.createLocationNode(
+      cityId: data['cityId'],
+      label: data['label'],
+      lat: data['lat'],
+      lng: data['lng'],
+      isMain: data['isMain'],
+    ).execute();
   }
 
   @override

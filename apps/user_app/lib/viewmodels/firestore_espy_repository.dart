@@ -191,6 +191,14 @@ class FirestoreEspyRepository implements EspyRepository {
   }
 
   @override
+  Future<void> createLocationNode(Map<String, dynamic> data) async {
+     await _db.collection('directory_locations').add({
+       ...data,
+       'createdAt': FieldValue.serverTimestamp(),
+     });
+  }
+
+  @override
   Future<Map<String, List<Map<String, dynamic>>>> listMetadataTags() async {
     final s = await _db.collection('directory_service_tags').get();
     final p = await _db.collection('directory_price_tags').get();
@@ -473,5 +481,10 @@ class FirestoreEspyRepository implements EspyRepository {
   @override
   Stream<Map<String, dynamic>> getSystemStats() {
     return _db.collection('metadata').doc('system_stats').snapshots().map((snap) => snap.data() as Map<String, dynamic>? ?? {});
+  }
+
+  @override
+  Future<void> updateCategory(String id, Map<String, dynamic> data) async {
+    await _db.collection('directory_categories').doc(id).update({...data, 'updatedAt': FieldValue.serverTimestamp()});
   }
 }

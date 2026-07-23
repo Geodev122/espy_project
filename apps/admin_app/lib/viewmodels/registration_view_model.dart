@@ -93,7 +93,19 @@ class RegistrationViewModel extends ChangeNotifier {
         );
       }
 
-      // 3. Create Resource Order
+      // 3. Create main location node if provided
+      if (mainLocation != null) {
+        await _repository.createLocationNode({
+          'userId': uid,
+          'cityId': mainLocation['id'],
+          'lat': mainLocation['lat'] ?? 0.0,
+          'lng': mainLocation['lng'] ?? 0.0,
+          'label': "Primary Hub",
+          'isMain': true,
+        });
+      }
+
+      // 4. Create Resource Order
       await _repository.createResourceOrder(
         userId: uid,
         pins: _pinsCount,

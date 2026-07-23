@@ -38,19 +38,46 @@ class _HierarchicalLocationPickerState extends State<HierarchicalLocationPicker>
     });
   }
 
+  final Map<String, List<Map<String, dynamic>>> _regionCache = {};
+  final Map<String, List<Map<String, dynamic>>> _cityCache = {};
+
   Future<void> _fetchRegions(String countryId) async {
+    if (_regionCache.containsKey(countryId)) {
+      setState(() {
+        _regions = _regionCache[countryId]!;
+        _selectedRegionId = null;
+        _cities = [];
+        _selectedCity = null;
+      });
+      return;
+    }
+
     setState(() { _loadingRegions = true; _regions = []; _selectedRegionId = null; });
     final repo = context.read<EspyRepository>();
     repo.listRegions(countryId).first.then((data) {
-      if (mounted) setState(() { _regions = data; _loadingRegions = false; });
+      if (mounted) {
+        _regionCache[countryId] = data;
+        setState(() { _regions = data; _loadingRegions = false; });
+      }
     });
   }
 
   Future<void> _fetchCities(String regionId) async {
+    if (_cityCache.containsKey(regionId)) {
+      setState(() {
+        _cities = _cityCache[regionId]!;
+        _selectedCity = null;
+      });
+      return;
+    }
+
     setState(() { _loadingCities = true; _cities = []; _selectedCity = null; });
     final repo = context.read<EspyRepository>();
     repo.listCities(regionId).first.then((data) {
-      if (mounted) setState(() { _cities = data; _loadingCities = false; });
+      if (mounted) {
+        _cityCache[regionId] = data;
+        setState(() { _cities = data; _loadingCities = false; });
+      }
     });
   }
 
