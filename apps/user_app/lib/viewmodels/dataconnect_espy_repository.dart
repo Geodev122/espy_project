@@ -216,6 +216,11 @@ class DataConnectEspyRepository implements EspyRepository {
   }
 
   @override
+  Future<void> deleteGeographyEntity(String id, String type) async {
+    await _db.deleteGeographyEntity(id: id).execute();
+  }
+
+  @override
   Future<void> updateSectorBranding(String id, Map<String, dynamic> data) async {
     await _db.updateSectorBranding(
       id: id,
@@ -274,7 +279,17 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Stream<List<Map<String, dynamic>>> listCommunityRequests({String? sectorId, bool newestFirst = true, String? userId}) {
-    return Stream.value([]); // Use listServiceRequests
+    return _db.listServiceRequests(sectorId: sectorId).subscribe().map((snap) =>
+      snap.data.serviceRequests.map((cr) => {
+        'id': cr.id,
+        'descriptionEn': cr.descriptionEn,
+        'descriptionAr': cr.descriptionAr,
+        'status': cr.status.stringValue,
+        'userName': cr.user.name,
+        'createdAt': cr.createdAt,
+        'sectorId': sectorId, // Fallback as it might not be in deep join but in query arg
+      }).toList()
+    );
   }
 
   @override

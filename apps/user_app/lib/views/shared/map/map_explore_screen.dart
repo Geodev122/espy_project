@@ -161,6 +161,62 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
   }
 
   void _showMarkerPopup(Map<String, dynamic> p, bool isAr, {String? activity}) {
+    // Check if we should show a cluster list or a single profile
+    final directoryVM = Provider.of<DirectoryViewModel>(context, listen: false);
+    final cityId = p['mainLocation']?['cityId'] ?? p['cityId'];
+    
+    // Find all providers in this city
+    final providersInCity = directoryVM.providers.where((prov) {
+      final loc = prov['mainLocation'] as Map<String, dynamic>?;
+      return loc != null && loc['cityId'] == cityId;
+    }).toList();
+
+    if (providersInCity.length > 1) {
+      _showCityClusterList(providersInCity, isAr);
+    } else {
+      _showSingleProfilePopup(p, isAr, activity: activity);
+    }
+  }
+
+  void _showCityClusterList(List<Map<String, dynamic>> providers, bool isAr) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(color: EspyTheme.platinum, borderRadius: BorderRadius.vertical(top: Radius.circular(32))),
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("CITY PROTOCOL SUMMARY", style: GoogleFonts.cinzel(fontSize: 14, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep, letterSpacing: 2)),
+            const SizedBox(height: 16),
+            Flexible(
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: providers.length,
+                itemBuilder: (context, index) {
+                  final p = providers[index];
+                  return ListTile(
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showSingleProfilePopup(p, isAr);
+                    },
+                    leading: CircleAvatar(backgroundImage: p['photoUrl'] != null ? NetworkImage(p['photoUrl']) : null),
+                    title: Text(p['name'] ?? 'Specialist', style: GoogleFonts.montserrat(fontWeight: FontWeight.bold, fontSize: 13)),
+                    subtitle: Text(p['specialization'] ?? 'Care Provider', style: const TextStyle(fontSize: 10)),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showSingleProfilePopup(Map<String, dynamic> p, bool isAr, {String? activity}) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(

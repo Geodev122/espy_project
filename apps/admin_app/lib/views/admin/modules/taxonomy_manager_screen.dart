@@ -127,7 +127,7 @@ class _GeographyPanelState extends State<_GeographyPanel> {
 
         if (_selectedRegionId != null) ...[
           const SizedBox(height: 32),
-          _buildSectionHeader("3. CITIES", onAdd: () => _showGeographyDialog("city")),
+          _buildSectionHeader("3. CITIES", onAdd: () => _showGeographyDialog("city"), onImport: () => _showImportDialog("city")),
           ...widget.vm.cities.map((city) => _buildListTile(
             label: city['nameEn'],
             onTap: () {}, // Detail editor could open here
@@ -182,15 +182,55 @@ class _GeographyPanelState extends State<_GeographyPanel> {
     );
   }
 
-  Widget _buildSectionHeader(String title, {VoidCallback? onAdd}) {
+  Widget _buildSectionHeader(String title, {VoidCallback? onAdd, VoidCallback? onImport}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(title, style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.w900, color: EspyTheme.gold, letterSpacing: 2)),
-          if (onAdd != null)
-            IconButton(icon: const Icon(Icons.add_circle_outline, size: 20, color: EspyTheme.gold), onPressed: onAdd),
+          Row(
+            children: [
+              if (onImport != null)
+                IconButton(icon: const Icon(Icons.file_upload_rounded, size: 20, color: EspyTheme.royalBlue), onPressed: onImport),
+              if (onAdd != null)
+                IconButton(icon: const Icon(Icons.add_circle_outline, size: 20, color: EspyTheme.gold), onPressed: onAdd),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showImportDialog(String type) {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("IMPORT ${type.toUpperCase()}S (CSV)"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text("Format: NameEn, NameAr, Lat, Lng", style: TextStyle(fontSize: 10, color: Colors.black38)),
+            const SizedBox(height: 12),
+            TextField(
+              controller: controller,
+              maxLines: 8,
+              decoration: const InputDecoration(hintText: "Enter CSV data here...", border: OutlineInputBorder()),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("CANCEL")),
+          ElevatedButton(
+            onPressed: () async {
+              if (type == 'city' && _selectedRegionId != null) {
+                await widget.vm.importCitiesCsv(_selectedRegionId!, controller.text);
+              }
+              if (mounted) Navigator.pop(context);
+            },
+            child: const Text("IMPORT"),
+          ),
         ],
       ),
     );

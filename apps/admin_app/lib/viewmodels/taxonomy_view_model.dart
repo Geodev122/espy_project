@@ -51,6 +51,24 @@ class TaxonomyViewModel extends ChangeNotifier {
 
   // --- Geography Hierarchy ---
 
+  Future<void> importCitiesCsv(String regionId, String csvContent) async {
+    final lines = csvContent.split('\n');
+    for (var line in lines) {
+      if (line.isEmpty) continue;
+      final parts = line.split(',');
+      if (parts.length >= 2) {
+        await upsertCity({
+          'regionId': regionId,
+          'nameEn': parts[0].trim(),
+          'nameAr': parts[1].trim(),
+          'lat': parts.length > 2 ? double.tryParse(parts[2]) : null,
+          'lng': parts.length > 3 ? double.tryParse(parts[3]) : null,
+        });
+      }
+    }
+    loadCities(regionId);
+  }
+
   final Map<String, List<Map<String, dynamic>>> _regionCache = {};
   final Map<String, List<Map<String, dynamic>>> _cityCache = {};
 

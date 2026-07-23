@@ -25,6 +25,8 @@ class DirectoryViewModel extends ChangeNotifier {
     _init();
   }
 
+  String? _mostNeededSectorId;
+
   void _init() {
     _providersSubscription = _repository.listAllProviders().listen((providers) {
       _providers = providers;
@@ -32,6 +34,23 @@ class DirectoryViewModel extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     });
+    _calculateTrends();
+  }
+
+  Future<void> _calculateTrends() async {
+    // Fetch recent requests and group by sector
+    final requests = await _repository.listCommunityRequests().first;
+    final Map<String, int> counts = {};
+    for (var r in requests) {
+      final sId = r['sectorId'] as String?;
+      if (sId != null) counts[sId] = (counts[sId] ?? 0) + 1;
+    }
+    
+    if (counts.isNotEmpty) {
+      final sorted = counts.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+      _mostNeededSectorId = sorted.first.key;
+      notifyListeners();
+    }
   }
 
   // Getters
@@ -42,6 +61,7 @@ class DirectoryViewModel extends ChangeNotifier {
   String? get selectedRole => _selectedRole;
   double get searchRadiusKm => _searchRadiusKm;
   bool get radiusFilterActive => _radiusFilterActive;
+  String? get mostNeededSectorId => _mostNeededSectorId;
 
   // Setters & Logic
   void setFilters({
