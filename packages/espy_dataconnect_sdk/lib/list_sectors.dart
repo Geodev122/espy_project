@@ -21,13 +21,17 @@ class ListSectorsSectors {
   final String id;
   final String nameEn;
   final String? nameAr;
-  final int? displayOrder;
+  final String? iconName;
+  final String? colorHex;
+  final String? description;
   ListSectorsSectors.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']),
   nameEn = nativeFromJson<String>(json['nameEn']),
   nameAr = json['nameAr'] == null ? null : nativeFromJson<String>(json['nameAr']),
-  displayOrder = json['displayOrder'] == null ? null : nativeFromJson<int>(json['displayOrder']);
+  iconName = json['iconName'] == null ? null : nativeFromJson<String>(json['iconName']),
+  colorHex = json['colorHex'] == null ? null : nativeFromJson<String>(json['colorHex']),
+  description = json['description'] == null ? null : nativeFromJson<String>(json['description']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -41,11 +45,13 @@ class ListSectorsSectors {
     return id == otherTyped.id && 
     nameEn == otherTyped.nameEn && 
     nameAr == otherTyped.nameAr && 
-    displayOrder == otherTyped.displayOrder;
+    iconName == otherTyped.iconName && 
+    colorHex == otherTyped.colorHex && 
+    description == otherTyped.description;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, nameEn.hashCode, nameAr.hashCode, displayOrder.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, nameEn.hashCode, nameAr.hashCode, iconName.hashCode, colorHex.hashCode, description.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -55,8 +61,14 @@ class ListSectorsSectors {
     if (nameAr != null) {
       json['nameAr'] = nativeToJson<String?>(nameAr);
     }
-    if (displayOrder != null) {
-      json['displayOrder'] = nativeToJson<int?>(displayOrder);
+    if (iconName != null) {
+      json['iconName'] = nativeToJson<String?>(iconName);
+    }
+    if (colorHex != null) {
+      json['colorHex'] = nativeToJson<String?>(colorHex);
+    }
+    if (description != null) {
+      json['description'] = nativeToJson<String?>(description);
     }
     return json;
   }
@@ -65,7 +77,9 @@ class ListSectorsSectors {
     required this.id,
     required this.nameEn,
     this.nameAr,
-    this.displayOrder,
+    this.iconName,
+    this.colorHex,
+    this.description,
   });
 }
 

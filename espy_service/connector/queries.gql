@@ -1,4 +1,4 @@
-# ESPY PROTOCOL - DATA CONNECT QUERIES v6.2
+# ESPY PROTOCOL - DATA CONNECT QUERIES v7.0
 
 # --- 1. Identity & Profile ---
 
@@ -57,7 +57,9 @@ query ListSectors @auth(level: PUBLIC) {
     id
     nameEn
     nameAr
-    displayOrder
+    iconName
+    colorHex
+    description
   }
 }
 
@@ -70,20 +72,51 @@ query ListCategories($sectorId: String) @auth(level: PUBLIC) {
   }
 }
 
-query ListActiveServices($categoryId: String) @auth(level: PUBLIC) {
+query ListRegions($countryId: String!) @auth(level: PUBLIC) {
+  regions(where: { country: { id: { eq: $countryId } } }) {
+    id
+    nameEn
+    nameAr
+    regionCode
+  }
+}
+
+query ListCities($regionId: UUID!) @auth(level: PUBLIC) {
+  cities(where: { region: { id: { eq: $regionId } } }) {
+    id
+    nameEn
+    nameAr
+    lat
+    lng
+  }
+}
+
+query ListMetadataTags @auth(level: PUBLIC) {
+  serviceTags { id nameEn nameAr }
+  priceTags { id nameEn nameAr category }
+  pinCategories { id nameEn nameAr iconBase }
+  presenceTags { id nameEn nameAr }
+}
+
+query ListActiveServices($categoryId: String, $sectorId: String) @auth(level: PUBLIC) {
   services(where: {
     _and: [
       { isActive: { eq: true } },
       { category: { id: { eq: $categoryId } } },
+      { sector: { id: { eq: $sectorId } } },
       { visibilityExpiresAt: { gt_expr: "request.time" } }
     ]
   }) {
     id
     titleEn
     titleAr
-    descriptionEn
     price
     imageUrl
+    deliveryMode
+    priceTag { nameEn nameAr }
+    serviceListingTags_on_service {
+      tag { nameEn nameAr }
+    }
     provider {
       id
       name
@@ -126,7 +159,7 @@ query ListLocationNodes($userId: String!) @auth(level: PUBLIC) {
   locationNodes(where: { user: { id: { eq: $userId } } }) {
     id
     label
-    cityName
+    city { nameEn nameAr }
     lat
     lng
     isMain
@@ -157,8 +190,8 @@ query ListContactedIds($actorId: String!) @auth(expr: "auth.uid == actorId") {
   }
 }
 
-query ListCommunityRequests($sectorId: String, $status: CommunityRequestStatus = ACTIVE) @auth(level: USER) {
-  communityRequests(
+query ListServiceRequests($sectorId: String, $status: CommunityRequestStatus = ACTIVE) @auth(level: USER) {
+  serviceRequests(
     where: {
       _and: [
         { status: { eq: $status } },
@@ -168,13 +201,17 @@ query ListCommunityRequests($sectorId: String, $status: CommunityRequestStatus =
     orderBy: [{ createdAt: DESC }]
   ) {
     id
-    title
-    description
-    locationLabel
+    descriptionEn
+    descriptionAr
+    urgency
+    preferredMode
     status
     createdAt
     user {
       name
+    }
+    serviceRequestTags_on_request {
+      tag { nameEn nameAr }
     }
   }
 }
@@ -277,13 +314,6 @@ query GetAuditDetails($id: String!) @auth(level: NO_ACCESS) {
     }
   }
 }
-
-# Aggregates disabled temporarily to ensure deployment success
-# query GetSystemStats @auth(level: NO_ACCESS) {
-#   users_aggregate { _count }
-#   services_aggregate(where: { isActive: { eq: true } }) { _count }
-#   communityRequests_aggregate(where: { status: { eq: ACTIVE } }) { _count }
-# }
 
 query ListRechargeCards @auth(level: NO_ACCESS) {
   rechargeCards(orderBy: [{ redeemedAt: DESC }]) {

@@ -7,6 +7,7 @@ import '../../../viewmodels/espy_repository.dart';
 import '../../../viewmodels/taxonomy_view_model.dart';
 import '../../../widgets/common/premium_card.dart';
 import '../../../widgets/common/espy_scaffold.dart';
+import '../../../widgets/common/espy_icon.dart';
 
 class TaxonomyManagerScreen extends StatelessWidget {
   const TaxonomyManagerScreen({super.key});
@@ -20,8 +21,21 @@ class TaxonomyManagerScreen extends StatelessWidget {
   }
 }
 
-class _TaxonomyManagerView extends StatelessWidget {
+class _TaxonomyManagerView extends StatefulWidget {
   const _TaxonomyManagerView();
+
+  @override
+  State<_TaxonomyManagerView> createState() => _TaxonomyManagerViewState();
+}
+
+class _TaxonomyManagerViewState extends State<_TaxonomyManagerView> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,63 +47,336 @@ class _TaxonomyManagerView extends StatelessWidget {
         title: Text("TAXONOMY PROTOCOLS", style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, fontSize: 14)),
         backgroundColor: Colors.white,
         foregroundColor: EspyTheme.navyDeep,
+        bottom: TabBar(
+          controller: _tabController,
+          labelColor: EspyTheme.royalBlue,
+          unselectedLabelColor: Colors.black38,
+          indicatorColor: EspyTheme.royalBlue,
+          tabs: const [
+            Tab(text: "GEOGRAPHY"),
+            Tab(text: "SECTORS"),
+            Tab(text: "METADATA"),
+          ],
+        ),
       ),
       body: viewModel.isLoading
           ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              padding: const EdgeInsets.all(24),
+          : TabBarView(
+              controller: _tabController,
               children: [
-                _buildHeader("ACTIVE SECTORS"),
-                ...viewModel.sectors.map((s) => _buildSectorTile(context, s, viewModel)),
-                const SizedBox(height: 32),
-                _buildHeader("TOP CATEGORIES"),
-                ...viewModel.categories.map((c) => _buildCategoryTile(context, c, viewModel)),
+                _GeographyPanel(vm: viewModel),
+                _SectorsPanel(vm: viewModel),
+                _MetadataPanel(vm: viewModel),
               ],
             ),
     );
   }
+}
 
-  Widget _buildHeader(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16, left: 4),
-      child: Text(text, style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.w900, color: Colors.black38, letterSpacing: 2)),
+class _GeographyPanel extends StatefulWidget {
+  final TaxonomyViewModel vm;
+  const _GeographyPanel({required this.vm});
+
+  @override
+  State<_GeographyPanel> createState() => _GeographyPanelState();
+}
+
+class _GeographyPanelState extends State<_GeographyPanel> {
+  String? _selectedCountryId;
+  String? _selectedRegionId;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(24),
+      children: [
+        _buildSectionHeader("1. COUNTRIES", onAdd: () => _showGeographyDialog("country")),
+        ...widget.vm.countries.map((c) => _buildListTile(
+          label: "${c['flagEmoji'] ?? ''} ${c['nameEn']}",
+          isSelected: _selectedCountryId == c['id'],
+          onTap: () {
+            setState(() {
+              _selectedCountryId = c['id'];
+              _selectedRegionId = null;
+            });
+            widget.vm.loadRegions(c['id']);
+          },
+        )),
+        
+        if (_selectedCountryId != null) ...[
+          const SizedBox(height: 32),
+          _buildSectionHeader("2. REGIONS", onAdd: () => _showGeographyDialog("region")),
+          ...widget.vm.regions.map((r) => _buildListTile(
+            label: r['nameEn'],
+            isSelected: _selectedRegionId == r['id'],
+            onTap: () {
+              setState(() => _selectedRegionId = r['id']);
+              widget.vm.loadCities(r['id']);
+            },
+          )),
+        ],
+
+        if (_selectedRegionId != null) ...[
+          const SizedBox(height: 32),
+          _buildSectionHeader("3. CITIES", onAdd: () => _showGeographyDialog("city")),
+          ...widget.vm.cities.map((city) => _buildListTile(
+            label: city['nameEn'],
+            onTap: () {}, // Detail editor could open here
+          )),
+        ],
+      ],
     );
   }
 
-  Widget _buildSectorTile(BuildContext context, Map<String, dynamic> sector, TaxonomyViewModel vm) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: PremiumCard(
-        padding: const EdgeInsets.all(16),
-        child: Row(
+  void _showGeographyDialog(String type) {
+    final nameEn = TextEditingController();
+    final nameAr = TextEditingController();
+    final code = TextEditingController(); // ISO or Region Code
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("ADD ${type.toUpperCase()}"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(LucideIcons.globe, color: EspyTheme.royalBlue, size: 20),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Text(sector['nameEn']?.toString().toUpperCase() ?? 'UNTITLED', style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, fontSize: 12)),
-            ),
-            IconButton(icon: const Icon(Icons.edit_rounded, size: 18), onPressed: () {}),
+            TextField(controller: nameEn, decoration: const InputDecoration(hintText: "Name (English)")),
+            const SizedBox(height: 8),
+            TextField(controller: nameAr, textDirection: TextDirection.rtl, decoration: const InputDecoration(hintText: "الأسم (عربي)")),
+            const SizedBox(height: 8),
+            if (type != 'city') TextField(controller: code, decoration: InputDecoration(hintText: type == 'country' ? "ISO Code" : "Region Code")),
           ],
         ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("CANCEL")),
+          ElevatedButton(
+            onPressed: () async {
+              final data = {
+                'id': type == 'country' ? code.text.toUpperCase() : null, // Countries use ISO codes as ID
+                'nameEn': nameEn.text,
+                'nameAr': nameAr.text,
+                'regionCode': type == 'region' ? code.text : null,
+                'countryId': _selectedCountryId,
+                'regionId': _selectedRegionId,
+              };
+
+              if (type == 'country') await widget.vm.upsertCountry(data);
+              if (type == 'region') await widget.vm.upsertRegion(data);
+              if (type == 'city') await widget.vm.upsertCity(data);
+
+              if (mounted) Navigator.pop(context);
+            },
+            child: const Text("SAVE"),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildCategoryTile(BuildContext context, Map<String, dynamic> cat, TaxonomyViewModel vm) {
+  Widget _buildSectionHeader(String title, {VoidCallback? onAdd}) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(title, style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.w900, color: EspyTheme.gold, letterSpacing: 2)),
+          if (onAdd != null)
+            IconButton(icon: const Icon(Icons.add_circle_outline, size: 20, color: EspyTheme.gold), onPressed: onAdd),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildListTile({required String label, bool isSelected = false, required VoidCallback onTap}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
       child: PremiumCard(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            const Icon(LucideIcons.tag, color: EspyTheme.gold, size: 20),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Text(cat['nameEn']?.toString().toUpperCase() ?? 'UNTITLED', style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, fontSize: 11)),
+        padding: EdgeInsets.zero,
+        child: ListTile(
+          onTap: onTap,
+          selected: isSelected,
+          selectedTileColor: EspyTheme.royalBlue.withValues(alpha: 0.05),
+          title: Text(label.toUpperCase(), style: GoogleFonts.montserrat(fontSize: 11, fontWeight: FontWeight.w700, color: isSelected ? EspyTheme.royalBlue : EspyTheme.navyDeep)),
+          trailing: const Icon(Icons.chevron_right_rounded, size: 18),
+        ),
+      ),
+    );
+  }
+}
+
+class _SectorsPanel extends StatefulWidget {
+  final TaxonomyViewModel vm;
+  const _SectorsPanel({required this.vm});
+
+  @override
+  State<_SectorsPanel> createState() => _SectorsPanelState();
+}
+
+class _SectorsPanelState extends State<_SectorsPanel> {
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(24),
+      itemCount: widget.vm.sectors.length,
+      itemBuilder: (context, index) {
+        final s = widget.vm.sectors[index];
+        final Color color = Color(int.tryParse(s['colorHex'] ?? '0xFF1565C0') ?? 0xFF1565C0);
+        
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: PremiumCard(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: EspyIcon(iconName: s['iconName'] ?? 'help', color: color),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(s['nameEn'].toString().toUpperCase(), style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, fontSize: 13)),
+                      Text(s['nameAr'] ?? 'N/A', style: const TextStyle(fontSize: 12, color: Colors.black38)),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.palette_rounded, size: 18, color: EspyTheme.gold), 
+                  onPressed: () => _showBrandingDialog(s),
+                ),
+              ],
             ),
-            IconButton(icon: const Icon(Icons.edit_rounded, size: 18), onPressed: () {}),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showBrandingDialog(Map<String, dynamic> sector) {
+    final iconName = TextEditingController(text: sector['iconName']);
+    final colorHex = TextEditingController(text: sector['colorHex']);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("BRANDING: ${sector['nameEn']}"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(controller: iconName, decoration: const InputDecoration(hintText: "Icon Name (e.g. heart, brain, scale)")),
+            const SizedBox(height: 12),
+            TextField(controller: colorHex, decoration: const InputDecoration(hintText: "Color Hex (e.g. 0xFF1565C0)")),
           ],
         ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("CANCEL")),
+          ElevatedButton(
+            onPressed: () async {
+              await widget.vm.updateSectorBranding(sector['id'], {
+                'iconName': iconName.text,
+                'colorHex': colorHex.text,
+              });
+              if (mounted) Navigator.pop(context);
+            },
+            child: const Text("SAVE"),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MetadataPanel extends StatefulWidget {
+  final TaxonomyViewModel vm;
+  const _MetadataPanel({required this.vm});
+
+  @override
+  State<_MetadataPanel> createState() => _MetadataPanelState();
+}
+
+class _MetadataPanelState extends State<_MetadataPanel> {
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(24),
+      children: [
+        _buildTagSection("SERVICE TAGS", widget.vm.tags['serviceTags'] ?? [], 'service'),
+        const SizedBox(height: 32),
+        _buildTagSection("PRICE TAGS", widget.vm.tags['priceTags'] ?? [], 'price'),
+        const SizedBox(height: 32),
+        _buildTagSection("PIN CATEGORIES", widget.vm.tags['pinCategories'] ?? [], 'pin'),
+        const SizedBox(height: 32),
+        _buildTagSection("PRESENCE TAGS", widget.vm.tags['presenceTags'] ?? [], 'presence'),
+      ],
+    );
+  }
+
+  Widget _buildTagSection(String title, List<Map<String, dynamic>> tags, String type) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(title, style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.w900, color: EspyTheme.gold, letterSpacing: 2)),
+            IconButton(
+              icon: const Icon(Icons.add_box_outlined, size: 18, color: EspyTheme.gold), 
+              onPressed: () => _showTagDialog(type),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 8, runSpacing: 8,
+          children: tags.map((t) => Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.black.withValues(alpha: 0.05))),
+            child: Text(t['nameEn'].toString().toUpperCase(), style: GoogleFonts.montserrat(fontSize: 9, fontWeight: FontWeight.bold, color: EspyTheme.navyDeep)),
+          )).toList(),
+        ),
+      ],
+    );
+  }
+
+  void _showTagDialog(String type) {
+    final id = TextEditingController();
+    final nameEn = TextEditingController();
+    final nameAr = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("ADD ${type.toUpperCase()} TAG"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(controller: id, decoration: const InputDecoration(hintText: "ID (e.g. online, consultation)")),
+            const SizedBox(height: 8),
+            TextField(controller: nameEn, decoration: const InputDecoration(hintText: "Name (English)")),
+            const SizedBox(height: 8),
+            TextField(controller: nameAr, textDirection: TextDirection.rtl, decoration: const InputDecoration(hintText: "الأسم (عربي)")),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("CANCEL")),
+          ElevatedButton(
+            onPressed: () async {
+              await widget.vm.upsertTag(type, {
+                'id': id.text.toLowerCase(),
+                'nameEn': nameEn.text,
+                'nameAr': nameAr.text,
+              });
+              if (mounted) Navigator.pop(context);
+            },
+            child: const Text("SAVE"),
+          ),
+        ],
       ),
     );
   }

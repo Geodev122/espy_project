@@ -68,19 +68,67 @@ class FirestoreEspyRepository implements EspyRepository {
   }
 
   @override
+  Stream<List<Map<String, dynamic>>> listRegions(String countryId) {
+    return _db.collection('directory_regions').where('countryId', isEqualTo: countryId).snapshots().map((snap) =>
+        snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList());
+  }
+
+  @override
+  Stream<List<Map<String, dynamic>>> listCities(String regionId) {
+    return _db.collection('directory_cities').where('regionId', isEqualTo: regionId).snapshots().map((snap) =>
+        snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList());
+  }
+
+  @override
   Stream<List<Map<String, dynamic>>> listLocationNodes(String userId) {
      return _db.collection('directory_locations').where('userId', isEqualTo: userId).snapshots().map((snap) =>
         snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList());
   }
 
   @override
-  Future<void> updateSector(String id, Map<String, dynamic> data) async {
-    await _db.collection('directory_sectors').doc(id).update({...data, 'updatedAt': FieldValue.serverTimestamp()});
+  Future<void> upsertCountry(Map<String, dynamic> data) async {
+    await _db.collection('directory_countries').doc(data['id']).set(data, SetOptions(merge: true));
   }
 
   @override
-  Future<void> updateCategory(String id, Map<String, dynamic> data) async {
-    await _db.collection('directory_categories').doc(id).update({...data, 'updatedAt': FieldValue.serverTimestamp()});
+  Future<void> upsertRegion(Map<String, dynamic> data) async {
+    await _db.collection('directory_regions').add(data);
+  }
+
+  @override
+  Future<void> upsertCity(Map<String, dynamic> data) async {
+    await _db.collection('directory_cities').add(data);
+  }
+
+  @override
+  Future<void> deleteGeographyEntity(String id, String type) async {
+    final col = type == 'country' ? 'directory_countries' : (type == 'region' ? 'directory_regions' : 'directory_cities');
+    await _db.collection(col).doc(id).delete();
+  }
+
+  @override
+  Future<void> updateSectorBranding(String id, Map<String, dynamic> data) async {
+    await _db.collection('directory_sectors').doc(id).update(data);
+  }
+
+  @override
+  Future<void> upsertServiceTag(Map<String, dynamic> data) async {
+    await _db.collection('directory_service_tags').doc(data['id']).set(data, SetOptions(merge: true));
+  }
+
+  @override
+  Future<void> upsertPriceTag(Map<String, dynamic> data) async {
+    await _db.collection('directory_price_tags').doc(data['id']).set(data, SetOptions(merge: true));
+  }
+
+  @override
+  Future<void> upsertPinCategory(Map<String, dynamic> data) async {
+    await _db.collection('directory_pin_categories').doc(data['id']).set(data, SetOptions(merge: true));
+  }
+
+  @override
+  Future<void> upsertPresenceTag(Map<String, dynamic> data) async {
+    await _db.collection('directory_presence_tags').doc(data['id']).set(data, SetOptions(merge: true));
   }
 
   // ─── 3. Core Business Logic ──────────────────────────────────────────────
@@ -140,6 +188,20 @@ class FirestoreEspyRepository implements EspyRepository {
        'createdAt': FieldValue.serverTimestamp(),
        'status': 'active',
      });
+  }
+
+  @override
+  Future<Map<String, List<Map<String, dynamic>>>> listMetadataTags() async {
+    final s = await _db.collection('directory_service_tags').get();
+    final p = await _db.collection('directory_price_tags').get();
+    final c = await _db.collection('directory_pin_categories').get();
+    final pr = await _db.collection('directory_presence_tags').get();
+    return {
+      'serviceTags': s.docs.map((d) => {'id': d.id, ...d.data()}).toList(),
+      'priceTags': p.docs.map((d) => {'id': d.id, ...d.data()}).toList(),
+      'pinCategories': c.docs.map((d) => {'id': d.id, ...d.data()}).toList(),
+      'presenceTags': pr.docs.map((d) => {'id': d.id, ...d.data()}).toList(),
+    };
   }
 
   // ─── 4. Ledger & Resource Orders ─────────────────────────────────────────

@@ -1,4 +1,4 @@
-# ESPY PROTOCOL - UNIFIED SCHEMA v6.1
+# ESPY PROTOCOL - UNIFIED SCHEMA v7.0
 
 # --- Enums ---
 
@@ -50,6 +50,19 @@ enum OrderStatus {
   APPROVED
   PAID
   CANCELLED
+}
+
+enum DeliveryMode {
+  ONLINE
+  FACE_TO_FACE
+  FIELD
+}
+
+enum UrgencyLevel {
+  LOW
+  MEDIUM
+  HIGH
+  EMERGENCY
 }
 
 # --- 1. Identity & Profiles ---
@@ -116,6 +129,9 @@ type Sector @table(key: "id") {
   id: String!
   nameEn: String!
   nameAr: String
+  description: String
+  iconName: String # Lucide/Material icon name string
+  colorHex: String # Primary branding color for this sector
   displayOrder: Int @default(value: 999)
   isActive: Boolean! @default(value: true)
 }
@@ -125,7 +141,9 @@ type Category @table(key: "id") {
   sector: Sector!
   nameEn: String!
   nameAr: String
+  description: String
   targetRole: UserRole!
+  isOtherCategory: Boolean! @default(value: false)
   isActive: Boolean! @default(value: true)
 }
 
@@ -133,49 +151,128 @@ type Country @table(key: "id") {
   id: String!
   nameEn: String!
   nameAr: String
+  isoCode: String
+  currency: String
+  timezone: String
   flagEmoji: String
+}
+
+type Region @table(key: "id") {
+  id: UUID! @default(expr: "uuidV4()")
+  country: Country!
+  nameEn: String!
+  nameAr: String
+  regionCode: String
+}
+
+type City @table(key: "id") {
+  id: UUID! @default(expr: "uuidV4()")
+  region: Region!
+  nameEn: String!
+  nameAr: String
+  population: Int
+  lat: Float
+  lng: Float
+}
+
+type PinCategory @table(key: "id") {
+  id: String!
+  nameEn: String!
+  nameAr: String
+  iconBase: String # Base icon for this location type
+}
+
+type PresenceTag @table(key: "id") {
+  id: String!
+  nameEn: String!
+  nameAr: String
 }
 
 type LocationNode @table(key: "id") {
   id: UUID! @default(expr: "uuidV4()")
   user: User!
-  country: Country!
-  governorateName: String
-  cityName: String
+  city: City!
+  pinCategory: PinCategory
+  presenceTag: PresenceTag
   lat: Float!
   lng: Float!
+  addressEn: String
+  addressAr: String
   isMain: Boolean! @default(value: false)
   isVerified: Boolean! @default(value: false)
   label: String
 }
 
-# --- 3. Core Business Logic ---
+# --- 3. Metadata Tags ---
+
+type ServiceTag @table(key: "id") {
+  id: String!
+  nameEn: String!
+  nameAr: String
+}
+
+type PriceTag @table(key: "id") {
+  id: String!
+  nameEn: String!
+  nameAr: String
+  category: String # "FREE", "PAID", "SUBSIDIZED"
+}
+
+# --- 4. Core Business Logic ---
+
+type InstitutionSector @table(key: ["institutionId", "sectorId"]) {
+  institution: User! @ref(fields: ["institutionId"])
+  institutionId: String!
+  sector: Sector! @ref(fields: ["sectorId"])
+  sectorId: String!
+}
 
 type Service @table(key: "id") {
   id: UUID! @default(expr: "uuidV4()")
   provider: User!
   category: Category!
+  sector: Sector!
   titleEn: String!
   titleAr: String
   descriptionEn: String
   descriptionAr: String
   price: Int @default(value: 0)
+  priceTag: PriceTag
+  deliveryMode: DeliveryMode @default(value: FACE_TO_FACE)
   isActive: Boolean! @default(value: true)
   isAllocated: Boolean! @default(value: false)
   imageUrl: String
   visibilityExpiresAt: Timestamp
 }
 
-type CommunityRequest @table(key: "id") {
+type ServiceListingTag @table(key: ["serviceId", "tagId"]) {
+  service: Service! @ref(fields: ["serviceId"])
+  serviceId: UUID!
+  tag: ServiceTag! @ref(fields: ["tagId"])
+  tagId: String!
+}
+
+type ServiceRequest @table(key: "id") {
   id: UUID! @default(expr: "uuidV4()")
   user: User!
   sector: Sector!
-  title: String!
-  description: String!
-  whatsapp: String
-  locationLabel: String
+  descriptionEn: String!
+  descriptionAr: String
+  urgency: UrgencyLevel @default(value: MEDIUM)
+  preferredMode: DeliveryMode @default(value: FACE_TO_FACE)
+  lat: Float
+  lng: Float
+  city: City
   status: CommunityRequestStatus! @default(value: ACTIVE)
   createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
+type ServiceRequestTag @table(key: ["requestId", "tagId"]) {
+  request: ServiceRequest! @ref(fields: ["requestId"])
+  requestId: UUID!
+  tag: ServiceTag! @ref(fields: ["tagId"])
+  tagId: String!
 }
 
 type Match @table(key: "id") {

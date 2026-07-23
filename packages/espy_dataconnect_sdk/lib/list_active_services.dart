@@ -2,10 +2,15 @@ part of 'espy.dart';
 
 class ListActiveServicesVariablesBuilder {
   Optional<String> _categoryId = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<String> _sectorId = Optional.optional(nativeFromJson, nativeToJson);
 
   final FirebaseDataConnect _dataConnect;
   ListActiveServicesVariablesBuilder categoryId(String? t) {
    _categoryId.value = t;
+   return this;
+  }
+  ListActiveServicesVariablesBuilder sectorId(String? t) {
+   _sectorId.value = t;
    return this;
   }
 
@@ -17,7 +22,7 @@ class ListActiveServicesVariablesBuilder {
   }
 
   QueryRef<ListActiveServicesData, ListActiveServicesVariables> ref() {
-    ListActiveServicesVariables vars= ListActiveServicesVariables(categoryId: _categoryId,);
+    ListActiveServicesVariables vars= ListActiveServicesVariables(categoryId: _categoryId,sectorId: _sectorId,);
     return _dataConnect.query("ListActiveServices", dataDeserializer, varsSerializer, vars);
   }
 }
@@ -27,18 +32,24 @@ class ListActiveServicesServices {
   final String id;
   final String titleEn;
   final String? titleAr;
-  final String? descriptionEn;
   final int? price;
   final String? imageUrl;
+  final EnumValue<DeliveryMode>? deliveryMode;
+  final ListActiveServicesServicesPriceTag? priceTag;
+  final List<ListActiveServicesServicesServiceListingTagsOnService> serviceListingTags_on_service;
   final ListActiveServicesServicesProvider provider;
   ListActiveServicesServices.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']),
   titleEn = nativeFromJson<String>(json['titleEn']),
   titleAr = json['titleAr'] == null ? null : nativeFromJson<String>(json['titleAr']),
-  descriptionEn = json['descriptionEn'] == null ? null : nativeFromJson<String>(json['descriptionEn']),
   price = json['price'] == null ? null : nativeFromJson<int>(json['price']),
   imageUrl = json['imageUrl'] == null ? null : nativeFromJson<String>(json['imageUrl']),
+  deliveryMode = json['deliveryMode'] == null ? null : deliveryModeDeserializer(json['deliveryMode']),
+  priceTag = json['priceTag'] == null ? null : ListActiveServicesServicesPriceTag.fromJson(json['priceTag']),
+  serviceListingTags_on_service = (json['serviceListingTags_on_service'] as List<dynamic>)
+        .map((e) => ListActiveServicesServicesServiceListingTagsOnService.fromJson(e))
+        .toList(),
   provider = ListActiveServicesServicesProvider.fromJson(json['provider']);
   @override
   bool operator ==(Object other) {
@@ -53,14 +64,16 @@ class ListActiveServicesServices {
     return id == otherTyped.id && 
     titleEn == otherTyped.titleEn && 
     titleAr == otherTyped.titleAr && 
-    descriptionEn == otherTyped.descriptionEn && 
     price == otherTyped.price && 
     imageUrl == otherTyped.imageUrl && 
+    deliveryMode == otherTyped.deliveryMode && 
+    priceTag == otherTyped.priceTag && 
+    serviceListingTags_on_service == otherTyped.serviceListingTags_on_service && 
     provider == otherTyped.provider;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, titleEn.hashCode, titleAr.hashCode, descriptionEn.hashCode, price.hashCode, imageUrl.hashCode, provider.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, titleEn.hashCode, titleAr.hashCode, price.hashCode, imageUrl.hashCode, deliveryMode.hashCode, priceTag.hashCode, serviceListingTags_on_service.hashCode, provider.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -70,15 +83,21 @@ class ListActiveServicesServices {
     if (titleAr != null) {
       json['titleAr'] = nativeToJson<String?>(titleAr);
     }
-    if (descriptionEn != null) {
-      json['descriptionEn'] = nativeToJson<String?>(descriptionEn);
-    }
     if (price != null) {
       json['price'] = nativeToJson<int?>(price);
     }
     if (imageUrl != null) {
       json['imageUrl'] = nativeToJson<String?>(imageUrl);
     }
+    if (deliveryMode != null) {
+      json['deliveryMode'] = 
+    deliveryModeSerializer(deliveryMode!)
+    ;
+    }
+    if (priceTag != null) {
+      json['priceTag'] = priceTag!.toJson();
+    }
+    json['serviceListingTags_on_service'] = serviceListingTags_on_service.map((e) => e.toJson()).toList();
     json['provider'] = provider.toJson();
     return json;
   }
@@ -87,10 +106,128 @@ class ListActiveServicesServices {
     required this.id,
     required this.titleEn,
     this.titleAr,
-    this.descriptionEn,
     this.price,
     this.imageUrl,
+    this.deliveryMode,
+    this.priceTag,
+    required this.serviceListingTags_on_service,
     required this.provider,
+  });
+}
+
+@immutable
+class ListActiveServicesServicesPriceTag {
+  final String nameEn;
+  final String? nameAr;
+  ListActiveServicesServicesPriceTag.fromJson(dynamic json):
+  
+  nameEn = nativeFromJson<String>(json['nameEn']),
+  nameAr = json['nameAr'] == null ? null : nativeFromJson<String>(json['nameAr']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final ListActiveServicesServicesPriceTag otherTyped = other as ListActiveServicesServicesPriceTag;
+    return nameEn == otherTyped.nameEn && 
+    nameAr == otherTyped.nameAr;
+    
+  }
+  @override
+  int get hashCode => Object.hashAll([nameEn.hashCode, nameAr.hashCode]);
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json['nameEn'] = nativeToJson<String>(nameEn);
+    if (nameAr != null) {
+      json['nameAr'] = nativeToJson<String?>(nameAr);
+    }
+    return json;
+  }
+
+  ListActiveServicesServicesPriceTag({
+    required this.nameEn,
+    this.nameAr,
+  });
+}
+
+@immutable
+class ListActiveServicesServicesServiceListingTagsOnService {
+  final ListActiveServicesServicesServiceListingTagsOnServiceTag tag;
+  ListActiveServicesServicesServiceListingTagsOnService.fromJson(dynamic json):
+  
+  tag = ListActiveServicesServicesServiceListingTagsOnServiceTag.fromJson(json['tag']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final ListActiveServicesServicesServiceListingTagsOnService otherTyped = other as ListActiveServicesServicesServiceListingTagsOnService;
+    return tag == otherTyped.tag;
+    
+  }
+  @override
+  int get hashCode => tag.hashCode;
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json['tag'] = tag.toJson();
+    return json;
+  }
+
+  ListActiveServicesServicesServiceListingTagsOnService({
+    required this.tag,
+  });
+}
+
+@immutable
+class ListActiveServicesServicesServiceListingTagsOnServiceTag {
+  final String nameEn;
+  final String? nameAr;
+  ListActiveServicesServicesServiceListingTagsOnServiceTag.fromJson(dynamic json):
+  
+  nameEn = nativeFromJson<String>(json['nameEn']),
+  nameAr = json['nameAr'] == null ? null : nativeFromJson<String>(json['nameAr']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final ListActiveServicesServicesServiceListingTagsOnServiceTag otherTyped = other as ListActiveServicesServicesServiceListingTagsOnServiceTag;
+    return nameEn == otherTyped.nameEn && 
+    nameAr == otherTyped.nameAr;
+    
+  }
+  @override
+  int get hashCode => Object.hashAll([nameEn.hashCode, nameAr.hashCode]);
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json['nameEn'] = nativeToJson<String>(nameEn);
+    if (nameAr != null) {
+      json['nameAr'] = nativeToJson<String?>(nameAr);
+    }
+    return json;
+  }
+
+  ListActiveServicesServicesServiceListingTagsOnServiceTag({
+    required this.nameEn,
+    this.nameAr,
   });
 }
 
@@ -181,12 +318,17 @@ class ListActiveServicesData {
 @immutable
 class ListActiveServicesVariables {
   late final Optional<String>categoryId;
+  late final Optional<String>sectorId;
   @Deprecated('fromJson is deprecated for Variable classes as they are no longer required for deserialization.')
   ListActiveServicesVariables.fromJson(Map<String, dynamic> json) {
   
   
     categoryId = Optional.optional(nativeFromJson, nativeToJson);
     categoryId.value = json['categoryId'] == null ? null : nativeFromJson<String>(json['categoryId']);
+  
+  
+    sectorId = Optional.optional(nativeFromJson, nativeToJson);
+    sectorId.value = json['sectorId'] == null ? null : nativeFromJson<String>(json['sectorId']);
   
   }
   @override
@@ -199,11 +341,12 @@ class ListActiveServicesVariables {
     }
 
     final ListActiveServicesVariables otherTyped = other as ListActiveServicesVariables;
-    return categoryId == otherTyped.categoryId;
+    return categoryId == otherTyped.categoryId && 
+    sectorId == otherTyped.sectorId;
     
   }
   @override
-  int get hashCode => categoryId.hashCode;
+  int get hashCode => Object.hashAll([categoryId.hashCode, sectorId.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -211,11 +354,15 @@ class ListActiveServicesVariables {
     if(categoryId.state == OptionalState.set) {
       json['categoryId'] = categoryId.toJson();
     }
+    if(sectorId.state == OptionalState.set) {
+      json['sectorId'] = sectorId.toJson();
+    }
     return json;
   }
 
   ListActiveServicesVariables({
     required this.categoryId,
+    required this.sectorId,
   });
 }
 

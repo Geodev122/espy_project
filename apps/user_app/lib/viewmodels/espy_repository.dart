@@ -16,11 +16,22 @@ abstract class EspyRepository {
   Stream<List<Map<String, dynamic>>> listSectors();
   Stream<List<Map<String, dynamic>>> listCategories({String? sectorId});
   Stream<List<Map<String, dynamic>>> listCountries();
+  Stream<List<Map<String, dynamic>>> listRegions(String countryId);
+  Stream<List<Map<String, dynamic>>> listCities(String regionId);
   Stream<List<Map<String, dynamic>>> listLocationNodes(String userId);
   
+  // Admin Geography Ops
+  Future<void> upsertCountry(Map<String, dynamic> data);
+  Future<void> upsertRegion(Map<String, dynamic> data);
+  Future<void> upsertCity(Map<String, dynamic> data);
+  Future<void> deleteGeographyEntity(String id, String type);
+
   // Admin Taxonomy Ops
-  Future<void> updateSector(String id, Map<String, dynamic> data);
-  Future<void> updateCategory(String id, Map<String, dynamic> data);
+  Future<void> updateSectorBranding(String id, Map<String, dynamic> data);
+  Future<void> upsertServiceTag(Map<String, dynamic> data);
+  Future<void> upsertPriceTag(Map<String, dynamic> data);
+  Future<void> upsertPinCategory(Map<String, dynamic> data);
+  Future<void> upsertPresenceTag(Map<String, dynamic> data);
 
   // ─── 3. Core Business Logic ──────────────────────────────────────────────
   Stream<List<Map<String, dynamic>>> listActiveServices({String? categoryId, String? sectorId});
@@ -29,6 +40,9 @@ abstract class EspyRepository {
 
   Stream<List<Map<String, dynamic>>> listCommunityRequests({String? sectorId, bool newestFirst = true, String? userId});
   Future<void> createCommunityRequest(Map<String, dynamic> data);
+  
+  // Metadata Tags
+  Future<Map<String, List<Map<String, dynamic>>>> listMetadataTags();
 
   // ─── 4. Ledger & Resource Orders ─────────────────────────────────────────
   Stream<List<Map<String, dynamic>>> listWalletTransactions(String userId);

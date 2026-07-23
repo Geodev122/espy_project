@@ -10,7 +10,9 @@ import 'package:espy_app/theme/espy_theme.dart';
 import 'package:espy_app/viewmodels/auth_service.dart';
 import 'package:espy_app/viewmodels/espy_repository.dart';
 import 'package:espy_app/viewmodels/registration_view_model.dart';
-import 'package:espy_app/widgets/common/location_picker_modal.dart';
+import 'package:espy_app/widgets/common/hierarchical_location_picker.dart';
+import 'package:espy_app/widgets/common/bilingual_text_field.dart';
+import 'package:espy_app/widgets/common/multi_select_chip_group.dart';
 import 'package:espy_app/widgets/common/premium_button.dart';
 import 'package:espy_app/widgets/common/premium_card.dart';
 import 'package:espy_app/widgets/common/profile_image_picker.dart';
@@ -35,6 +37,7 @@ class _InstitutionWizardState extends State<InstitutionWizard> {
   final _registrationController = TextEditingController();
 
   String? _selectedCategoryId;
+  List<String> _selectedSectorIds = [];
   File? _profileImageFile;
   Uint8List? _profileImageWebBytes;
 
@@ -94,6 +97,7 @@ class _InstitutionWizardState extends State<InstitutionWizard> {
   }
 
   Widget _buildPhase1(AppLocalizations l10n) {
+    final repo = Provider.of<EspyRepository>(context, listen: false);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -108,8 +112,20 @@ class _InstitutionWizardState extends State<InstitutionWizard> {
           ),
         ),
         const SizedBox(height: 32),
-        _buildLabel("INSTITUTION NAME"),
+        _buildLabel("LEGAL INSTITUTION NAME"),
         _buildTextField(_nameController, "e.g. Hope Medical Center"),
+        const SizedBox(height: 24),
+        StreamBuilder<List<Map<String, dynamic>>>(
+          stream: repo.listSectors(),
+          builder: (context, snapshot) {
+            return MultiSelectChipGroup(
+              label: "Primary Care Sectors",
+              options: snapshot.data ?? [],
+              initialSelectedIds: _selectedSectorIds,
+              onChanged: (ids) => setState(() => _selectedSectorIds = ids),
+            );
+          },
+        ),
         const SizedBox(height: 24),
         _buildLabel("INSTITUTION CATEGORY"),
         _buildCategoryDropdown(),
@@ -117,8 +133,13 @@ class _InstitutionWizardState extends State<InstitutionWizard> {
         _buildLabel("REGISTRATION NUMBER / ID"),
         _buildTextField(_registrationController, "Official identifier"),
         const SizedBox(height: 24),
-        _buildLabel("MISSION DESCRIPTION (EN)"),
-        _buildTextField(_bioController, "Describe your institutional services...", maxLines: 3),
+        BilingualTextField(
+          controllerEn: _bioController,
+          controllerAr: _bioArController,
+          labelEn: "Mission Description",
+          labelAr: "وصف المهمة",
+          maxLines: 4,
+        ),
       ],
     );
   }
@@ -136,7 +157,7 @@ class _InstitutionWizardState extends State<InstitutionWizard> {
         Text("LEGAL VERIFICATION", style: GoogleFonts.cinzel(color: EspyTheme.cyan, fontWeight: FontWeight.w900, fontSize: 14)),
         const SizedBox(height: 16),
         DocumentPicker(label: 'Upload Registration Docs', onDocumentSelected: (f, b, n) {}),
-        const SizedBox(height: 24),
+        const SizedBox(height: 32),
         _buildLabel("OFFICIAL WHATSAPP"),
         Row(
           children: [
@@ -145,9 +166,13 @@ class _InstitutionWizardState extends State<InstitutionWizard> {
             Expanded(child: _buildTextField(_whatsappNumberController, "Number", kType: TextInputType.phone)),
           ],
         ),
-        const SizedBox(height: 24),
-        _buildLabel("PRIMARY FACILITY LOCATION"),
-        _buildLocationPicker(l10n),
+        const SizedBox(height: 32),
+        _buildLabel("PRIMARY FACILITY ANCHOR"),
+        HierarchicalLocationPicker(
+          onCitySelected: (city) {
+            setState(() => _mainLocation = city);
+          },
+        ),
       ],
     );
   }
@@ -208,19 +233,6 @@ class _InstitutionWizardState extends State<InstitutionWizard> {
     );
   }
 
-  Widget _buildLocationPicker(AppLocalizations l10n) {
-    return PremiumCard(padding: const EdgeInsets.all(12), child: ListTile(
-      leading: const Icon(Icons.location_on, color: EspyTheme.gold),
-      title: Text(_mainLocation?['cityName'] ?? "No Pin Dropped", style: GoogleFonts.lora(fontSize: 13, fontWeight: FontWeight.bold)),
-      trailing: TextButton(onPressed: () => _openMainLocationPicker(l10n), child: const Text("SET HUB")),
-    ));
-  }
-
-  Future<void> _openMainLocationPicker(AppLocalizations l10n) async {
-    final result = await showModalBottomSheet(context: context, isScrollControlled: true, backgroundColor: Colors.transparent, builder: (_) => LocationPickerModal(title: l10n.setMainNode));
-    if (result != null) setState(() => _mainLocation = result);
-  }
-
   Widget _buildBottomNav(AppLocalizations l10n, RegistrationViewModel viewModel) {
     return Container(padding: const EdgeInsets.all(32), decoration: const BoxDecoration(color: EspyTheme.navyDeep), child: Row(children: [
       if (viewModel.currentPhase > 0) ...[
@@ -240,7 +252,7 @@ class _InstitutionWizardState extends State<InstitutionWizard> {
               bioAr: _bioArController.text,
               specialty: _registrationController.text.trim(), // Using as reg number
               specialtyAr: '', 
-              sectorId: "institution", // Default for inst
+              sectorId: _selectedSectorIds.isNotEmpty ? _selectedSectorIds.first : "institution", 
               categoryId: _selectedCategoryId!,
               whatsapp: '${_whatsappCodeController.text}${_whatsappNumberController.text}',
               profileImage: _profileImageFile,

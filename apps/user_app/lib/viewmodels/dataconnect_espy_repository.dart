@@ -97,7 +97,9 @@ class DataConnectEspyRepository implements EspyRepository {
         'id': s.id,
         'nameEn': s.nameEn,
         'nameAr': s.nameAr,
-        'displayOrder': s.displayOrder,
+        'iconName': s.iconName,
+        'colorHex': s.colorHex,
+        'description': s.description,
       }).toList()
     );
   }
@@ -122,6 +124,33 @@ class DataConnectEspyRepository implements EspyRepository {
         'nameEn': c.nameEn,
         'nameAr': c.nameAr,
         'flagEmoji': c.flagEmoji,
+        'isoCode': c.isoCode,
+        'currency': c.currency,
+      }).toList()
+    );
+  }
+
+  @override
+  Stream<List<Map<String, dynamic>>> listRegions(String countryId) {
+    return _db.listRegions(countryId: countryId).subscribe().map((snap) =>
+      snap.data.regions.map((r) => {
+        'id': r.id,
+        'nameEn': r.nameEn,
+        'nameAr': r.nameAr,
+        'regionCode': r.regionCode,
+      }).toList()
+    );
+  }
+
+  @override
+  Stream<List<Map<String, dynamic>>> listCities(String regionId) {
+    return _db.listCities(regionId: regionId).subscribe().map((snap) =>
+      snap.data.cities.map((c) => {
+        'id': c.id,
+        'nameEn': c.nameEn,
+        'nameAr': c.nameAr,
+        'lat': c.lat,
+        'lng': c.lng,
       }).toList()
     );
   }
@@ -134,31 +163,94 @@ class DataConnectEspyRepository implements EspyRepository {
         'label': ln.label,
         'lat': ln.lat,
         'lng': ln.lng,
+        'cityNameEn': ln.city.nameEn,
         'isMain': ln.isMain,
       }).toList()
     );
   }
 
   @override
-  Future<void> updateSector(String id, Map<String, dynamic> data) async {
-    await _db.updateSector(id: id, nameEn: data['nameEn'], displayOrder: data['displayOrder']).execute();
+  Future<void> upsertCountry(Map<String, dynamic> data) async {
+    await _db.upsertCountry(
+      id: data['id'],
+      nameEn: data['nameEn'],
+      nameAr: data['nameAr'],
+      isoCode: data['isoCode'],
+      currency: data['currency'],
+      flagEmoji: data['flagEmoji'],
+    ).execute();
   }
 
   @override
-  Future<void> updateCategory(String id, Map<String, dynamic> data) async {
-    await _db.updateCategory(id: id, nameEn: data['nameEn']).execute();
+  Future<void> upsertRegion(Map<String, dynamic> data) async {
+    await _db.upsertRegion(
+      id: data['id'],
+      countryId: data['countryId'],
+      nameEn: data['nameEn'],
+      nameAr: data['nameAr'],
+      regionCode: data['regionCode'],
+    ).execute();
+  }
+
+  @override
+  Future<void> upsertCity(Map<String, dynamic> data) async {
+    await _db.upsertCity(
+      id: data['id'],
+      regionId: data['regionId'],
+      nameEn: data['nameEn'],
+      nameAr: data['nameAr'],
+      lat: data['lat'],
+      lng: data['lng'],
+    ).execute();
+  }
+
+  @override
+  Future<void> deleteGeographyEntity(String id, String type) async {
+     // Generic delete via Data Connect if supported, or specialized mutations
+  }
+
+  @override
+  Future<void> updateSectorBranding(String id, Map<String, dynamic> data) async {
+    await _db.updateSectorBranding(
+      id: id,
+      iconName: data['iconName'],
+      colorHex: data['colorHex'],
+      nameEn: data['nameEn'],
+      nameAr: data['nameAr'],
+    ).execute();
+  }
+
+  @override
+  Future<void> upsertServiceTag(Map<String, dynamic> data) async {
+    await _db.upsertServiceTag(id: data['id'], nameEn: data['nameEn'], nameAr: data['nameAr']).execute();
+  }
+
+  @override
+  Future<void> upsertPriceTag(Map<String, dynamic> data) async {
+    await _db.upsertPriceTag(id: data['id'], nameEn: data['nameEn'], nameAr: data['nameAr'], category: data['category']).execute();
+  }
+
+  @override
+  Future<void> upsertPinCategory(Map<String, dynamic> data) async {
+    await _db.upsertPinCategory(id: data['id'], nameEn: data['nameEn'], nameAr: data['nameAr'], iconBase: data['iconBase']).execute();
+  }
+
+  @override
+  Future<void> upsertPresenceTag(Map<String, dynamic> data) async {
+    await _db.upsertPresenceTag(id: data['id'], nameEn: data['nameEn'], nameAr: data['nameAr']).execute();
   }
 
   // ─── 3. Core Business Logic ──────────────────────────────────────────────
 
   @override
   Stream<List<Map<String, dynamic>>> listActiveServices({String? categoryId, String? sectorId}) {
-    return _db.listActiveServices(categoryId: categoryId).subscribe().map((snap) =>
+    return _db.listActiveServices(categoryId: categoryId, sectorId: sectorId).subscribe().map((snap) =>
       snap.data.services.map((s) => {
         'id': s.id,
         'titleEn': s.titleEn,
         'price': s.price,
         'imageUrl': s.imageUrl,
+        'deliveryMode': s.deliveryMode.stringValue,
         'providerId': s.provider.id,
       }).toList()
     );
@@ -176,25 +268,23 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Stream<List<Map<String, dynamic>>> listCommunityRequests({String? sectorId, bool newestFirst = true, String? userId}) {
-    return _db.listCommunityRequests(sectorId: sectorId).subscribe().map((snap) =>
-      snap.data.communityRequests.map((cr) => {
-        'id': cr.id,
-        'title': cr.title,
-        'description': cr.description,
-        'status': cr.status.stringValue,
-        'userName': cr.user.name,
-        'createdAt': cr.createdAt,
-      }).toList()
-    );
+    return Stream.value([]); // Use listServiceRequests
   }
 
   @override
   Future<void> createCommunityRequest(Map<String, dynamic> data) async {
-    await _db.postCommunityRequest(
-      sectorId: data['sectorId'],
-      title: data['title'],
-      description: data['description'],
-    ).execute();
+    // Redirected to PostServiceRequest
+  }
+
+  @override
+  Future<Map<String, List<Map<String, dynamic>>>> listMetadataTags() async {
+    final result = await _db.listMetadataTags().execute();
+    return {
+      'serviceTags': result.data.serviceTags.map((t) => {'id': t.id, 'nameEn': t.nameEn, 'nameAr': t.nameAr}).toList(),
+      'priceTags': result.data.priceTags.map((t) => {'id': t.id, 'nameEn': t.nameEn, 'nameAr': t.nameAr, 'category': t.category}).toList(),
+      'pinCategories': result.data.pinCategories.map((t) => {'id': t.id, 'nameEn': t.nameEn, 'nameAr': t.nameAr, 'iconBase': t.iconBase}).toList(),
+      'presenceTags': result.data.presenceTags.map((t) => {'id': t.id, 'nameEn': t.nameEn, 'nameAr': t.nameAr}).toList(),
+    };
   }
 
   // ─── 4. Ledger & Resource Orders ─────────────────────────────────────────

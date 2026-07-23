@@ -24,7 +24,7 @@ part 'update_resource_order.dart';
 
 part 'spend_tokens.dart';
 
-part 'post_community_request.dart';
+part 'post_service_request.dart';
 
 part 'record_interaction.dart';
 
@@ -36,17 +36,23 @@ part 'verify_user_professional.dart';
 
 part 'verify_user_institution.dart';
 
+part 'upsert_country.dart';
+
+part 'upsert_region.dart';
+
+part 'upsert_city.dart';
+
+part 'update_sector_branding.dart';
+
+part 'upsert_service_tag.dart';
+
+part 'upsert_price_tag.dart';
+
+part 'upsert_pin_category.dart';
+
+part 'upsert_presence_tag.dart';
+
 part 'create_recharge_card.dart';
-
-part 'update_sector.dart';
-
-part 'update_category.dart';
-
-part 'approve_professional.dart';
-
-part 'validate_profile.dart';
-
-part 'validate_institution_profile.dart';
 
 part 'approve_resource_order.dart';
 
@@ -60,6 +66,12 @@ part 'list_sectors.dart';
 
 part 'list_categories.dart';
 
+part 'list_regions.dart';
+
+part 'list_cities.dart';
+
+part 'list_metadata_tags.dart';
+
 part 'list_active_services.dart';
 
 part 'search_services.dart';
@@ -72,7 +84,7 @@ part 'list_favorite_ids.dart';
 
 part 'list_contacted_ids.dart';
 
-part 'list_community_requests.dart';
+part 'list_service_requests.dart';
 
 part 'get_wallet_transactions.dart';
 
@@ -121,6 +133,37 @@ part 'list_support_tickets.dart';
       
       case 'PENDING':
         return const Known(CommunityRequestStatus.PENDING);
+      
+      default:
+        return Unknown(data);
+    }
+  }
+  
+
+  enum DeliveryMode {
+    
+      ONLINE,
+    
+      FACE_TO_FACE,
+    
+      FIELD,
+    
+  }
+  
+  String deliveryModeSerializer(EnumValue<DeliveryMode> e) {
+    return e.stringValue;
+  }
+  EnumValue<DeliveryMode> deliveryModeDeserializer(dynamic data) {
+    switch (data) {
+      
+      case 'ONLINE':
+        return const Known(DeliveryMode.ONLINE);
+      
+      case 'FACE_TO_FACE':
+        return const Known(DeliveryMode.FACE_TO_FACE);
+      
+      case 'FIELD':
+        return const Known(DeliveryMode.FIELD);
       
       default:
         return Unknown(data);
@@ -308,6 +351,42 @@ part 'list_support_tickets.dart';
   }
   
 
+  enum UrgencyLevel {
+    
+      LOW,
+    
+      MEDIUM,
+    
+      HIGH,
+    
+      EMERGENCY,
+    
+  }
+  
+  String urgencyLevelSerializer(EnumValue<UrgencyLevel> e) {
+    return e.stringValue;
+  }
+  EnumValue<UrgencyLevel> urgencyLevelDeserializer(dynamic data) {
+    switch (data) {
+      
+      case 'LOW':
+        return const Known(UrgencyLevel.LOW);
+      
+      case 'MEDIUM':
+        return const Known(UrgencyLevel.MEDIUM);
+      
+      case 'HIGH':
+        return const Known(UrgencyLevel.HIGH);
+      
+      case 'EMERGENCY':
+        return const Known(UrgencyLevel.EMERGENCY);
+      
+      default:
+        return Unknown(data);
+    }
+  }
+  
+
   enum UserRole {
     
       VISITOR,
@@ -423,8 +502,8 @@ class EspyConnector {
   }
   
   
-  CreateServiceVariablesBuilder createService ({required String categoryId, required String titleEn, required int price, }) {
-    return CreateServiceVariablesBuilder(dataConnect, categoryId: categoryId,titleEn: titleEn,price: price,);
+  CreateServiceVariablesBuilder createService ({required String categoryId, required String sectorId, required String titleEn, required int price, }) {
+    return CreateServiceVariablesBuilder(dataConnect, categoryId: categoryId,sectorId: sectorId,titleEn: titleEn,price: price,);
   }
   
   
@@ -433,8 +512,8 @@ class EspyConnector {
   }
   
   
-  CreateLocationNodeVariablesBuilder createLocationNode ({required String countryId, required String label, required double lat, required double lng, required bool isMain, }) {
-    return CreateLocationNodeVariablesBuilder(dataConnect, countryId: countryId,label: label,lat: lat,lng: lng,isMain: isMain,);
+  CreateLocationNodeVariablesBuilder createLocationNode ({required String cityId, required String label, required double lat, required double lng, required bool isMain, }) {
+    return CreateLocationNodeVariablesBuilder(dataConnect, cityId: cityId,label: label,lat: lat,lng: lng,isMain: isMain,);
   }
   
   
@@ -453,8 +532,8 @@ class EspyConnector {
   }
   
   
-  PostCommunityRequestVariablesBuilder postCommunityRequest ({required String sectorId, required String title, required String description, }) {
-    return PostCommunityRequestVariablesBuilder(dataConnect, sectorId: sectorId,title: title,description: description,);
+  PostServiceRequestVariablesBuilder postServiceRequest ({required String sectorId, required String descriptionEn, }) {
+    return PostServiceRequestVariablesBuilder(dataConnect, sectorId: sectorId,descriptionEn: descriptionEn,);
   }
   
   
@@ -483,33 +562,48 @@ class EspyConnector {
   }
   
   
+  UpsertCountryVariablesBuilder upsertCountry ({required String id, required String nameEn, required String nameAr, }) {
+    return UpsertCountryVariablesBuilder(dataConnect, id: id,nameEn: nameEn,nameAr: nameAr,);
+  }
+  
+  
+  UpsertRegionVariablesBuilder upsertRegion ({required String id, required String countryId, required String nameEn, required String nameAr, }) {
+    return UpsertRegionVariablesBuilder(dataConnect, id: id,countryId: countryId,nameEn: nameEn,nameAr: nameAr,);
+  }
+  
+  
+  UpsertCityVariablesBuilder upsertCity ({required String id, required String regionId, required String nameEn, required String nameAr, }) {
+    return UpsertCityVariablesBuilder(dataConnect, id: id,regionId: regionId,nameEn: nameEn,nameAr: nameAr,);
+  }
+  
+  
+  UpdateSectorBrandingVariablesBuilder updateSectorBranding ({required String id, }) {
+    return UpdateSectorBrandingVariablesBuilder(dataConnect, id: id,);
+  }
+  
+  
+  UpsertServiceTagVariablesBuilder upsertServiceTag ({required String id, required String nameEn, required String nameAr, }) {
+    return UpsertServiceTagVariablesBuilder(dataConnect, id: id,nameEn: nameEn,nameAr: nameAr,);
+  }
+  
+  
+  UpsertPriceTagVariablesBuilder upsertPriceTag ({required String id, required String nameEn, required String nameAr, }) {
+    return UpsertPriceTagVariablesBuilder(dataConnect, id: id,nameEn: nameEn,nameAr: nameAr,);
+  }
+  
+  
+  UpsertPinCategoryVariablesBuilder upsertPinCategory ({required String id, required String nameEn, required String nameAr, }) {
+    return UpsertPinCategoryVariablesBuilder(dataConnect, id: id,nameEn: nameEn,nameAr: nameAr,);
+  }
+  
+  
+  UpsertPresenceTagVariablesBuilder upsertPresenceTag ({required String id, required String nameEn, required String nameAr, }) {
+    return UpsertPresenceTagVariablesBuilder(dataConnect, id: id,nameEn: nameEn,nameAr: nameAr,);
+  }
+  
+  
   CreateRechargeCardVariablesBuilder createRechargeCard ({required String code, required int value, required int pins, required int slots, }) {
     return CreateRechargeCardVariablesBuilder(dataConnect, code: code,value: value,pins: pins,slots: slots,);
-  }
-  
-  
-  UpdateSectorVariablesBuilder updateSector ({required String id, }) {
-    return UpdateSectorVariablesBuilder(dataConnect, id: id,);
-  }
-  
-  
-  UpdateCategoryVariablesBuilder updateCategory ({required String id, }) {
-    return UpdateCategoryVariablesBuilder(dataConnect, id: id,);
-  }
-  
-  
-  ApproveProfessionalVariablesBuilder approveProfessional ({required String id, required bool isApproved, }) {
-    return ApproveProfessionalVariablesBuilder(dataConnect, id: id,isApproved: isApproved,);
-  }
-  
-  
-  ValidateProfileVariablesBuilder validateProfile ({required String id, }) {
-    return ValidateProfileVariablesBuilder(dataConnect, id: id,);
-  }
-  
-  
-  ValidateInstitutionProfileVariablesBuilder validateInstitutionProfile ({required String id, }) {
-    return ValidateInstitutionProfileVariablesBuilder(dataConnect, id: id,);
   }
   
   
@@ -543,6 +637,21 @@ class EspyConnector {
   }
   
   
+  ListRegionsVariablesBuilder listRegions ({required String countryId, }) {
+    return ListRegionsVariablesBuilder(dataConnect, countryId: countryId,);
+  }
+  
+  
+  ListCitiesVariablesBuilder listCities ({required String regionId, }) {
+    return ListCitiesVariablesBuilder(dataConnect, regionId: regionId,);
+  }
+  
+  
+  ListMetadataTagsVariablesBuilder listMetadataTags () {
+    return ListMetadataTagsVariablesBuilder(dataConnect, );
+  }
+  
+  
   ListActiveServicesVariablesBuilder listActiveServices () {
     return ListActiveServicesVariablesBuilder(dataConnect, );
   }
@@ -573,8 +682,8 @@ class EspyConnector {
   }
   
   
-  ListCommunityRequestsVariablesBuilder listCommunityRequests () {
-    return ListCommunityRequestsVariablesBuilder(dataConnect, );
+  ListServiceRequestsVariablesBuilder listServiceRequests () {
+    return ListServiceRequestsVariablesBuilder(dataConnect, );
   }
   
   

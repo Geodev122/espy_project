@@ -1,4 +1,4 @@
-# ESPY PROTOCOL - DATA CONNECT MUTATIONS v6.2
+# ESPY PROTOCOL - DATA CONNECT MUTATIONS v7.0
 
 # --- 1. Identity & Profile ---
 
@@ -57,12 +57,14 @@ mutation UpsertInstitutionProfile(
 
 # --- 2. Service & Discovery ---
 
-mutation CreateService($categoryId: String!, $titleEn: String!, $price: Int!) @auth(level: USER) {
+mutation CreateService($categoryId: String!, $sectorId: String!, $titleEn: String!, $price: Int!, $priceTagId: String) @auth(level: USER) {
   service_insert(data: {
     providerId_expr: "auth.uid",
     categoryId: $categoryId,
+    sectorId: $sectorId,
     titleEn: $titleEn,
-    price: $price
+    price: $price,
+    priceTagId: $priceTagId
   })
 }
 
@@ -76,10 +78,10 @@ mutation UpdateService($id: UUID!, $isActive: Boolean, $isAllocated: Boolean) @a
   )
 }
 
-mutation CreateLocationNode($countryId: String!, $label: String!, $lat: Float!, $lng: Float!, $isMain: Boolean!) @auth(level: USER) {
+mutation CreateLocationNode($cityId: UUID!, $label: String!, $lat: Float!, $lng: Float!, $isMain: Boolean!) @auth(level: USER) {
   locationNode_insert(data: {
     userId_expr: "auth.uid",
-    countryId: $countryId,
+    cityId: $cityId,
     label: $label,
     lat: $lat,
     lng: $lng,
@@ -129,12 +131,13 @@ mutation SpendTokens($userId: String!, $cost: Int!, $ledgerAmount: Int!, $type: 
 
 # --- 4. Community & Interaction ---
 
-mutation PostCommunityRequest($sectorId: String!, $title: String!, $description: String!) @auth(level: USER) {
-  communityRequest_insert(data: {
+mutation PostServiceRequest($sectorId: String!, $descriptionEn: String!, $urgency: UrgencyLevel, $preferredMode: DeliveryMode) @auth(level: USER) {
+  serviceRequest_insert(data: {
     userId_expr: "auth.uid",
     sectorId: $sectorId,
-    title: $title,
-    description: $description
+    descriptionEn: $descriptionEn,
+    urgency: $urgency,
+    preferredMode: $preferredMode
   })
 }
 
@@ -178,42 +181,45 @@ mutation VerifyUserInstitution($id: String!, $isApproved: Boolean!) @auth(level:
   })
 }
 
+# --- 5. Administration & Taxonomy ---
+
+mutation UpsertCountry($id: String!, $nameEn: String!, $nameAr: String!, $isoCode: String, $currency: String, $flagEmoji: String) @auth(level: NO_ACCESS) {
+  country_upsert(data: { id: $id, nameEn: $nameEn, nameAr: $nameAr, isoCode: $isoCode, currency: $currency, flagEmoji: $flagEmoji })
+}
+
+mutation UpsertRegion($id: UUID!, $countryId: String!, $nameEn: String!, $nameAr: String!, $regionCode: String) @auth(level: NO_ACCESS) {
+  region_upsert(data: { id: $id, countryId: $countryId, nameEn: $nameEn, nameAr: $nameAr, regionCode: $regionCode })
+}
+
+mutation UpsertCity($id: UUID!, $regionId: UUID!, $nameEn: String!, $nameAr: String!, $lat: Float, $lng: Float) @auth(level: NO_ACCESS) {
+  city_upsert(data: { id: $id, regionId: $regionId, nameEn: $nameEn, nameAr: $nameAr, lat: $lat, lng: $lng })
+}
+
+mutation UpdateSectorBranding($id: String!, $iconName: String, $colorHex: String, $nameEn: String, $nameAr: String) @auth(level: NO_ACCESS) {
+  sector_update(key: { id: $id }, data: { iconName: $iconName, colorHex: $colorHex, nameEn: $nameEn, nameAr: $nameAr })
+}
+
+mutation UpsertServiceTag($id: String!, $nameEn: String!, $nameAr: String!) @auth(level: NO_ACCESS) {
+  serviceTag_upsert(data: { id: $id, nameEn: $nameEn, nameAr: $nameAr })
+}
+
+mutation UpsertPriceTag($id: String!, $nameEn: String!, $nameAr: String!, $category: String) @auth(level: NO_ACCESS) {
+  priceTag_upsert(data: { id: $id, nameEn: $nameEn, nameAr: $nameAr, category: $category })
+}
+
+mutation UpsertPinCategory($id: String!, $nameEn: String!, $nameAr: String!, $iconBase: String) @auth(level: NO_ACCESS) {
+  pinCategory_upsert(data: { id: $id, nameEn: $nameEn, nameAr: $nameAr, iconBase: $iconBase })
+}
+
+mutation UpsertPresenceTag($id: String!, $nameEn: String!, $nameAr: String!) @auth(level: NO_ACCESS) {
+  presenceTag_upsert(data: { id: $id, nameEn: $nameEn, nameAr: $nameAr })
+}
+
 mutation CreateRechargeCard($code: String!, $value: Int!, $pins: Int!, $slots: Int!) @auth(level: NO_ACCESS) {
   rechargeCard_insert(data: {
     id: $code,
     tokenValue: $value,
     status: "active"
-  })
-}
-
-mutation UpdateSector($id: String!, $nameEn: String, $displayOrder: Int) @auth(level: NO_ACCESS) {
-  sector_update(key: { id: $id }, data: {
-    nameEn: $nameEn,
-    displayOrder: $displayOrder
-  })
-}
-
-mutation UpdateCategory($id: String!, $nameEn: String) @auth(level: NO_ACCESS) {
-  category_update(key: { id: $id }, data: {
-    nameEn: $nameEn
-  })
-}
-
-mutation ApproveProfessional($id: String!, $isApproved: Boolean!) @auth(level: NO_ACCESS) {
-  professionalProfile_update(key: { id: $id }, data: {
-    isApproved: $isApproved
-  })
-}
-
-mutation ValidateProfile($id: String!) @auth(level: NO_ACCESS) {
-  professionalProfile_update(key: { id: $id }, data: {
-    isProfileValidated: true
-  })
-}
-
-mutation ValidateInstitutionProfile($id: String!) @auth(level: NO_ACCESS) {
-  institutionProfile_update(key: { id: $id }, data: {
-    isProfileValidated: true
   })
 }
 

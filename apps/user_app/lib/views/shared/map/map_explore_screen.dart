@@ -16,6 +16,7 @@ import 'package:espy_app/viewmodels/auth_service.dart';
 import 'package:espy_app/viewmodels/sound_service.dart';
 import 'package:espy_app/viewmodels/directory_view_model.dart';
 import 'package:espy_app/models/user_model.dart';
+import 'package:espy_app/widgets/common/espy_icon.dart';
 import 'package:espy_app/widgets/common/premium_button.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';
 
@@ -79,8 +80,12 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
           
       if (expiry.isBefore(now)) continue;
 
-      final role = p['role'] ?? 'professional';
-      final color = role == 'professional' ? EspyTheme.electricBlue : EspyTheme.gold;
+      final role = p['role']?.toString().toLowerCase() ?? 'professional';
+      final Color roleColor = role == 'institution' ? EspyTheme.gold : EspyTheme.royalBlue;
+
+      // Extract sector branding if available
+      final String iconName = p['sector']?['iconName'] ?? (role == 'institution' ? 'hospital' : 'person');
+      final Color sectorColor = Color(int.tryParse(p['sector']?['colorHex'] ?? '') ?? roleColor.value);
 
       final mainLoc = p['mainLocation'] as Map<String, dynamic>?;
       if (mainLoc != null && mainLoc['lat'] != null) {
@@ -88,7 +93,7 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
           Marker(
             point: LatLng(mainLoc['lat'], mainLoc['lng']),
             width: 80, height: 80,
-            child: _buildProtocolMarker(p, color, isAr, isMain: true),
+            child: _buildProtocolMarker(p, roleColor, sectorColor, iconName, isAr, isMain: true),
           ),
         );
       }
@@ -100,7 +105,7 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
             Marker(
               point: LatLng(loc['lat'], loc['lng']),
               width: 80, height: 80,
-              child: _buildProtocolMarker(p, color, isAr, isMain: false, activity: loc['activity']),
+              child: _buildProtocolMarker(p, roleColor, sectorColor, iconName, isAr, isMain: false, activity: loc['activity']),
             ),
           );
         }
@@ -109,7 +114,7 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
     return newMarkers;
   }
 
-  Widget _buildProtocolMarker(Map<String, dynamic> p, Color color, bool isAr, {required bool isMain, String? activity}) {
+  Widget _buildProtocolMarker(Map<String, dynamic> p, Color roleColor, Color sectorColor, String iconName, bool isAr, {required bool isMain, String? activity}) {
     return GestureDetector(
       onTap: () {
         HapticFeedback.lightImpact();
@@ -126,8 +131,8 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
               height: isMain ? 45 : 35,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: color.withValues(alpha: 0.2),
-                border: Border.all(color: color.withValues(alpha: 0.1), width: 1),
+                color: roleColor.withValues(alpha: 0.2),
+                border: Border.all(color: roleColor.withValues(alpha: 0.1), width: 1),
               ),
             ),
           ),
@@ -135,16 +140,16 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
             width: isMain ? 28 : 22,
             height: isMain ? 28 : 22,
             decoration: BoxDecoration(
-              color: color,
+              color: sectorColor,
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.white, width: isMain ? 3 : 2),
+              border: Border.all(color: roleColor, width: isMain ? 3 : 2),
               boxShadow: [
-                BoxShadow(color: color.withValues(alpha: 0.4), blurRadius: 10, spreadRadius: 2)
+                BoxShadow(color: roleColor.withValues(alpha: 0.4), blurRadius: 10, spreadRadius: 2)
               ]
             ),
             child: Center(
-              child: Icon(
-                p['role'] == 'professional' ? Icons.person_rounded : Icons.medical_services_rounded,
+              child: EspyIcon(
+                iconName: iconName,
                 color: Colors.white,
                 size: isMain ? 14 : 10,
               ),

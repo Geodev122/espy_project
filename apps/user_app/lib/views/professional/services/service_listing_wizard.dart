@@ -8,6 +8,9 @@ import 'package:espy_app/l10n/app_localizations.dart';
 import 'package:espy_app/theme/espy_theme.dart';
 import 'package:espy_app/viewmodels/user_service.dart';
 import 'package:espy_app/viewmodels/sound_service.dart';
+import 'package:espy_app/viewmodels/espy_repository.dart';
+import 'package:espy_app/widgets/common/multi_select_chip_group.dart';
+import 'package:espy_app/widgets/common/hierarchical_location_picker.dart';
 import 'package:espy_app/widgets/common/premium_button.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';
 
@@ -30,6 +33,10 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
   final _descController = TextEditingController();
   
   String _allocationType = 'main';
+  String? _selectedPriceTagId;
+  List<String> _selectedTagIds = [];
+  String _deliveryMode = 'FACE_TO_FACE';
+  Map<String, dynamic>? _customLocation;
 
   bool _isSubmitting = false;
 
@@ -69,7 +76,7 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10),
         child: LinearProgressIndicator(
-          value: (_currentStep + 1) / 2, 
+          value: (_currentStep + 1) / 3, 
           backgroundColor: Colors.white10,
           valueColor: const AlwaysStoppedAnimation<Color>(EspyTheme.gold),
         ),
@@ -80,9 +87,75 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
   Widget _buildCurrentStep(AppLocalizations l10n) {
     switch (_currentStep) {
       case 0: return _stepIdentity(l10n);
-      case 1: return _stepAllocation(l10n);
+      case 1: return _stepMetadata(l10n);
+      case 2: return _stepAllocation(l10n);
       default: return const SizedBox();
     }
+  }
+
+  Widget _stepMetadata(AppLocalizations l10n) {
+    final repo = context.read<EspyRepository>();
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('SERVICE METADATA', style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, fontSize: 16, color: Colors.white, letterSpacing: 1.5)),
+          const SizedBox(height: 32),
+          _buildLabel("Pricing Model"),
+          _buildPriceTagDropdown(repo),
+          const SizedBox(height: 24),
+          _buildLabel("Delivery Mode"),
+          _buildDeliveryModeSelector(),
+          const SizedBox(height: 32),
+          FutureBuilder<Map<String, List<Map<String, dynamic>>>>(
+            future: repo.listMetadataTags(),
+            builder: (context, snapshot) {
+              final tags = snapshot.data?['serviceTags'] ?? [];
+              return MultiSelectChipGroup(
+                label: "Service Capabilities",
+                options: tags,
+                initialSelectedIds: _selectedTagIds,
+                onChanged: (ids) => setState(() => _selectedTagIds = ids),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPriceTagDropdown(EspyRepository repo) {
+    return FutureBuilder<Map<String, List<Map<String, dynamic>>>>(
+      future: repo.listMetadataTags(),
+      builder: (context, snapshot) {
+        final tags = snapshot.data?['priceTags'] ?? [];
+        return DropdownButtonFormField<String>(
+          value: _selectedPriceTagId,
+          items: tags.map((t) => DropdownMenuItem(value: t['id'].toString(), child: Text(t['nameEn'].toUpperCase(), style: const TextStyle(fontSize: 12)))).toList(),
+          onChanged: (v) => setState(() => _selectedPriceTagId = v),
+          dropdownColor: EspyTheme.navyDeep,
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          decoration: InputDecoration(filled: true, fillColor: Colors.white.withValues(alpha: 0.05), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)),
+        );
+      },
+    );
+  }
+
+  Widget _buildDeliveryModeSelector() {
+    return Wrap(
+      spacing: 10,
+      children: ['ONLINE', 'FACE_TO_FACE', 'FIELD'].map((mode) {
+        final bool isSelected = _deliveryMode == mode;
+        return ChoiceChip(
+          label: Text(mode.replaceAll('_', ' ')),
+          selected: isSelected,
+          onSelected: (v) => setState(() => _deliveryMode = mode),
+          selectedColor: EspyTheme.gold,
+          labelStyle: TextStyle(color: isSelected ? EspyTheme.navyDeep : Colors.white, fontWeight: FontWeight.bold, fontSize: 10),
+        );
+      }).toList(),
+    );
   }
 
   Widget _stepIdentity(AppLocalizations l10n) {
@@ -120,7 +193,7 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.bold, color: EspyTheme.gold)),
+        _buildLabel(label),
         TextField(
           controller: controller,
           maxLines: maxLines,
@@ -129,6 +202,10 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
         ),
       ],
     );
+  }
+
+  Widget _buildLabel(String text) {
+    return Text(text, style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.bold, color: EspyTheme.gold));
   }
 
   Widget _stepAllocation(AppLocalizations l10n) {
@@ -162,6 +239,13 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
             title: Text('SERVICE SLOT (MANUAL)', style: const TextStyle(color: Colors.white)),
             onChanged: (val) => setState(() => _allocationType = val!)
           ),
+          if (_allocationType == 'slot') ...[
+            const SizedBox(height: 24),
+            _buildLabel("Select Service Location"),
+            HierarchicalLocationPicker(
+              onCitySelected: (city) => setState(() => _customLocation = city),
+            ),
+          ],
         ],
       ),
     );
@@ -175,10 +259,10 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
           if (_currentStep > 0) IconButton(onPressed: () => setState(() => _currentStep--), icon: const Icon(Icons.arrow_back_ios, color: Colors.white)),
           const Spacer(),
           PremiumButton(
-            label: _currentStep == 1 ? l10n.listService : l10n.continueText,
+            label: _currentStep == 2 ? l10n.listService : l10n.continueText,
             isLoading: _isSubmitting,
             onPressed: () {
-              if (_currentStep == 0) {
+              if (_currentStep < 2) {
                 setState(() => _currentStep++);
               } else {
                 _finalizeListing(l10n);

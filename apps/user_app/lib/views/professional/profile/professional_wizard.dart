@@ -10,7 +10,8 @@ import 'package:espy_app/theme/espy_theme.dart';
 import 'package:espy_app/viewmodels/auth_service.dart';
 import 'package:espy_app/viewmodels/espy_repository.dart';
 import 'package:espy_app/viewmodels/registration_view_model.dart';
-import 'package:espy_app/widgets/common/location_picker_modal.dart';
+import 'package:espy_app/widgets/common/hierarchical_location_picker.dart';
+import 'package:espy_app/widgets/common/bilingual_text_field.dart';
 import 'package:espy_app/widgets/common/premium_button.dart';
 import 'package:espy_app/widgets/common/premium_card.dart';
 import 'package:espy_app/widgets/common/profile_image_picker.dart';
@@ -110,7 +111,7 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
           ),
         ),
         const SizedBox(height: 32),
-        _buildLabel("LEGAL NAME / CLINIC NAME"),
+        _buildLabel("LEGAL FULL NAME"),
         _buildTextField(_nameController, "e.g. Dr. Adam Smith"),
         const SizedBox(height: 24),
         _buildLabel("SECTOR & CATEGORY"),
@@ -120,13 +121,20 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
           _buildCategoryDropdown(),
         ],
         const SizedBox(height: 24),
-        _buildLabel("SPECIALIZATION (EN / AR)"),
-        _buildTextField(_specializationController, "Specialty in English"),
-        const SizedBox(height: 12),
-        _buildTextField(_specializationArController, "التخصص بالعربية", isRtl: true),
+        BilingualTextField(
+          controllerEn: _specializationController,
+          controllerAr: _specializationArController,
+          labelEn: "Professional Specialty",
+          labelAr: "التخصص المهني",
+        ),
         const SizedBox(height: 24),
-        _buildLabel("PROFESSIONAL BIO (EN)"),
-        _buildTextField(_bioController, "Tell users about your experience...", maxLines: 3),
+        BilingualTextField(
+          controllerEn: _bioController,
+          controllerAr: _bioArController,
+          labelEn: "Professional Bio",
+          labelAr: "السيرة المهنية",
+          maxLines: 4,
+        ),
       ],
     );
   }
@@ -144,7 +152,7 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
         Text("VERIFICATION", style: GoogleFonts.cinzel(color: EspyTheme.gold, fontWeight: FontWeight.w900, fontSize: 14)),
         const SizedBox(height: 16),
         DocumentPicker(label: 'Upload License/Degree', onDocumentSelected: (f, b, n) {}),
-        const SizedBox(height: 24),
+        const SizedBox(height: 32),
         _buildLabel("WHATSAPP FOR CLIENTS"),
         Row(
           children: [
@@ -153,9 +161,13 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
             Expanded(child: _buildTextField(_whatsappNumberController, "Number", kType: TextInputType.phone)),
           ],
         ),
-        const SizedBox(height: 24),
-        _buildLabel("MAIN PRACTICE HUB"),
-        _buildLocationPicker(l10n),
+        const SizedBox(height: 32),
+        _buildLabel("MAIN HUB ANCHOR"),
+        HierarchicalLocationPicker(
+          onCitySelected: (city) {
+            setState(() => _mainLocation = city);
+          },
+        ),
       ],
     );
   }
@@ -230,19 +242,6 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
         );
       },
     );
-  }
-
-  Widget _buildLocationPicker(AppLocalizations l10n) {
-    return PremiumCard(padding: const EdgeInsets.all(12), child: ListTile(
-      leading: const Icon(Icons.location_on, color: EspyTheme.gold),
-      title: Text(_mainLocation?['cityName'] ?? "No Pin Dropped", style: GoogleFonts.lora(fontSize: 13, fontWeight: FontWeight.bold)),
-      trailing: TextButton(onPressed: () => _openMainLocationPicker(l10n), child: const Text("SET PIN")),
-    ));
-  }
-
-  Future<void> _openMainLocationPicker(AppLocalizations l10n) async {
-    final result = await showModalBottomSheet(context: context, isScrollControlled: true, backgroundColor: Colors.transparent, builder: (_) => LocationPickerModal(title: l10n.setMainNode));
-    if (result != null) setState(() => _mainLocation = result);
   }
 
   Widget _buildBottomNav(AppLocalizations l10n, RegistrationViewModel vm) {

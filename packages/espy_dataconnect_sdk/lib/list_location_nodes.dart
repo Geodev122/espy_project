@@ -21,7 +21,7 @@ class ListLocationNodesVariablesBuilder {
 class ListLocationNodesLocationNodes {
   final String id;
   final String? label;
-  final String? cityName;
+  final ListLocationNodesLocationNodesCity city;
   final double lat;
   final double lng;
   final bool isMain;
@@ -29,7 +29,7 @@ class ListLocationNodesLocationNodes {
   
   id = nativeFromJson<String>(json['id']),
   label = json['label'] == null ? null : nativeFromJson<String>(json['label']),
-  cityName = json['cityName'] == null ? null : nativeFromJson<String>(json['cityName']),
+  city = ListLocationNodesLocationNodesCity.fromJson(json['city']),
   lat = nativeFromJson<double>(json['lat']),
   lng = nativeFromJson<double>(json['lng']),
   isMain = nativeFromJson<bool>(json['isMain']);
@@ -45,14 +45,14 @@ class ListLocationNodesLocationNodes {
     final ListLocationNodesLocationNodes otherTyped = other as ListLocationNodesLocationNodes;
     return id == otherTyped.id && 
     label == otherTyped.label && 
-    cityName == otherTyped.cityName && 
+    city == otherTyped.city && 
     lat == otherTyped.lat && 
     lng == otherTyped.lng && 
     isMain == otherTyped.isMain;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, label.hashCode, cityName.hashCode, lat.hashCode, lng.hashCode, isMain.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, label.hashCode, city.hashCode, lat.hashCode, lng.hashCode, isMain.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -61,9 +61,7 @@ class ListLocationNodesLocationNodes {
     if (label != null) {
       json['label'] = nativeToJson<String?>(label);
     }
-    if (cityName != null) {
-      json['cityName'] = nativeToJson<String?>(cityName);
-    }
+    json['city'] = city.toJson();
     json['lat'] = nativeToJson<double>(lat);
     json['lng'] = nativeToJson<double>(lng);
     json['isMain'] = nativeToJson<bool>(isMain);
@@ -73,10 +71,51 @@ class ListLocationNodesLocationNodes {
   ListLocationNodesLocationNodes({
     required this.id,
     this.label,
-    this.cityName,
+    required this.city,
     required this.lat,
     required this.lng,
     required this.isMain,
+  });
+}
+
+@immutable
+class ListLocationNodesLocationNodesCity {
+  final String nameEn;
+  final String? nameAr;
+  ListLocationNodesLocationNodesCity.fromJson(dynamic json):
+  
+  nameEn = nativeFromJson<String>(json['nameEn']),
+  nameAr = json['nameAr'] == null ? null : nativeFromJson<String>(json['nameAr']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final ListLocationNodesLocationNodesCity otherTyped = other as ListLocationNodesLocationNodesCity;
+    return nameEn == otherTyped.nameEn && 
+    nameAr == otherTyped.nameAr;
+    
+  }
+  @override
+  int get hashCode => Object.hashAll([nameEn.hashCode, nameAr.hashCode]);
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json['nameEn'] = nativeToJson<String>(nameEn);
+    if (nameAr != null) {
+      json['nameAr'] = nativeToJson<String?>(nameAr);
+    }
+    return json;
+  }
+
+  ListLocationNodesLocationNodesCity({
+    required this.nameEn,
+    this.nameAr,
   });
 }
 

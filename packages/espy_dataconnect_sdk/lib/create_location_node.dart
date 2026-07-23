@@ -1,14 +1,14 @@
 part of 'espy.dart';
 
 class CreateLocationNodeVariablesBuilder {
-  String countryId;
+  String cityId;
   String label;
   double lat;
   double lng;
   bool isMain;
 
   final FirebaseDataConnect _dataConnect;
-  CreateLocationNodeVariablesBuilder(this._dataConnect, {required  this.countryId,required  this.label,required  this.lat,required  this.lng,required  this.isMain,});
+  CreateLocationNodeVariablesBuilder(this._dataConnect, {required  this.cityId,required  this.label,required  this.lat,required  this.lng,required  this.isMain,});
   Deserializer<CreateLocationNodeData> dataDeserializer = (dynamic json)  => CreateLocationNodeData.fromJson(jsonDecode(json));
   Serializer<CreateLocationNodeVariables> varsSerializer = (CreateLocationNodeVariables vars) => jsonEncode(vars.toJson());
   Future<OperationResult<CreateLocationNodeData, CreateLocationNodeVariables>> execute() {
@@ -16,7 +16,7 @@ class CreateLocationNodeVariablesBuilder {
   }
 
   MutationRef<CreateLocationNodeData, CreateLocationNodeVariables> ref() {
-    CreateLocationNodeVariables vars= CreateLocationNodeVariables(countryId: countryId,label: label,lat: lat,lng: lng,isMain: isMain,);
+    CreateLocationNodeVariables vars= CreateLocationNodeVariables(cityId: cityId,label: label,lat: lat,lng: lng,isMain: isMain,);
     return _dataConnect.mutation("CreateLocationNode", dataDeserializer, varsSerializer, vars);
   }
 }
@@ -91,7 +91,7 @@ class CreateLocationNodeData {
 
 @immutable
 class CreateLocationNodeVariables {
-  final String countryId;
+  final String cityId;
   final String label;
   final double lat;
   final double lng;
@@ -99,7 +99,7 @@ class CreateLocationNodeVariables {
   @Deprecated('fromJson is deprecated for Variable classes as they are no longer required for deserialization.')
   CreateLocationNodeVariables.fromJson(Map<String, dynamic> json):
   
-  countryId = nativeFromJson<String>(json['countryId']),
+  cityId = nativeFromJson<String>(json['cityId']),
   label = nativeFromJson<String>(json['label']),
   lat = nativeFromJson<double>(json['lat']),
   lng = nativeFromJson<double>(json['lng']),
@@ -114,7 +114,7 @@ class CreateLocationNodeVariables {
     }
 
     final CreateLocationNodeVariables otherTyped = other as CreateLocationNodeVariables;
-    return countryId == otherTyped.countryId && 
+    return cityId == otherTyped.cityId && 
     label == otherTyped.label && 
     lat == otherTyped.lat && 
     lng == otherTyped.lng && 
@@ -122,12 +122,12 @@ class CreateLocationNodeVariables {
     
   }
   @override
-  int get hashCode => Object.hashAll([countryId.hashCode, label.hashCode, lat.hashCode, lng.hashCode, isMain.hashCode]);
+  int get hashCode => Object.hashAll([cityId.hashCode, label.hashCode, lat.hashCode, lng.hashCode, isMain.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
-    json['countryId'] = nativeToJson<String>(countryId);
+    json['cityId'] = nativeToJson<String>(cityId);
     json['label'] = nativeToJson<String>(label);
     json['lat'] = nativeToJson<double>(lat);
     json['lng'] = nativeToJson<double>(lng);
@@ -136,7 +136,7 @@ class CreateLocationNodeVariables {
   }
 
   CreateLocationNodeVariables({
-    required this.countryId,
+    required this.cityId,
     required this.label,
     required this.lat,
     required this.lng,
