@@ -1,13 +1,14 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../theme/espy_theme.dart';
 import '../../../viewmodels/espy_repository.dart';
 import '../../../viewmodels/user_manager_view_model.dart';
 import '../../../widgets/common/premium_card.dart';
 import '../../../widgets/common/espy_scaffold.dart';
+import '../../../widgets/common/espy_filter_bar.dart';
+import '../../../widgets/common/espy_status_badge.dart';
 import 'user_profile_detail_screen.dart';
 
 class UsersManagerScreen extends StatelessWidget {
@@ -30,18 +31,26 @@ class _UsersManagerView extends StatefulWidget {
 }
 
 class _UsersManagerViewState extends State<_UsersManagerView> {
-  String _searchQuery = "";
+  final _searchController = TextEditingController();
+  Timer? _debounce;
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String query, UserManagerViewModel vm) {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      vm.updateSearchQuery(query);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<UserManagerViewModel>(context);
-
-    final filteredUsers = viewModel.users.where((u) {
-      final query = _searchQuery.toLowerCase();
-      return u['name']?.toString().toLowerCase().contains(query) == true ||
-             u['email']?.toString().toLowerCase().contains(query) == true ||
-             u['id']?.toString().toLowerCase().contains(query) == true;
-    }).toList();
 
     return EspyScaffold(
       useCinematicBackground: false,
@@ -52,30 +61,34 @@ class _UsersManagerViewState extends State<_UsersManagerView> {
       ),
       body: Column(
         children: [
-          _buildSearchHeader(),
+          _buildSearchHeader(viewModel),
+          _buildFilterBar(viewModel),
           Expanded(
             child: viewModel.isLoading
                 ? const Center(child: CircularProgressIndicator())
-                : ListView.builder(
-                    padding: const EdgeInsets.all(24),
-                    itemCount: filteredUsers.length,
-                    itemBuilder: (context, index) {
-                      final user = filteredUsers[index];
-                      return _buildUserTile(context, user);
-                    },
-                  ),
+                : viewModel.users.isEmpty 
+                    ? _buildEmptyState()
+                    : ListView.builder(
+                        padding: const EdgeInsets.all(24),
+                        itemCount: viewModel.users.length,
+                        itemBuilder: (context, index) {
+                          final user = viewModel.users[index];
+                          return _buildUserTile(context, user);
+                        },
+                      ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSearchHeader() {
+  Widget _buildSearchHeader(UserManagerViewModel vm) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
       color: Colors.white,
       child: TextField(
-        onChanged: (v) => setState(() => _searchQuery = v),
+        controller: _searchController,
+        onChanged: (q) => _onSearchChanged(q, vm),
         decoration: InputDecoration(
           hintText: "SEARCH ID, NAME OR EMAIL...",
           prefixIcon: const Icon(Icons.search_rounded),
@@ -87,25 +100,44 @@ class _UsersManagerViewState extends State<_UsersManagerView> {
     );
   }
 
+  Widget _buildFilterBar(UserManagerViewModel vm) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
+      color: Colors.white,
+      child: Column(
+        children: [
+          EspyFilterBar(
+            label: "ROLE",
+            options: const ["visitor", "professional", "institution"],
+            selectedOption: vm.filterRole,
+            onSelected: (role) => vm.updateFilters(role: role),
+          ),
+          const SizedBox(height: 16),
+          EspyFilterBar(
+            label: "STATUS",
+            options: const ["PENDING", "ACTIVE", "VERIFIED", "SUSPENDED"],
+            selectedOption: vm.filterStatus,
+            onSelected: (status) => vm.updateFilters(status: status),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.person_search_rounded, size: 64, color: Colors.black12),
+          const SizedBox(height: 16),
+          Text("NO USERS MATCHING CRITERIA", style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, color: Colors.black26, fontSize: 12)),
+        ],
+      ),
+    );
+  }
+
   Widget _buildUserTile(BuildContext context, Map<String, dynamic> user) {
-    final bool isSuspended = user['isActive'] == false;
-    final bool isVerified = user['isApproved'] == true;
-    final bool isPending = user['hasProfile'] == false;
-    
-    String status = "ACTIVE";
-    Color statusColor = EspyTheme.success;
-
-    if (isSuspended) {
-      status = "SUSPENDED";
-      statusColor = Colors.redAccent;
-    } else if (isVerified) {
-      status = "VERIFIED";
-      statusColor = EspyTheme.royalBlue;
-    } else if (isPending) {
-      status = "PENDING";
-      statusColor = EspyTheme.gold;
-    }
-
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       child: PremiumCard(
@@ -125,7 +157,11 @@ class _UsersManagerViewState extends State<_UsersManagerView> {
                       children: [
                         _tag(user['role']?.toString().toUpperCase() ?? 'VISITOR', EspyTheme.navyDeep),
                         const SizedBox(width: 8),
-                        _tag(status, statusColor),
+                        EspyStatusBadge.fromFlags(
+                          hasProfile: user['hasProfile'] == true,
+                          isActive: user['isActive'] != false,
+                          isApproved: user['isApproved'] == true,
+                        ),
                       ],
                     ),
                   ],
@@ -142,7 +178,7 @@ class _UsersManagerViewState extends State<_UsersManagerView> {
   Widget _tag(String label, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
       child: Text(label, style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: color)),
     );
   }

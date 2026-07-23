@@ -61,6 +61,7 @@ type User @table(key: "id") {
   role: UserRole! @default(value: VISITOR)
   isActive: Boolean! @default(value: true)
   hasProfile: Boolean! @default(value: false) # Tracks wizard completion
+  adminNotes: String # For internal administrative use
   walletBalance: Int! @default(value: 0)
   tokensUsed: Int! @default(value: 0)
   photoUrl: String

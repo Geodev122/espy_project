@@ -39,9 +39,6 @@ abstract class EspyRepository {
   Stream<List<String>> listFavoriteIds(String userId);
   Stream<List<String>> listContactedIds(String userId);
 
-  Future<void> upsertProfessionalProfile({required String id, String? fullNameAr, String? specialty, String? specialtyAr, String? bioEn, String? bioAr});
-  Future<void> upsertInstitutionProfile({required String id, String? nameAr, String? bioEn, String? bioAr, String? registrationNumber});
-
   // --- Resource Orders ---
   Future<void> createResourceOrder({required String userId, required int pins, required int slots, required int broadcasts, required int total});
   Future<void> updateResourceOrder({required String id, required int pins, required int slots, required int broadcasts, required int total});
@@ -52,8 +49,8 @@ abstract class EspyRepository {
   Stream<List<Map<String, dynamic>>> listRechargeCards();
 
   // ─── 5. Admin Operations ─────────────────────────────────────────────────
-  Stream<List<Map<String, dynamic>>> listAllUsers();
-  Future<Map<String, dynamic>> getUserDetails(String id);
+  Stream<List<Map<String, dynamic>>> searchUsersAdmin({String? query, String? role, bool? hasProfile, bool? isActive});
+  Future<Map<String, dynamic>> getAuditDetails(String id);
   Future<void> adminUpdateUser(String id, Map<String, dynamic> data);
   Future<void> toggleUserActiveStatus(String id, bool isActive);
   Future<void> verifyUserDocs(String id, String role, bool isApproved);

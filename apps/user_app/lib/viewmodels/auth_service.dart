@@ -20,10 +20,12 @@ class AuthService extends ChangeNotifier {
   User? _user;
   UserModel? _userData;
   bool _isLoading = true;
+  bool _isProvisioning = false;
 
   User? get user => _user;
   UserModel? get userData => _userData;
   bool get isLoading => _isLoading;
+  bool get isProvisioning => _isProvisioning;
 
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 

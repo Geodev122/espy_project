@@ -130,13 +130,15 @@ mutation RecordInteraction($targetId: String!, $type: InteractionType!) @auth(le
   })
 }
 
-mutation UpdateUserAdmin($id: String!, $name: String, $role: UserRole, $isActive: Boolean, $phone: String, $whatsapp: String) @auth(level: NO_ACCESS) {
+mutation UpdateUserAdmin($id: String!, $name: String, $role: UserRole, $isActive: Boolean, $phone: String, $whatsapp: String, $notes: String, $balance: Int) @auth(level: NO_ACCESS) {
   user_update(key: { id: $id }, data: {
     name: $name,
     role: $role,
     isActive: $isActive,
     phone: $phone,
     whatsapp: $whatsapp,
+    adminNotes: $notes,
+    walletBalance: $balance,
     updatedAt_expr: "request.time"
   })
 }

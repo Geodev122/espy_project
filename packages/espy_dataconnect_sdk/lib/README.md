@@ -693,17 +693,49 @@ ref.subscribe(...);
 ```
 
 
-### ListAllUsers
+### SearchUsersAdmin
 #### Required Arguments
 ```dart
 // No required arguments
-EspyConnector.instance.listAllUsers().execute();
+EspyConnector.instance.searchUsersAdmin().execute();
 ```
 
+#### Optional Arguments
+We return a builder for each query. For SearchUsersAdmin, we created `SearchUsersAdminBuilder`. For queries and mutations with optional parameters, we return a builder class.
+The builder pattern allows Data Connect to distinguish between fields that haven't been set and fields that have been set to null. A field can be set by calling its respective setter method like below:
+```dart
+class SearchUsersAdminVariablesBuilder {
+  ...
+ 
+  SearchUsersAdminVariablesBuilder query(String? t) {
+   _query.value = t;
+   return this;
+  }
+  SearchUsersAdminVariablesBuilder role(UserRole? t) {
+   _role.value = t;
+   return this;
+  }
+  SearchUsersAdminVariablesBuilder hasProfile(bool? t) {
+   _hasProfile.value = t;
+   return this;
+  }
+  SearchUsersAdminVariablesBuilder isActive(bool? t) {
+   _isActive.value = t;
+   return this;
+  }
 
+  ...
+}
+EspyConnector.instance.searchUsersAdmin()
+.query(query)
+.role(role)
+.hasProfile(hasProfile)
+.isActive(isActive)
+.execute();
+```
 
 #### Return Type
-`execute()` returns a `QueryResult<ListAllUsersData, void>`
+`execute()` returns a `QueryResult<SearchUsersAdminData, SearchUsersAdminVariables>`
 ```dart
 /// Result of an Operation Request (query/mutation).
 class OperationResult<Data, Variables> {
@@ -718,8 +750,8 @@ class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
   QueryResult(super.dataConnect, super.data, super.ref);
 }
 
-final result = await EspyConnector.instance.listAllUsers();
-ListAllUsersData data = result.data;
+final result = await EspyConnector.instance.searchUsersAdmin();
+SearchUsersAdminData data = result.data;
 final ref = result.ref;
 ```
 
@@ -727,18 +759,18 @@ final ref = result.ref;
 Each builder returns an `execute` function, which is a helper function that creates a `Ref` object, and executes the underlying operation.
 An example of how to use the `Ref` object is shown below:
 ```dart
-final ref = EspyConnector.instance.listAllUsers().ref();
+final ref = EspyConnector.instance.searchUsersAdmin().ref();
 ref.execute();
 
 ref.subscribe(...);
 ```
 
 
-### GetUserDetails
+### GetAuditDetails
 #### Required Arguments
 ```dart
 String id = ...;
-EspyConnector.instance.getUserDetails(
+EspyConnector.instance.getAuditDetails(
   id: id,
 ).execute();
 ```
@@ -746,7 +778,7 @@ EspyConnector.instance.getUserDetails(
 
 
 #### Return Type
-`execute()` returns a `QueryResult<GetUserDetailsData, GetUserDetailsVariables>`
+`execute()` returns a `QueryResult<GetAuditDetailsData, GetAuditDetailsVariables>`
 ```dart
 /// Result of an Operation Request (query/mutation).
 class OperationResult<Data, Variables> {
@@ -761,10 +793,10 @@ class QueryResult<Data, Variables> extends OperationResult<Data, Variables> {
   QueryResult(super.dataConnect, super.data, super.ref);
 }
 
-final result = await EspyConnector.instance.getUserDetails(
+final result = await EspyConnector.instance.getAuditDetails(
   id: id,
 );
-GetUserDetailsData data = result.data;
+GetAuditDetailsData data = result.data;
 final ref = result.ref;
 ```
 
@@ -774,7 +806,7 @@ An example of how to use the `Ref` object is shown below:
 ```dart
 String id = ...;
 
-final ref = EspyConnector.instance.getUserDetails(
+final ref = EspyConnector.instance.getAuditDetails(
   id: id,
 ).ref();
 ref.execute();
@@ -1702,6 +1734,14 @@ class UpdateUserAdminVariablesBuilder {
    _whatsapp.value = t;
    return this;
   }
+  UpdateUserAdminVariablesBuilder notes(String? t) {
+   _notes.value = t;
+   return this;
+  }
+  UpdateUserAdminVariablesBuilder balance(int? t) {
+   _balance.value = t;
+   return this;
+  }
 
   ...
 }
@@ -1713,6 +1753,8 @@ EspyConnector.instance.updateUserAdmin(
 .isActive(isActive)
 .phone(phone)
 .whatsapp(whatsapp)
+.notes(notes)
+.balance(balance)
 .execute();
 ```
 

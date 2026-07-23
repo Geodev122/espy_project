@@ -294,15 +294,24 @@ class FirestoreEspyRepository implements EspyRepository {
   // ─── 5. Admin Operations ─────────────────────────────────────────────────
 
   @override
-  Stream<List<Map<String, dynamic>>> listAllUsers() {
-    return _db.collection('users')
-        .orderBy('createdAt', descending: true)
-        .snapshots()
-        .map((snap) => snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList());
+  Stream<List<Map<String, dynamic>>> searchUsersAdmin({String? query, String? role, bool? hasProfile, bool? isActive}) {
+    Query q = _db.collection('users');
+    if (role != null) q = q.where('role', isEqualTo: role.toLowerCase());
+    if (hasProfile != null) q = q.where('hasProfile', isEqualTo: hasProfile);
+    if (isActive != null) q = q.where('isActive', isEqualTo: isActive);
+    
+    return q.orderBy('createdAt', descending: true).snapshots().map((snap) {
+      final docs = snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>});
+      if (query != null && query.isNotEmpty) {
+        final low = query.toLowerCase();
+        return docs.where((u) => u['email']?.toString().toLowerCase().contains(low) == true || u['name']?.toString().toLowerCase().contains(low) == true).toList();
+      }
+      return docs.toList();
+    });
   }
 
   @override
-  Future<Map<String, dynamic>> getUserDetails(String id) async {
+  Future<Map<String, dynamic>> getAuditDetails(String id) async {
     final userDoc = await _db.collection('users').doc(id).get();
     final data = userDoc.data() as Map<String, dynamic>? ?? {};
     
@@ -314,6 +323,10 @@ class FirestoreEspyRepository implements EspyRepository {
       final instDoc = await _db.collection('directory_institutions').doc(id).get();
       data['institutionProfile'] = instDoc.data();
     }
+    
+    // Transactions
+    final txs = await _db.collection('directory_membership_transactions').where('userId', isEqualTo: id).limit(10).get();
+    data['transactions'] = txs.docs.map((d) => d.data()).toList();
     
     return data;
   }

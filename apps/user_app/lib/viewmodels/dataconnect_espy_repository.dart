@@ -317,8 +317,16 @@ class DataConnectEspyRepository implements EspyRepository {
   // ─── 5. Admin Operations ─────────────────────────────────────────────────
 
   @override
-  Stream<List<Map<String, dynamic>>> listAllUsers() {
-    return _db.listAllUsers().subscribe().map((snap) =>
+  Stream<List<Map<String, dynamic>>> searchUsersAdmin({String? query, String? role, bool? hasProfile, bool? isActive}) {
+    sdk.UserRole? gqlRole;
+    if (role != null) gqlRole = sdk.UserRole.values.byName(role.toUpperCase());
+    
+    return _db.searchUsersAdmin(
+      query: query,
+      role: gqlRole,
+      hasProfile: hasProfile,
+      isActive: isActive,
+    ).subscribe().map((snap) =>
       snap.data.users.map((u) => {
         'id': u.id,
         'email': u.email,
@@ -334,8 +342,8 @@ class DataConnectEspyRepository implements EspyRepository {
   }
 
   @override
-  Future<Map<String, dynamic>> getUserDetails(String id) async {
-    final result = await _db.getUserDetails(id: id).execute();
+  Future<Map<String, dynamic>> getAuditDetails(String id) async {
+    final result = await _db.getAuditDetails(id: id).execute();
     final u = result.data.user;
     if (u == null) return {};
 
@@ -350,8 +358,16 @@ class DataConnectEspyRepository implements EspyRepository {
       'phone': u.phone,
       'whatsapp': u.whatsapp,
       'walletBalance': u.walletBalance,
+      'adminNotes': u.adminNotes,
       'createdAt': u.createdAt,
       'updatedAt': u.updatedAt,
+      'transactions': u.walletTransactions_on_user.map((t) => {
+        'id': t.id,
+        'amount': t.amount,
+        'type': t.type.stringValue,
+        'description': t.description,
+        'createdAt': t.createdAt,
+      }).toList(),
     };
 
     if (u.professionalProfile_on_user != null) {
@@ -384,12 +400,18 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Future<void> adminUpdateUser(String id, Map<String, dynamic> data) async {
+    sdk.UserRole? gqlRole;
+    if (data['role'] != null) gqlRole = sdk.UserRole.values.byName(data['role'].toString().toUpperCase());
+
     await _db.updateUserAdmin(
       id: id,
       name: data['name'],
       phone: data['phone'],
       whatsapp: data['whatsapp'],
       isActive: data['isActive'],
+      role: gqlRole,
+      notes: data['adminNotes'],
+      balance: data['walletBalance'],
     ).execute();
   }
 

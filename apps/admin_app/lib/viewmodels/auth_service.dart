@@ -20,10 +20,12 @@ class AuthService extends ChangeNotifier {
   User? _user;
   UserModel? _userData;
   bool _isLoading = true;
+  bool _isProvisioning = false;
 
   User? get user => _user;
   UserModel? get userData => _userData;
   bool get isLoading => _isLoading;
+  bool get isProvisioning => _isProvisioning;
 
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
@@ -159,10 +161,17 @@ class AuthService extends ChangeNotifier {
         final credential = await _auth.signInWithEmailAndPassword(email: email, password: password);
         // After successful login, check if super admin profile exists
         if (email == 'geo.elnajjar@gmail.com') {
-          final existing = await _repository.getUser(credential.user!.uid);
-          if (existing == null) {
-            _debug.log('AUTH', 'Super Admin profile missing. Creating...');
-            await _createInitialUserDoc(credential.user!);
+          _isProvisioning = true;
+          notifyListeners();
+          try {
+            final existing = await _repository.getUser(credential.user!.uid);
+            if (existing == null) {
+              _debug.log('AUTH', 'Super Admin profile missing. Creating...');
+              await _createInitialUserDoc(credential.user!);
+            }
+          } finally {
+            _isProvisioning = false;
+            notifyListeners();
           }
         }
         return credential;

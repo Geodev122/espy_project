@@ -76,9 +76,9 @@ part 'get_wallet_transactions.dart';
 
 part 'get_active_resource_order.dart';
 
-part 'list_all_users.dart';
+part 'search_users_admin.dart';
 
-part 'get_user_details.dart';
+part 'get_audit_details.dart';
 
 part 'list_recharge_cards.dart';
 
@@ -581,13 +581,13 @@ class EspyConnector {
   }
   
   
-  ListAllUsersVariablesBuilder listAllUsers () {
-    return ListAllUsersVariablesBuilder(dataConnect, );
+  SearchUsersAdminVariablesBuilder searchUsersAdmin () {
+    return SearchUsersAdminVariablesBuilder(dataConnect, );
   }
   
   
-  GetUserDetailsVariablesBuilder getUserDetails ({required String id, }) {
-    return GetUserDetailsVariablesBuilder(dataConnect, id: id,);
+  GetAuditDetailsVariablesBuilder getAuditDetails ({required String id, }) {
+    return GetAuditDetailsVariablesBuilder(dataConnect, id: id,);
   }
   
   

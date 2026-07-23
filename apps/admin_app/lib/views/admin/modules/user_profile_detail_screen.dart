@@ -9,6 +9,8 @@ import '../../../viewmodels/user_manager_view_model.dart';
 import '../../../widgets/common/premium_card.dart';
 import '../../../widgets/common/espy_scaffold.dart';
 import '../../../widgets/common/premium_button.dart';
+import '../../../widgets/common/admin_data_row.dart';
+import '../../../widgets/common/espy_status_badge.dart';
 
 class UserProfileDetailScreen extends StatelessWidget {
   final String userId;
@@ -68,10 +70,13 @@ class _UserProfileDetailViewState extends State<_UserProfileDetailView> {
           : SingleChildScrollView(
               padding: const EdgeInsets.all(24),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildHeader(),
                   const SizedBox(height: 24),
-                  _buildStatusCard(vm),
+                  _buildStatusCard(),
+                  const SizedBox(height: 24),
+                  _buildDetailsCard(vm),
                   const SizedBox(height: 24),
                   _buildDocumentSection(),
                   const SizedBox(height: 32),
@@ -110,32 +115,51 @@ class _UserProfileDetailViewState extends State<_UserProfileDetailView> {
     );
   }
 
-  Widget _buildStatusCard(UserManagerViewModel vm) {
-    final bool isActive = _userDetails?['isActive'] != false;
-    final bool isApproved = _userDetails?['isApproved'] == true;
-    final bool isValidated = _userDetails?['isProfileValidated'] == true;
-
+  Widget _buildStatusCard() {
     return PremiumCard(
       padding: const EdgeInsets.all(24),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _statusRow("ACCOUNT STATUS", isActive ? "ACTIVE" : "SUSPENDED", isActive ? EspyTheme.success : Colors.redAccent),
-          const Divider(height: 24),
-          _statusRow("IDENTITY VERIFICATION", isApproved ? "VERIFIED" : "UNVERIFIED", isApproved ? EspyTheme.royalBlue : EspyTheme.gold),
-          const Divider(height: 24),
-          _statusRow("PROTOCOL VALIDATION", isValidated ? "VALIDATED" : "PENDING", isValidated ? EspyTheme.success : EspyTheme.gold),
+          Text("PROTOCOL STATUS", style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.w900, color: Colors.black38, letterSpacing: 2)),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              EspyStatusBadge.fromFlags(
+                hasProfile: _userDetails?['hasProfile'] == true,
+                isActive: _userDetails?['isActive'] != false,
+                isApproved: _userDetails?['professionalProfile']?['isApproved'] == true || _userDetails?['institutionProfile']?['isApproved'] == true,
+              ),
+              Text(
+                "SINCE ${_formatDate(_userDetails?['createdAt'])}",
+                style: GoogleFonts.montserrat(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.black26),
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
 
-  Widget _statusRow(String label, String value, Color color) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label, style: GoogleFonts.cinzel(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.black38)),
-        Text(value, style: GoogleFonts.montserrat(fontSize: 11, fontWeight: FontWeight.w900, color: color)),
-      ],
+  Widget _buildDetailsCard(UserManagerViewModel vm) {
+    return PremiumCard(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("IDENTITY DATA", style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.w900, color: Colors.black38, letterSpacing: 2)),
+          const SizedBox(height: 12),
+          AdminDataRow(label: "USER ID", value: widget.userId),
+          AdminDataRow(label: "PHONE", value: _userDetails?['phone'] ?? "N/A", onEdit: () => _showEditDialog("phone", _userDetails?['phone'])),
+          AdminDataRow(label: "WHATSAPP", value: _userDetails?['whatsapp'] ?? "N/A", onEdit: () => _showEditDialog("whatsapp", _userDetails?['whatsapp'])),
+          AdminDataRow(label: "BALANCE", value: "${_userDetails?['walletBalance'] ?? 0} \$E", onEdit: () => _showEditDialog("walletBalance", _userDetails?['walletBalance']?.toString())),
+          const Divider(height: 32),
+          Text("ADMIN NOTES", style: GoogleFonts.cinzel(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.black38)),
+          const SizedBox(height: 8),
+          Text(_userDetails?['adminNotes'] ?? "No administrative logs recorded.", style: GoogleFonts.lora(fontSize: 12, fontStyle: FontStyle.italic, color: Colors.black54)),
+        ],
+      ),
     );
   }
 
@@ -172,7 +196,8 @@ class _UserProfileDetailViewState extends State<_UserProfileDetailView> {
 
   Widget _buildAdminActions(UserManagerViewModel vm) {
     final bool isActive = _userDetails?['isActive'] != false;
-    final bool isApproved = _userDetails?['isApproved'] == true;
+    final dynamic profile = _userDetails?['professionalProfile'] ?? _userDetails?['institutionProfile'];
+    final bool isApproved = profile?['isApproved'] == true;
 
     return Column(
       children: [
@@ -182,7 +207,7 @@ class _UserProfileDetailViewState extends State<_UserProfileDetailView> {
             fullWidth: true,
             variant: PremiumButtonVariant.gold,
             onPressed: () async {
-              await vm.verifyUser(_userDetails!['id'], _userDetails!['role'], true);
+              await vm.verifyUser(widget.userId, _userDetails!['role'], true);
               _loadDetails();
             },
           ),
@@ -193,7 +218,7 @@ class _UserProfileDetailViewState extends State<_UserProfileDetailView> {
               child: PremiumButton(
                 label: "FORCE EDIT",
                 variant: PremiumButtonVariant.platinum,
-                onPressed: () {},
+                onPressed: () => _showEditDialog("name", _userDetails?['name']),
               ),
             ),
             const SizedBox(width: 16),
@@ -202,7 +227,7 @@ class _UserProfileDetailViewState extends State<_UserProfileDetailView> {
                 label: isActive ? "SUSPEND" : "REACTIVATE",
                 variant: isActive ? PremiumButtonVariant.outline : PremiumButtonVariant.cyan,
                 onPressed: () async {
-                  await vm.suspendUser(_userDetails!['id'], isActive);
+                  await vm.suspendUser(widget.userId, isActive);
                   _loadDetails();
                 },
               ),
@@ -210,6 +235,41 @@ class _UserProfileDetailViewState extends State<_UserProfileDetailView> {
           ],
         ),
       ],
+    );
+  }
+
+  String _formatDate(dynamic date) {
+    if (date == null) return "N/A";
+    if (date is DateTime) return DateFormat('dd MMM yyyy').format(date);
+    return date.toString();
+  }
+
+  void _showEditDialog(String field, String? initialValue) {
+    final controller = TextEditingController(text: initialValue);
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("EDIT ${field.toUpperCase()}"),
+        content: TextField(
+          controller: controller,
+          decoration: InputDecoration(hintText: "Enter new $field"),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("CANCEL")),
+          ElevatedButton(
+            onPressed: () async {
+              final vm = Provider.of<UserManagerViewModel>(context, listen: false);
+              dynamic value = controller.text.trim();
+              if (field == 'walletBalance') value = int.tryParse(value) ?? 0;
+              
+              await vm.adminUpdateUser(widget.userId, {field: value});
+              Navigator.pop(context);
+              _loadDetails();
+            },
+            child: const Text("SAVE"),
+          ),
+        ],
+      ),
     );
   }
 }

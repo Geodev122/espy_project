@@ -24,7 +24,7 @@ class MainGate extends StatelessWidget {
     final _debug = DebugService();
     return Consumer<AuthService>(
       builder: (context, auth, _) {
-        if (auth.isLoading) {
+        if (auth.isLoading || auth.isProvisioning) {
           return const SplashScreen();
         }
 

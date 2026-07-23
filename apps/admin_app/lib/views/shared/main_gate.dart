@@ -17,8 +17,21 @@ class MainGate extends StatelessWidget {
     final _debug = DebugService();
     return Consumer<AuthService>(
       builder: (context, auth, _) {
-        if (auth.isLoading) {
-          return const SplashScreen();
+        if (auth.isLoading || auth.isProvisioning) {
+          return Scaffold(
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(color: models.EspyTheme.gold),
+                  if (auth.isProvisioning) ...[
+                    const SizedBox(height: 24),
+                    Text("SYNCHRONIZING PROTOCOL...", style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, color: models.EspyTheme.gold, fontSize: 10, letterSpacing: 2)),
+                  ],
+                ],
+              ),
+            ),
+          );
         }
 
         if (auth.user == null) {

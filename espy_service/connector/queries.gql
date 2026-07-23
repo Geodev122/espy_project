@@ -212,8 +212,18 @@ query GetActiveResourceOrder($userId: String!) @auth(expr: "auth.uid == userId")
 
 # --- 5. Administration & Audit ---
 
-query ListAllUsers @auth(level: NO_ACCESS) {
-  users(orderBy: [{ createdAt: DESC }]) {
+query SearchUsersAdmin($query: String, $role: UserRole, $hasProfile: Boolean, $isActive: Boolean) @auth(level: NO_ACCESS) {
+  users(
+    where: {
+      _and: [
+        { email: { contains: $query } },
+        { role: { eq: $role } },
+        { hasProfile: { eq: $hasProfile } },
+        { isActive: { eq: $isActive } }
+      ]
+    },
+    orderBy: [{ createdAt: DESC }]
+  ) {
     id
     email
     name
@@ -226,7 +236,7 @@ query ListAllUsers @auth(level: NO_ACCESS) {
   }
 }
 
-query GetUserDetails($id: String!) @auth(level: NO_ACCESS) {
+query GetAuditDetails($id: String!) @auth(level: NO_ACCESS) {
   user(key: { id: $id }) {
     id
     email
@@ -238,6 +248,7 @@ query GetUserDetails($id: String!) @auth(level: NO_ACCESS) {
     phone
     whatsapp
     walletBalance
+    adminNotes
     createdAt
     updatedAt
     professionalProfile_on_user {
@@ -256,6 +267,13 @@ query GetUserDetails($id: String!) @auth(level: NO_ACCESS) {
       isProfileValidated
       verificationDocUrl
       visibilityExpiresAt
+    }
+    walletTransactions_on_user(orderBy: [{ createdAt: DESC }], limit: 10) {
+      id
+      amount
+      type
+      description
+      createdAt
     }
   }
 }

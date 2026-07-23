@@ -7,6 +7,8 @@ class UpdateUserAdminVariablesBuilder {
   Optional<bool> _isActive = Optional.optional(nativeFromJson, nativeToJson);
   Optional<String> _phone = Optional.optional(nativeFromJson, nativeToJson);
   Optional<String> _whatsapp = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<String> _notes = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<int> _balance = Optional.optional(nativeFromJson, nativeToJson);
 
   final FirebaseDataConnect _dataConnect;  UpdateUserAdminVariablesBuilder name(String? t) {
    _name.value = t;
@@ -28,6 +30,14 @@ class UpdateUserAdminVariablesBuilder {
    _whatsapp.value = t;
    return this;
   }
+  UpdateUserAdminVariablesBuilder notes(String? t) {
+   _notes.value = t;
+   return this;
+  }
+  UpdateUserAdminVariablesBuilder balance(int? t) {
+   _balance.value = t;
+   return this;
+  }
 
   UpdateUserAdminVariablesBuilder(this._dataConnect, {required  this.id,});
   Deserializer<UpdateUserAdminData> dataDeserializer = (dynamic json)  => UpdateUserAdminData.fromJson(jsonDecode(json));
@@ -37,7 +47,7 @@ class UpdateUserAdminVariablesBuilder {
   }
 
   MutationRef<UpdateUserAdminData, UpdateUserAdminVariables> ref() {
-    UpdateUserAdminVariables vars= UpdateUserAdminVariables(id: id,name: _name,role: _role,isActive: _isActive,phone: _phone,whatsapp: _whatsapp,);
+    UpdateUserAdminVariables vars= UpdateUserAdminVariables(id: id,name: _name,role: _role,isActive: _isActive,phone: _phone,whatsapp: _whatsapp,notes: _notes,balance: _balance,);
     return _dataConnect.mutation("UpdateUserAdmin", dataDeserializer, varsSerializer, vars);
   }
 }
@@ -120,6 +130,8 @@ class UpdateUserAdminVariables {
   late final Optional<bool>isActive;
   late final Optional<String>phone;
   late final Optional<String>whatsapp;
+  late final Optional<String>notes;
+  late final Optional<int>balance;
   @Deprecated('fromJson is deprecated for Variable classes as they are no longer required for deserialization.')
   UpdateUserAdminVariables.fromJson(Map<String, dynamic> json):
   
@@ -146,6 +158,14 @@ class UpdateUserAdminVariables {
     whatsapp = Optional.optional(nativeFromJson, nativeToJson);
     whatsapp.value = json['whatsapp'] == null ? null : nativeFromJson<String>(json['whatsapp']);
   
+  
+    notes = Optional.optional(nativeFromJson, nativeToJson);
+    notes.value = json['notes'] == null ? null : nativeFromJson<String>(json['notes']);
+  
+  
+    balance = Optional.optional(nativeFromJson, nativeToJson);
+    balance.value = json['balance'] == null ? null : nativeFromJson<int>(json['balance']);
+  
   }
   @override
   bool operator ==(Object other) {
@@ -162,11 +182,13 @@ class UpdateUserAdminVariables {
     role == otherTyped.role && 
     isActive == otherTyped.isActive && 
     phone == otherTyped.phone && 
-    whatsapp == otherTyped.whatsapp;
+    whatsapp == otherTyped.whatsapp && 
+    notes == otherTyped.notes && 
+    balance == otherTyped.balance;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, name.hashCode, role.hashCode, isActive.hashCode, phone.hashCode, whatsapp.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, name.hashCode, role.hashCode, isActive.hashCode, phone.hashCode, whatsapp.hashCode, notes.hashCode, balance.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -187,6 +209,12 @@ class UpdateUserAdminVariables {
     if(whatsapp.state == OptionalState.set) {
       json['whatsapp'] = whatsapp.toJson();
     }
+    if(notes.state == OptionalState.set) {
+      json['notes'] = notes.toJson();
+    }
+    if(balance.state == OptionalState.set) {
+      json['balance'] = balance.toJson();
+    }
     return json;
   }
 
@@ -197,6 +225,8 @@ class UpdateUserAdminVariables {
     required this.isActive,
     required this.phone,
     required this.whatsapp,
+    required this.notes,
+    required this.balance,
   });
 }
 

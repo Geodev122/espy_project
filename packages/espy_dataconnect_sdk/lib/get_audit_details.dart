@@ -1,24 +1,24 @@
 part of 'espy.dart';
 
-class GetUserDetailsVariablesBuilder {
+class GetAuditDetailsVariablesBuilder {
   String id;
 
   final FirebaseDataConnect _dataConnect;
-  GetUserDetailsVariablesBuilder(this._dataConnect, {required  this.id,});
-  Deserializer<GetUserDetailsData> dataDeserializer = (dynamic json)  => GetUserDetailsData.fromJson(jsonDecode(json));
-  Serializer<GetUserDetailsVariables> varsSerializer = (GetUserDetailsVariables vars) => jsonEncode(vars.toJson());
-  Future<QueryResult<GetUserDetailsData, GetUserDetailsVariables>> execute() {
+  GetAuditDetailsVariablesBuilder(this._dataConnect, {required  this.id,});
+  Deserializer<GetAuditDetailsData> dataDeserializer = (dynamic json)  => GetAuditDetailsData.fromJson(jsonDecode(json));
+  Serializer<GetAuditDetailsVariables> varsSerializer = (GetAuditDetailsVariables vars) => jsonEncode(vars.toJson());
+  Future<QueryResult<GetAuditDetailsData, GetAuditDetailsVariables>> execute() {
     return ref().execute();
   }
 
-  QueryRef<GetUserDetailsData, GetUserDetailsVariables> ref() {
-    GetUserDetailsVariables vars= GetUserDetailsVariables(id: id,);
-    return _dataConnect.query("GetUserDetails", dataDeserializer, varsSerializer, vars);
+  QueryRef<GetAuditDetailsData, GetAuditDetailsVariables> ref() {
+    GetAuditDetailsVariables vars= GetAuditDetailsVariables(id: id,);
+    return _dataConnect.query("GetAuditDetails", dataDeserializer, varsSerializer, vars);
   }
 }
 
 @immutable
-class GetUserDetailsUser {
+class GetAuditDetailsUser {
   final String id;
   final String email;
   final String? name;
@@ -29,11 +29,13 @@ class GetUserDetailsUser {
   final String? phone;
   final String? whatsapp;
   final int walletBalance;
+  final String? adminNotes;
   final Timestamp createdAt;
   final Timestamp updatedAt;
-  final GetUserDetailsUserProfessionalProfileOnUser? professionalProfile_on_user;
-  final GetUserDetailsUserInstitutionProfileOnUser? institutionProfile_on_user;
-  GetUserDetailsUser.fromJson(dynamic json):
+  final GetAuditDetailsUserProfessionalProfileOnUser? professionalProfile_on_user;
+  final GetAuditDetailsUserInstitutionProfileOnUser? institutionProfile_on_user;
+  final List<GetAuditDetailsUserWalletTransactionsOnUser> walletTransactions_on_user;
+  GetAuditDetailsUser.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']),
   email = nativeFromJson<String>(json['email']),
@@ -45,10 +47,14 @@ class GetUserDetailsUser {
   phone = json['phone'] == null ? null : nativeFromJson<String>(json['phone']),
   whatsapp = json['whatsapp'] == null ? null : nativeFromJson<String>(json['whatsapp']),
   walletBalance = nativeFromJson<int>(json['walletBalance']),
+  adminNotes = json['adminNotes'] == null ? null : nativeFromJson<String>(json['adminNotes']),
   createdAt = Timestamp.fromJson(json['createdAt']),
   updatedAt = Timestamp.fromJson(json['updatedAt']),
-  professionalProfile_on_user = json['professionalProfile_on_user'] == null ? null : GetUserDetailsUserProfessionalProfileOnUser.fromJson(json['professionalProfile_on_user']),
-  institutionProfile_on_user = json['institutionProfile_on_user'] == null ? null : GetUserDetailsUserInstitutionProfileOnUser.fromJson(json['institutionProfile_on_user']);
+  professionalProfile_on_user = json['professionalProfile_on_user'] == null ? null : GetAuditDetailsUserProfessionalProfileOnUser.fromJson(json['professionalProfile_on_user']),
+  institutionProfile_on_user = json['institutionProfile_on_user'] == null ? null : GetAuditDetailsUserInstitutionProfileOnUser.fromJson(json['institutionProfile_on_user']),
+  walletTransactions_on_user = (json['walletTransactions_on_user'] as List<dynamic>)
+        .map((e) => GetAuditDetailsUserWalletTransactionsOnUser.fromJson(e))
+        .toList();
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -58,7 +64,7 @@ class GetUserDetailsUser {
       return false;
     }
 
-    final GetUserDetailsUser otherTyped = other as GetUserDetailsUser;
+    final GetAuditDetailsUser otherTyped = other as GetAuditDetailsUser;
     return id == otherTyped.id && 
     email == otherTyped.email && 
     name == otherTyped.name && 
@@ -69,14 +75,16 @@ class GetUserDetailsUser {
     phone == otherTyped.phone && 
     whatsapp == otherTyped.whatsapp && 
     walletBalance == otherTyped.walletBalance && 
+    adminNotes == otherTyped.adminNotes && 
     createdAt == otherTyped.createdAt && 
     updatedAt == otherTyped.updatedAt && 
     professionalProfile_on_user == otherTyped.professionalProfile_on_user && 
-    institutionProfile_on_user == otherTyped.institutionProfile_on_user;
+    institutionProfile_on_user == otherTyped.institutionProfile_on_user && 
+    walletTransactions_on_user == otherTyped.walletTransactions_on_user;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, email.hashCode, name.hashCode, role.hashCode, isActive.hashCode, hasProfile.hashCode, photoUrl.hashCode, phone.hashCode, whatsapp.hashCode, walletBalance.hashCode, createdAt.hashCode, updatedAt.hashCode, professionalProfile_on_user.hashCode, institutionProfile_on_user.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, email.hashCode, name.hashCode, role.hashCode, isActive.hashCode, hasProfile.hashCode, photoUrl.hashCode, phone.hashCode, whatsapp.hashCode, walletBalance.hashCode, adminNotes.hashCode, createdAt.hashCode, updatedAt.hashCode, professionalProfile_on_user.hashCode, institutionProfile_on_user.hashCode, walletTransactions_on_user.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -101,6 +109,9 @@ class GetUserDetailsUser {
       json['whatsapp'] = nativeToJson<String?>(whatsapp);
     }
     json['walletBalance'] = nativeToJson<int>(walletBalance);
+    if (adminNotes != null) {
+      json['adminNotes'] = nativeToJson<String?>(adminNotes);
+    }
     json['createdAt'] = createdAt.toJson();
     json['updatedAt'] = updatedAt.toJson();
     if (professionalProfile_on_user != null) {
@@ -109,10 +120,11 @@ class GetUserDetailsUser {
     if (institutionProfile_on_user != null) {
       json['institutionProfile_on_user'] = institutionProfile_on_user!.toJson();
     }
+    json['walletTransactions_on_user'] = walletTransactions_on_user.map((e) => e.toJson()).toList();
     return json;
   }
 
-  GetUserDetailsUser({
+  GetAuditDetailsUser({
     required this.id,
     required this.email,
     this.name,
@@ -123,15 +135,17 @@ class GetUserDetailsUser {
     this.phone,
     this.whatsapp,
     required this.walletBalance,
+    this.adminNotes,
     required this.createdAt,
     required this.updatedAt,
     this.professionalProfile_on_user,
     this.institutionProfile_on_user,
+    required this.walletTransactions_on_user,
   });
 }
 
 @immutable
-class GetUserDetailsUserProfessionalProfileOnUser {
+class GetAuditDetailsUserProfessionalProfileOnUser {
   final String? fullNameAr;
   final String? specialty;
   final bool isApproved;
@@ -139,7 +153,7 @@ class GetUserDetailsUserProfessionalProfileOnUser {
   final String? verificationDocUrl;
   final EnumValue<MembershipTier>? membershipTier;
   final Timestamp? visibilityExpiresAt;
-  GetUserDetailsUserProfessionalProfileOnUser.fromJson(dynamic json):
+  GetAuditDetailsUserProfessionalProfileOnUser.fromJson(dynamic json):
   
   fullNameAr = json['fullNameAr'] == null ? null : nativeFromJson<String>(json['fullNameAr']),
   specialty = json['specialty'] == null ? null : nativeFromJson<String>(json['specialty']),
@@ -157,7 +171,7 @@ class GetUserDetailsUserProfessionalProfileOnUser {
       return false;
     }
 
-    final GetUserDetailsUserProfessionalProfileOnUser otherTyped = other as GetUserDetailsUserProfessionalProfileOnUser;
+    final GetAuditDetailsUserProfessionalProfileOnUser otherTyped = other as GetAuditDetailsUserProfessionalProfileOnUser;
     return fullNameAr == otherTyped.fullNameAr && 
     specialty == otherTyped.specialty && 
     isApproved == otherTyped.isApproved && 
@@ -195,7 +209,7 @@ class GetUserDetailsUserProfessionalProfileOnUser {
     return json;
   }
 
-  GetUserDetailsUserProfessionalProfileOnUser({
+  GetAuditDetailsUserProfessionalProfileOnUser({
     this.fullNameAr,
     this.specialty,
     required this.isApproved,
@@ -207,14 +221,14 @@ class GetUserDetailsUserProfessionalProfileOnUser {
 }
 
 @immutable
-class GetUserDetailsUserInstitutionProfileOnUser {
+class GetAuditDetailsUserInstitutionProfileOnUser {
   final String? nameAr;
   final String? registrationNumber;
   final bool isApproved;
   final bool isProfileValidated;
   final String? verificationDocUrl;
   final Timestamp? visibilityExpiresAt;
-  GetUserDetailsUserInstitutionProfileOnUser.fromJson(dynamic json):
+  GetAuditDetailsUserInstitutionProfileOnUser.fromJson(dynamic json):
   
   nameAr = json['nameAr'] == null ? null : nativeFromJson<String>(json['nameAr']),
   registrationNumber = json['registrationNumber'] == null ? null : nativeFromJson<String>(json['registrationNumber']),
@@ -231,7 +245,7 @@ class GetUserDetailsUserInstitutionProfileOnUser {
       return false;
     }
 
-    final GetUserDetailsUserInstitutionProfileOnUser otherTyped = other as GetUserDetailsUserInstitutionProfileOnUser;
+    final GetAuditDetailsUserInstitutionProfileOnUser otherTyped = other as GetAuditDetailsUserInstitutionProfileOnUser;
     return nameAr == otherTyped.nameAr && 
     registrationNumber == otherTyped.registrationNumber && 
     isApproved == otherTyped.isApproved && 
@@ -263,7 +277,7 @@ class GetUserDetailsUserInstitutionProfileOnUser {
     return json;
   }
 
-  GetUserDetailsUserInstitutionProfileOnUser({
+  GetAuditDetailsUserInstitutionProfileOnUser({
     this.nameAr,
     this.registrationNumber,
     required this.isApproved,
@@ -274,11 +288,19 @@ class GetUserDetailsUserInstitutionProfileOnUser {
 }
 
 @immutable
-class GetUserDetailsData {
-  final GetUserDetailsUser? user;
-  GetUserDetailsData.fromJson(dynamic json):
+class GetAuditDetailsUserWalletTransactionsOnUser {
+  final String id;
+  final int amount;
+  final EnumValue<TransactionType> type;
+  final String? description;
+  final Timestamp createdAt;
+  GetAuditDetailsUserWalletTransactionsOnUser.fromJson(dynamic json):
   
-  user = json['user'] == null ? null : GetUserDetailsUser.fromJson(json['user']);
+  id = nativeFromJson<String>(json['id']),
+  amount = nativeFromJson<int>(json['amount']),
+  type = transactionTypeDeserializer(json['type']),
+  description = json['description'] == null ? null : nativeFromJson<String>(json['description']),
+  createdAt = Timestamp.fromJson(json['createdAt']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -288,7 +310,57 @@ class GetUserDetailsData {
       return false;
     }
 
-    final GetUserDetailsData otherTyped = other as GetUserDetailsData;
+    final GetAuditDetailsUserWalletTransactionsOnUser otherTyped = other as GetAuditDetailsUserWalletTransactionsOnUser;
+    return id == otherTyped.id && 
+    amount == otherTyped.amount && 
+    type == otherTyped.type && 
+    description == otherTyped.description && 
+    createdAt == otherTyped.createdAt;
+    
+  }
+  @override
+  int get hashCode => Object.hashAll([id.hashCode, amount.hashCode, type.hashCode, description.hashCode, createdAt.hashCode]);
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
+    json['amount'] = nativeToJson<int>(amount);
+    json['type'] = 
+    transactionTypeSerializer(type)
+    ;
+    if (description != null) {
+      json['description'] = nativeToJson<String?>(description);
+    }
+    json['createdAt'] = createdAt.toJson();
+    return json;
+  }
+
+  GetAuditDetailsUserWalletTransactionsOnUser({
+    required this.id,
+    required this.amount,
+    required this.type,
+    this.description,
+    required this.createdAt,
+  });
+}
+
+@immutable
+class GetAuditDetailsData {
+  final GetAuditDetailsUser? user;
+  GetAuditDetailsData.fromJson(dynamic json):
+  
+  user = json['user'] == null ? null : GetAuditDetailsUser.fromJson(json['user']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final GetAuditDetailsData otherTyped = other as GetAuditDetailsData;
     return user == otherTyped.user;
     
   }
@@ -304,16 +376,16 @@ class GetUserDetailsData {
     return json;
   }
 
-  GetUserDetailsData({
+  GetAuditDetailsData({
     this.user,
   });
 }
 
 @immutable
-class GetUserDetailsVariables {
+class GetAuditDetailsVariables {
   final String id;
   @Deprecated('fromJson is deprecated for Variable classes as they are no longer required for deserialization.')
-  GetUserDetailsVariables.fromJson(Map<String, dynamic> json):
+  GetAuditDetailsVariables.fromJson(Map<String, dynamic> json):
   
   id = nativeFromJson<String>(json['id']);
   @override
@@ -325,7 +397,7 @@ class GetUserDetailsVariables {
       return false;
     }
 
-    final GetUserDetailsVariables otherTyped = other as GetUserDetailsVariables;
+    final GetAuditDetailsVariables otherTyped = other as GetAuditDetailsVariables;
     return id == otherTyped.id;
     
   }
@@ -339,7 +411,7 @@ class GetUserDetailsVariables {
     return json;
   }
 
-  GetUserDetailsVariables({
+  GetAuditDetailsVariables({
     required this.id,
   });
 }
