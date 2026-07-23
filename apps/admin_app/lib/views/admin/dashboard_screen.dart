@@ -1,22 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:espy_app/theme/espy_theme.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';
 import 'package:espy_app/widgets/common/premium_card.dart';
 import 'package:espy_app/viewmodels/admin_dashboard_view_model.dart';
-
-import 'modules/verifications_screen.dart';
-import 'modules/support_inbox_screen.dart';
-import 'modules/orders_manager_screen.dart';
-import 'modules/recharge_cards_screen.dart';
-import 'modules/taxonomy_manager_screen.dart';
-import 'modules/users_manager_screen.dart';
-
-import 'modules/seed_manager_page.dart';
-
-import 'modules/service_management_screen.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({super.key});
@@ -34,6 +22,8 @@ class AdminDashboardScreen extends StatelessWidget {
           children: [
             Text("SYSTEM OVERVIEW", style: GoogleFonts.cinzel(fontSize: 14, fontWeight: FontWeight.w900, color: EspyTheme.gold, letterSpacing: 2)),
             const SizedBox(height: 24),
+            
+            // Primary Metrics
             Row(
               children: [
                 _buildStatCard("TOTAL USERS", viewModel.stats['users'] ?? '0', Icons.people_rounded),
@@ -41,8 +31,33 @@ class AdminDashboardScreen extends StatelessWidget {
                 _buildStatCard("ACTIVE SERVICES", viewModel.stats['services'] ?? '0', Icons.medical_services_rounded),
               ],
             ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                _buildStatCard("OPEN REQUESTS", viewModel.stats['communityRequests'] ?? '0', Icons.campaign_rounded),
+                const SizedBox(width: 16),
+                _buildStatCard("PENDING ORDERS", viewModel.stats['pendingOrders'] ?? '0', Icons.shopping_cart_checkout_rounded),
+              ],
+            ),
+
             const SizedBox(height: 32),
-            _buildActionList(context),
+            Text("LIVE ACTIVITY STREAM", style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.w900, color: Colors.black38, letterSpacing: 1)),
+            const SizedBox(height: 16),
+            
+            // Placeholder for activity feed
+            PremiumCard(
+              padding: const EdgeInsets.all(32),
+              child: Center(
+                child: Column(
+                  children: [
+                    const Icon(Icons.analytics_outlined, color: EspyTheme.platinum, size: 48),
+                    const SizedBox(height: 16),
+                    Text("SYNCHRONIZING REAL-TIME ANALYTICS...", 
+                      style: GoogleFonts.montserrat(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.black26)),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -55,55 +70,11 @@ class AdminDashboardScreen extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            Icon(icon, color: EspyTheme.royalBlue, size: 24),
+            Icon(icon, color: EspyTheme.royalBlue, size: 20),
             const SizedBox(height: 12),
-            Text(value, style: GoogleFonts.montserrat(fontSize: 20, fontWeight: FontWeight.w900)),
-            Text(label, style: GoogleFonts.cinzel(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.black38)),
+            Text(value, style: GoogleFonts.montserrat(fontSize: 18, fontWeight: FontWeight.w900)),
+            Text(label, style: GoogleFonts.cinzel(fontSize: 7, fontWeight: FontWeight.bold, color: Colors.black38)),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildActionList(BuildContext context) {
-    return Column(
-      children: [
-        _adminTile("USER MANAGEMENT", LucideIcons.users, () {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const UsersManagerScreen()));
-        }),
-        _adminTile("PENDING VERIFICATIONS", Icons.verified_user_rounded, () {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const VerificationsScreen()));
-        }),
-        _adminTile("RESOURCE ORDERS", Icons.shopping_bag_rounded, () {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const OrdersManagerScreen()));
-        }),
-        _adminTile("SERVICE MANAGEMENT", Icons.settings_suggest_rounded, () {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const ServiceManagementScreen()));
-        }),
-        _adminTile("TAXONOMY MANAGEMENT", Icons.category_rounded, () {
-           Navigator.push(context, MaterialPageRoute(builder: (_) => const TaxonomyManagerScreen()));
-        }),
-        _adminTile("SEED DATA", LucideIcons.database, () {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const SeedManagerPage()));
-        }),
-        _adminTile("SUPPORT INBOX", Icons.support_agent_rounded, () {
-           Navigator.push(context, MaterialPageRoute(builder: (_) => const SupportInboxScreen()));
-        }),
-        _adminTile("SYSTEM ANNOUNCEMENTS", Icons.campaign_rounded, () {}),
-      ],
-    );
-  }
-
-  Widget _adminTile(String label, IconData icon, VoidCallback onTap) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: PremiumCard(
-        padding: EdgeInsets.zero,
-        child: ListTile(
-          onTap: onTap,
-          leading: Icon(icon, color: EspyTheme.navyDeep),
-          title: Text(label, style: GoogleFonts.montserrat(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1)),
-          trailing: const Icon(Icons.chevron_right_rounded, color: EspyTheme.gold),
         ),
       ),
     );

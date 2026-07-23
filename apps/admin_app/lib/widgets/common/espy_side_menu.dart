@@ -12,6 +12,9 @@ import '../../views/admin/modules/verifications_screen.dart';
 import '../../views/admin/modules/orders_manager_screen.dart';
 import '../../views/admin/modules/support_inbox_screen.dart';
 import '../../views/admin/modules/users_manager_screen.dart';
+import '../../views/admin/modules/taxonomy_manager_screen.dart';
+import '../../views/admin/modules/service_management_screen.dart';
+import '../../views/admin/modules/seed_manager_page.dart';
 
 class EspySideMenu extends StatelessWidget {
   const EspySideMenu({super.key});
@@ -32,11 +35,25 @@ class EspySideMenu extends StatelessWidget {
               child: ListView(
                 padding: const EdgeInsets.all(24),
                 children: [
-                    _buildSectionHeader('ADMINISTRATIVE'),
+                    _buildSectionHeader('SYSTEM'),
+                    _buildMenuItem(context, LucideIcons.layoutDashboard, 'DASHBOARD', null, isHome: true),
+                    
+                    const SizedBox(height: 24),
+                    _buildSectionHeader('OPERATIONS'),
                     _buildMenuItem(context, LucideIcons.users, 'USERS', const UsersManagerScreen()),
                     _buildMenuItem(context, LucideIcons.shieldCheck, 'VALIDATIONS', const VerificationsScreen()),
                     _buildMenuItem(context, LucideIcons.shoppingBag, 'RESOURCES', const OrdersManagerScreen()),
                     _buildMenuItem(context, LucideIcons.inbox, 'SUPPORT', const SupportInboxScreen()),
+
+                    const SizedBox(height: 24),
+                    _buildSectionHeader('GOVERNANCE'),
+                    _buildMenuItem(context, LucideIcons.map, 'GEOGRAPHY', const TaxonomyManagerScreen()),
+                    _buildMenuItem(context, LucideIcons.settings, 'SERVICES', const ServiceManagementScreen()),
+                    _buildMenuItem(context, LucideIcons.megaphone, 'ANNOUNCEMENTS', null),
+
+                    const SizedBox(height: 24),
+                    _buildSectionHeader('DEVELOPER'),
+                    _buildMenuItem(context, LucideIcons.database, 'MASTER SEEDING', const SeedManagerPage()),
                 ],
               ),
             ),
@@ -87,11 +104,17 @@ class EspySideMenu extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuItem(BuildContext context, IconData icon, String label, Widget screen) {
+  Widget _buildMenuItem(BuildContext context, IconData icon, String label, Widget? screen, {bool isHome = false}) {
     return ListTile(
       onTap: () {
         Navigator.pop(context);
-        Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
+        if (isHome) {
+           // Home is handled by the shell, just close drawer
+           return;
+        }
+        if (screen != null) {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
+        }
       },
       leading: Icon(icon, color: Colors.white70, size: 20),
       title: Text(label, style: GoogleFonts.montserrat(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 11, letterSpacing: 1)),

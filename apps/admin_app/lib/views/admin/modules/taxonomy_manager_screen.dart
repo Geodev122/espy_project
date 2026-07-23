@@ -1,7 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../theme/espy_theme.dart';
 import '../../../viewmodels/espy_repository.dart';
 import '../../../viewmodels/taxonomy_view_model.dart';
@@ -9,7 +10,6 @@ import '../../../widgets/common/premium_button.dart';
 import '../../../widgets/common/premium_card.dart';
 import '../../../widgets/common/espy_scaffold.dart';
 import '../../../widgets/common/espy_icon.dart';
-
 import '../../../viewmodels/audit_view_model.dart';
 
 class TaxonomyManagerScreen extends StatelessWidget {
@@ -99,7 +99,10 @@ class _GeographyPanelState extends State<_GeographyPanel> {
     return ListView(
       padding: const EdgeInsets.all(24),
       children: [
-        _buildSectionHeader("1. COUNTRIES", onAdd: () => _showGeographyDialog("country")),
+        _buildSectionHeader("1. COUNTRIES", 
+          onAdd: () => _showGeographyDialog("country"),
+          onImport: () => _showMasterImportDialog(),
+        ),
         ...widget.vm.countries.map((c) => _buildListTile(
           label: "${c['flagEmoji'] ?? ''} ${c['nameEn']}",
           isSelected: _selectedCountryId == c['id'],
@@ -114,7 +117,11 @@ class _GeographyPanelState extends State<_GeographyPanel> {
         
         if (_selectedCountryId != null) ...[
           const SizedBox(height: 32),
-          _buildSectionHeader("2. REGIONS", onAdd: () => _showGeographyDialog("region")),
+          _buildSectionHeader("2. REGIONS", 
+            onAdd: () => _showGeographyDialog("region"),
+            onImport: () => _showImportDialog("region"),
+            onDownload: () => _showTemplateDialog("region"),
+          ),
           ...widget.vm.regions.map((r) => _buildListTile(
             label: r['nameEn'],
             isSelected: _selectedRegionId == r['id'],
@@ -127,20 +134,62 @@ class _GeographyPanelState extends State<_GeographyPanel> {
 
         if (_selectedRegionId != null) ...[
           const SizedBox(height: 32),
-          _buildSectionHeader("3. CITIES", onAdd: () => _showGeographyDialog("city"), onImport: () => _showImportDialog("city")),
+          _buildSectionHeader("3. CITIES", 
+            onAdd: () => _showGeographyDialog("city"), 
+            onImport: () => _showImportDialog("city"),
+            onDownload: () => _showTemplateDialog("city"),
+          ),
           ...widget.vm.cities.map((city) => _buildListTile(
             label: city['nameEn'],
-            onTap: () {}, // Detail editor could open here
+            onTap: () {},
           )),
         ],
       ],
     );
   }
 
+  void _showMasterImportDialog() {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("MASTER HIERARCHY IMPORT (JSON)"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text("Paste a JSON array containing Countries, Regions, and Cities.", style: TextStyle(fontSize: 11)),
+            const SizedBox(height: 12),
+            TextField(
+              controller: controller,
+              maxLines: 12,
+              decoration: const InputDecoration(hintText: "[ { \"id\": \"LB\", ... } ]", border: OutlineInputBorder()),
+              style: GoogleFonts.firaCode(fontSize: 10),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("CANCEL")),
+          ElevatedButton(
+            onPressed: () async {
+              try {
+                await widget.vm.importFullTaxonomyJson(controller.text);
+                if (mounted) Navigator.pop(context);
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Import Failed: $e")));
+              }
+            },
+            child: const Text("EXECUTE MASTER SEED"),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showGeographyDialog(String type) {
+    final id = TextEditingController();
     final nameEn = TextEditingController();
     final nameAr = TextEditingController();
-    final code = TextEditingController(); // ISO or Region Code
+    final code = TextEditingController();
 
     showDialog(
       context: context,
@@ -149,31 +198,43 @@ class _GeographyPanelState extends State<_GeographyPanel> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (type != 'country') TextField(controller: id, decoration: const InputDecoration(hintText: "Slug ID (e.g. beirut)")),
+            const SizedBox(height: 8),
             TextField(controller: nameEn, decoration: const InputDecoration(hintText: "Name (English)")),
             const SizedBox(height: 8),
             TextField(controller: nameAr, textDirection: TextDirection.rtl, decoration: const InputDecoration(hintText: "الأسم (عربي)")),
             const SizedBox(height: 8),
-            if (type != 'city') TextField(controller: code, decoration: InputDecoration(hintText: type == 'country' ? "ISO Code" : "Region Code")),
+            if (type != 'city') TextField(controller: code, decoration: InputDecoration(hintText: type == 'country' ? "ISO Code (e.g. LB)" : "Region Code")),
           ],
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text("CANCEL")),
           ElevatedButton(
             onPressed: () async {
+              final finalId = type == 'country' ? code.text.toUpperCase() : id.text.toLowerCase().trim();
+              if (finalId.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("ID is required")));
+                return;
+              }
+
               final data = {
-                'id': type == 'country' ? code.text.toUpperCase() : null, // Countries use ISO codes as ID
+                'id': finalId,
                 'nameEn': nameEn.text,
                 'nameAr': nameAr.text,
                 'regionCode': type == 'region' ? code.text : null,
                 'countryId': _selectedCountryId,
                 'regionId': _selectedRegionId,
+                'isoCode': type == 'country' ? code.text : null,
               };
 
-              if (type == 'country') await widget.vm.upsertCountry(data);
-              if (type == 'region') await widget.vm.upsertRegion(data);
-              if (type == 'city') await widget.vm.upsertCity(data);
-
-              if (mounted) Navigator.pop(context);
+              try {
+                if (type == 'country') await widget.vm.upsertCountry(data);
+                if (type == 'region') await widget.vm.upsertRegion(data);
+                if (type == 'city') await widget.vm.upsertCity(data);
+                if (mounted) Navigator.pop(context);
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Save Failed: $e")));
+              }
             },
             child: const Text("SAVE"),
           ),
@@ -182,7 +243,105 @@ class _GeographyPanelState extends State<_GeographyPanel> {
     );
   }
 
-  Widget _buildSectionHeader(String title, {VoidCallback? onAdd, VoidCallback? onImport}) {
+  void _showImportDialog(String type) {
+    final controller = TextEditingController();
+    final template = type == 'region' 
+      ? "id, nameEn, nameAr, regionCode"
+      : "id, nameEn, nameAr, lat, lng";
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("IMPORT ${type.toUpperCase()}S (CSV)"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("COLUMNS: $template", style: GoogleFonts.montserrat(fontWeight: FontWeight.bold, fontSize: 10, color: EspyTheme.royalBlue)),
+            const SizedBox(height: 12),
+            TextField(
+              controller: controller,
+              maxLines: 8,
+              decoration: const InputDecoration(hintText: "Paste CSV data here...", border: OutlineInputBorder()),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("CANCEL")),
+          ElevatedButton(
+            onPressed: () async {
+              if (type == 'region' && _selectedCountryId != null) {
+                await widget.vm.importRegionsCsv(_selectedCountryId!, controller.text);
+              }
+              if (type == 'city' && _selectedRegionId != null) {
+                await widget.vm.importCitiesCsv(_selectedRegionId!, controller.text);
+              }
+              if (mounted) Navigator.pop(context);
+            },
+            child: const Text("IMPORT"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showTemplateDialog(String type) {
+    final String jsonTemplate = """
+[
+  {
+    "id": "LB",
+    "nameEn": "Lebanon",
+    "nameAr": "لبنان",
+    "isoCode": "LB",
+    "regions": [
+      {
+        "id": "beirut",
+        "nameEn": "Beirut",
+        "nameAr": "بيروت",
+        "regionCode": "BE",
+        "cities": [
+          { "id": "beirut-city", "nameEn": "Beirut", "nameAr": "بيروت", "lat": 33.89, "lng": 35.50 }
+        ]
+      }
+    ]
+  }
+]
+""";
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("HIERARCHY TEMPLATE (JSON)"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text("Use this format for Master Import:", style: TextStyle(fontSize: 12)),
+            const SizedBox(height: 16),
+            Container(
+              constraints: const BoxConstraints(maxHeight: 200),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(8)),
+              child: SingleChildScrollView(
+                child: SelectableText(jsonTemplate, style: GoogleFonts.firaCode(fontSize: 9)),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("CLOSE")),
+          ElevatedButton(
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: jsonTemplate));
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Template copied to clipboard")));
+            },
+            child: const Text("COPY JSON TEMPLATE"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title, {VoidCallback? onAdd, VoidCallback? onImport, VoidCallback? onDownload}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
@@ -191,45 +350,13 @@ class _GeographyPanelState extends State<_GeographyPanel> {
           Text(title, style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.w900, color: EspyTheme.gold, letterSpacing: 2)),
           Row(
             children: [
+              if (onDownload != null)
+                IconButton(icon: const Icon(Icons.description_outlined, size: 20, color: EspyTheme.royalBlue), onPressed: onDownload),
               if (onImport != null)
                 IconButton(icon: const Icon(Icons.file_upload_rounded, size: 20, color: EspyTheme.royalBlue), onPressed: onImport),
               if (onAdd != null)
                 IconButton(icon: const Icon(Icons.add_circle_outline, size: 20, color: EspyTheme.gold), onPressed: onAdd),
             ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showImportDialog(String type) {
-    final controller = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text("IMPORT ${type.toUpperCase()}S (CSV)"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text("Format: NameEn, NameAr, Lat, Lng", style: TextStyle(fontSize: 10, color: Colors.black38)),
-            const SizedBox(height: 12),
-            TextField(
-              controller: controller,
-              maxLines: 8,
-              decoration: const InputDecoration(hintText: "Enter CSV data here...", border: OutlineInputBorder()),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text("CANCEL")),
-          ElevatedButton(
-            onPressed: () async {
-              if (type == 'city' && _selectedRegionId != null) {
-                await widget.vm.importCitiesCsv(_selectedRegionId!, controller.text);
-              }
-              if (mounted) Navigator.pop(context);
-            },
-            child: const Text("IMPORT"),
           ),
         ],
       ),

@@ -9,11 +9,13 @@ class AdminDashboardViewModel extends ChangeNotifier {
     'users': '0',
     'services': '0',
     'communityRequests': '0',
+    'pendingOrders': '0',
   };
   bool _isLoading = true;
   bool _disposed = false;
 
   StreamSubscription? _statsSub;
+  StreamSubscription? _ordersSub;
 
   AdminDashboardViewModel(this._repository) {
     _init();
@@ -26,11 +28,10 @@ class AdminDashboardViewModel extends ChangeNotifier {
     try {
       _statsSub = _repository.getSystemStats().listen((data) {
         if (_disposed) return;
-        _stats = {
-          'users': data['users']?.toString() ?? '0',
-          'services': data['services']?.toString() ?? '0',
-          'communityRequests': data['communityRequests']?.toString() ?? '0',
-        };
+        final safeData = data ?? {};
+        _stats['users'] = safeData['users']?.toString() ?? _stats['users'];
+        _stats['services'] = safeData['services']?.toString() ?? _stats['services'];
+        _stats['communityRequests'] = safeData['communityRequests']?.toString() ?? _stats['communityRequests'];
         _isLoading = false;
         notifyListeners();
       }, onError: (e) {
@@ -39,6 +40,14 @@ class AdminDashboardViewModel extends ChangeNotifier {
           _isLoading = false;
           notifyListeners();
         }
+      });
+
+      _ordersSub = _repository.listPendingOrders().listen((data) {
+        if (_disposed) return;
+        _stats['pendingOrders'] = data.length.toString();
+        notifyListeners();
+      }, onError: (e) {
+        debugPrint("Orders Subscription Error: $e");
       });
     } catch (e) {
       debugPrint("Stats Init Error: $e");
@@ -50,6 +59,7 @@ class AdminDashboardViewModel extends ChangeNotifier {
   void dispose() {
     _disposed = true;
     _statsSub?.cancel();
+    _ordersSub?.cancel();
     super.dispose();
   }
 }

@@ -21,7 +21,7 @@ import 'viewmodels/matching_view_model.dart';
 import 'viewmodels/requests_view_model.dart';
 import 'viewmodels/services_view_model.dart';
 import 'viewmodels/espy_repository.dart';
-import 'viewmodels/firestore_espy_repository.dart';
+import 'viewmodels/dataconnect_espy_repository.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -64,7 +64,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        Provider<EspyRepository>(create: (_) => FirestoreEspyRepository()),
+        Provider<EspyRepository>(create: (_) => DataConnectEspyRepository()),
         ChangeNotifierProxyProvider<EspyRepository, AuthService>(
           create: (context) => AuthService(context.read<EspyRepository>()),
           update: (context, repo, previous) => AuthService(repo),

@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart' as firestore;
+import 'package:firebase_data_connect/firebase_data_connect.dart';
 import 'espy_repository.dart';
 import '../models/user_model.dart' as models;
 import '../models/professional_profile.dart';
@@ -22,13 +24,13 @@ class DataConnectEspyRepository implements EspyRepository {
       id: user.id,
       email: user.email,
       name: user.name ?? '',
-      role: models.UserRole.values.byName(user.role.stringValue.toLowerCase()),
+      role: models.UserRole.values.byName(user.role.value.name.toLowerCase()),
       isActive: user.isActive,
       walletBalance: user.walletBalance,
       tokensUsed: user.tokensUsed,
       photoUrl: user.photoUrl,
-      createdAt: user.createdAt.asDateTime,
-      updatedAt: user.updatedAt.asDateTime,
+      createdAt: user.createdAt.toDateTime(),
+      updatedAt: user.updatedAt.toDateTime(),
     );
   }
 
@@ -57,10 +59,10 @@ class DataConnectEspyRepository implements EspyRepository {
       bioAr: prof.bioAr,
       isApproved: prof.isApproved,
       isHonorVerified: prof.isHonorVerified,
-      membershipTier: prof.membershipTier?.stringValue.toLowerCase() ?? 'basic',
+      membershipTier: prof.membershipTier?.value.name.toLowerCase() ?? 'basic',
       serviceSlots: prof.serviceSlots,
       practicePins: prof.practicePins,
-      visibilityExpiresAt: prof.visibilityExpiresAt?.asDateTime,
+      visibilityExpiresAt: prof.visibilityExpiresAt?.toDateTime(),
     );
   }
 
@@ -75,7 +77,7 @@ class DataConnectEspyRepository implements EspyRepository {
       nameAr: inst.nameAr,
       isApproved: inst.isApproved,
       serviceSlots: 0, // Fallback
-      visibilityExpiresAt: inst.visibilityExpiresAt?.asDateTime,
+      visibilityExpiresAt: inst.visibilityExpiresAt?.toDateTime(),
     );
   }
 
@@ -84,14 +86,14 @@ class DataConnectEspyRepository implements EspyRepository {
     final result = await _db.getUser(uid: id).execute();
     final visitor = result.data.user?.visitorProfile_on_user;
     if (visitor == null) return null;
-    return VisitorProfile(id: id, interests: visitor.interests ?? []);
+    return VisitorProfile(id: id, interests: (visitor.interests ?? []).whereType<String>().toList());
   }
 
   // ─── 2. Taxonomy & Location ──────────────────────────────────────────────
 
   @override
   Stream<List<Map<String, dynamic>>> listSectors() {
-    return _db.listSectors().subscribe().map((snap) => 
+    return _db.listSectors().ref().subscribe().map((snap) => 
       snap.data.sectors.map((s) => {
         'id': s.id,
         'nameEn': s.nameEn,
@@ -110,19 +112,22 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Stream<List<Map<String, dynamic>>> listCategories({String? sectorId}) {
-    return _db.listCategories(sectorId: sectorId).subscribe().map((snap) =>
+    var builder = _db.listCategories();
+    if (sectorId != null) builder = builder.sectorId(sectorId);
+    
+    return builder.ref().subscribe().map((snap) =>
       snap.data.categories.map((c) => {
         'id': c.id,
         'nameEn': c.nameEn,
         'nameAr': c.nameAr,
-        'targetRole': c.targetRole.stringValue.toLowerCase(),
+        'targetRole': c.targetRole.value.name.toLowerCase(),
       }).toList()
     );
   }
 
   @override
   Stream<List<Map<String, dynamic>>> listCountries() {
-    return _db.listCountries().subscribe().map((snap) =>
+    return _db.listCountries().ref().subscribe().map((snap) =>
       snap.data.countries.map((c) => {
         'id': c.id,
         'nameEn': c.nameEn,
@@ -136,7 +141,7 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Stream<List<Map<String, dynamic>>> listRegions(String countryId) {
-    return _db.listRegions(countryId: countryId).subscribe().map((snap) =>
+    return _db.listRegions(countryId: countryId).ref().subscribe().map((snap) =>
       snap.data.regions.map((r) => {
         'id': r.id.toString(),
         'nameEn': r.nameEn,
@@ -148,7 +153,7 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Stream<List<Map<String, dynamic>>> listCities(String regionId) {
-    return _db.listCities(regionId: regionId).subscribe().map((snap) =>
+    return _db.listCities(regionId: regionId).ref().subscribe().map((snap) =>
       snap.data.cities.map((c) => {
         'id': c.id.toString(),
         'nameEn': c.nameEn,
@@ -161,7 +166,7 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Stream<List<Map<String, dynamic>>> listLocationNodes(String userId) {
-    return _db.listLocationNodes(userId: userId).subscribe().map((snap) => 
+    return _db.listLocationNodes(userId: userId).ref().subscribe().map((snap) => 
       snap.data.locationNodes.map((ln) => {
         'id': ln.id,
         'label': ln.label,
@@ -175,37 +180,40 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Future<void> upsertCountry(Map<String, dynamic> data) async {
-    await _db.upsertCountry(
+    final builder = _db.upsertCountry(
       id: data['id'],
       nameEn: data['nameEn'],
       nameAr: data['nameAr'],
-      isoCode: data['isoCode'],
-      currency: data['currency'],
-      flagEmoji: data['flagEmoji'],
-    ).execute();
+    );
+    if (data['isoCode'] != null) builder.isoCode(data['isoCode']);
+    if (data['currency'] != null) builder.currency(data['currency']);
+    if (data['flagEmoji'] != null) builder.flagEmoji(data['flagEmoji']);
+    await builder.execute();
   }
 
   @override
   Future<void> upsertRegion(Map<String, dynamic> data) async {
-    await _db.upsertRegion(
+    final builder = _db.upsertRegion(
       id: data['id'],
       countryId: data['countryId'],
       nameEn: data['nameEn'],
       nameAr: data['nameAr'],
-      regionCode: data['regionCode'],
-    ).execute();
+    );
+    if (data['regionCode'] != null) builder.regionCode(data['regionCode']);
+    await builder.execute();
   }
 
   @override
   Future<void> upsertCity(Map<String, dynamic> data) async {
-    await _db.upsertCity(
+    final builder = _db.upsertCity(
       id: data['id'],
       regionId: data['regionId'],
       nameEn: data['nameEn'],
       nameAr: data['nameAr'],
-      lat: data['lat'],
-      lng: data['lng'],
-    ).execute();
+    );
+    if (data['lat'] != null) builder.lat(data['lat']);
+    if (data['lng'] != null) builder.lng(data['lng']);
+    await builder.execute();
   }
 
   @override
@@ -226,13 +234,12 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Future<void> updateSectorBranding(String id, Map<String, dynamic> data) async {
-    await _db.updateSectorBranding(
-      id: id,
-      iconName: data['iconName'],
-      colorHex: data['colorHex'],
-      nameEn: data['nameEn'],
-      nameAr: data['nameAr'],
-    ).execute();
+    final builder = _db.updateSectorBranding(id: id);
+    if (data['iconName'] != null) builder.iconName(data['iconName']);
+    if (data['colorHex'] != null) builder.colorHex(data['colorHex']);
+    if (data['nameEn'] != null) builder.nameEn(data['nameEn']);
+    if (data['nameAr'] != null) builder.nameAr(data['nameAr']);
+    await builder.execute();
   }
 
   @override
@@ -242,12 +249,16 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Future<void> upsertPriceTag(Map<String, dynamic> data) async {
-    await _db.upsertPriceTag(id: data['id'], nameEn: data['nameEn'], nameAr: data['nameAr'], category: data['category']).execute();
+    final builder = _db.upsertPriceTag(id: data['id'], nameEn: data['nameEn'], nameAr: data['nameAr']);
+    if (data['category'] != null) builder.category(data['category']);
+    await builder.execute();
   }
 
   @override
   Future<void> upsertPinCategory(Map<String, dynamic> data) async {
-    await _db.upsertPinCategory(id: data['id'], nameEn: data['nameEn'], nameAr: data['nameAr'], iconBase: data['iconBase']).execute();
+    final builder = _db.upsertPinCategory(id: data['id'], nameEn: data['nameEn'], nameAr: data['nameAr']);
+    if (data['iconBase'] != null) builder.iconBase(data['iconBase']);
+    await builder.execute();
   }
 
   @override
@@ -259,13 +270,17 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Stream<List<Map<String, dynamic>>> listActiveServices({String? categoryId, String? sectorId}) {
-    return _db.listActiveServices(categoryId: categoryId, sectorId: sectorId).subscribe().map((snap) =>
+    var builder = _db.listActiveServices();
+    if (categoryId != null) builder = builder.categoryId(categoryId);
+    if (sectorId != null) builder = builder.sectorId(sectorId);
+
+    return builder.ref().subscribe().map((snap) =>
       snap.data.services.map((s) => {
         'id': s.id.toString(),
         'titleEn': s.titleEn,
         'price': s.price,
         'imageUrl': s.imageUrl,
-        'deliveryMode': s.deliveryMode.stringValue,
+        'deliveryMode': s.deliveryMode?.value.name,
         'providerId': s.provider.id,
         'template': s.sector.template != null ? {
            'accentColor': s.sector.template!.accentColor,
@@ -283,19 +298,22 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Future<void> toggleServiceSlot(String serviceId, bool allocate) async {
-    await _db.updateService(id: serviceId, isAllocated: allocate).execute();
+    await _db.updateService(id: serviceId).isAllocated(allocate).execute();
   }
 
   @override
   Stream<List<Map<String, dynamic>>> listCommunityRequests({String? sectorId, bool newestFirst = true, String? userId}) {
-    return _db.listServiceRequests(sectorId: sectorId).subscribe().map((snap) =>
+    var builder = _db.listServiceRequests();
+    if (sectorId != null) builder = builder.sectorId(sectorId);
+
+    return builder.ref().subscribe().map((snap) =>
       snap.data.serviceRequests.map((cr) => {
         'id': cr.id.toString(),
         'descriptionEn': cr.descriptionEn,
         'descriptionAr': cr.descriptionAr,
-        'status': cr.status.stringValue,
+        'status': cr.status.value.name,
         'userName': cr.user.name,
-        'createdAt': cr.createdAt.asDateTime,
+        'createdAt': cr.createdAt.toDateTime(),
         'sectorId': sectorId,
       }).toList()
     );
@@ -321,13 +339,13 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Stream<List<Map<String, dynamic>>> listWalletTransactions(String userId) {
-    return _db.getWalletTransactions(userId: userId).subscribe().map((snap) =>
+    return _db.getWalletTransactions(userId: userId).ref().subscribe().map((snap) =>
       snap.data.walletTransactions.map((t) => {
         'id': t.id.toString(),
-        'type': t.type.stringValue,
+        'type': t.type.value.name,
         'amount': t.amount,
         'description': t.description,
-        'createdAt': t.createdAt.asDateTime,
+        'createdAt': t.createdAt.toDateTime(),
       }).toList()
     );
   }
@@ -339,8 +357,7 @@ class DataConnectEspyRepository implements EspyRepository {
       cost: cost,
       ledgerAmount: -cost,
       description: "Purchase: $itemId",
-      type: sdk.TransactionType.PURCHASE,
-    ).execute();
+    ).type(sdk.TransactionType.PURCHASE).execute();
     return {'success': true};
   }
 
@@ -362,38 +379,36 @@ class DataConnectEspyRepository implements EspyRepository {
   @override
   Stream<List<String>> listFavoriteIds(String userId) {
     return _db.listInteractions(actorId: userId, type: sdk.InteractionType.FAVORITE)
-        .subscribe()
+        .ref().subscribe()
         .map((snap) => snap.data.interactions.map((i) => i.targetId).toList());
   }
 
   @override
   Stream<List<String>> listContactedIds(String userId) {
     return _db.listInteractions(actorId: userId, type: sdk.InteractionType.CONTACT)
-        .subscribe()
+        .ref().subscribe()
         .map((snap) => snap.data.interactions.map((i) => i.targetId).toList());
   }
 
   @override
   Future<void> upsertProfessionalProfile({required String id, String? fullNameAr, String? specialty, String? specialtyAr, String? bioEn, String? bioAr}) async {
-    await _db.upsertProfessionalProfile(
-      id: id,
-      fullNameAr: fullNameAr,
-      specialty: specialty,
-      specialtyAr: specialtyAr,
-      bioEn: bioEn,
-      bioAr: bioAr,
-    ).execute();
+    final builder = _db.upsertProfessionalProfile(id: id);
+    if (fullNameAr != null) builder.fullNameAr(fullNameAr);
+    if (specialty != null) builder.specialty(specialty);
+    if (specialtyAr != null) builder.specialtyAr(specialtyAr);
+    if (bioEn != null) builder.bioEn(bioEn);
+    if (bioAr != null) builder.bioAr(bioAr);
+    await builder.execute();
   }
 
   @override
   Future<void> upsertInstitutionProfile({required String id, String? nameAr, String? bioEn, String? bioAr, String? registrationNumber}) async {
-    await _db.upsertInstitutionProfile(
-      id: id,
-      nameAr: nameAr,
-      bioEn: bioEn,
-      bioAr: bioAr,
-      registrationNumber: registrationNumber,
-    ).execute();
+    final builder = _db.upsertInstitutionProfile(id: id);
+    if (nameAr != null) builder.nameAr(nameAr);
+    if (bioEn != null) builder.bioEn(bioEn);
+    if (bioAr != null) builder.bioAr(bioAr);
+    if (registrationNumber != null) builder.registrationNumber(registrationNumber);
+    await builder.execute();
   }
 
   @override
@@ -408,7 +423,7 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Stream<Map<String, dynamic>?> getActiveResourceOrder(String userId) {
-    return _db.getActiveResourceOrder(userId: userId).subscribe().map((snap) {
+    return _db.getActiveResourceOrder(userId: userId).ref().subscribe().map((snap) {
       if (snap.data.resourceOrders.isEmpty) return null;
       final o = snap.data.resourceOrders.first;
       return {
@@ -417,7 +432,7 @@ class DataConnectEspyRepository implements EspyRepository {
         'slotsCount': o.slotsCount,
         'broadcastsCount': o.broadcastsCount,
         'totalCost': o.totalCost,
-        'status': o.status.stringValue,
+        'status': o.status.value.name,
       };
     });
   }
@@ -429,12 +444,12 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Stream<List<Map<String, dynamic>>> listRechargeCards() {
-    return _db.listRechargeCards().subscribe().map((snap) =>
+    return _db.listRechargeCards().ref().subscribe().map((snap) =>
       snap.data.rechargeCards.map((c) => {
         'id': c.id,
         'tokenValue': c.tokenValue,
         'status': c.status,
-        'redeemedAt': c.redeemedAt?.asDateTime,
+        'redeemedAt': c.redeemedAt?.toDateTime(),
         'redeemedBy': c.redeemedBy?.email,
       }).toList()
     );
@@ -444,25 +459,26 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Stream<List<Map<String, dynamic>>> searchUsersAdmin({String? query, String? role, bool? hasProfile, bool? isActive}) {
-    sdk.UserRole? gqlRole;
-    if (role != null) gqlRole = sdk.UserRole.values.byName(role.toUpperCase());
+    var builder = _db.searchUsersAdmin();
+    if (query != null) builder = builder.query(query);
+    if (role != null) {
+       final gqlRole = sdk.UserRole.values.byName(role.toUpperCase());
+       builder = builder.role(gqlRole);
+    }
+    if (hasProfile != null) builder = builder.hasProfile(hasProfile);
+    if (isActive != null) builder = builder.isActive(isActive);
     
-    return _db.searchUsersAdmin(
-      query: query,
-      role: gqlRole,
-      hasProfile: hasProfile,
-      isActive: isActive,
-    ).subscribe().map((snap) =>
+    return builder.ref().subscribe().map((snap) =>
       snap.data.users.map((u) => {
         'id': u.id,
         'email': u.email,
         'name': u.name,
-        'role': u.role.stringValue,
+        'role': u.role.value.name,
         'isActive': u.isActive,
         'hasProfile': u.hasProfile,
         'phone': u.phone,
         'whatsapp': u.whatsapp,
-        'createdAt': u.createdAt.asDateTime,
+        'createdAt': u.createdAt.toDateTime(),
       }).toList()
     );
   }
@@ -477,7 +493,7 @@ class DataConnectEspyRepository implements EspyRepository {
       'id': u.id,
       'email': u.email,
       'name': u.name,
-      'role': u.role.stringValue,
+      'role': u.role.value.name,
       'isActive': u.isActive,
       'hasProfile': u.hasProfile,
       'photoUrl': u.photoUrl,
@@ -485,14 +501,14 @@ class DataConnectEspyRepository implements EspyRepository {
       'whatsapp': u.whatsapp,
       'walletBalance': u.walletBalance,
       'adminNotes': u.adminNotes,
-      'createdAt': u.createdAt.asDateTime,
-      'updatedAt': u.updatedAt.asDateTime,
+      'createdAt': u.createdAt.toDateTime(),
+      'updatedAt': u.updatedAt.toDateTime(),
       'transactions': u.walletTransactions_on_user.map((t) => {
         'id': t.id.toString(),
         'amount': t.amount,
-        'type': t.type.stringValue,
+        'type': t.type.value.name,
         'description': t.description,
-        'createdAt': t.createdAt.asDateTime,
+        'createdAt': t.createdAt.toDateTime(),
       }).toList(),
     };
 
@@ -504,8 +520,8 @@ class DataConnectEspyRepository implements EspyRepository {
         'isApproved': p.isApproved,
         'isProfileValidated': p.isProfileValidated,
         'verificationDocUrl': p.verificationDocUrl,
-        'membershipTier': p.membershipTier?.stringValue,
-        'visibilityExpiresAt': p.visibilityExpiresAt?.asDateTime,
+        'membershipTier': p.membershipTier?.value.name,
+        'visibilityExpiresAt': p.visibilityExpiresAt?.toDateTime(),
       };
     }
 
@@ -517,7 +533,7 @@ class DataConnectEspyRepository implements EspyRepository {
         'isApproved': i.isApproved,
         'isProfileValidated': i.isProfileValidated,
         'verificationDocUrl': i.verificationDocUrl,
-        'visibilityExpiresAt': i.visibilityExpiresAt?.asDateTime,
+        'visibilityExpiresAt': i.visibilityExpiresAt?.toDateTime(),
       };
     }
 
@@ -577,27 +593,29 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Stream<List<Map<String, dynamic>>> listSupportTickets({String? status}) {
-     sdk.SupportTicketStatus? gqlStatus;
+     var builder = _db.listSupportTickets();
      if (status != null) {
+        sdk.SupportTicketStatus? gqlStatus;
         if (status.toUpperCase() == 'OPEN') gqlStatus = sdk.SupportTicketStatus.OPEN;
         if (status.toUpperCase() == 'CLOSED') gqlStatus = sdk.SupportTicketStatus.CLOSED;
         if (status.toUpperCase() == 'PENDING') gqlStatus = sdk.SupportTicketStatus.PENDING;
+        if (gqlStatus != null) builder = builder.status(gqlStatus);
      }
-     return _db.listSupportTickets(status: gqlStatus).subscribe().map((snap) =>
+     return builder.ref().subscribe().map((snap) =>
         snap.data.supportTickets.map((st) => {
           'id': st.id.toString(),
           'subject': st.subject,
           'message': st.message,
-          'status': st.status.stringValue,
+          'status': st.status.value.name,
           'userEmail': st.user.email,
-          'createdAt': st.createdAt.asDateTime,
+          'createdAt': st.createdAt.toDateTime(),
         }).toList()
      );
   }
 
   @override
   Stream<List<Map<String, dynamic>>> listPendingOrders() {
-    return _db.listPendingOrders().subscribe().map((snap) =>
+    return _db.listPendingOrders().ref().subscribe().map((snap) =>
       snap.data.resourceOrders.map((o) => {
         'id': o.id.toString(),
         'pinsCount': o.pinsCount,
@@ -617,15 +635,15 @@ class DataConnectEspyRepository implements EspyRepository {
   @override
   Stream<List<Map<String, dynamic>>> listServiceModerationQueue({String status = 'PENDING'}) {
     final sdkStatus = sdk.ModerationStatus.values.byName(status.toUpperCase());
-    return _db.listServiceModerationQueue(status: sdkStatus).subscribe().map((snap) =>
+    return _db.listServiceModerationQueue().status(sdkStatus).ref().subscribe().map((snap) =>
       snap.data.services.map((s) => {
         'id': s.id.toString(),
         'titleEn': s.titleEn,
         'titleAr': s.titleAr,
         'price': s.price,
         'imageUrl': s.imageUrl,
-        'deliveryMode': s.deliveryMode.stringValue,
-        'moderationStatus': s.moderationStatus.stringValue,
+        'deliveryMode': s.deliveryMode?.value.name,
+        'moderationStatus': s.moderationStatus.value.name,
         'flagReason': s.flagReason,
         'categoryName': s.category.nameEn,
         'sectorName': s.sector.nameEn,
@@ -644,17 +662,17 @@ class DataConnectEspyRepository implements EspyRepository {
   @override
   Stream<List<Map<String, dynamic>>> listRequestModerationQueue({String status = 'PENDING'}) {
     final sdkStatus = sdk.ModerationStatus.values.byName(status.toUpperCase());
-    return _db.listRequestModerationQueue(status: sdkStatus).subscribe().map((snap) =>
+    return _db.listRequestModerationQueue().status(sdkStatus).ref().subscribe().map((snap) =>
       snap.data.serviceRequests.map((r) => {
         'id': r.id.toString(),
         'descriptionEn': r.descriptionEn,
         'descriptionAr': r.descriptionAr,
-        'urgency': r.urgency?.stringValue,
-        'preferredMode': r.preferredMode?.stringValue,
-        'status': r.status.stringValue,
-        'moderationStatus': r.moderationStatus.stringValue,
+        'urgency': r.urgency?.value.name,
+        'preferredMode': r.preferredMode?.value.name,
+        'status': r.status.value.name,
+        'moderationStatus': r.moderationStatus.value.name,
         'flagReason': r.flagReason,
-        'createdAt': r.createdAt.asDateTime,
+        'createdAt': r.createdAt.toDateTime(),
         'sectorName': r.sector.nameEn,
         'userName': r.user.name,
         'userEmail': r.user.email,
@@ -670,29 +688,34 @@ class DataConnectEspyRepository implements EspyRepository {
   @override
   Future<void> moderateService(String id, String status, {String? reason}) async {
     final sdkStatus = sdk.ModerationStatus.values.byName(status.toUpperCase());
-    await _db.moderateService(id: id, status: sdkStatus, reason: reason).execute();
+    final builder = _db.moderateService(id: id, status: sdkStatus);
+    if (reason != null) builder.reason(reason);
+    await builder.execute();
   }
 
   @override
   Future<void> moderateRequest(String id, String status, {String? reason}) async {
     final sdkStatus = sdk.ModerationStatus.values.byName(status.toUpperCase());
-    await _db.moderateRequest(id: id, status: sdkStatus, reason: reason).execute();
+    final builder = _db.moderateRequest(id: id, status: sdkStatus);
+    if (reason != null) builder.reason(reason);
+    await builder.execute();
   }
 
   @override
   Future<void> createLocalizedBroadcast({required String title, required String message, String? country, String? region, String? city}) async {
-    await _db.createLocalizedBroadcast(
+    final builder = _db.createLocalizedBroadcast(
       title: title,
       message: message,
-      country: country,
-      region: region,
-      city: city,
-    ).execute();
+    );
+    if (country != null) builder.country(country);
+    if (region != null) builder.region(region);
+    if (city != null) builder.city(city);
+    await builder.execute();
   }
 
   @override
   Stream<List<Map<String, dynamic>>> listTemplates() {
-    return _db.listTemplates().subscribe().map((snap) =>
+    return _db.listTemplates().ref().subscribe().map((snap) =>
       snap.data.templates.map((t) => {
         'id': t.id,
         'accentColor': t.accentColor,
@@ -705,20 +728,19 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Future<void> upsertTemplate(String id, List<String> visibleFields, {String? configJson, String? accentColor, String? iconName}) async {
-    await _db.upsertTemplate(
-      id: id,
-      visibleFields: visibleFields,
-      configJson: configJson,
-      accentColor: accentColor,
-      iconName: iconName,
-    ).execute();
+    final builder = _db.upsertTemplate(id: id);
+    builder.visibleFields(visibleFields);
+    if (configJson != null) builder.configJson(configJson);
+    if (accentColor != null) builder.accentColor(accentColor);
+    if (iconName != null) builder.iconName(iconName);
+    await builder.execute();
   }
 
   // ─── 6. Discovery & Helpers ──────────────────────────────────────────────
 
   @override
   Stream<Map<String, dynamic>> getSystemStats() {
-    return Stream.value({});
+    return firestore.FirebaseFirestore.instance.collection('metadata').doc('system_stats').snapshots().map((snap) => (snap.data() as Map<String, dynamic>?) ?? {});
   }
 
   @override

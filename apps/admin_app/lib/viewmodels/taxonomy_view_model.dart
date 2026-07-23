@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'espy_repository.dart';
 
@@ -57,18 +58,95 @@ class TaxonomyViewModel extends ChangeNotifier {
 
   // --- Geography Hierarchy ---
 
+  Future<void> importFullTaxonomyJson(String jsonContent) async {
+    try {
+      final List<dynamic> data = jsonDecode(jsonContent);
+      for (var countryMap in data) {
+        // 1. Country
+        final String countryId = countryMap['id'];
+        await upsertCountry({
+          'id': countryId,
+          'nameEn': countryMap['nameEn'],
+          'nameAr': countryMap['nameAr'],
+          'isoCode': countryMap['isoCode'] ?? countryId,
+          'flagEmoji': countryMap['flagEmoji'],
+          'currency': countryMap['currency'],
+        });
+
+        // 2. Regions
+        final List<dynamic>? regions = countryMap['regions'];
+        if (regions != null) {
+          for (var regionMap in regions) {
+            final String regionId = regionMap['id'];
+            await upsertRegion({
+              'id': regionId,
+              'countryId': countryId,
+              'nameEn': regionMap['nameEn'],
+              'nameAr': regionMap['nameAr'],
+              'regionCode': regionMap['regionCode'],
+            });
+
+            // 3. Cities
+            final List<dynamic>? cities = regionMap['cities'];
+            if (cities != null) {
+              for (var cityMap in cities) {
+                await upsertCity({
+                  'id': cityMap['id'],
+                  'regionId': regionId,
+                  'nameEn': cityMap['nameEn'],
+                  'nameAr': cityMap['nameAr'],
+                  'lat': cityMap['lat'] != null ? double.tryParse(cityMap['lat'].toString()) : null,
+                  'lng': cityMap['lng'] != null ? double.tryParse(cityMap['lng'].toString()) : null,
+                });
+              }
+            }
+          }
+        }
+      }
+      _init(); // Reload top level
+    } catch (e) {
+      debugPrint("Import Full Taxonomy Error: $e");
+      rethrow;
+    }
+  }
+
+  Future<void> importRegionsCsv(String countryId, String csvContent) async {
+    final lines = csvContent.split('\n');
+    for (var line in lines) {
+      if (line.trim().isEmpty) continue;
+      final parts = line.split(',');
+      if (parts.length >= 2) {
+        final id = parts[0].trim().toLowerCase().replaceAll(' ', '-');
+        if (id.isEmpty) continue;
+        
+        await upsertRegion({
+          'id': id,
+          'countryId': countryId,
+          'nameEn': parts[1].trim(),
+          'nameAr': parts.length > 2 ? parts[2].trim() : parts[1].trim(),
+          'regionCode': parts.length > 3 ? parts[3].trim().toUpperCase() : null,
+        });
+      }
+    }
+    loadRegions(countryId);
+  }
+
   Future<void> importCitiesCsv(String regionId, String csvContent) async {
     final lines = csvContent.split('\n');
     for (var line in lines) {
-      if (line.isEmpty) continue;
+      if (line.trim().isEmpty) continue;
       final parts = line.split(',');
       if (parts.length >= 2) {
+        final id = parts[0].trim().toLowerCase().replaceAll(' ', '-');
+        if (id.isEmpty) continue;
+
         await upsertCity({
+          'id': id,
           'regionId': regionId,
-          'nameEn': parts[0].trim(),
-          'nameAr': parts[1].trim(),
-          'lat': parts.length > 2 ? double.tryParse(parts[2]) : null,
-          'lng': parts.length > 3 ? double.tryParse(parts[3]) : null,
+          'nameEn': parts[1].trim(),
+          'nameAr': parts.length > 2 ? parts[2].trim() : parts[1].trim(),
+          'lat': parts.length > 3 ? double.tryParse(parts[3]) : null,
+          'lng': parts.length > 4 ? double.tryParse(parts[4]) : null,
         });
       }
     }
