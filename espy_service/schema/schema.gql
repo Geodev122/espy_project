@@ -1,4 +1,4 @@
-# ESPY PROTOCOL - UNIFIED SCHEMA v8.1 (Adaptive Branding)
+# ESPY PROTOCOL - UNIFIED SCHEMA v8.2 (Sector-Based Adaptive Branding)
 
 # --- Enums ---
 
@@ -141,6 +141,7 @@ type Sector @table(key: "id") {
   colorHex: String # Primary branding color for this sector
   displayOrder: Int @default(value: 999)
   isActive: Boolean! @default(value: true)
+  template: Template @ref
 }
 
 type Category @table(key: "id") {
@@ -152,12 +153,10 @@ type Category @table(key: "id") {
   targetRole: UserRole!
   isOtherCategory: Boolean! @default(value: false)
   isActive: Boolean! @default(value: true)
-  template: Template @ref
 }
 
 type Template @table(key: "id") {
-  id: String! # Links to CategoryID
-  category: Category! @ref(fields: ["id"])
+  id: String! # Links to SectorID or "GLOBAL_VISITOR_REQUEST"
   accentColor: String # Branding Hex
   iconName: String # Branding Icon
   visibleFields: [String] # e.g. ["title", "price", "location", "tags"]
@@ -284,7 +283,7 @@ type ServiceRequest @table(key: "id") {
   lng: Float
   city: City
   status: CommunityRequestStatus! @default(value: ACTIVE)
-  moderationStatus: ModerationStatus! @default(value: APPROVED) # Visitors usually auto-approved or pending?
+  moderationStatus: ModerationStatus! @default(value: APPROVED)
   flagReason: String
   createdAt: Timestamp! @default(expr: "request.time")
   updatedAt: Timestamp! @default(expr: "request.time")

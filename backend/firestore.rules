@@ -17,9 +17,10 @@ service cloud.firestore {
             || request.auth.token.email == 'geodev122@gmail.com'
             || request.auth.token.email == 'admin@espy.com'
             || request.auth.token.email == 'committee@hope-bearer.org'
+            || request.auth.uid == 'hnkKVHtIqZaXeOEyA8BSS7Gk0FW2'
             || request.auth.uid == 'tYtarL5VEbP6sfSBEjsrcl67Drv1'
             || request.auth.uid == '8m9zP6vQp7U5g2vR9w8x3b1c2d3e'
-            || request.auth.uid == 'X9Xp7mRz3FhGj8K2L5N4B1V0C6W7'); // Ensuring Admin/Institution fallback
+            || request.auth.uid == 'X9Xp7mRz3FhGj8K2L5N4B1V0C6W7');
     }
 
     // PUBLIC-FACING DATA: Allow anyone to read.
@@ -399,6 +400,31 @@ service cloud.firestore {
     }
 
     match /directory_categories/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /directory_service_tags/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /directory_price_tags/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /directory_pin_categories/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /directory_presence_tags/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /directory_templates/{docId} {
       allow read: if true;
       allow write: if isAdmin();
     }

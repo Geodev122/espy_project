@@ -24,6 +24,7 @@ class ListSectorsSectors {
   final String? iconName;
   final String? colorHex;
   final String? description;
+  final ListSectorsSectorsTemplate? template;
   ListSectorsSectors.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']),
@@ -31,7 +32,8 @@ class ListSectorsSectors {
   nameAr = json['nameAr'] == null ? null : nativeFromJson<String>(json['nameAr']),
   iconName = json['iconName'] == null ? null : nativeFromJson<String>(json['iconName']),
   colorHex = json['colorHex'] == null ? null : nativeFromJson<String>(json['colorHex']),
-  description = json['description'] == null ? null : nativeFromJson<String>(json['description']);
+  description = json['description'] == null ? null : nativeFromJson<String>(json['description']),
+  template = json['template'] == null ? null : ListSectorsSectorsTemplate.fromJson(json['template']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -47,11 +49,12 @@ class ListSectorsSectors {
     nameAr == otherTyped.nameAr && 
     iconName == otherTyped.iconName && 
     colorHex == otherTyped.colorHex && 
-    description == otherTyped.description;
+    description == otherTyped.description && 
+    template == otherTyped.template;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, nameEn.hashCode, nameAr.hashCode, iconName.hashCode, colorHex.hashCode, description.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, nameEn.hashCode, nameAr.hashCode, iconName.hashCode, colorHex.hashCode, description.hashCode, template.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -70,6 +73,9 @@ class ListSectorsSectors {
     if (description != null) {
       json['description'] = nativeToJson<String?>(description);
     }
+    if (template != null) {
+      json['template'] = template!.toJson();
+    }
     return json;
   }
 
@@ -80,6 +86,59 @@ class ListSectorsSectors {
     this.iconName,
     this.colorHex,
     this.description,
+    this.template,
+  });
+}
+
+@immutable
+class ListSectorsSectorsTemplate {
+  final String? accentColor;
+  final String? iconName;
+  final List<String>? visibleFields;
+  ListSectorsSectorsTemplate.fromJson(dynamic json):
+  
+  accentColor = json['accentColor'] == null ? null : nativeFromJson<String>(json['accentColor']),
+  iconName = json['iconName'] == null ? null : nativeFromJson<String>(json['iconName']),
+  visibleFields = json['visibleFields'] == null ? null : (json['visibleFields'] as List<dynamic>)
+        .map((e) => nativeFromJson<String>(e))
+        .toList();
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final ListSectorsSectorsTemplate otherTyped = other as ListSectorsSectorsTemplate;
+    return accentColor == otherTyped.accentColor && 
+    iconName == otherTyped.iconName && 
+    visibleFields == otherTyped.visibleFields;
+    
+  }
+  @override
+  int get hashCode => Object.hashAll([accentColor.hashCode, iconName.hashCode, visibleFields.hashCode]);
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    if (accentColor != null) {
+      json['accentColor'] = nativeToJson<String?>(accentColor);
+    }
+    if (iconName != null) {
+      json['iconName'] = nativeToJson<String?>(iconName);
+    }
+    if (visibleFields != null) {
+      json['visibleFields'] = visibleFields?.map((e) => nativeToJson<String>(e)).toList();
+    }
+    return json;
+  }
+
+  ListSectorsSectorsTemplate({
+    this.accentColor,
+    this.iconName,
+    this.visibleFields,
   });
 }
 

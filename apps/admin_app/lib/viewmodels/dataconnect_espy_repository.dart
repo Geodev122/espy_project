@@ -99,6 +99,11 @@ class DataConnectEspyRepository implements EspyRepository {
         'iconName': s.iconName,
         'colorHex': s.colorHex,
         'description': s.description,
+        'template': s.template != null ? {
+           'accentColor': s.template!.accentColor,
+           'iconName': s.template!.iconName,
+           'visibleFields': s.template!.visibleFields,
+        } : null,
       }).toList()
     );
   }
@@ -111,11 +116,6 @@ class DataConnectEspyRepository implements EspyRepository {
         'nameEn': c.nameEn,
         'nameAr': c.nameAr,
         'targetRole': c.targetRole.stringValue.toLowerCase(),
-        'template': c.template != null ? {
-           'accentColor': c.template!.accentColor,
-           'iconName': c.template!.iconName,
-           'visibleFields': c.template!.visibleFields,
-        } : null,
       }).toList()
     );
   }
@@ -267,10 +267,10 @@ class DataConnectEspyRepository implements EspyRepository {
         'imageUrl': s.imageUrl,
         'deliveryMode': s.deliveryMode.stringValue,
         'providerId': s.provider.id,
-        'template': s.category.template != null ? {
-           'accentColor': s.category.template!.accentColor,
-           'iconName': s.category.template!.iconName,
-           'visibleFields': s.category.template!.visibleFields,
+        'template': s.sector.template != null ? {
+           'accentColor': s.sector.template!.accentColor,
+           'iconName': s.sector.template!.iconName,
+           'visibleFields': s.sector.template!.visibleFields,
         } : null,
       }).toList()
     );
@@ -632,10 +632,10 @@ class DataConnectEspyRepository implements EspyRepository {
         'providerName': s.provider.name,
         'providerEmail': s.provider.email,
         'providerPhoto': s.provider.photoUrl,
-        'template': s.category.template != null ? {
-           'accentColor': s.category.template!.accentColor,
-           'iconName': s.category.template!.iconName,
-           'visibleFields': s.category.template!.visibleFields,
+        'template': s.sector.template != null ? {
+           'accentColor': s.sector.template!.accentColor,
+           'iconName': s.sector.template!.iconName,
+           'visibleFields': s.sector.template!.visibleFields,
         } : null,
       }).toList()
     );
@@ -658,6 +658,11 @@ class DataConnectEspyRepository implements EspyRepository {
         'sectorName': r.sector.nameEn,
         'userName': r.user.name,
         'userEmail': r.user.email,
+        'template': r.sector.template != null ? {
+           'accentColor': r.sector.template!.accentColor,
+           'iconName': r.sector.template!.iconName,
+           'visibleFields': r.sector.template!.visibleFields,
+        } : null,
       }).toList()
     );
   }
@@ -694,8 +699,6 @@ class DataConnectEspyRepository implements EspyRepository {
         'iconName': t.iconName,
         'visibleFields': t.visibleFields,
         'configJson': t.configJson,
-        'categoryId': t.category.id,
-        'categoryName': t.category.nameEn,
       }).toList()
     );
   }

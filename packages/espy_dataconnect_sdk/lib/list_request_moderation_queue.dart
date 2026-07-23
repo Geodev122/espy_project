@@ -124,12 +124,16 @@ class ListRequestModerationQueueServiceRequests {
 
 @immutable
 class ListRequestModerationQueueServiceRequestsSector {
+  final String id;
   final String nameEn;
   final String? nameAr;
+  final ListRequestModerationQueueServiceRequestsSectorTemplate? template;
   ListRequestModerationQueueServiceRequestsSector.fromJson(dynamic json):
   
+  id = nativeFromJson<String>(json['id']),
   nameEn = nativeFromJson<String>(json['nameEn']),
-  nameAr = json['nameAr'] == null ? null : nativeFromJson<String>(json['nameAr']);
+  nameAr = json['nameAr'] == null ? null : nativeFromJson<String>(json['nameAr']),
+  template = json['template'] == null ? null : ListRequestModerationQueueServiceRequestsSectorTemplate.fromJson(json['template']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -140,26 +144,86 @@ class ListRequestModerationQueueServiceRequestsSector {
     }
 
     final ListRequestModerationQueueServiceRequestsSector otherTyped = other as ListRequestModerationQueueServiceRequestsSector;
-    return nameEn == otherTyped.nameEn && 
-    nameAr == otherTyped.nameAr;
+    return id == otherTyped.id && 
+    nameEn == otherTyped.nameEn && 
+    nameAr == otherTyped.nameAr && 
+    template == otherTyped.template;
     
   }
   @override
-  int get hashCode => Object.hashAll([nameEn.hashCode, nameAr.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, nameEn.hashCode, nameAr.hashCode, template.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
     json['nameEn'] = nativeToJson<String>(nameEn);
     if (nameAr != null) {
       json['nameAr'] = nativeToJson<String?>(nameAr);
+    }
+    if (template != null) {
+      json['template'] = template!.toJson();
     }
     return json;
   }
 
   ListRequestModerationQueueServiceRequestsSector({
+    required this.id,
     required this.nameEn,
     this.nameAr,
+    this.template,
+  });
+}
+
+@immutable
+class ListRequestModerationQueueServiceRequestsSectorTemplate {
+  final String? accentColor;
+  final String? iconName;
+  final List<String>? visibleFields;
+  ListRequestModerationQueueServiceRequestsSectorTemplate.fromJson(dynamic json):
+  
+  accentColor = json['accentColor'] == null ? null : nativeFromJson<String>(json['accentColor']),
+  iconName = json['iconName'] == null ? null : nativeFromJson<String>(json['iconName']),
+  visibleFields = json['visibleFields'] == null ? null : (json['visibleFields'] as List<dynamic>)
+        .map((e) => nativeFromJson<String>(e))
+        .toList();
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final ListRequestModerationQueueServiceRequestsSectorTemplate otherTyped = other as ListRequestModerationQueueServiceRequestsSectorTemplate;
+    return accentColor == otherTyped.accentColor && 
+    iconName == otherTyped.iconName && 
+    visibleFields == otherTyped.visibleFields;
+    
+  }
+  @override
+  int get hashCode => Object.hashAll([accentColor.hashCode, iconName.hashCode, visibleFields.hashCode]);
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    if (accentColor != null) {
+      json['accentColor'] = nativeToJson<String?>(accentColor);
+    }
+    if (iconName != null) {
+      json['iconName'] = nativeToJson<String?>(iconName);
+    }
+    if (visibleFields != null) {
+      json['visibleFields'] = visibleFields?.map((e) => nativeToJson<String>(e)).toList();
+    }
+    return json;
+  }
+
+  ListRequestModerationQueueServiceRequestsSectorTemplate({
+    this.accentColor,
+    this.iconName,
+    this.visibleFields,
   });
 }
 

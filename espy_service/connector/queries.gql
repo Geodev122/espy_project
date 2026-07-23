@@ -1,4 +1,4 @@
-# ESPY PROTOCOL - DATA CONNECT QUERIES v8.1 (Adaptive Branding)
+# ESPY PROTOCOL - DATA CONNECT QUERIES v8.2 (Sector-Based Adaptive Branding)
 
 # --- 1. Identity & Profile ---
 
@@ -66,6 +66,11 @@ query ListSectors @auth(level: PUBLIC) {
     iconName
     colorHex
     description
+    template {
+      accentColor
+      iconName
+      visibleFields
+    }
   }
 }
 
@@ -75,11 +80,6 @@ query ListCategories($sectorId: String) @auth(level: PUBLIC) {
     nameEn
     nameAr
     targetRole
-    template {
-      accentColor
-      iconName
-      visibleFields
-    }
   }
 }
 
@@ -126,7 +126,7 @@ query ListActiveServices($categoryId: String, $sectorId: String) @auth(level: PU
     imageUrl
     deliveryMode
     priceTag { nameEn nameAr }
-    category {
+    sector {
       template {
         accentColor
         iconName
@@ -409,13 +409,13 @@ query ListServiceModerationQueue($status: ModerationStatus = PENDING) @auth(leve
     deliveryMode
     moderationStatus
     flagReason
-    category {
+    category { nameEn nameAr }
+    sector {
       id
       nameEn
       nameAr
       template { accentColor iconName visibleFields }
     }
-    sector { nameEn nameAr }
     provider { id name photoUrl email }
   }
 }
@@ -431,7 +431,12 @@ query ListRequestModerationQueue($status: ModerationStatus = PENDING) @auth(leve
     moderationStatus
     flagReason
     createdAt
-    sector { nameEn nameAr }
+    sector {
+      id
+      nameEn
+      nameAr
+      template { accentColor iconName visibleFields }
+    }
     user { id name email }
   }
 }
@@ -443,7 +448,6 @@ query ListTemplates @auth(level: PUBLIC) {
     iconName
     visibleFields
     configJson
-    category { id nameEn nameAr }
   }
 }
 

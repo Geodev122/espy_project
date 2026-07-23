@@ -122,16 +122,12 @@ class ListServiceModerationQueueServices {
 
 @immutable
 class ListServiceModerationQueueServicesCategory {
-  final String id;
   final String nameEn;
   final String? nameAr;
-  final ListServiceModerationQueueServicesCategoryTemplate? template;
   ListServiceModerationQueueServicesCategory.fromJson(dynamic json):
   
-  id = nativeFromJson<String>(json['id']),
   nameEn = nativeFromJson<String>(json['nameEn']),
-  nameAr = json['nameAr'] == null ? null : nativeFromJson<String>(json['nameAr']),
-  template = json['template'] == null ? null : ListServiceModerationQueueServicesCategoryTemplate.fromJson(json['template']);
+  nameAr = json['nameAr'] == null ? null : nativeFromJson<String>(json['nameAr']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -142,6 +138,51 @@ class ListServiceModerationQueueServicesCategory {
     }
 
     final ListServiceModerationQueueServicesCategory otherTyped = other as ListServiceModerationQueueServicesCategory;
+    return nameEn == otherTyped.nameEn && 
+    nameAr == otherTyped.nameAr;
+    
+  }
+  @override
+  int get hashCode => Object.hashAll([nameEn.hashCode, nameAr.hashCode]);
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json['nameEn'] = nativeToJson<String>(nameEn);
+    if (nameAr != null) {
+      json['nameAr'] = nativeToJson<String?>(nameAr);
+    }
+    return json;
+  }
+
+  ListServiceModerationQueueServicesCategory({
+    required this.nameEn,
+    this.nameAr,
+  });
+}
+
+@immutable
+class ListServiceModerationQueueServicesSector {
+  final String id;
+  final String nameEn;
+  final String? nameAr;
+  final ListServiceModerationQueueServicesSectorTemplate? template;
+  ListServiceModerationQueueServicesSector.fromJson(dynamic json):
+  
+  id = nativeFromJson<String>(json['id']),
+  nameEn = nativeFromJson<String>(json['nameEn']),
+  nameAr = json['nameAr'] == null ? null : nativeFromJson<String>(json['nameAr']),
+  template = json['template'] == null ? null : ListServiceModerationQueueServicesSectorTemplate.fromJson(json['template']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final ListServiceModerationQueueServicesSector otherTyped = other as ListServiceModerationQueueServicesSector;
     return id == otherTyped.id && 
     nameEn == otherTyped.nameEn && 
     nameAr == otherTyped.nameAr && 
@@ -165,7 +206,7 @@ class ListServiceModerationQueueServicesCategory {
     return json;
   }
 
-  ListServiceModerationQueueServicesCategory({
+  ListServiceModerationQueueServicesSector({
     required this.id,
     required this.nameEn,
     this.nameAr,
@@ -174,11 +215,11 @@ class ListServiceModerationQueueServicesCategory {
 }
 
 @immutable
-class ListServiceModerationQueueServicesCategoryTemplate {
+class ListServiceModerationQueueServicesSectorTemplate {
   final String? accentColor;
   final String? iconName;
   final List<String>? visibleFields;
-  ListServiceModerationQueueServicesCategoryTemplate.fromJson(dynamic json):
+  ListServiceModerationQueueServicesSectorTemplate.fromJson(dynamic json):
   
   accentColor = json['accentColor'] == null ? null : nativeFromJson<String>(json['accentColor']),
   iconName = json['iconName'] == null ? null : nativeFromJson<String>(json['iconName']),
@@ -194,7 +235,7 @@ class ListServiceModerationQueueServicesCategoryTemplate {
       return false;
     }
 
-    final ListServiceModerationQueueServicesCategoryTemplate otherTyped = other as ListServiceModerationQueueServicesCategoryTemplate;
+    final ListServiceModerationQueueServicesSectorTemplate otherTyped = other as ListServiceModerationQueueServicesSectorTemplate;
     return accentColor == otherTyped.accentColor && 
     iconName == otherTyped.iconName && 
     visibleFields == otherTyped.visibleFields;
@@ -218,51 +259,10 @@ class ListServiceModerationQueueServicesCategoryTemplate {
     return json;
   }
 
-  ListServiceModerationQueueServicesCategoryTemplate({
+  ListServiceModerationQueueServicesSectorTemplate({
     this.accentColor,
     this.iconName,
     this.visibleFields,
-  });
-}
-
-@immutable
-class ListServiceModerationQueueServicesSector {
-  final String nameEn;
-  final String? nameAr;
-  ListServiceModerationQueueServicesSector.fromJson(dynamic json):
-  
-  nameEn = nativeFromJson<String>(json['nameEn']),
-  nameAr = json['nameAr'] == null ? null : nativeFromJson<String>(json['nameAr']);
-  @override
-  bool operator ==(Object other) {
-    if(identical(this, other)) {
-      return true;
-    }
-    if(other.runtimeType != runtimeType) {
-      return false;
-    }
-
-    final ListServiceModerationQueueServicesSector otherTyped = other as ListServiceModerationQueueServicesSector;
-    return nameEn == otherTyped.nameEn && 
-    nameAr == otherTyped.nameAr;
-    
-  }
-  @override
-  int get hashCode => Object.hashAll([nameEn.hashCode, nameAr.hashCode]);
-  
-
-  Map<String, dynamic> toJson() {
-    Map<String, dynamic> json = {};
-    json['nameEn'] = nativeToJson<String>(nameEn);
-    if (nameAr != null) {
-      json['nameAr'] = nativeToJson<String?>(nameAr);
-    }
-    return json;
-  }
-
-  ListServiceModerationQueueServicesSector({
-    required this.nameEn,
-    this.nameAr,
   });
 }
 

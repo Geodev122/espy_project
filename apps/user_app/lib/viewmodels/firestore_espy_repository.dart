@@ -298,7 +298,7 @@ class FirestoreEspyRepository implements EspyRepository {
         .where('userId', isEqualTo: userId)
         .snapshots()
         .map((snap) => snap.docs.map((doc) {
-              final data = doc.data() as Map<String, dynamic>;
+              final data = doc.data();
               return data['targetId'] as String? ?? '';
             }).where((id) => id.isNotEmpty).toList());
   }
@@ -310,7 +310,7 @@ class FirestoreEspyRepository implements EspyRepository {
         .where('type', isEqualTo: 'like')
         .snapshots()
         .map((snap) => snap.docs.map((doc) {
-              final data = doc.data() as Map<String, dynamic>;
+              final data = doc.data();
               return data['targetId'] as String? ?? '';
             }).where((id) => id.isNotEmpty).toList());
   }
@@ -557,18 +557,38 @@ class FirestoreEspyRepository implements EspyRepository {
   }
 
   @override
+  Future<void> createLocalizedBroadcast({required String title, required String message, String? country, String? region, String? city}) async {
+    await _db.collection('directory_broadcasts').add({
+      'title': title,
+      'message': message,
+      'targetCountry': country ?? 'GLOBAL',
+      'targetRegion': region,
+      'targetCity': city,
+      'status': 'queued',
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  @override
   Stream<List<Map<String, dynamic>>> listTemplates() {
     return _db.collection('directory_templates').snapshots().map((snap) =>
         snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList());
   }
 
   @override
-  Future<void> upsertTemplate(String id, List<String> visibleFields, {String? configJson}) async {
+  Future<void> upsertTemplate(String id, List<String> visibleFields, {String? configJson, String? accentColor, String? iconName}) async {
     await _db.collection('directory_templates').doc(id).set({
       'visibleFields': visibleFields,
       'configJson': configJson,
+      'accentColor': accentColor,
+      'iconName': iconName,
       'updatedAt': FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));
+  }
+
+  @override
+  Future<void> updateCategory(String id, Map<String, dynamic> data) async {
+    await _db.collection('directory_categories').doc(id).update({...data, 'updatedAt': FieldValue.serverTimestamp()});
   }
 
   // ─── 6. Discovery & Helpers ──────────────────────────────────────────────
@@ -576,10 +596,5 @@ class FirestoreEspyRepository implements EspyRepository {
   @override
   Stream<Map<String, dynamic>> getSystemStats() {
     return _db.collection('metadata').doc('system_stats').snapshots().map((snap) => (snap.data() as Map<String, dynamic>?) ?? {});
-  }
-
-  @override
-  Future<void> updateCategory(String id, Map<String, dynamic> data) async {
-    await _db.collection('directory_categories').doc(id).update({...data, 'updatedAt': FieldValue.serverTimestamp()});
   }
 }

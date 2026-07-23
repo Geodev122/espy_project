@@ -99,6 +99,11 @@ class DataConnectEspyRepository implements EspyRepository {
         'iconName': s.iconName,
         'colorHex': s.colorHex,
         'description': s.description,
+        'template': s.template != null ? {
+           'accentColor': s.template!.accentColor,
+           'iconName': s.template!.iconName,
+           'visibleFields': s.template!.visibleFields,
+        } : null,
       }).toList()
     );
   }
@@ -133,7 +138,7 @@ class DataConnectEspyRepository implements EspyRepository {
   Stream<List<Map<String, dynamic>>> listRegions(String countryId) {
     return _db.listRegions(countryId: countryId).subscribe().map((snap) =>
       snap.data.regions.map((r) => {
-        'id': r.id,
+        'id': r.id.toString(),
         'nameEn': r.nameEn,
         'nameAr': r.nameAr,
         'regionCode': r.regionCode,
@@ -145,7 +150,7 @@ class DataConnectEspyRepository implements EspyRepository {
   Stream<List<Map<String, dynamic>>> listCities(String regionId) {
     return _db.listCities(regionId: regionId).subscribe().map((snap) =>
       snap.data.cities.map((c) => {
-        'id': c.id,
+        'id': c.id.toString(),
         'nameEn': c.nameEn,
         'nameAr': c.nameAr,
         'lat': c.lat,
@@ -256,12 +261,17 @@ class DataConnectEspyRepository implements EspyRepository {
   Stream<List<Map<String, dynamic>>> listActiveServices({String? categoryId, String? sectorId}) {
     return _db.listActiveServices(categoryId: categoryId, sectorId: sectorId).subscribe().map((snap) =>
       snap.data.services.map((s) => {
-        'id': s.id,
+        'id': s.id.toString(),
         'titleEn': s.titleEn,
         'price': s.price,
         'imageUrl': s.imageUrl,
         'deliveryMode': s.deliveryMode.stringValue,
         'providerId': s.provider.id,
+        'template': s.sector.template != null ? {
+           'accentColor': s.sector.template!.accentColor,
+           'iconName': s.sector.template!.iconName,
+           'visibleFields': s.sector.template!.visibleFields,
+        } : null,
       }).toList()
     );
   }
@@ -280,13 +290,13 @@ class DataConnectEspyRepository implements EspyRepository {
   Stream<List<Map<String, dynamic>>> listCommunityRequests({String? sectorId, bool newestFirst = true, String? userId}) {
     return _db.listServiceRequests(sectorId: sectorId).subscribe().map((snap) =>
       snap.data.serviceRequests.map((cr) => {
-        'id': cr.id,
+        'id': cr.id.toString(),
         'descriptionEn': cr.descriptionEn,
         'descriptionAr': cr.descriptionAr,
         'status': cr.status.stringValue,
         'userName': cr.user.name,
         'createdAt': cr.createdAt.asDateTime,
-        'sectorId': sectorId, // Fallback
+        'sectorId': sectorId,
       }).toList()
     );
   }
@@ -313,7 +323,7 @@ class DataConnectEspyRepository implements EspyRepository {
   Stream<List<Map<String, dynamic>>> listWalletTransactions(String userId) {
     return _db.getWalletTransactions(userId: userId).subscribe().map((snap) =>
       snap.data.walletTransactions.map((t) => {
-        'id': t.id,
+        'id': t.id.toString(),
         'type': t.type.stringValue,
         'amount': t.amount,
         'description': t.description,
@@ -402,7 +412,7 @@ class DataConnectEspyRepository implements EspyRepository {
       if (snap.data.resourceOrders.isEmpty) return null;
       final o = snap.data.resourceOrders.first;
       return {
-        'id': o.id,
+        'id': o.id.toString(),
         'pinsCount': o.pinsCount,
         'slotsCount': o.slotsCount,
         'broadcastsCount': o.broadcastsCount,
@@ -478,7 +488,7 @@ class DataConnectEspyRepository implements EspyRepository {
       'createdAt': u.createdAt.asDateTime,
       'updatedAt': u.updatedAt.asDateTime,
       'transactions': u.walletTransactions_on_user.map((t) => {
-        'id': t.id,
+        'id': t.id.toString(),
         'amount': t.amount,
         'type': t.type.stringValue,
         'description': t.description,
@@ -575,7 +585,7 @@ class DataConnectEspyRepository implements EspyRepository {
      }
      return _db.listSupportTickets(status: gqlStatus).subscribe().map((snap) =>
         snap.data.supportTickets.map((st) => {
-          'id': st.id,
+          'id': st.id.toString(),
           'subject': st.subject,
           'message': st.message,
           'status': st.status.stringValue,
@@ -589,7 +599,7 @@ class DataConnectEspyRepository implements EspyRepository {
   Stream<List<Map<String, dynamic>>> listPendingOrders() {
     return _db.listPendingOrders().subscribe().map((snap) =>
       snap.data.resourceOrders.map((o) => {
-        'id': o.id,
+        'id': o.id.toString(),
         'pinsCount': o.pinsCount,
         'slotsCount': o.slotsCount,
         'broadcastsCount': o.broadcastsCount,
@@ -622,6 +632,11 @@ class DataConnectEspyRepository implements EspyRepository {
         'providerName': s.provider.name,
         'providerEmail': s.provider.email,
         'providerPhoto': s.provider.photoUrl,
+        'template': s.sector.template != null ? {
+           'accentColor': s.sector.template!.accentColor,
+           'iconName': s.sector.template!.iconName,
+           'visibleFields': s.sector.template!.visibleFields,
+        } : null,
       }).toList()
     );
   }
@@ -643,6 +658,11 @@ class DataConnectEspyRepository implements EspyRepository {
         'sectorName': r.sector.nameEn,
         'userName': r.user.name,
         'userEmail': r.user.email,
+        'template': r.sector.template != null ? {
+           'accentColor': r.sector.template!.accentColor,
+           'iconName': r.sector.template!.iconName,
+           'visibleFields': r.sector.template!.visibleFields,
+        } : null,
       }).toList()
     );
   }
@@ -660,21 +680,38 @@ class DataConnectEspyRepository implements EspyRepository {
   }
 
   @override
+  Future<void> createLocalizedBroadcast({required String title, required String message, String? country, String? region, String? city}) async {
+    await _db.createLocalizedBroadcast(
+      title: title,
+      message: message,
+      country: country,
+      region: region,
+      city: city,
+    ).execute();
+  }
+
+  @override
   Stream<List<Map<String, dynamic>>> listTemplates() {
     return _db.listTemplates().subscribe().map((snap) =>
       snap.data.templates.map((t) => {
         'id': t.id,
+        'accentColor': t.accentColor,
+        'iconName': t.iconName,
         'visibleFields': t.visibleFields,
         'configJson': t.configJson,
-        'categoryId': t.category.id,
-        'categoryName': t.category.nameEn,
       }).toList()
     );
   }
 
   @override
-  Future<void> upsertTemplate(String id, List<String> visibleFields, {String? configJson}) async {
-    await _db.upsertTemplate(id: id, visibleFields: visibleFields, configJson: configJson).execute();
+  Future<void> upsertTemplate(String id, List<String> visibleFields, {String? configJson, String? accentColor, String? iconName}) async {
+    await _db.upsertTemplate(
+      id: id,
+      visibleFields: visibleFields,
+      configJson: configJson,
+      accentColor: accentColor,
+      iconName: iconName,
+    ).execute();
   }
 
   // ─── 6. Discovery & Helpers ──────────────────────────────────────────────

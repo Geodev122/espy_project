@@ -11,6 +11,7 @@ class AdminDashboardViewModel extends ChangeNotifier {
     'communityRequests': '0',
   };
   bool _isLoading = true;
+  bool _disposed = false;
 
   StreamSubscription? _statsSub;
 
@@ -22,19 +23,34 @@ class AdminDashboardViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   void _init() {
-    _statsSub = _repository.getSystemStats().listen((data) {
-      _stats = {
-        'users': data['users']?.toString() ?? '0',
-        'services': data['services']?.toString() ?? '0',
-        'communityRequests': data['communityRequests']?.toString() ?? '0',
-      };
+    try {
+      _statsSub = _repository.getSystemStats().listen((data) {
+        _stats = {
+          'users': data['users']?.toString() ?? '0',
+          'services': data['services']?.toString() ?? '0',
+          'communityRequests': data['communityRequests']?.toString() ?? '0',
+        };
+        _isLoading = false;
+        _safeNotify();
+      }, onError: (e) {
+        debugPrint("Stats Subscription Error: $e");
+        _isLoading = false;
+        _safeNotify();
+      });
+    } catch (e) {
+      debugPrint("Stats Init Error: $e");
       _isLoading = false;
-      notifyListeners();
-    });
+      _safeNotify();
+    }
+  }
+
+  void _safeNotify() {
+    if (!_disposed) notifyListeners();
   }
 
   @override
   void dispose() {
+    _disposed = true;
     _statsSub?.cancel();
     super.dispose();
   }

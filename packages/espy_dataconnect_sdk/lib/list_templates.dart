@@ -23,7 +23,6 @@ class ListTemplatesTemplates {
   final String? iconName;
   final List<String>? visibleFields;
   final String? configJson;
-  final ListTemplatesTemplatesCategory category;
   ListTemplatesTemplates.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']),
@@ -32,8 +31,7 @@ class ListTemplatesTemplates {
   visibleFields = json['visibleFields'] == null ? null : (json['visibleFields'] as List<dynamic>)
         .map((e) => nativeFromJson<String>(e))
         .toList(),
-  configJson = json['configJson'] == null ? null : nativeFromJson<String>(json['configJson']),
-  category = ListTemplatesTemplatesCategory.fromJson(json['category']);
+  configJson = json['configJson'] == null ? null : nativeFromJson<String>(json['configJson']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -48,12 +46,11 @@ class ListTemplatesTemplates {
     accentColor == otherTyped.accentColor && 
     iconName == otherTyped.iconName && 
     visibleFields == otherTyped.visibleFields && 
-    configJson == otherTyped.configJson && 
-    category == otherTyped.category;
+    configJson == otherTyped.configJson;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, accentColor.hashCode, iconName.hashCode, visibleFields.hashCode, configJson.hashCode, category.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, accentColor.hashCode, iconName.hashCode, visibleFields.hashCode, configJson.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -71,7 +68,6 @@ class ListTemplatesTemplates {
     if (configJson != null) {
       json['configJson'] = nativeToJson<String?>(configJson);
     }
-    json['category'] = category.toJson();
     return json;
   }
 
@@ -81,53 +77,6 @@ class ListTemplatesTemplates {
     this.iconName,
     this.visibleFields,
     this.configJson,
-    required this.category,
-  });
-}
-
-@immutable
-class ListTemplatesTemplatesCategory {
-  final String id;
-  final String nameEn;
-  final String? nameAr;
-  ListTemplatesTemplatesCategory.fromJson(dynamic json):
-  
-  id = nativeFromJson<String>(json['id']),
-  nameEn = nativeFromJson<String>(json['nameEn']),
-  nameAr = json['nameAr'] == null ? null : nativeFromJson<String>(json['nameAr']);
-  @override
-  bool operator ==(Object other) {
-    if(identical(this, other)) {
-      return true;
-    }
-    if(other.runtimeType != runtimeType) {
-      return false;
-    }
-
-    final ListTemplatesTemplatesCategory otherTyped = other as ListTemplatesTemplatesCategory;
-    return id == otherTyped.id && 
-    nameEn == otherTyped.nameEn && 
-    nameAr == otherTyped.nameAr;
-    
-  }
-  @override
-  int get hashCode => Object.hashAll([id.hashCode, nameEn.hashCode, nameAr.hashCode]);
-  
-
-  Map<String, dynamic> toJson() {
-    Map<String, dynamic> json = {};
-    json['id'] = nativeToJson<String>(id);
-    json['nameEn'] = nativeToJson<String>(nameEn);
-    if (nameAr != null) {
-      json['nameAr'] = nativeToJson<String?>(nameAr);
-    }
-    return json;
-  }
-
-  ListTemplatesTemplatesCategory({
-    required this.id,
-    required this.nameEn,
-    this.nameAr,
   });
 }
 

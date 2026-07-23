@@ -28,14 +28,12 @@ class ListCategoriesCategories {
   final String nameEn;
   final String? nameAr;
   final EnumValue<UserRole> targetRole;
-  final ListCategoriesCategoriesTemplate? template;
   ListCategoriesCategories.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']),
   nameEn = nativeFromJson<String>(json['nameEn']),
   nameAr = json['nameAr'] == null ? null : nativeFromJson<String>(json['nameAr']),
-  targetRole = userRoleDeserializer(json['targetRole']),
-  template = json['template'] == null ? null : ListCategoriesCategoriesTemplate.fromJson(json['template']);
+  targetRole = userRoleDeserializer(json['targetRole']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -49,12 +47,11 @@ class ListCategoriesCategories {
     return id == otherTyped.id && 
     nameEn == otherTyped.nameEn && 
     nameAr == otherTyped.nameAr && 
-    targetRole == otherTyped.targetRole && 
-    template == otherTyped.template;
+    targetRole == otherTyped.targetRole;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, nameEn.hashCode, nameAr.hashCode, targetRole.hashCode, template.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, nameEn.hashCode, nameAr.hashCode, targetRole.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -67,9 +64,6 @@ class ListCategoriesCategories {
     json['targetRole'] = 
     userRoleSerializer(targetRole)
     ;
-    if (template != null) {
-      json['template'] = template!.toJson();
-    }
     return json;
   }
 
@@ -78,59 +72,6 @@ class ListCategoriesCategories {
     required this.nameEn,
     this.nameAr,
     required this.targetRole,
-    this.template,
-  });
-}
-
-@immutable
-class ListCategoriesCategoriesTemplate {
-  final String? accentColor;
-  final String? iconName;
-  final List<String>? visibleFields;
-  ListCategoriesCategoriesTemplate.fromJson(dynamic json):
-  
-  accentColor = json['accentColor'] == null ? null : nativeFromJson<String>(json['accentColor']),
-  iconName = json['iconName'] == null ? null : nativeFromJson<String>(json['iconName']),
-  visibleFields = json['visibleFields'] == null ? null : (json['visibleFields'] as List<dynamic>)
-        .map((e) => nativeFromJson<String>(e))
-        .toList();
-  @override
-  bool operator ==(Object other) {
-    if(identical(this, other)) {
-      return true;
-    }
-    if(other.runtimeType != runtimeType) {
-      return false;
-    }
-
-    final ListCategoriesCategoriesTemplate otherTyped = other as ListCategoriesCategoriesTemplate;
-    return accentColor == otherTyped.accentColor && 
-    iconName == otherTyped.iconName && 
-    visibleFields == otherTyped.visibleFields;
-    
-  }
-  @override
-  int get hashCode => Object.hashAll([accentColor.hashCode, iconName.hashCode, visibleFields.hashCode]);
-  
-
-  Map<String, dynamic> toJson() {
-    Map<String, dynamic> json = {};
-    if (accentColor != null) {
-      json['accentColor'] = nativeToJson<String?>(accentColor);
-    }
-    if (iconName != null) {
-      json['iconName'] = nativeToJson<String?>(iconName);
-    }
-    if (visibleFields != null) {
-      json['visibleFields'] = visibleFields?.map((e) => nativeToJson<String>(e)).toList();
-    }
-    return json;
-  }
-
-  ListCategoriesCategoriesTemplate({
-    this.accentColor,
-    this.iconName,
-    this.visibleFields,
   });
 }
 

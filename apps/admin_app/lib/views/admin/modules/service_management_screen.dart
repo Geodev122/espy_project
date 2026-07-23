@@ -80,7 +80,7 @@ class _ListingModerationPanel extends StatelessWidget {
     return Stack(
       children: [
         Padding(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 100),
           child: CardSwiper(
             cardsCount: vm.listingQueue.length,
             cardBuilder: (context, index, _, __) {
@@ -88,7 +88,7 @@ class _ListingModerationPanel extends StatelessWidget {
               return _buildModerationCard(
                 context,
                 title: item['titleEn'] ?? 'SERVICE',
-                subtitle: "${item['categoryName']} | ${item['providerName']}",
+                subtitle: "${item['sectorName']} | ${item['providerName']}",
                 description: item['descriptionEn'] ?? '',
                 onApprove: () => _showBroadcastCriteriaDialog(context, (scope) => vm.approveService(item['id'], broadcastScope: scope, serviceData: item)),
                 onReject: () => _showRejectDialog(context, (reason) => vm.rejectService(item['id'], reason)),
@@ -132,14 +132,30 @@ class _ListingModerationPanel extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("BROADCAST SCOPE"),
+        title: Text("BROADCAST SCOPE", style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, fontSize: 16)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ListTile(title: const Text("NO BROADCAST"), onTap: () { onConfirm('NONE'); Navigator.pop(context); }),
-            ListTile(title: const Text("SAME COUNTRY"), onTap: () { onConfirm('COUNTRY'); Navigator.pop(context); }),
-            ListTile(title: const Text("SAME REGION"), onTap: () { onConfirm('REGION'); Navigator.pop(context); }),
-            ListTile(title: const Text("SAME CITY"), onTap: () { onConfirm('CITY'); Navigator.pop(context); }),
+            ListTile(
+              title: const Text("NO BROADCAST"), 
+              subtitle: const Text("Silent approval, no notifications sent.", style: TextStyle(fontSize: 10)),
+              onTap: () { onConfirm('NONE'); Navigator.pop(context); }
+            ),
+            ListTile(
+              title: const Text("SAME COUNTRY"), 
+              subtitle: const Text("Notify all visitors in this country.", style: TextStyle(fontSize: 10)),
+              onTap: () { onConfirm('COUNTRY'); Navigator.pop(context); }
+            ),
+            ListTile(
+              title: const Text("SAME REGION"), 
+              subtitle: const Text("Notify visitors in this specific region.", style: TextStyle(fontSize: 10)),
+              onTap: () { onConfirm('REGION'); Navigator.pop(context); }
+            ),
+            ListTile(
+              title: const Text("SAME CITY"), 
+              subtitle: const Text("Notify visitors in the provider's city.", style: TextStyle(fontSize: 10)),
+              onTap: () { onConfirm('CITY'); Navigator.pop(context); }
+            ),
           ],
         ),
       ),
@@ -171,7 +187,7 @@ class _RequestModerationPanel extends StatelessWidget {
     if (vm.requestQueue.isEmpty) return Center(child: Text("NO PENDING REQUESTS", style: GoogleFonts.cinzel(color: Colors.black26)));
 
     return Padding(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 100),
       child: CardSwiper(
         cardsCount: vm.requestQueue.length,
         cardBuilder: (context, index, _, __) {
@@ -210,69 +226,91 @@ class _TemplateManagementPanel extends StatelessWidget {
     final repo = context.read<EspyRepository>();
 
     return StreamBuilder<List<Map<String, dynamic>>>(
-      stream: repo.listCategories(),
+      stream: repo.listSectors(),
       builder: (context, snapshot) {
-        final categories = snapshot.data ?? [];
-        return ListView.builder(
+        final sectors = snapshot.data ?? [];
+        return ListView(
           padding: const EdgeInsets.all(24),
-          itemCount: categories.length,
-          itemBuilder: (context, index) {
-            final cat = categories[index];
-            final t = cat['template'] as Map<String, dynamic>?;
-            
-            return PremiumCard(
-              margin: const EdgeInsets.only(bottom: 12),
-              child: ListTile(
-                leading: Container(
-                   width: 12, height: 12,
-                   decoration: BoxDecoration(
-                     color: Color(int.tryParse(t?['accentColor'] ?? '0xFF1565C0') ?? 0xFF1565C0),
-                     shape: BoxShape.circle,
-                   ),
+          children: [
+            _buildSpecialTemplateTile(context, vm, "VISITOR REQUESTS", "GLOBAL_VISITOR_REQUEST"),
+            const Divider(height: 48),
+            Text("SECTOR TEMPLATES", style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.w900, color: EspyTheme.gold, letterSpacing: 2)),
+            const SizedBox(height: 16),
+            ...sectors.map((s) {
+              final t = s['template'] as Map<String, dynamic>?;
+              return PremiumCard(
+                margin: const EdgeInsets.only(bottom: 12),
+                child: ListTile(
+                  leading: Container(
+                     width: 12, height: 12,
+                     decoration: BoxDecoration(
+                       color: Color(int.tryParse(t?['accentColor'] ?? '0xFF1565C0') ?? 0xFF1565C0),
+                       shape: BoxShape.circle,
+                     ),
+                  ),
+                  title: Text(s['nameEn'].toString().toUpperCase(), style: GoogleFonts.montserrat(fontWeight: FontWeight.bold, fontSize: 13)),
+                  subtitle: Text("Identity: ${t?['iconName'] ?? 'Standard'}", style: const TextStyle(fontSize: 10)),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.palette_outlined, color: EspyTheme.gold),
+                    onPressed: () => _showTemplateEditor(context, s['id'], s['nameEn'], t, vm),
+                  ),
                 ),
-                title: Text(cat['nameEn'].toString().toUpperCase(), style: GoogleFonts.montserrat(fontWeight: FontWeight.bold, fontSize: 13)),
-                subtitle: Text("Fields: ${t?['visibleFields']?.length ?? 0}", style: const TextStyle(fontSize: 10)),
-                trailing: IconButton(
-                  icon: const Icon(Icons.settings_suggest_rounded, color: EspyTheme.gold),
-                  onPressed: () => _showTemplateEditor(context, cat, vm),
-                ),
-              ),
-            );
-          },
+              );
+            }),
+          ],
         );
       }
     );
   }
 
-  void _showTemplateEditor(BuildContext context, Map<String, dynamic> cat, ServiceManagementViewModel vm) {
-    final List<String> fields = ['Title', 'Price', 'Location', 'Tags', 'Image', 'Provider Profile'];
-    final t = cat['template'] as Map<String, dynamic>?;
+  Widget _buildSpecialTemplateTile(BuildContext context, ServiceManagementViewModel vm, String label, String templateId) {
+    // Find the template in the viewmodel's list
+    final t = vm.templates.firstWhere((element) => element['id'] == templateId, orElse: () => <String, dynamic>{});
     
-    List<String> selected = List<String>.from(t?['visibleFields'] ?? ['Title', 'Price', 'Location']);
-    final colorController = TextEditingController(text: t?['accentColor'] ?? '0xFF1565C0');
-    final iconController = TextEditingController(text: t?['iconName'] ?? 'medical_services');
+    return PremiumCard(
+      accentColor: EspyTheme.gold,
+      child: ListTile(
+        title: Text(label, style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, fontSize: 14)),
+        subtitle: const Text("Governs visitor Care Requests visualization", style: TextStyle(fontSize: 10)),
+        trailing: IconButton(
+          icon: const Icon(Icons.settings_suggest_rounded, color: EspyTheme.gold),
+          onPressed: () => _showTemplateEditor(context, templateId, label, t, vm),
+        ),
+      ),
+    );
+  }
+
+  void _showTemplateEditor(BuildContext context, String id, String label, Map<String, dynamic>? current, ServiceManagementViewModel vm) {
+    final List<String> fields = ['Title', 'Price', 'Location', 'Tags', 'Image', 'Provider Profile', 'Urgency', 'Description'];
+    
+    List<String> selected = List<String>.from(current?['visibleFields'] ?? ['Title', 'Location']);
+    final colorController = TextEditingController(text: current?['accentColor'] ?? '0xFF1565C0');
+    final iconController = TextEditingController(text: current?['iconName'] ?? 'medical_services');
 
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setModalState) => AlertDialog(
-          title: Text("TEMPLATE: ${cat['nameEn']}"),
+          title: Text("IDENTITY: $label"),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(controller: colorController, decoration: const InputDecoration(labelText: "ACCENT COLOR (HEX)")),
                 const SizedBox(height: 12),
-                TextField(controller: iconController, decoration: const InputDecoration(labelText: "ICON NAME")),
+                TextField(controller: iconController, decoration: const InputDecoration(labelText: "ICON NAME (LUCIDE)")),
+                const SizedBox(height: 24),
+                Text("VISIBLE DATA FIELDS", style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black38)),
                 const SizedBox(height: 12),
                 ...fields.map((f) => CheckboxListTile(
-                  title: Text(f),
+                  title: Text(f, style: const TextStyle(fontSize: 12)),
                   value: selected.contains(f),
                   onChanged: (val) {
                     setModalState(() {
                       if (val == true) selected.add(f); else selected.remove(f);
                     });
                   },
+                  dense: true,
                 )).toList(),
               ],
             ),
@@ -281,13 +319,13 @@ class _TemplateManagementPanel extends StatelessWidget {
             TextButton(onPressed: () => Navigator.pop(context), child: const Text("CANCEL")),
             ElevatedButton(onPressed: () { 
               vm.updateTemplate(
-                categoryId: cat['id'], 
+                categoryId: id, 
                 visibleFields: selected,
                 accentColor: colorController.text,
                 iconName: iconController.text,
               ); 
               Navigator.pop(context); 
-            }, child: const Text("SAVE TEMPLATE")),
+            }, child: const Text("SAVE IDENTITY")),
           ],
         ),
       ),

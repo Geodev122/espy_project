@@ -86,9 +86,10 @@ abstract class EspyRepository {
   Stream<List<Map<String, dynamic>>> listRequestModerationQueue({String status = 'PENDING'});
   Future<void> moderateService(String id, String status, {String? reason});
   Future<void> moderateRequest(String id, String status, {String? reason});
+  Future<void> createLocalizedBroadcast({required String title, required String message, String? country, String? region, String? city});
   
   Stream<List<Map<String, dynamic>>> listTemplates();
-  Future<void> upsertTemplate(String id, List<String> visibleFields, {String? configJson});
+  Future<void> upsertTemplate(String id, List<String> visibleFields, {String? configJson, String? accentColor, String? iconName});
 
   // ─── 6. Discovery & Helpers ──────────────────────────────────────────────
   Stream<Map<String, dynamic>> getSystemStats();
