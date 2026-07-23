@@ -65,7 +65,7 @@ class _MatchingScreenState extends State<MatchingScreen> {
                     if (cardData['isEnd'] == true) return _buildEndCard(l10n);
                     return _buildSwipeCard(cardData);
                   },
-                  onSwipe: (previousIndex, currentIndex, direction) async {
+                  onSwipe: (previousIndex, _, direction) async {
                     final target = displayCards[previousIndex];
                     if (target['isInfo'] == true || target['isEnd'] == true) return true;
 

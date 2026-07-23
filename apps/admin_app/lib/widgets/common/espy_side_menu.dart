@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 
 import 'package:espy_app/theme/espy_theme.dart';
 import 'package:espy_app/viewmodels/auth_service.dart';
-import 'package:espy_app/viewmodels/wallet_view_model.dart';
 import 'package:espy_app/models/user_model.dart';
 
 // Admin Screens (Conditional import or dynamic navigation)

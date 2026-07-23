@@ -68,7 +68,7 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
                     if (data['isEnd'] == true) return _buildEndCard(l10n);
                     return _buildRequestCard(data, l10n);
                   },
-                  onSwipe: (previousIndex, currentIndex, direction) async {
+                  onSwipe: (previousIndex, _, direction) async {
                     final target = displayCards[previousIndex];
                     if (target['isEnd'] == true) return false;
 

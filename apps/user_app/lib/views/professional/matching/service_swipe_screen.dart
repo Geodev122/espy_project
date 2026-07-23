@@ -40,7 +40,7 @@ class _ServiceSwipeScreenState extends State<ServiceSwipeScreen> {
                       cardBuilder: (context, index, _, __) {
                         return _buildServiceCard(viewModel.services[index]);
                       },
-                      onSwipe: (previousIndex, currentIndex, direction) async {
+                      onSwipe: (previousIndex, _, direction) async {
                         final target = viewModel.services[previousIndex];
                         if (direction == CardSwiperDirection.right) {
                           await viewModel.recordInteraction(target['id'], 'service_like');

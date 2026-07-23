@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import 'package:espy_app/l10n/app_localizations.dart';
 
 import 'package:espy_app/theme/espy_theme.dart';
-import 'package:espy_app/viewmodels/firestore_service.dart';
 import 'package:espy_app/viewmodels/user_service.dart';
 import 'package:espy_app/viewmodels/sound_service.dart';
 import 'package:espy_app/widgets/common/premium_button.dart';

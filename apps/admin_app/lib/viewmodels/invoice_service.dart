@@ -155,7 +155,7 @@ class InvoiceService {
     );
 
     await Printing.layoutPdf(
-      onLayout: (PdfPageFormat format) async => pdf.save(),
+      onLayout: (PdfPageFormat _) async => pdf.save(),
       name: 'Invoice_$invoiceNo.pdf',
     );
   }

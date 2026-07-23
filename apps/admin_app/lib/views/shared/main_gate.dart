@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:espy_app/viewmodels/debug_service.dart';
 import 'package:espy_app/viewmodels/auth_service.dart';
 import 'package:espy_app/models/user_model.dart';
 
@@ -13,6 +14,7 @@ class MainGate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _debug = DebugService();
     return Consumer<AuthService>(
       builder: (context, auth, _) {
         if (auth.isLoading) {
@@ -28,6 +30,7 @@ class MainGate extends StatelessWidget {
         }
 
         final user = auth.userData!;
+        _debug.log('GATE', 'Role: ${user.role}, IsActive: ${user.isActive}');
 
         // Check for Admin Role or Super Admin Bypass
         final bool isSuperAdmin = ['geo.elnajjar@gmail.com', 'admin@espy.com'].contains(auth.user?.email);

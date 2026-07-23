@@ -3,14 +3,12 @@ import '../models/user_model.dart';
 import '../models/professional_profile.dart';
 import '../models/institution_profile.dart';
 import '../models/visitor_profile.dart';
-import 'package:espy_dataconnect_sdk/espy_dataconnect_sdk.dart';
+import 'package:espy_dataconnect_sdk/espy_dataconnect_sdk.dart' as sdk;
 
-/**
- * Repository implementation for Firebase DataConnect (PostgreSQL)
- * Uses the auto-generated type-safe SDK for all database operations.
- */
+/// Repository implementation for Firebase DataConnect (PostgreSQL)
+/// Uses the auto-generated type-safe SDK for all database operations.
 class DataConnectEspyRepository implements EspyRepository {
-  final EspyConnector _db = EspyConnector.instance;
+  final sdk.EspyConnector _db = sdk.EspyConnector.instance;
 
   // ─── 1. Identity & Profiles ──────────────────────────────────────────────
 
@@ -221,7 +219,7 @@ class DataConnectEspyRepository implements EspyRepository {
       cost: cost,
       ledgerAmount: -cost,
       description: "Purchase: $itemId",
-      type: TransactionType.purchase,
+      type: sdk.TransactionType.PURCHASE,
     ).execute();
     return {'success': true};
   }
@@ -230,7 +228,7 @@ class DataConnectEspyRepository implements EspyRepository {
   Future<void> recordInteraction({required String userId, required String targetId, required String type}) async {
     await _db.recordInteraction(
       targetId: targetId,
-      type: InteractionType.values.byName(type.toUpperCase()),
+      type: sdk.InteractionType.values.byName(type.toUpperCase()),
     ).execute();
   }
 
@@ -243,14 +241,14 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Stream<List<String>> listFavoriteIds(String userId) {
-    return _db.listInteractions(actorId: userId, type: InteractionType.favorite)
+    return _db.listInteractions(actorId: userId, type: sdk.InteractionType.FAVORITE)
         .subscribe()
         .map((snap) => snap.data.interactions.map((i) => i.targetId).toList());
   }
 
   @override
   Stream<List<String>> listContactedIds(String userId) {
-    return _db.listInteractions(actorId: userId, type: InteractionType.like)
+    return _db.listInteractions(actorId: userId, type: sdk.InteractionType.CONTACT)
         .subscribe()
         .map((snap) => snap.data.interactions.map((i) => i.targetId).toList());
   }
@@ -339,8 +337,8 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Stream<List<Map<String, dynamic>>> listSupportTickets({String? status}) {
-     SupportTicketStatus? gqlStatus;
-     if (status != null) gqlStatus = SupportTicketStatus.values.byName(status.toUpperCase());
+     sdk.SupportTicketStatus? gqlStatus;
+     if (status != null) gqlStatus = sdk.SupportTicketStatus.values.byName(status.toUpperCase());
      return _db.listSupportTickets(status: gqlStatus).subscribe().map((snap) =>
         snap.data.supportTickets.map((st) => {
           'id': st.id,

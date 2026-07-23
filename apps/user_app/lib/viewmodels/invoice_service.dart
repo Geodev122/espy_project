@@ -44,7 +44,7 @@ class InvoiceService {
       pw.Page(
         pageFormat: PdfPageFormat.a5,
         margin: const pw.EdgeInsets.all(32),
-        build: (pw.Context context) {
+        build: (pw.Context _) {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
@@ -155,7 +155,7 @@ class InvoiceService {
     );
 
     await Printing.layoutPdf(
-      onLayout: (PdfPageFormat format) async => pdf.save(),
+      onLayout: (PdfPageFormat _) async => pdf.save(),
       name: 'Invoice_$invoiceNo.pdf',
     );
   }
