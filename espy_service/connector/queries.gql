@@ -1,4 +1,4 @@
-# ESPY PROTOCOL - DATA CONNECT QUERIES v9.0
+# ESPY PROTOCOL - DATA CONNECT QUERIES v8.2 (Sector-Based Adaptive Branding)
 
 # --- 1. Identity & Profile ---
 
@@ -144,6 +144,28 @@ query ListActiveServices($categoryId: String, $sectorId: String) @auth(level: PU
   }
 }
 
+query SearchServices($query: String, $minPrice: Int, $maxPrice: Int) @auth(level: PUBLIC) {
+  services(where: {
+    _and: [
+      { isActive: { eq: true } },
+      { moderationStatus: { eq: APPROVED } },
+      { titleEn: { contains: $query } },
+      { price: { ge: $minPrice } },
+      { price: { le: $maxPrice } },
+      { visibilityExpiresAt: { gt_expr: "request.time" } }
+    ]
+  }) {
+    id
+    titleEn
+    price
+    imageUrl
+    provider {
+      id
+      name
+    }
+  }
+}
+
 query ListCountries @auth(level: PUBLIC) {
   countries {
     id
@@ -167,6 +189,28 @@ query ListLocationNodes($userId: String!) @auth(level: PUBLIC) {
 }
 
 # --- 3. Interactions & Community ---
+
+query ListFavoriteIds($actorId: String!) @auth(expr: "auth.uid == actorId") {
+  interactions(where: {
+    _and: [
+      { actor: { id: { eq: $actorId } } },
+      { type: { eq: FAVORITE } }
+    ]
+  }) {
+    targetId
+  }
+}
+
+query ListContactedIds($actorId: String!) @auth(expr: "auth.uid == actorId") {
+  interactions(where: {
+    _and: [
+      { actor: { id: { eq: $actorId } } },
+      { type: { eq: CONTACT } }
+    ]
+  }) {
+    targetId
+  }
+}
 
 query ListInteractions($actorId: String!, $type: InteractionType!) @auth(expr: "auth.uid == actorId") {
   interactions(where: {
@@ -200,20 +244,44 @@ query ListServiceRequests($sectorId: String, $status: CommunityRequestStatus = A
     user {
       name
     }
-    sector {
-      template {
-        accentColor
-        iconName
-        visibleFields
-      }
-    }
     serviceRequestTags_on_request {
       tag { nameEn nameAr }
     }
   }
 }
 
-# --- 4. Administration & Audit ---
+# --- 4. Ledger & Resource Orders ---
+
+query GetWalletTransactions($userId: String!) @auth(expr: "auth.uid == userId") {
+  walletTransactions(where: { user: { id: { eq: $userId } } }, orderBy: [{ createdAt: DESC }]) {
+    id
+    type
+    amount
+    referenceId
+    description
+    createdAt
+  }
+}
+
+query GetActiveResourceOrder($userId: String!) @auth(expr: "auth.uid == userId") {
+  resourceOrders(where: {
+    _and: [
+      { user: { id: { eq: $userId } } },
+      { status: { ne: PAID } },
+      { status: { ne: CANCELLED } }
+    ]
+  }, orderBy: [{ createdAt: DESC }], limit: 1) {
+    id
+    pinsCount
+    slotsCount
+    broadcastsCount
+    totalCost
+    status
+    createdAt
+  }
+}
+
+# --- 5. Administration & Audit ---
 
 query SearchUsersAdmin($query: String, $role: UserRole, $hasProfile: Boolean, $isActive: Boolean) @auth(level: NO_ACCESS) {
   users(
@@ -281,10 +349,58 @@ query GetAuditDetails($id: String!) @auth(level: NO_ACCESS) {
   }
 }
 
-# --- Moderation Queue ---
+query ListRechargeCards @auth(level: NO_ACCESS) {
+  rechargeCards(orderBy: [{ redeemedAt: DESC }]) {
+    id
+    tokenValue
+    status
+    redeemedAt
+    redeemedBy { email }
+  }
+}
+
+query ListPendingApprovals @auth(level: NO_ACCESS) {
+  professionalProfiles(where: { isApproved: { eq: false } }) {
+    id
+    fullNameAr
+    user {
+      email
+      createdAt
+    }
+  }
+}
+
+query ListPendingOrders @auth(level: NO_ACCESS) {
+  resourceOrders(where: { status: { eq: PENDING } }, orderBy: [{ createdAt: DESC }]) {
+    id
+    pinsCount
+    slotsCount
+    broadcastsCount
+    totalCost
+    status
+    user {
+      id
+      email
+      name
+    }
+  }
+}
+
+query ListSupportTickets($status: SupportTicketStatus) @auth(level: NO_ACCESS) {
+  supportTickets(where: { status: { eq: $status } }, orderBy: [{ createdAt: DESC }]) {
+    id
+    subject
+    message
+    status
+    createdAt
+    user { email name }
+  }
+}
+
+# --- Service Moderation Queries ---
 
 query ListServiceModerationQueue($status: ModerationStatus = PENDING) @auth(level: NO_ACCESS) {
-  services(where: { moderationStatus: { eq: $status } }, orderBy: [{ createdAt: DESC }]) {
+  services(where: { moderationStatus: { eq: $status } }, orderBy: [{ visibilityExpiresAt: DESC }]) {
     id
     titleEn
     titleAr
@@ -334,3 +450,9 @@ query ListTemplates @auth(level: PUBLIC) {
     configJson
   }
 }
+
+# query GetSystemStats @auth(level: NO_ACCESS) {
+#   users_aggregate { count }
+#   services_aggregate(where: { isActive: { eq: true } }) { count }
+#   communityRequests_aggregate(where: { status: { eq: ACTIVE } }) { count }
+# }
