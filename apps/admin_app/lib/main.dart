@@ -67,40 +67,40 @@ void main() async {
         Provider<EspyRepository>(create: (_) => DataConnectEspyRepository()),
         ChangeNotifierProxyProvider<EspyRepository, AuthService>(
           create: (context) => AuthService(context.read<EspyRepository>()),
-          update: (context, repo, previous) => AuthService(repo),
+          update: (context, repo, previous) => previous ?? AuthService(repo),
         ),
         ChangeNotifierProxyProvider<EspyRepository, UserService>(
           create: (context) => UserService(context.read<EspyRepository>()),
-          update: (context, repo, previous) => UserService(repo),
+          update: (context, repo, previous) => previous ?? UserService(repo),
         ),
         ChangeNotifierProvider(create: (_) => LocaleService()),
         ChangeNotifierProxyProvider<EspyRepository, DirectoryViewModel>(
           create: (context) => DirectoryViewModel(context.read<EspyRepository>()),
-          update: (context, repo, previous) => DirectoryViewModel(repo),
+          update: (context, repo, previous) => previous ?? DirectoryViewModel(repo),
         ),
         ChangeNotifierProxyProvider<EspyRepository, AdminDashboardViewModel>(
           create: (context) => AdminDashboardViewModel(context.read<EspyRepository>()),
-          update: (context, repo, previous) => AdminDashboardViewModel(repo),
+          update: (context, repo, previous) => previous ?? AdminDashboardViewModel(repo),
         ),
         ChangeNotifierProxyProvider2<AuthService, EspyRepository, DashboardViewModel>(
           create: (context) => DashboardViewModel(context.read<AuthService>(), context.read<EspyRepository>()),
-          update: (context, auth, repo, previous) => DashboardViewModel(auth, repo),
+          update: (context, auth, repo, previous) => previous ?? DashboardViewModel(auth, repo),
         ),
         ChangeNotifierProxyProvider2<AuthService, EspyRepository, WalletViewModel>(
           create: (context) => WalletViewModel(context.read<AuthService>(), context.read<EspyRepository>()),
-          update: (context, auth, repo, previous) => WalletViewModel(auth, repo),
+          update: (context, auth, repo, previous) => previous ?? WalletViewModel(auth, repo),
         ),
         ChangeNotifierProxyProvider2<EspyRepository, AuthService, MatchingViewModel>(
           create: (context) => MatchingViewModel(context.read<EspyRepository>(), context.read<AuthService>()),
-          update: (context, repo, auth, previous) => MatchingViewModel(repo, auth),
+          update: (context, repo, auth, previous) => previous ?? MatchingViewModel(repo, auth),
         ),
         ChangeNotifierProxyProvider2<EspyRepository, AuthService, RequestsViewModel>(
           create: (context) => RequestsViewModel(context.read<EspyRepository>(), context.read<AuthService>()),
-          update: (context, repo, auth, previous) => RequestsViewModel(repo, auth),
+          update: (context, repo, auth, previous) => previous ?? RequestsViewModel(repo, auth),
         ),
         ChangeNotifierProxyProvider2<EspyRepository, AuthService, ServicesViewModel>(
           create: (context) => ServicesViewModel(context.read<EspyRepository>(), context.read<AuthService>()),
-          update: (context, repo, auth, previous) => ServicesViewModel(repo, auth),
+          update: (context, repo, auth, previous) => previous ?? ServicesViewModel(repo, auth),
         ),
         Provider(create: (_) => FirestoreService()),
         Provider(create: (_) => StorageService()),

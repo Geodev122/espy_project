@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart' as firestore;
 import 'package:firebase_data_connect/firebase_data_connect.dart';
+import 'package:flutter/foundation.dart';
 import 'espy_repository.dart';
 import '../models/user_model.dart' as models;
 import '../models/professional_profile.dart';
@@ -7,109 +8,173 @@ import '../models/institution_profile.dart';
 import '../models/visitor_profile.dart';
 import 'package:espy_dataconnect_sdk/espy_dataconnect_sdk.dart' as sdk;
 
-/// Repository implementation for Firebase DataConnect (PostgreSQL)
-/// Uses the auto-generated type-safe SDK for all database operations.
+/// Repository implementation for Firebase DataConnect (PostgreSQL) with Firestore Fallback
 class DataConnectEspyRepository implements EspyRepository {
   final sdk.EspyConnector _db = sdk.EspyConnector.instance;
+  final firestore.FirebaseFirestore _firestore = firestore.FirebaseFirestore.instance;
 
   // ─── 1. Identity & Profiles ──────────────────────────────────────────────
 
   @override
   Future<models.UserModel?> getUser(String id) async {
-    final result = await _db.getUser(uid: id).execute();
-    final user = result.data.user;
-    if (user == null) return null;
+    try {
+      // 1. Try DataConnect
+      final result = await _db.getUser(uid: id).execute();
+      final user = result.data.user;
+      if (user != null) {
+        return models.UserModel(
+          id: user.id,
+          email: user.email,
+          name: user.name ?? '',
+          role: models.UserRole.values.byName(user.role.stringValue.toLowerCase()),
+          isActive: user.isActive,
+          walletBalance: user.walletBalance,
+          tokensUsed: user.tokensUsed,
+          photoUrl: user.photoUrl,
+          createdAt: user.createdAt.toDateTime(),
+          updatedAt: user.updatedAt.toDateTime(),
+        );
+      }
+    } catch (e) {
+      debugPrint("DataConnect getUser failed: $e");
+    }
+
+    // 2. Fallback to Firestore
+    try {
+      final doc = await _firestore.collection('users').doc(id).get();
+      if (doc.exists && doc.data() != null) {
+        return models.UserModel.fromMap(doc.data() as Map<String, dynamic>);
+      }
+    } catch (e) {
+      debugPrint("Firestore Fallback getUser failed: $e");
+    }
     
-    return models.UserModel(
-      id: user.id,
-      email: user.email,
-      name: user.name ?? '',
-      role: models.UserRole.values.byName(user.role.stringValue.toLowerCase()),
-      isActive: user.isActive,
-      walletBalance: user.walletBalance,
-      tokensUsed: user.tokensUsed,
-      photoUrl: user.photoUrl,
-      createdAt: user.createdAt.toDateTime(),
-      updatedAt: user.updatedAt.toDateTime(),
-    );
+    return null;
   }
 
   @override
   Future<void> createUser(Map<String, dynamic> data) async {
-    await _db.createUser(
-      id: data['id'],
-      email: data['email'],
-      role: sdk.UserRole.values.byName(data['role'].toString().toUpperCase()),
-    ).name(data['name']).execute();
+    // Write to Firestore first
+    await _firestore.collection('users').doc(data['id']).set(data);
+    
+    // Shadow-write to DataConnect
+    try {
+      await _db.createUser(
+        id: data['id'],
+        email: data['email'],
+        role: sdk.UserRole.values.byName(data['role'].toString().toUpperCase()),
+      ).name(data['name']).execute();
+    } catch (e) {
+      debugPrint("Shadow-write createUser failed: $e");
+    }
   }
 
   @override
   Future<void> upsertUser(Map<String, dynamic> data) async {
-    await _db.upsertUser(
-      id: data['id'],
-      email: data['email'],
-      role: sdk.UserRole.values.byName(data['role'].toString().toUpperCase()),
-    ).name(data['name']).execute();
+    // Write to Firestore first
+    await _firestore.collection('users').doc(data['id']).set(data, firestore.SetOptions(merge: true));
+
+    // Shadow-write to DataConnect
+    try {
+      await _db.upsertUser(
+        id: data['id'],
+        email: data['email'],
+        role: sdk.UserRole.values.byName(data['role'].toString().toUpperCase()),
+      ).name(data['name']).execute();
+    } catch (e) {
+      debugPrint("Shadow-write upsertUser failed: $e");
+    }
   }
 
   @override
   Future<void> updateUser(String id, Map<String, dynamic> data) async {
-    final builder = _db.updateUserProfile(id: id);
-    if (data.containsKey('name')) builder.name(data['name']);
-    if (data.containsKey('photoUrl')) builder.photoUrl(data['photoUrl']);
-    if (data.containsKey('phone')) builder.phone(data['phone']);
-    if (data.containsKey('whatsapp')) builder.whatsapp(data['whatsapp']);
-    await builder.execute();
+    await _firestore.collection('users').doc(id).update(data);
+
+    try {
+      final builder = _db.updateUserProfile(id: id);
+      if (data.containsKey('name')) builder.name(data['name']);
+      if (data.containsKey('photoUrl')) builder.photoUrl(data['photoUrl']);
+      if (data.containsKey('phone')) builder.phone(data['phone']);
+      if (data.containsKey('whatsapp')) builder.whatsapp(data['whatsapp']);
+      await builder.execute();
+    } catch (e) {
+      debugPrint("Shadow-write updateUser failed: $e");
+    }
   }
 
   @override
   Future<void> updateLastActive(String id) async {
-    await _db.updateUserLastActive(id: id).execute();
+    await _firestore.collection('users').doc(id).update({
+      'lastActiveAt': firestore.FieldValue.serverTimestamp(),
+      'updatedAt': firestore.FieldValue.serverTimestamp(),
+    });
+
+    try {
+      await _db.updateUserLastActive(id: id).execute();
+    } catch (e) {
+      debugPrint("Shadow-write updateLastActive failed: $e");
+    }
   }
 
   @override
   Future<ProfessionalProfile?> getProfessionalProfile(String id) async {
-    final result = await _db.getProfessionalDetails(uid: id).execute();
-    final prof = result.data.professionalProfile;
-    if (prof == null) return null;
+    try {
+      final result = await _db.getProfessionalDetails(uid: id).execute();
+      final prof = result.data.professionalProfile;
+      if (prof != null) {
+        return ProfessionalProfile(
+          id: prof.id,
+          fullNameAr: prof.fullNameAr,
+          specialty: prof.specialty,
+          specialtyAr: prof.specialtyAr,
+          bioEn: prof.bioEn,
+          bioAr: prof.bioAr,
+          isApproved: prof.isApproved,
+          isHonorVerified: prof.isHonorVerified,
+          membershipTier: prof.membershipTier?.stringValue.toLowerCase() ?? 'basic',
+          serviceSlots: prof.serviceSlots,
+          practicePins: prof.practicePins,
+          visibilityExpiresAt: prof.visibilityExpiresAt?.toDateTime(),
+        );
+      }
+    } catch (_) {}
 
-    return ProfessionalProfile(
-      id: prof.id,
-      fullNameAr: prof.fullNameAr,
-      specialty: prof.specialty,
-      specialtyAr: prof.specialtyAr,
-      bioEn: prof.bioEn,
-      bioAr: prof.bioAr,
-      isApproved: prof.isApproved,
-      isHonorVerified: prof.isHonorVerified,
-      membershipTier: prof.membershipTier?.stringValue.toLowerCase() ?? 'basic',
-      serviceSlots: prof.serviceSlots,
-      practicePins: prof.practicePins,
-      visibilityExpiresAt: prof.visibilityExpiresAt?.toDateTime(),
-    );
+    final doc = await _firestore.collection('directory_professionals').doc(id).get();
+    return (doc.exists && doc.data() != null) ? ProfessionalProfile.fromMap(doc.data() as Map<String, dynamic>) : null;
   }
 
   @override
   Future<InstitutionProfile?> getInstitutionProfile(String id) async {
-    final result = await _db.getUser(uid: id).execute();
-    final inst = result.data.user?.institutionProfile_on_user;
-    if (inst == null) return null;
+    try {
+      final result = await _db.getUser(uid: id).execute();
+      final inst = result.data.user?.institutionProfile_on_user;
+      if (inst != null) {
+        return InstitutionProfile(
+          id: id,
+          nameAr: inst.nameAr,
+          isApproved: inst.isApproved,
+          serviceSlots: 0,
+          visibilityExpiresAt: inst.visibilityExpiresAt?.toDateTime(),
+        );
+      }
+    } catch (_) {}
 
-    return InstitutionProfile(
-      id: id,
-      nameAr: inst.nameAr,
-      isApproved: inst.isApproved,
-      serviceSlots: 0, // Fallback
-      visibilityExpiresAt: inst.visibilityExpiresAt?.toDateTime(),
-    );
+    final doc = await _firestore.collection('directory_institutions').doc(id).get();
+    return (doc.exists && doc.data() != null) ? InstitutionProfile.fromMap(doc.data() as Map<String, dynamic>) : null;
   }
 
   @override
   Future<VisitorProfile?> getVisitorProfile(String id) async {
-    final result = await _db.getUser(uid: id).execute();
-    final visitor = result.data.user?.visitorProfile_on_user;
-    if (visitor == null) return null;
-    return VisitorProfile(id: id, interests: (visitor.interests ?? []).whereType<String>().toList());
+    try {
+      final result = await _db.getUser(uid: id).execute();
+      final visitor = result.data.user?.visitorProfile_on_user;
+      if (visitor != null) {
+        return VisitorProfile(id: id, interests: (visitor.interests ?? []).whereType<String>().toList());
+      }
+    } catch (_) {}
+
+    final doc = await _firestore.collection('directory_visitors').doc(id).get();
+    return (doc.exists && doc.data() != null) ? VisitorProfile.fromMap(doc.data() as Map<String, dynamic>) : null;
   }
 
   // ─── 2. Taxonomy & Location ──────────────────────────────────────────────
@@ -763,7 +828,7 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Stream<Map<String, dynamic>> getSystemStats() {
-    return firestore.FirebaseFirestore.instance.collection('metadata').doc('system_stats').snapshots().map((snap) => (snap.data() as Map<String, dynamic>?) ?? {});
+    return _firestore.collection('metadata').doc('system_stats').snapshots().map((snap) => (snap.data() as Map<String, dynamic>?) ?? {});
   }
 
   @override
