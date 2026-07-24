@@ -1,6 +1,11 @@
-# Admin App Stability & Hierarchical Import Plan
+# Admin App Stability & Hierarchical Import Plan [STABILIZED]
 
-This plan addresses the data fetching failures in the Admin App by implementing Firestore fallbacks and adds a hierarchical Excel (CSV) import for geography.
+This plan has been executed. The Admin App now uses a hybrid data strategy (DataConnect + Firestore) and supports hierarchical CSV imports.
+
+## Current Status: LIVE
+- **Repositories**: Hybrid logic implemented with Firestore fallbacks.
+- **Import**: Hierarchical CSV import available in Taxonomy Manager.
+- **Deployment**: Both apps deployed to Firebase Hosting.
 
 ## User Review Required
 

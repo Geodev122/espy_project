@@ -58,57 +58,87 @@ class TaxonomyViewModel extends ChangeNotifier {
 
   // --- Geography Hierarchy ---
 
+  String slugify(String text) {
+    return text.toLowerCase().trim()
+      .replaceAll(RegExp(r'[^a-z0-9]+'), '-')
+      .replaceAll(RegExp(r'^-+|-+$'), '');
+  }
+
+  String getGeographyCsvTemplate() {
+    return "Type,ParentName,NameEn,NameAr,Extra1,Extra2\n"
+           "COUNTRY,,Lebanon,لبنان,LB,🇱🇧\n"
+           "REGION,Lebanon,Beirut,بيروت,BE,\n"
+           "CITY,Beirut,Ashrafieh,الأشرفية,33.88,35.51";
+  }
+
   Future<void> importHierarchicalCsv(String csvContent) async {
     final lines = csvContent.split('\n');
+    final Map<String, String> nameToId = {};
     int count = 0;
+    
     try {
-      // 1. First Pass: Countries
+      // 1. Countries
       for (var line in lines) {
-        if (line.trim().isEmpty) continue;
         final parts = line.split(',');
-        if (parts[0].toUpperCase() == 'COUNTRY' && parts.length >= 5) {
-          await upsertCountry({
-            'id': parts[1].trim(),
-            'nameEn': parts[3].trim(),
-            'nameAr': parts[4].trim(),
-            'isoCode': parts.length > 5 ? parts[5].trim() : parts[1].trim(),
-            'flagEmoji': parts.length > 6 ? parts[6].trim() : null,
-          });
-          count++;
-        }
+        if (parts.length < 4 || parts[0].toUpperCase() != 'COUNTRY') continue;
+        
+        final nameEn = parts[2].trim();
+        final id = slugify(nameEn);
+        if (id.isEmpty) continue;
+
+        await upsertCountry({
+          'id': id,
+          'nameEn': nameEn,
+          'nameAr': parts[3].trim(),
+          'isoCode': parts.length > 4 ? parts[4].trim() : id.toUpperCase(),
+          'flagEmoji': parts.length > 5 ? parts[5].trim() : null,
+        });
+        nameToId[nameEn.toLowerCase()] = id;
+        count++;
       }
 
-      // 2. Second Pass: Regions
+      // 2. Regions
       for (var line in lines) {
-        if (line.trim().isEmpty) continue;
         final parts = line.split(',');
-        if (parts[0].toUpperCase() == 'REGION' && parts.length >= 5) {
-          await upsertRegion({
-            'id': parts[1].trim(),
-            'countryId': parts[2].trim(),
-            'nameEn': parts[3].trim(),
-            'nameAr': parts[4].trim(),
-            'regionCode': parts.length > 5 ? parts[5].trim() : null,
-          });
-          count++;
-        }
+        if (parts.length < 4 || parts[0].toUpperCase() != 'REGION') continue;
+
+        final parentName = parts[1].trim().toLowerCase();
+        final nameEn = parts[2].trim();
+        final parentId = nameToId[parentName];
+        if (parentId == null) continue;
+
+        final id = "$parentId-${slugify(nameEn)}";
+        await upsertRegion({
+          'id': id,
+          'countryId': parentId,
+          'nameEn': nameEn,
+          'nameAr': parts[3].trim(),
+          'regionCode': parts.length > 4 ? parts[4].trim() : null,
+        });
+        nameToId[nameEn.toLowerCase()] = id;
+        count++;
       }
 
-      // 3. Third Pass: Cities
+      // 3. Cities
       for (var line in lines) {
-        if (line.trim().isEmpty) continue;
         final parts = line.split(',');
-        if (parts[0].toUpperCase() == 'CITY' && parts.length >= 5) {
-          await upsertCity({
-            'id': parts[1].trim(),
-            'regionId': parts[2].trim(),
-            'nameEn': parts[3].trim(),
-            'nameAr': parts[4].trim(),
-            'lat': parts.length > 5 ? double.tryParse(parts[5].trim()) : null,
-            'lng': parts.length > 6 ? double.tryParse(parts[6].trim()) : null,
-          });
-          count++;
-        }
+        if (parts.length < 4 || parts[0].toUpperCase() != 'CITY') continue;
+
+        final parentName = parts[1].trim().toLowerCase();
+        final nameEn = parts[2].trim();
+        final parentId = nameToId[parentName];
+        if (parentId == null) continue;
+
+        final id = "$parentId-${slugify(nameEn)}";
+        await upsertCity({
+          'id': id,
+          'regionId': parentId,
+          'nameEn': nameEn,
+          'nameAr': parts[3].trim(),
+          'lat': parts.length > 4 ? double.tryParse(parts[4].trim()) : null,
+          'lng': parts.length > 5 ? double.tryParse(parts[5].trim()) : null,
+        });
+        count++;
       }
       
       debugPrint("Imported $count entities from CSV");

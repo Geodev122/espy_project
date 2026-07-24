@@ -42,7 +42,7 @@ class DataConnectEspyRepository implements EspyRepository {
     try {
       final doc = await _firestore.collection('users').doc(id).get();
       if (doc.exists && doc.data() != null) {
-        return models.UserModel.fromMap(doc.data() as Map<String, dynamic>);
+        return models.UserModel.fromMap(doc.data()!);
       }
     } catch (e) {
       debugPrint("Firestore Fallback getUser failed: $e");
@@ -134,7 +134,7 @@ class DataConnectEspyRepository implements EspyRepository {
     } catch (_) {}
 
     final doc = await _firestore.collection('directory_professionals').doc(id).get();
-    final data = doc.data() as Map<String, dynamic>?;
+    final data = doc.data();
     return (doc.exists && data != null) ? ProfessionalProfile.fromMap(data) : null;
   }
 
@@ -155,7 +155,7 @@ class DataConnectEspyRepository implements EspyRepository {
     } catch (_) {}
 
     final doc = await _firestore.collection('directory_institutions').doc(id).get();
-    final data = doc.data() as Map<String, dynamic>?;
+    final data = doc.data();
     return (doc.exists && data != null) ? InstitutionProfile.fromMap(data) : null;
   }
 
@@ -170,7 +170,7 @@ class DataConnectEspyRepository implements EspyRepository {
     } catch (_) {}
 
     final doc = await _firestore.collection('directory_visitors').doc(id).get();
-    final data = doc.data() as Map<String, dynamic>?;
+    final data = doc.data();
     return (doc.exists && data != null) ? VisitorProfile.fromMap(data) : null;
   }
 
@@ -178,7 +178,7 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Stream<List<Map<String, dynamic>>> listSectors() {
-    final dcStream = _db.listSectors().ref().subscribe().map((snap) => 
+    final fdcStream = _db.listSectors().ref().subscribe().map((snap) => 
       snap.data.sectors.map((s) => {
         'id': s.id,
         'nameEn': s.nameEn,
@@ -199,7 +199,7 @@ class DataConnectEspyRepository implements EspyRepository {
     );
 
     return Rx.combineLatest2<List<Map<String, dynamic>>, List<Map<String, dynamic>>, List<Map<String, dynamic>>>(
-      dcStream, fsStream, (dc, fs) => dc.isNotEmpty ? dc : fs
+      fdcStream, fsStream, (dc, fs) => dc.isNotEmpty ? dc : fs
     ).distinct();
   }
 
@@ -219,7 +219,7 @@ class DataConnectEspyRepository implements EspyRepository {
 
     firestore.Query fsQuery = _firestore.collection('directory_categories');
     if (sectorId != null) fsQuery = fsQuery.where('sectorId', isEqualTo: sectorId);
-    final fsStream = fsQuery.snapshots().map((snap) => snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList());
+    final fsStream = fsQuery.snapshots().map((snap) => snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList());
 
     return Rx.combineLatest2<List<Map<String, dynamic>>, List<Map<String, dynamic>>, List<Map<String, dynamic>>>(
       fdcStream, fsStream, (dc, fs) => dc.isNotEmpty ? dc : fs
@@ -240,7 +240,7 @@ class DataConnectEspyRepository implements EspyRepository {
     ).onErrorReturnWith((e, s) => []);
 
     final fsStream = _firestore.collection('directory_countries').snapshots().map((snap) =>
-      snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList()
+      snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList()
     );
 
     return Rx.combineLatest2<List<Map<String, dynamic>>, List<Map<String, dynamic>>, List<Map<String, dynamic>>>(
@@ -260,7 +260,7 @@ class DataConnectEspyRepository implements EspyRepository {
     ).onErrorReturnWith((e, s) => []);
 
     final fsStream = _firestore.collection('directory_regions').where('countryId', isEqualTo: countryId).snapshots().map((snap) =>
-      snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList()
+      snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList()
     );
 
     return Rx.combineLatest2<List<Map<String, dynamic>>, List<Map<String, dynamic>>, List<Map<String, dynamic>>>(
@@ -281,7 +281,7 @@ class DataConnectEspyRepository implements EspyRepository {
     ).onErrorReturnWith((e, s) => []);
 
     final fsStream = _firestore.collection('directory_cities').where('regionId', isEqualTo: regionId).snapshots().map((snap) =>
-      snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList()
+      snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList()
     );
 
     return Rx.combineLatest2<List<Map<String, dynamic>>, List<Map<String, dynamic>>, List<Map<String, dynamic>>>(
@@ -404,8 +404,8 @@ class DataConnectEspyRepository implements EspyRepository {
         'providerId': s.provider.id,
         'template': s.sector.template != null ? {
            'accentColor': s.sector.template!.accentColor,
-           'iconName': s.sector.template!.iconName,
-           'visibleFields': s.sector.template!.visibleFields,
+           'iconName': s.template!.iconName,
+           'visibleFields': s.template!.visibleFields,
         } : null,
       }).toList()
     ).onErrorReturnWith((e, s) => []);
@@ -463,10 +463,10 @@ class DataConnectEspyRepository implements EspyRepository {
     final c = await _firestore.collection('directory_pin_categories').get();
     final pr = await _firestore.collection('directory_presence_tags').get();
     return {
-      'serviceTags': s.docs.map((d) => <String, dynamic>{'id': d.id, ...d.data()}).toList(),
-      'priceTags': p.docs.map((d) => <String, dynamic>{'id': d.id, ...d.data()}).toList(),
-      'pinCategories': c.docs.map((d) => <String, dynamic>{'id': d.id, ...d.data()}).toList(),
-      'presenceTags': pr.docs.map((d) => <String, dynamic>{'id': d.id, ...d.data()}).toList(),
+      'serviceTags': s.docs.map((d) => {'id': d.id, ...d.data()}).toList(),
+      'priceTags': p.docs.map((d) => {'id': d.id, ...d.data()}).toList(),
+      'pinCategories': c.docs.map((d) => {'id': d.id, ...d.data()}).toList(),
+      'presenceTags': pr.docs.map((d) => {'id': d.id, ...d.data()}).toList(),
     };
   }
 
@@ -625,7 +625,7 @@ class DataConnectEspyRepository implements EspyRepository {
     if (isActive != null) fsQuery = fsQuery.where('isActive', isEqualTo: isActive);
     
     final fsStream = fsQuery.orderBy('createdAt', descending: true).snapshots().map((snap) {
-      final docs = snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>});
+      final docs = snap.docs.map((doc) => {'id': doc.id, ...doc.data()});
       if (query != null && query.isNotEmpty) {
         final low = query.toLowerCase();
         return docs.where((u) => u['email']?.toString().toLowerCase().contains(low) == true || u['name']?.toString().toLowerCase().contains(low) == true).toList();
@@ -684,7 +684,7 @@ class DataConnectEspyRepository implements EspyRepository {
     } catch (_) {}
 
     final userDoc = await _firestore.collection('users').doc(id).get();
-    final data = (userDoc.data() as Map<String, dynamic>?) ?? {};
+    final data = userDoc.data() ?? {};
     final role = data['role']?.toString().toLowerCase();
     if (role == 'professional') {
       final profDoc = await _firestore.collection('directory_professionals').doc(id).get();
@@ -737,8 +737,8 @@ class DataConnectEspyRepository implements EspyRepository {
       _firestore.collection('directory_institutions').snapshots(),
       (profs, insts) {
         final List<Map<String, dynamic>> all = [];
-        all.addAll(profs.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).where((p) => p['isActive'] != false));
-        all.addAll(insts.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).where((p) => p['isActive'] != false));
+        all.addAll(profs.docs.map((doc) => {'id': doc.id, ...doc.data()}).where((p) => p['isActive'] != false));
+        all.addAll(insts.docs.map((doc) => {'id': doc.id, ...doc.data()}).where((p) => p['isActive'] != false));
         return all;
       },
     );
@@ -781,7 +781,7 @@ class DataConnectEspyRepository implements EspyRepository {
 
      firestore.Query fsQuery = _firestore.collection('directory_support_inbox');
      if (status != null) fsQuery = fsQuery.where('status', isEqualTo: status);
-     final fsStream = fsQuery.snapshots().map((snap) => snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList());
+     final fsStream = fsQuery.snapshots().map((snap) => snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList());
 
      return Rx.combineLatest2<List<Map<String, dynamic>>, List<Map<String, dynamic>>, List<Map<String, dynamic>>>(
        fdcStream, fsStream, (dc, fs) => dc.isNotEmpty ? dc : fs
@@ -802,7 +802,7 @@ class DataConnectEspyRepository implements EspyRepository {
     ).onErrorReturnWith((e, s) => []);
 
     final fsStream = _firestore.collection('directory_resource_orders').where('status', isEqualTo: 'PENDING').snapshots().map((snap) =>
-      snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList()
+      snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList()
     );
 
     return Rx.combineLatest2<List<Map<String, dynamic>>, List<Map<String, dynamic>>, List<Map<String, dynamic>>>(
@@ -835,7 +835,7 @@ class DataConnectEspyRepository implements EspyRepository {
     ).onErrorReturnWith((e, s) => []);
 
     final fsStream = _firestore.collection('directory_services').where('moderationStatus', isEqualTo: status).snapshots().map((snap) =>
-      snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList()
+      snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList()
     );
 
     return Rx.combineLatest2<List<Map<String, dynamic>>, List<Map<String, dynamic>>, List<Map<String, dynamic>>>(
@@ -857,7 +857,7 @@ class DataConnectEspyRepository implements EspyRepository {
     ).onErrorReturnWith((e, s) => []);
 
     final fsStream = _firestore.collection('directory_service_requests').where('moderationStatus', isEqualTo: status).snapshots().map((snap) =>
-      snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList()
+      snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList()
     );
 
     return Rx.combineLatest2<List<Map<String, dynamic>>, List<Map<String, dynamic>>, List<Map<String, dynamic>>>(
@@ -889,7 +889,15 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Future<void> createLocalizedBroadcast({required String title, required String message, String? country, String? region, String? city}) async {
-    await _firestore.collection('directory_broadcasts').add({'title': title, 'message': message, 'targetCountry': country, 'createdAt': firestore.FieldValue.serverTimestamp()});
+    await _firestore.collection('directory_broadcasts').add({
+      'title': title,
+      'message': message,
+      'targetCountry': country ?? 'GLOBAL',
+      'targetRegion': region,
+      'targetCity': city,
+      'status': 'queued',
+      'createdAt': firestore.FieldValue.serverTimestamp(),
+    });
     try {
       final builder = _db.createLocalizedBroadcast(title: title, message: message);
       if (country != null) builder.country(country);
@@ -914,7 +922,13 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Future<void> upsertTemplate(String id, List<String> visibleFields, {String? configJson, String? accentColor, String? iconName}) async {
-    await _firestore.collection('directory_templates').doc(id).set({'visibleFields': visibleFields, 'configJson': configJson, 'accentColor': accentColor, 'iconName': iconName}, firestore.SetOptions(merge: true));
+    await _firestore.collection('directory_templates').doc(id).set({
+      'visibleFields': visibleFields,
+      'configJson': configJson,
+      'accentColor': accentColor,
+      'iconName': iconName,
+      'updatedAt': firestore.FieldValue.serverTimestamp(),
+    }, firestore.SetOptions(merge: true));
     try {
       final builder = _db.upsertTemplate(id: id);
       builder.visibleFields(visibleFields);
@@ -929,7 +943,7 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Stream<Map<String, dynamic>> getSystemStats() {
-    return _firestore.collection('metadata').doc('system_stats').snapshots().map((snap) => (snap.data() as Map<String, dynamic>?) ?? {});
+    return _firestore.collection('metadata').doc('system_stats').snapshots().map((snap) => snap.data() ?? {});
   }
 
   @override

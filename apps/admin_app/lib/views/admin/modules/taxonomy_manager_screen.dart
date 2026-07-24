@@ -11,6 +11,7 @@ import '../../../widgets/common/premium_card.dart';
 import '../../../widgets/common/espy_scaffold.dart';
 import '../../../widgets/common/espy_icon.dart';
 import '../../../viewmodels/audit_view_model.dart';
+import '../../../utils/download_helper.dart';
 
 class TaxonomyManagerScreen extends StatelessWidget {
   const TaxonomyManagerScreen({super.key});
@@ -159,13 +160,23 @@ class _GeographyPanelState extends State<_GeographyPanel> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("Format: Type,ID,ParentID,NameEn,NameAr,Value1,Value2", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text("Format: Type,ParentName,NameEn,NameAr,Extra1,Extra2", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                TextButton.icon(
+                  onPressed: () => DownloadHelper.downloadCsv(widget.vm.getGeographyCsvTemplate(), "espy_geography_template.csv"),
+                  icon: const Icon(Icons.download, size: 14),
+                  label: const Text("DOWNLOAD TEMPLATE", style: TextStyle(fontSize: 9)),
+                ),
+              ],
+            ),
             const Text("Types: COUNTRY, REGION, CITY", style: TextStyle(fontSize: 10)),
             const SizedBox(height: 12),
             TextField(
               controller: controller,
               maxLines: 12,
-              decoration: const InputDecoration(hintText: "COUNTRY,LB,,Lebanon,لبنان,LB,🇱🇧\nREGION,beirut,LB,Beirut,بيروت,BE,\nCITY,bey-city,beirut,Beirut,بيروت,33.8,35.5", border: OutlineInputBorder()),
+              decoration: const InputDecoration(hintText: "COUNTRY,,Lebanon,لبنان,LB,🇱🇧\nREGION,Lebanon,Beirut,بيروت,BE,\nCITY,Beirut,Ashrafieh,الأشرفية,33.88,35.51", border: OutlineInputBorder()),
               style: GoogleFonts.firaCode(fontSize: 10),
             ),
           ],
