@@ -32,7 +32,7 @@ dependencies:
   intl: 0.20.2
   geolocator: ^14.0.1
   flutter_map: ^8.3.0
-  flutter_map_marker_cluster: ^1.4.0
+  flutter_map_marker_cluster: ^8.2.2
   latlong2: ^0.9.1
   geocoding: ^4.0.0
   geoflutterfire_plus: ^0.0.34
