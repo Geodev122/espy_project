@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:espy_app/theme/espy_theme.dart';
 import 'package:espy_app/viewmodels/auth_service.dart';
 import 'package:espy_app/models/user_model.dart';
+import 'package:espy_app/models/enums.dart';
 
 // User Screens
 import '../../views/professional/profile/edit_profile_screen.dart';

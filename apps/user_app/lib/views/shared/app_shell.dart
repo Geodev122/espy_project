@@ -11,6 +11,7 @@ import 'package:espy_app/viewmodels/auth_service.dart';
 import 'package:espy_app/viewmodels/sound_service.dart';
 import 'package:espy_app/viewmodels/locale_service.dart';
 import 'package:espy_app/models/user_model.dart';
+import 'package:espy_app/models/enums.dart';
 
 import '../professional/home/dashboard_screen.dart';
 import '../professional/matching/matching_screen.dart';

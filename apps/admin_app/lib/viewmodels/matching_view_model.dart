@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import './espy_repository.dart';
 import './auth_service.dart';
 import '../models/service_model.dart';
+import '../models/enums.dart';
 
 class MatchingViewModel extends ChangeNotifier {
   final EspyRepository _repository;
@@ -72,8 +73,6 @@ class MatchingViewModel extends ChangeNotifier {
   void _applyFilters() {
     _filteredServices = _allServices.where((s) {
       if (_filterSectorId != null && s.sectorId != _filterSectorId) return false;
-      // We don't have country info in ServiceModel directly yet, would need to fetch or add to model
-      // if (_filterCountry != 'ALL' && s.countryId != _filterCountry) return false;
       return true;
     }).toList();
 

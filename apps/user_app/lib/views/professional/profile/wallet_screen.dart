@@ -12,6 +12,7 @@ import 'package:espy_app/viewmodels/locale_service.dart';
 import 'package:espy_app/viewmodels/wallet_view_model.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';
 import 'package:espy_app/models/user_model.dart';
+import '../../../models/enums.dart';
 
 import 'location_manager_screen.dart';
 import 'edit_profile_screen.dart';

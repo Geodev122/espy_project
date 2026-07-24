@@ -9,6 +9,7 @@ import 'package:espy_app/widgets/common/premium_button.dart';
 import 'package:espy_app/widgets/common/premium_card.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';
 import 'package:espy_app/l10n/app_localizations.dart';
+import '../../../models/user_model.dart';
 
 class LocationManagerScreen extends StatefulWidget {
   const LocationManagerScreen({super.key});
@@ -25,17 +26,19 @@ class _LocationManagerScreenState extends State<LocationManagerScreen> {
   @override
   void initState() {
     super.initState();
-    final profile = Provider.of<UserService>(context, listen: false).profile ?? {};
-    _mainLocation = profile['mainLocation'];
-    final secondary = profile['secondaryLocations'] as List?;
-    if (secondary != null) _secondaryLocations = List<Map<String, dynamic>>.from(secondary);
+    final profile = Provider.of<UserService>(context, listen: false).profile;
+    if (profile != null) {
+      _mainLocation = profile['mainLocation'];
+      final secondary = profile['secondaryLocations'] as List?;
+      if (secondary != null) _secondaryLocations = List<Map<String, dynamic>>.from(secondary);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final userService = Provider.of<UserService>(context);
-    final profile = userService.profile ?? {};
-    final int practicePins = profile['practicePins'] ?? 0;
+    final profile = userService.profile;
+    final int practicePins = profile?['practicePins'] ?? 0;
     final int currentSecondaryCount = _secondaryLocations.length;
     final bool canAddMore = currentSecondaryCount < practicePins;
 
@@ -121,9 +124,28 @@ class _LocationManagerScreenState extends State<LocationManagerScreen> {
   }
 
   Future<void> _saveLocations() async {
+    final userService = Provider.of<UserService>(context, listen: false);
+    if (userService.profile == null) return;
+
     setState(() => _isLoading = true);
     try {
-      await Provider.of<UserService>(context, listen: false).updateProfile({'mainLocation': _mainLocation, 'secondaryLocations': _secondaryLocations});
+      final current = userService.profile!;
+      final updated = UserModel(
+        id: current.id,
+        email: current.email,
+        name: current.name,
+        role: current.role,
+        isActive: current.isActive,
+        hasProfile: current.hasProfile,
+        createdAt: current.createdAt,
+        updatedAt: DateTime.now(),
+        rawData: {
+          ...current.rawData,
+          'mainLocation': _mainLocation,
+          'secondaryLocations': _secondaryLocations,
+        }
+      );
+      await userService.updateProfile(updated);
       if (mounted) Navigator.pop(context);
     } finally {
       if (mounted) setState(() => _isLoading = false);

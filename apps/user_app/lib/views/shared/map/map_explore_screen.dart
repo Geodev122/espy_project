@@ -16,6 +16,7 @@ import 'package:espy_app/viewmodels/auth_service.dart';
 import 'package:espy_app/viewmodels/sound_service.dart';
 import 'package:espy_app/viewmodels/directory_view_model.dart';
 import 'package:espy_app/models/user_model.dart';
+import 'package:espy_app/models/enums.dart';
 import 'package:espy_app/widgets/common/espy_icon.dart';
 import 'package:espy_app/widgets/common/premium_button.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';

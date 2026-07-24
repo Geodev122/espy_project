@@ -225,7 +225,7 @@ class DataConnectEspyRepository implements EspyRepository {
         sectorId: c.sector.id,
         nameEn: c.nameEn,
         nameAr: c.nameAr,
-        targetRole: UserRole.parse(c.targetRole.stringValue).name,
+        targetRole: UserRole.parse(c.targetRole.stringValue),
       )).toList()
     ).onErrorReturnWith((e, s) => <CategoryModel>[]);
 
@@ -423,8 +423,8 @@ class DataConnectEspyRepository implements EspyRepository {
         titleAr: s.titleAr,
         price: s.price ?? 0,
         imageUrl: s.imageUrl,
-        deliveryMode: DeliveryMode.parse(s.deliveryMode?.stringValue).name,
-        moderationStatus: ModerationStatus.parse(s.moderationStatus.stringValue).name,
+        deliveryMode: DeliveryMode.parse(s.deliveryMode?.stringValue),
+        moderationStatus: ModerationStatus.parse(s.moderationStatus.stringValue),
         flagReason: s.flagReason,
         createdAt: DateTime.now(), // Fallback
         updatedAt: DateTime.now(),
@@ -457,10 +457,10 @@ class DataConnectEspyRepository implements EspyRepository {
         sectorId: cr.sector.id,
         descriptionEn: cr.descriptionEn,
         descriptionAr: cr.descriptionAr,
-        urgency: UrgencyLevel.parse(cr.urgency?.stringValue).name,
-        preferredMode: DeliveryMode.parse(cr.preferredMode?.stringValue).name,
-        status: CommunityRequestStatus.parse(cr.status.stringValue).name,
-        moderationStatus: 'APPROVED',
+        urgency: UrgencyLevel.parse(cr.urgency?.stringValue),
+        preferredMode: DeliveryMode.parse(cr.preferredMode?.stringValue),
+        status: CommunityRequestStatus.parse(cr.status.stringValue),
+        moderationStatus: ModerationStatus.approved,
         createdAt: cr.createdAt.toDateTime(),
         userName: cr.user.name,
       )).toList()
@@ -507,7 +507,7 @@ class DataConnectEspyRepository implements EspyRepository {
         id: t.id.toString(),
         userId: userId,
         amount: t.amount,
-        type: TransactionType.parse(t.type.stringValue).name,
+        type: TransactionType.parse(t.type.stringValue),
         description: t.description,
         createdAt: t.createdAt.toDateTime(),
       )).toList()
@@ -599,7 +599,7 @@ class DataConnectEspyRepository implements EspyRepository {
         slotsCount: o.slotsCount,
         broadcastsCount: o.broadcastsCount,
         totalCost: o.totalCost,
-        status: OrderStatus.parse(o.status.stringValue).name.toUpperCase(),
+        status: OrderStatus.parse(o.status.stringValue),
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
@@ -656,7 +656,7 @@ class DataConnectEspyRepository implements EspyRepository {
     if (hasProfile != null) fsQuery = fsQuery.where('hasProfile', isEqualTo: hasProfile);
     if (isActive != null) fsQuery = fsQuery.where('isActive', isEqualTo: isActive);
     
-    final fsStream = fsQuery.orderBy('createdAt', firestore.QueryDirection.descending).snapshots().map((snap) {
+    final fsStream = fsQuery.orderBy('createdAt', descending: true).snapshots().map((snap) {
       final docs = snap.docs.map((doc) => models.UserModel.fromMap({'id': doc.id, ...doc.data() as Map<String, dynamic>}));
       if (query != null && query.isNotEmpty) {
         final low = query.toLowerCase();
@@ -806,7 +806,7 @@ class DataConnectEspyRepository implements EspyRepository {
           userId: st.user.id, 
           subject: st.subject,
           message: st.message,
-          status: SupportTicketStatus.parse(st.status.stringValue).name.toUpperCase(),
+          status: SupportTicketStatus.parse(st.status.stringValue),
           userEmail: st.user.email,
           createdAt: st.createdAt.toDateTime(),
         )).toList()
@@ -831,7 +831,7 @@ class DataConnectEspyRepository implements EspyRepository {
         slotsCount: o.slotsCount,
         broadcastsCount: o.broadcastsCount,
         totalCost: o.totalCost,
-        status: OrderStatus.parse(o.status.stringValue).name.toUpperCase(),
+        status: OrderStatus.parse(o.status.stringValue),
         userEmail: o.user.email,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
@@ -867,7 +867,7 @@ class DataConnectEspyRepository implements EspyRepository {
         titleEn: s.titleEn,
         price: s.price ?? 0,
         imageUrl: s.imageUrl,
-        moderationStatus: ModerationStatus.parse(s.moderationStatus.stringValue).name.toUpperCase(),
+        moderationStatus: ModerationStatus.parse(s.moderationStatus.stringValue),
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       )).toList()
@@ -891,8 +891,8 @@ class DataConnectEspyRepository implements EspyRepository {
         userId: r.user.id,
         sectorId: r.sector.id,
         descriptionEn: r.descriptionEn,
-        status: CommunityRequestStatus.parse(r.status.stringValue).name.toUpperCase(),
-        moderationStatus: ModerationStatus.parse(r.moderationStatus.stringValue).name.toUpperCase(),
+        status: CommunityRequestStatus.parse(r.status.stringValue),
+        moderationStatus: ModerationStatus.parse(r.moderationStatus.stringValue),
         createdAt: r.createdAt.toDateTime(),
         userName: r.user.name,
       )).toList()
@@ -963,11 +963,6 @@ class DataConnectEspyRepository implements EspyRepository {
       'iconName': iconName,
       'updatedAt': firestore.FieldValue.serverTimestamp(),
     }, firestore.SetOptions(merge: true));
-  }
-
-  @override
-  Future<void> updateCategory(CategoryModel category) async {
-     await _firestore.collection('directory_categories').doc(category.id).update(category.toMap());
   }
 
   // ─── 6. Discovery & Helpers ──────────────────────────────────────────────

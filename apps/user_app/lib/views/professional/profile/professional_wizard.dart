@@ -19,6 +19,8 @@ import 'package:espy_app/widgets/common/document_picker.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';
 import '../../../models/sector_model.dart';
 import '../../../models/category_model.dart';
+import '../../../models/city_model.dart';
+import '../../../models/enums.dart';
 
 class ProfessionalWizard extends StatefulWidget {
   const ProfessionalWizard({super.key});
@@ -33,24 +35,16 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
   final _nameController = TextEditingController();
   final _bioController = TextEditingController();
   final _bioArController = TextEditingController();
-  final _whatsappCodeController = TextEditingController(text: '+961');
-  final _whatsappNumberController = TextEditingController();
   final _specializationController = TextEditingController();
   final _specializationArController = TextEditingController();
+  final _whatsappCodeController = TextEditingController(text: '+961');
+  final _whatsappNumberController = TextEditingController();
 
   String? _selectedSectorId;
   String? _selectedCategoryId;
-  File? _profileImageFile;
-  Uint8List? _profileImageWebBytes;
-
   CityModel? _mainLocation;
-
-  @override
-  void initState() {
-    super.initState();
-    final auth = Provider.of<AuthService>(context, listen: false);
-    _nameController.text = auth.user?.displayName ?? '';
-  }
+  File? _profileImage;
+  File? _verificationDoc;
 
   @override
   Widget build(BuildContext context) {
@@ -59,222 +53,182 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
 
     return EspyScaffold(
       useCinematicBackground: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Text("PROTOCOL ONBOARDING", style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, letterSpacing: 2, color: Colors.white, fontSize: 13)),
-      ),
       body: SafeArea(
-        child: Column(
-          children: [
-            _buildStepIndicator(viewModel),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
-                child: Form(key: _formKey, child: viewModel.currentPhase == 0 ? _buildPhase1(l10n) : _buildPhase2(l10n, viewModel)),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildProgressHeader(viewModel),
+              const SizedBox(height: 32),
+              Form(
+                key: _formKey,
+                child: viewModel.currentPhase == 0 
+                  ? _buildPhase1(l10n) 
+                  : _buildPhase2(l10n, viewModel),
               ),
-            ),
-            _buildBottomNav(l10n, viewModel),
-          ],
+              const SizedBox(height: 40),
+              _buildActions(viewModel, l10n),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildStepIndicator(RegistrationViewModel vm) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: List.generate(2, (index) {
-          bool active = index == vm.currentPhase;
-          return Container(
-            margin: const EdgeInsets.symmetric(horizontal: 4),
-            width: active ? 40 : 12, height: 6,
-            decoration: BoxDecoration(color: active ? EspyTheme.gold : Colors.white24, borderRadius: BorderRadius.circular(3)),
-          );
-        }),
+  Widget _buildProgressHeader(RegistrationViewModel vm) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("PROFESSIONAL ONBOARDING", style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.bold, color: EspyTheme.cyan, letterSpacing: 2)),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            _stepIndicator(0, "IDENTITY", vm.currentPhase >= 0),
+            _stepIndicator(1, "CAPACITY", vm.currentPhase >= 1),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _stepIndicator(int index, String label, bool active) {
+    return Expanded(
+      child: Column(
+        children: [
+          Container(height: 4, color: active ? EspyTheme.gold : Colors.white10),
+          const SizedBox(height: 8),
+          Text(label, style: GoogleFonts.montserrat(fontSize: 8, fontWeight: FontWeight.bold, color: active ? Colors.white : Colors.white24)),
+        ],
       ),
     );
   }
 
   Widget _buildPhase1(AppLocalizations l10n) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("PHASE I: IDENTITY", style: GoogleFonts.cinzel(color: EspyTheme.gold, fontWeight: FontWeight.w900, fontSize: 18)),
+        ProfileImagePicker(onImageSelected: (file, bytes) => setState(() => _profileImage = file)),
         const SizedBox(height: 32),
-        Center(
-          child: ProfileImagePicker(
-            onImageSelected: (file, bytes) {
-              _profileImageFile = file;
-              _profileImageWebBytes = bytes;
-            },
+        PremiumCard(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            children: [
+              _buildLabel("Identity Name"),
+              TextField(controller: _nameController, decoration: const InputDecoration(hintText: "LEGAL FULL NAME")),
+              const SizedBox(height: 20),
+              _buildSectorPicker(),
+              const SizedBox(height: 20),
+              _buildLabel("Phone Node (WhatsApp)"),
+              Row(
+                children: [
+                  SizedBox(width: 80, child: TextField(controller: _whatsappCodeController)),
+                  const SizedBox(width: 12),
+                  Expanded(child: TextField(controller: _whatsappNumberController, decoration: const InputDecoration(hintText: "NUMBER"))),
+                ],
+              ),
+            ],
           ),
         ),
-        const SizedBox(height: 32),
-        _buildLabel("LEGAL FULL NAME"),
-        _buildTextField(_nameController, "e.g. Dr. Adam Smith"),
-        const SizedBox(height: 24),
-        _buildLabel("SECTOR & CATEGORY"),
-        _buildSectorDropdown(),
-        if (_selectedSectorId != null) ...[
-          const SizedBox(height: 12),
-          _buildCategoryDropdown(),
-        ],
-        const SizedBox(height: 24),
-        BilingualTextField(
-          controllerEn: _specializationController,
-          controllerAr: _specializationArController,
-          labelEn: "Professional Specialty",
-          labelAr: "التخصص المهني",
-        ),
-        const SizedBox(height: 24),
-        BilingualTextField(
-          controllerEn: _bioController,
-          controllerAr: _bioArController,
-          labelEn: "Professional Bio",
-          labelAr: "السيرة المهنية",
-          maxLines: 4,
-        ),
+        const SizedBox(height: 20),
+        HierarchicalLocationPicker(onCitySelected: (city) => setState(() => _mainLocation = city)),
       ],
     );
   }
 
   Widget _buildPhase2(AppLocalizations l10n, RegistrationViewModel vm) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("PHASE II: RESOURCES", style: GoogleFonts.cinzel(color: EspyTheme.gold, fontWeight: FontWeight.w900, fontSize: 18)),
+        PremiumCard(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            children: [
+              _buildResourceCard(icon: LucideIcons.mapPin, title: "MAP PINS", desc: "Map nodes visible to visitors.", value: vm.pinsCount, onChanged: vm.updatePins),
+              _buildResourceCard(icon: LucideIcons.layoutGrid, title: "SERVICE SLOTS", desc: "Active service profiles.", value: vm.slotsCount, onChanged: vm.updateSlots),
+            ],
+          ),
+        ),
         const SizedBox(height: 24),
-        _buildResourceCard(icon: LucideIcons.mapPin, title: "MAP PINS", desc: "Map nodes visible to visitors.", value: vm.pinsCount, onChanged: vm.updatePins),
-        _buildResourceCard(icon: LucideIcons.layoutGrid, title: "SERVICE SLOTS", desc: "Active service profiles.", value: vm.slotsCount, onChanged: vm.updateSlots),
-        _buildResourceCard(icon: LucideIcons.megaphone, title: "BROADCASTS", desc: "Marketing bursts to reach community.", value: vm.broadcastsCount, onChanged: vm.updateBroadcasts),
-        const SizedBox(height: 32),
-        Text("VERIFICATION", style: GoogleFonts.cinzel(color: EspyTheme.gold, fontWeight: FontWeight.w900, fontSize: 14)),
-        const SizedBox(height: 16),
-        DocumentPicker(label: 'Upload License/Degree', onDocumentSelected: (f, b, n) {}),
-        const SizedBox(height: 32),
-        _buildLabel("WHATSAPP FOR CLIENTS"),
-        Row(
-          children: [
-            SizedBox(width: 80, child: _buildTextField(_whatsappCodeController, "+961", kType: TextInputType.phone)),
-            const SizedBox(width: 12),
-            Expanded(child: _buildTextField(_whatsappNumberController, "Number", kType: TextInputType.phone)),
-          ],
-        ),
-        const SizedBox(height: 32),
-        _buildLabel("MAIN HUB ANCHOR"),
-        HierarchicalLocationPicker(
-          onCitySelected: (city) {
-            setState(() => _mainLocation = city);
-          },
-        ),
+        DocumentPicker(label: "VERIFICATION PROTOCOL (ID/LICENSE)", onDocumentSelected: (file, bytes, name) => setState(() => _verificationDoc = file)),
       ],
     );
   }
 
   Widget _buildResourceCard({required IconData icon, required String title, required String desc, required int value, required Function(int) onChanged}) {
-    return PremiumCard(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         children: [
-          Icon(icon, color: EspyTheme.royalBlue, size: 24),
+          Icon(icon, color: EspyTheme.gold, size: 20),
           const SizedBox(width: 16),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(title, style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, fontSize: 11, letterSpacing: 1)),
-              Text(desc, style: GoogleFonts.lora(fontSize: 9, color: Colors.black45), maxLines: 2),
+              Text(title, style: GoogleFonts.cinzel(fontSize: 12, fontWeight: FontWeight.w900)),
+              Text(desc, style: GoogleFonts.lora(fontSize: 10, color: Colors.white54)),
             ]),
           ),
           Row(children: [
-            _counterBtn(Icons.remove, () => value > 0 ? onChanged(value - 1) : null),
-            SizedBox(width: 30, child: Center(child: Text("$value", style: GoogleFonts.montserrat(fontWeight: FontWeight.w900)))),
-            _counterBtn(Icons.add, () => onChanged(value + 1)),
+            IconButton(icon: const Icon(Icons.remove_circle_outline, size: 18), onPressed: value > 1 ? () => onChanged(value - 1) : null),
+            Text(value.toString(), style: GoogleFonts.montserrat(fontWeight: FontWeight.bold)),
+            IconButton(icon: const Icon(Icons.add_circle_outline, size: 18), onPressed: () => onChanged(value + 1)),
           ]),
         ],
       ),
     );
   }
 
-  Widget _counterBtn(IconData icon, VoidCallback onTap) {
-    return InkWell(onTap: onTap, child: Container(padding: const EdgeInsets.all(4), decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.black12)), child: Icon(icon, size: 14)));
-  }
-
-  Widget _buildTextField(TextEditingController ctrl, String hint, {int maxLines = 1, bool isRtl = false, TextInputType kType = TextInputType.text}) {
-    return TextFormField(
-      controller: ctrl, maxLines: maxLines, textAlign: isRtl ? TextAlign.right : TextAlign.left, keyboardType: kType,
-      style: GoogleFonts.montserrat(color: EspyTheme.navyDeep, fontSize: 14, fontWeight: FontWeight.w600),
-      decoration: InputDecoration(hintText: hint, filled: true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)),
-    );
-  }
-
-  Widget _buildLabel(String text) {
-    return Padding(padding: const EdgeInsets.only(left: 4, bottom: 8), child: Text(text, style: GoogleFonts.montserrat(fontSize: 9, fontWeight: FontWeight.w800, color: EspyTheme.cyan, letterSpacing: 1)));
-  }
-
-  Widget _buildSectorDropdown() {
-    final repo = Provider.of<EspyRepository>(context, listen: false);
+  Widget _buildSectorPicker() {
+    final repo = context.read<EspyRepository>();
     return StreamBuilder<List<SectorModel>>(
       stream: repo.listSectors(),
       builder: (context, snapshot) {
         final sectors = snapshot.data ?? [];
         return DropdownButtonFormField<String>(
           value: _selectedSectorId,
-          items: sectors.map((s) => DropdownMenuItem(value: s.id, child: Text(s.nameEn.toUpperCase(), style: const TextStyle(fontSize: 12)))).toList(),
-          onChanged: (v) => setState(() { _selectedSectorId = v; _selectedCategoryId = null; }),
-          decoration: InputDecoration(hintText: "Select Sector", filled: true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)),
+          hint: const Text("SELECT CARE SECTOR"),
+          items: sectors.map((s) => DropdownMenuItem(value: s.id, child: Text(s.nameEn.toUpperCase()))).toList(),
+          onChanged: (v) => setState(() => _selectedSectorId = v),
         );
-      },
+      }
     );
   }
 
-  Widget _buildCategoryDropdown() {
-    final repo = Provider.of<EspyRepository>(context, listen: false);
-    return StreamBuilder<List<CategoryModel>>(
-      stream: repo.listCategories(sectorId: _selectedSectorId),
-      builder: (context, snapshot) {
-        final cats = snapshot.data ?? [];
-        return DropdownButtonFormField<String>(
-          value: _selectedCategoryId,
-          items: cats.map((c) => DropdownMenuItem(value: c.id, child: Text(c.nameEn.toUpperCase(), style: const TextStyle(fontSize: 12)))).toList(),
-          onChanged: (v) => setState(() => _selectedCategoryId = v),
-          decoration: InputDecoration(hintText: "Select Category", filled: true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)),
-        );
-      },
-    );
-  }
-
-  Widget _buildBottomNav(AppLocalizations l10n, RegistrationViewModel vm) {
-    return Container(padding: const EdgeInsets.all(32), decoration: const BoxDecoration(color: EspyTheme.navyDeep), child: Row(children: [
-      if (vm.currentPhase > 0) ...[
-        IconButton(onPressed: () => vm.setPhase(0), icon: const Icon(Icons.arrow_back_ios, color: Colors.white70)),
+  Widget _buildActions(RegistrationViewModel vm, AppLocalizations l10n) {
+    return Row(
+      children: [
+        if (vm.currentPhase > 0)
+          IconButton(onPressed: () => vm.setPhase(0), icon: const Icon(Icons.arrow_back_ios, color: Colors.white70)),
         const SizedBox(width: 16),
+        Expanded(
+          child: PremiumButton(
+            label: vm.currentPhase == 1 ? "FINALIZE REGISTRATION" : "CONTINUE",
+            isLoading: vm.isSubmitting,
+            onPressed: () async {
+              if (vm.currentPhase == 0) {
+                vm.setPhase(1);
+              } else {
+                final success = await vm.submitProfessionalRegistration(
+                  name: _nameController.text,
+                  bio: _bioController.text,
+                  bioAr: _bioArController.text,
+                  specialty: _specializationController.text,
+                  specialtyAr: _specializationArController.text,
+                  sectorId: _selectedSectorId ?? 'health',
+                  categoryId: _selectedCategoryId ?? 'doctors',
+                  whatsapp: '${_whatsappCodeController.text}${_whatsappNumberController.text}',
+                  mainLocation: _mainLocation,
+                );
+                if (success) {
+                   // Done
+                }
+              }
+            },
+          ),
+        ),
       ],
-      Expanded(child: PremiumButton(
-        label: vm.currentPhase == 1 ? "FINALIZE REGISTRATION" : l10n.continueText.toUpperCase(),
-        isLoading: vm.isSubmitting,
-        onPressed: () {
-          if (vm.currentPhase == 0) {
-             vm.setPhase(1);
-          } else {
-            vm.submitProfessionalRegistration(
-              name: _nameController.text.trim(),
-              bio: _bioController.text,
-              bioAr: _bioArController.text,
-              specialty: _specializationController.text,
-              specialtyAr: _specializationArController.text,
-              sectorId: _selectedSectorId!,
-              categoryId: _selectedCategoryId!,
-              whatsapp: '${_whatsappCodeController.text}${_whatsappNumberController.text}',
-              profileImage: _profileImageFile,
-              profileBytes: _profileImageWebBytes,
-              mainLocation: _mainLocation,
-            );
-          }
-        },
-      )),
-    ]));
+    );
+  }
+
+  Widget _buildLabel(String text) {
+    return Padding(padding: const EdgeInsets.only(bottom: 8), child: Text(text.toUpperCase(), style: GoogleFonts.cinzel(fontSize: 9, fontWeight: FontWeight.bold, color: EspyTheme.gold)));
   }
 }

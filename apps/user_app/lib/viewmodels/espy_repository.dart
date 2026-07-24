@@ -64,9 +64,9 @@ abstract class EspyRepository {
 
   // ─── 4. Ledger & Resource Orders ─────────────────────────────────────────
   Stream<List<WalletTransactionModel>> listWalletTransactions(String userId);
-  Future<Map<String, dynamic>> spendTokens({required String userId, required String itemId, required int cost, required String role});
+  Future<Map<String, dynamic>> spendTokens({required String userId, required String itemId, required int cost, required UserRole role});
 
-  Future<void> recordInteraction({required String userId, required String targetId, InteractionType type});
+  Future<void> recordInteraction({required String userId, required String targetId, required InteractionType type});
   Future<void> toggleFavorite(String userId, String targetId, bool isFavorite);
   Stream<List<String>> listFavoriteIds(String userId);
   Stream<List<String>> listContactedIds(String userId);

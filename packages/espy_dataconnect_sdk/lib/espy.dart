@@ -498,7 +498,41 @@ String enumSerializer(Enum e) {
   return e.name;
 }
 
+T nativeFromJson<T>(dynamic json) {
+  if (json is T) return json;
+  if (T == double && json is num) return json.toDouble() as T;
+  if (T == int && json is num) return json.toInt() as T;
+  return json as T;
+}
 
+dynamic nativeToJson<T>(T value) {
+  return value;
+}
+
+class Optional<T> {
+  T? _value;
+  bool _isSet = false;
+  final dynamic Function(dynamic) _deserializer;
+  final dynamic Function(T) _serializer;
+
+  Optional._(this._value, this._isSet, this._deserializer, this._serializer);
+
+  factory Optional.optional(dynamic Function(dynamic) deserializer, dynamic Function(T) serializer) =>
+      Optional._(null, false, deserializer, serializer);
+
+  T? get value => _value;
+  set value(T? v) {
+    _value = v;
+    _isSet = true;
+  }
+
+  bool get isSet => _isSet;
+  OptionalState get state => _isSet ? OptionalState.set : OptionalState.unset;
+
+  dynamic toJson() => _isSet ? _serializer(_value as T) : null;
+}
+
+enum OptionalState { set, unset }
 
 /// A sealed class representing either a known enum value or an unknown string value.
 @immutable

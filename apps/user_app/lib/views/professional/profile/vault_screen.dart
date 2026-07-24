@@ -9,6 +9,8 @@ import 'package:espy_app/theme/espy_theme.dart';
 import 'package:espy_app/viewmodels/auth_service.dart';
 import 'package:espy_app/viewmodels/user_service.dart';
 import 'package:espy_app/viewmodels/locale_service.dart';
+import '../../../models/user_model.dart';
+import '../../../models/enums.dart';
 import '../../visitor/emergency/sos_hub_screen.dart';
 import 'location_manager_screen.dart';
 import 'edit_profile_screen.dart';
@@ -54,9 +56,8 @@ class VaultScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAppBar(BuildContext context, Map<String, dynamic> profile) {
-    final String role = profile['role']?.toString().toLowerCase() ?? 'visitor';
-    final bool isVisitor = role == 'visitor';
+  Widget _buildAppBar(BuildContext context, UserModel profile) {
+    final bool isVisitor = profile.role == UserRole.visitor;
 
     return SliverAppBar(
       expandedHeight: 220,
@@ -87,14 +88,14 @@ class VaultScreen extends StatelessWidget {
                         boxShadow: [
                           BoxShadow(color: EspyTheme.royalBlue.withValues(alpha: 0.1), blurRadius: 20)
                         ],
-                        image: profile['photoUrl'] != null
+                        image: profile.photoUrl != null
                             ? DecorationImage(
                                 image: CachedNetworkImageProvider(
-                                    profile['photoUrl']),
+                                    profile.photoUrl!),
                                 fit: BoxFit.cover)
                             : null,
                       ),
-                      child: profile['photoUrl'] == null
+                      child: profile.photoUrl == null
                           ? const Icon(Icons.person,
                               color: EspyTheme.navyDeep, size: 45)
                           : null,
@@ -102,7 +103,7 @@ class VaultScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    profile['name']?.toString().toUpperCase() ?? 'MEMBER',
+                    profile.name.toUpperCase(),
                     style: GoogleFonts.cinzel(
                       color: EspyTheme.navyDeep,
                       fontSize: 18,
@@ -161,11 +162,10 @@ class VaultScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildVaultStatus(BuildContext context, Map<String, dynamic> profile) {
-    final String role = profile['role']?.toString().toLowerCase() ?? 'visitor';
-    final bool isVisitor = role == 'visitor';
+  Widget _buildVaultStatus(BuildContext context, UserModel profile) {
+    final bool isVisitor = profile.role == UserRole.visitor;
     final bool isPaid = isVisitor || profile['paymentStatus'] == 'completed' || profile['isPaid'] == true;
-    final bool isPendingPro = !isPaid && (role == 'professional' || role == 'institution');
+    final bool isPendingPro = !isPaid && (profile.role == UserRole.professional || profile.role == UserRole.institution);
     final l10n = AppLocalizations.of(context)!;
     
     return Column(
@@ -256,8 +256,8 @@ class VaultScreen extends StatelessWidget {
   }
 
   Widget _buildVaultMenu(BuildContext context, AuthService auth) {
-    final role = auth.userData?['role'];
-    final bool isVisitor = role == 'visitor';
+    final role = auth.userData?.role;
+    final bool isVisitor = role == UserRole.visitor;
     final localeService = Provider.of<LocaleService>(context);
     final l10n = AppLocalizations.of(context)!;
 

@@ -6,7 +6,8 @@ import 'package:espy_app/theme/espy_theme.dart';
 import 'package:espy_app/viewmodels/debug_service.dart';
 import 'package:espy_app/viewmodels/platform/web_helper.dart';
 import 'package:espy_app/viewmodels/auth_service.dart';
-import 'package:espy_app/models/user_model.dart' as models;
+import 'package:espy_app/models/user_model.dart';
+import 'package:espy_app/models/enums.dart';
 
 import 'app_shell.dart';
 import 'onboarding/splash_screen.dart';
@@ -77,10 +78,10 @@ class MainGate extends StatelessWidget {
 
         if (!user.hasProfile) {
           final role = user.role;
-          if (role == models.UserRole.pending) return const RoleSelectionScreen();
-          if (role == models.UserRole.professional) return const ProfessionalWizard();
-          if (role == models.UserRole.institution) return const InstitutionWizard();
-          if (role == models.UserRole.visitor) return const VisitorWizard();
+          if (role == UserRole.pending) return const RoleSelectionScreen();
+          if (role == UserRole.professional) return const ProfessionalWizard();
+          if (role == UserRole.institution) return const InstitutionWizard();
+          if (role == UserRole.visitor) return const VisitorWizard();
           return const RoleSelectionScreen();
         }
 

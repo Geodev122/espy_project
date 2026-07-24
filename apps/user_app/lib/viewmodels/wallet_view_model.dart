@@ -4,6 +4,7 @@ import './auth_service.dart';
 import './espy_repository.dart';
 import '../models/wallet_transaction.dart';
 import '../models/resource_order.dart';
+import '../models/enums.dart';
 
 class WalletViewModel extends ChangeNotifier {
   final AuthService _authService;
@@ -83,7 +84,7 @@ class WalletViewModel extends ChangeNotifier {
         userId: _authService.user!.uid,
         itemId: itemId,
         cost: cost,
-        role: _authService.userData?.role.name ?? 'professional',
+        role: _authService.userData?.role ?? UserRole.professional,
       );
       if (result['success'] == true) {
         await _authService.fetchUserData();

@@ -6,9 +6,10 @@ import 'package:espy_app/l10n/app_localizations.dart';
 
 import 'package:espy_app/theme/espy_theme.dart';
 import 'package:espy_app/viewmodels/auth_service.dart';
-import 'package:espy_app/viewmodels/firestore_service.dart';
+import 'package:espy_app/viewmodels/espy_repository.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';
-import '../auth/auth_screen.dart';
+import '../../../models/user_model.dart';
+import '../../../models/enums.dart';
 
 class RoleSelectionScreen extends StatelessWidget {
   const RoleSelectionScreen({super.key});
@@ -144,12 +145,26 @@ class RoleSelectionScreen extends StatelessWidget {
 
   Future<void> _handleRoleSelection(BuildContext context, String role) async {
     final auth = Provider.of<AuthService>(context, listen: false);
-    final firestore = FirestoreService();
+    final repo = Provider.of<EspyRepository>(context, listen: false);
     
     try {
-      await firestore.updateUserProfile(auth.user!.uid, {'role': role});
+      final current = auth.userData;
+      if (current == null) return;
+
+      final updated = UserModel(
+        id: current.id,
+        email: current.email,
+        name: current.name,
+        role: UserRole.parse(role),
+        photoUrl: current.photoUrl,
+        isActive: current.isActive,
+        hasProfile: current.hasProfile,
+        createdAt: current.createdAt,
+        updatedAt: DateTime.now(),
+      );
+      
+      await repo.updateUser(current.id, updated);
       await auth.fetchUserData();
-      // MainGate will handle navigation
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));

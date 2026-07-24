@@ -257,12 +257,12 @@ class FirestoreEspyRepository implements EspyRepository {
   }
 
   @override
-  Future<Map<String, dynamic>> spendTokens({required String userId, required String itemId, required int cost, required String role}) async {
+  Future<Map<String, dynamic>> spendTokens({required String userId, required String itemId, required int cost, required UserRole role}) async {
     final result = await _functions.httpsCallable('spendTokens').call({
       'userId': userId,
       'itemId': itemId,
       'cost': cost,
-      'role': role,
+      'role': role.name,
     });
     return result.data as Map<String, dynamic>;
   }

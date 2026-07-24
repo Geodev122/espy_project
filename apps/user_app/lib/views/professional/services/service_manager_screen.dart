@@ -9,6 +9,8 @@ import 'package:espy_app/viewmodels/services_view_model.dart';
 import 'package:espy_app/viewmodels/user_service.dart';
 import 'package:espy_app/widgets/common/premium_card.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';
+import '../../../models/service_model.dart';
+import '../../../models/enums.dart';
 import 'service_listing_wizard.dart';
 
 class ServiceManagerScreen extends StatefulWidget {
@@ -24,7 +26,7 @@ class _ServiceManagerScreenState extends State<ServiceManagerScreen> {
     final viewModel = Provider.of<ServicesViewModel>(context);
     final userService = Provider.of<UserService>(context);
     final l10n = AppLocalizations.of(context)!;
-    final userData = userService.profile ?? {};
+    final profile = userService.profile;
     final bool canPop = Navigator.canPop(context);
 
     return EspyScaffold(
@@ -39,8 +41,8 @@ class _ServiceManagerScreenState extends State<ServiceManagerScreen> {
           ? const Center(child: CircularProgressIndicator(color: EspyTheme.gold))
           : CustomScrollView(
               slivers: [
-                _buildSlotOverview(l10n, userData, viewModel),
-                _buildActiveList(l10n, viewModel, userData),
+                if (profile != null) _buildSlotOverview(l10n, profile, viewModel),
+                _buildActiveList(l10n, viewModel, profile),
                 const SliverToBoxAdapter(child: SizedBox(height: 100)),
               ],
             ),
@@ -57,9 +59,9 @@ class _ServiceManagerScreenState extends State<ServiceManagerScreen> {
     );
   }
 
-  Widget _buildSlotOverview(AppLocalizations l10n, Map<String, dynamic> userData, ServicesViewModel vm) {
-    final total = (userData['serviceSlots'] as int? ?? (userData['role'] == 'institution' ? 5 : 2));
-    final used = vm.professionalServices.where((s) => s['isAllocated'] == true).length;
+  Widget _buildSlotOverview(AppLocalizations l10n, dynamic userData, ServicesViewModel vm) {
+    final total = (userData['serviceSlots'] as int? ?? (userData.role == UserRole.institution ? 5 : 2));
+    final used = vm.professionalServices.where((s) => s.isAllocated).length;
 
     return SliverToBoxAdapter(
       child: Padding(
@@ -92,13 +94,13 @@ class _ServiceManagerScreenState extends State<ServiceManagerScreen> {
     );
   }
 
-  Widget _buildActiveList(AppLocalizations l10n, ServicesViewModel vm, Map<String, dynamic> userData) {
+  Widget _buildActiveList(AppLocalizations l10n, ServicesViewModel vm, dynamic userData) {
     if (vm.professionalServices.isEmpty) {
       return SliverToBoxAdapter(child: Center(child: Text(l10n.noActiveListings.toUpperCase())));
     }
 
-    final totalSlots = (userData['serviceSlots'] as int? ?? (userData['role'] == 'institution' ? 5 : 2));
-    final usedSlots = vm.professionalServices.where((s) => s['isAllocated'] == true).length;
+    final totalSlots = (userData?['serviceSlots'] as int? ?? (userData?.role == UserRole.institution ? 5 : 2));
+    final usedSlots = vm.professionalServices.where((s) => s.isAllocated).length;
 
     return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -111,8 +113,8 @@ class _ServiceManagerScreenState extends State<ServiceManagerScreen> {
     );
   }
 
-  Widget _buildServiceTile(Map<String, dynamic> service, int totalSlots, int usedSlots, ServicesViewModel vm) {
-    final bool isAllocated = service['isAllocated'] == true;
+  Widget _buildServiceTile(ServiceModel service, int totalSlots, int usedSlots, ServicesViewModel vm) {
+    final bool isAllocated = service.isAllocated;
     final bool canAllocate = usedSlots < totalSlots;
     
     return Container(
@@ -125,7 +127,7 @@ class _ServiceManagerScreenState extends State<ServiceManagerScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(service['title'] ?? '', style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, fontSize: 11, color: EspyTheme.navyDeep)),
+                  Text(service.titleEn.toUpperCase(), style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, fontSize: 11, color: EspyTheme.navyDeep)),
                   const SizedBox(height: 4),
                   Text(isAllocated ? "ACTIVE" : "INACTIVE", style: GoogleFonts.cinzel(fontSize: 7, fontWeight: FontWeight.bold, color: isAllocated ? EspyTheme.success : EspyTheme.error)),
                 ],
@@ -136,7 +138,7 @@ class _ServiceManagerScreenState extends State<ServiceManagerScreen> {
               activeColor: EspyTheme.success,
               onChanged: (val) {
                 if (val && !canAllocate) return;
-                vm.toggleServiceSlot(service['id'], val);
+                vm.toggleServiceSlot(service.id, val);
               },
             ),
           ],

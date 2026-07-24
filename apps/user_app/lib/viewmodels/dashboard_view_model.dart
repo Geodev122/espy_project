@@ -43,7 +43,7 @@ class DashboardViewModel extends ChangeNotifier {
       final result = await _repository.spendTokens(
         userId: _authService.user!.uid,
         itemId: 'renew_visibility',
-        cost: 500, // Default cost, could be fetched from settings repo later
+        cost: 500,
         role: _authService.userData?.role ?? UserRole.professional,
       );
 

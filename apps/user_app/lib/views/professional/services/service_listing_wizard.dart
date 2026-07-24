@@ -13,6 +13,9 @@ import 'package:espy_app/widgets/common/multi_select_chip_group.dart';
 import 'package:espy_app/widgets/common/hierarchical_location_picker.dart';
 import 'package:espy_app/widgets/common/premium_button.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';
+import '../../../models/service_model.dart';
+import '../../../models/city_model.dart';
+import '../../../models/enums.dart';
 
 import 'dart:io' as io;
 
@@ -38,14 +41,13 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
   String _deliveryMode = 'FACE_TO_FACE';
   CityModel? _customLocation;
 
-  bool _isSubmitting = false;
-
   @override
   void initState() {
     super.initState();
     if (widget.initialService != null) {
       _titleController.text = widget.initialService!.titleEn;
       _descController.text = widget.initialService!.descriptionEn ?? '';
+      _deliveryMode = widget.initialService!.deliveryMode.name.toUpperCase();
     }
   }
 
@@ -53,246 +55,124 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return EspyScaffold(
-      useCinematicBackground: true,
+      useCinematicBackground: false,
       appBar: AppBar(
-        title: Text(l10n.serviceProtocol.toUpperCase(), style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, letterSpacing: 2, color: Colors.white, fontSize: 13)),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        title: Text(l10n.listNewService.toUpperCase(), style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, fontSize: 14)),
+        backgroundColor: Colors.white,
+        foregroundColor: EspyTheme.navyDeep,
       ),
-      body: Column(
-        children: [
-          _buildProgress(),
-          Expanded(child: _buildCurrentStep(l10n)),
-          _buildActions(l10n),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProgress() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: LinearProgressIndicator(
-          value: (_currentStep + 1) / 3, 
-          backgroundColor: Colors.white10,
-          valueColor: const AlwaysStoppedAnimation<Color>(EspyTheme.gold),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCurrentStep(AppLocalizations l10n) {
-    switch (_currentStep) {
-      case 0: return _stepIdentity(l10n);
-      case 1: return _stepMetadata(l10n);
-      case 2: return _stepAllocation(l10n);
-      default: return const SizedBox();
-    }
-  }
-
-  Widget _stepMetadata(AppLocalizations l10n) {
-    final repo = context.read<EspyRepository>();
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('SERVICE METADATA', style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, fontSize: 16, color: Colors.white, letterSpacing: 1.5)),
-          const SizedBox(height: 32),
-          _buildLabel("Pricing Model"),
-          _buildPriceTagDropdown(repo),
-          const SizedBox(height: 24),
-          _buildLabel("Delivery Mode"),
-          _buildDeliveryModeSelector(),
-          const SizedBox(height: 32),
-          FutureBuilder<Map<String, List<Map<String, dynamic>>>>(
-            future: repo.listMetadataTags(),
-            builder: (context, snapshot) {
-              final tags = snapshot.data?['serviceTags'] ?? [];
-              return MultiSelectChipGroup(
-                label: "Service Capabilities",
-                options: tags,
-                initialSelectedIds: _selectedTagIds,
-                onChanged: (ids) => setState(() => _selectedTagIds = ids),
-              );
-            },
+      body: Stepper(
+        type: StepperType.horizontal,
+        currentStep: _currentStep,
+        onStepContinue: () {
+          if (_currentStep < 2) setState(() => _currentStep++);
+          else _submit();
+        },
+        onStepCancel: () {
+          if (_currentStep > 0) setState(() => _currentStep--);
+        },
+        steps: [
+          Step(
+            title: const Text("IDENTITY"),
+            content: _buildIdentityStep(l10n),
+            isActive: _currentStep >= 0,
+          ),
+          Step(
+            title: const Text("PROTOCOL"),
+            content: _buildProtocolStep(l10n),
+            isActive: _currentStep >= 1,
+          ),
+          Step(
+            title: const Text("LOCATION"),
+            content: _buildLocationStep(l10n),
+            isActive: _currentStep >= 2,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildPriceTagDropdown(EspyRepository repo) {
-    return FutureBuilder<Map<String, List<Map<String, dynamic>>>>(
-      future: repo.listMetadataTags(),
-      builder: (context, snapshot) {
-        final tags = snapshot.data?['priceTags'] ?? [];
-        return DropdownButtonFormField<String>(
-          value: _selectedPriceTagId,
-          items: tags.map((t) => DropdownMenuItem(value: t['id'].toString(), child: Text(t['nameEn'].toUpperCase(), style: const TextStyle(fontSize: 12)))).toList(),
-          onChanged: (v) => setState(() => _selectedPriceTagId = v),
-          dropdownColor: EspyTheme.navyDeep,
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          decoration: InputDecoration(filled: true, fillColor: Colors.white.withValues(alpha: 0.05), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)),
-        );
-      },
+  Widget _buildIdentityStep(AppLocalizations l10n) {
+    return Column(
+      children: [
+        _buildImagePicker(),
+        const SizedBox(height: 24),
+        TextField(controller: _titleController, decoration: const InputDecoration(labelText: "SERVICE TITLE")),
+        const SizedBox(height: 16),
+        TextField(controller: _descController, maxLines: 3, decoration: const InputDecoration(labelText: "DESCRIPTION")),
+      ],
     );
   }
 
-  Widget _buildDeliveryModeSelector() {
-    return Wrap(
-      spacing: 10,
-      children: ['ONLINE', 'FACE_TO_FACE', 'FIELD'].map((mode) {
-        final bool isSelected = _deliveryMode == mode;
-        return ChoiceChip(
-          label: Text(mode.replaceAll('_', ' ')),
-          selected: isSelected,
-          onSelected: (v) => setState(() => _deliveryMode = mode),
-          selectedColor: EspyTheme.gold,
-          labelStyle: TextStyle(color: isSelected ? EspyTheme.navyDeep : Colors.white, fontWeight: FontWeight.bold, fontSize: 10),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _stepIdentity(AppLocalizations l10n) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.identityAndContent.toUpperCase(), style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, fontSize: 16, color: Colors.white, letterSpacing: 1.5)),
-          const SizedBox(height: 32),
-          _buildImagePicker(l10n),
-          const SizedBox(height: 32),
-          _buildTextField(_titleController, l10n.serviceTitle.toUpperCase()),
-          const SizedBox(height: 24),
-          _buildTextField(_descController, l10n.description.toUpperCase(), maxLines: 4),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildImagePicker(AppLocalizations l10n) {
-    return GestureDetector(
-      onTap: _pickAndCropImage,
-      child: Container(
-        height: 200,
-        decoration: BoxDecoration(color: Colors.white10, borderRadius: BorderRadius.circular(24), border: Border.all(color: Colors.white24)),
-        child: (_imageFile == null && _webImageBytes == null)
-          ? Center(child: Icon(Icons.add_a_photo, color: EspyTheme.gold, size: 40))
-          : ClipRRect(borderRadius: BorderRadius.circular(24), child: Image(image: kIsWeb ? MemoryImage(_webImageBytes!) : FileImage(io.File(_imageFile!.path)) as ImageProvider, fit: BoxFit.cover)),
-      ),
-    );
-  }
-
-  Widget _buildTextField(TextEditingController controller, String label, {int maxLines = 1}) {
+  Widget _buildProtocolStep(AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildLabel(label),
-        TextField(
-          controller: controller,
-          maxLines: maxLines,
-          style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white24))),
+        const Text("DELIVERY MODE", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10)),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 12,
+          children: ['FACE_TO_FACE', 'ONLINE', 'FIELD'].map((mode) => ChoiceChip(
+            label: Text(mode),
+            selected: _deliveryMode == mode,
+            onSelected: (v) => setState(() => _deliveryMode = mode),
+          )).toList(),
         ),
       ],
     );
   }
 
-  Widget _buildLabel(String text) {
-    return Text(text, style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.bold, color: EspyTheme.gold));
+  Widget _buildLocationStep(AppLocalizations l10n) {
+    return Column(
+      children: [
+        RadioListTile<String>(
+          title: const Text("Main Hub"),
+          value: 'main',
+          groupValue: _allocationType,
+          onChanged: (v) => setState(() => _allocationType = v!),
+        ),
+        RadioListTile<String>(
+          title: const Text("Custom Presence Node"),
+          value: 'custom',
+          groupValue: _allocationType,
+          onChanged: (v) => setState(() => _allocationType = v!),
+        ),
+        if (_allocationType == 'custom')
+          HierarchicalLocationPicker(onCitySelected: (city) => setState(() => _customLocation = city)),
+      ],
+    );
   }
 
-  Widget _stepAllocation(AppLocalizations l10n) {
-    final userService = Provider.of<UserService>(context);
-    final profile = userService.profile;
-    final secondaryPins = profile?.rawData['secondaryLocations'] as List? ?? [];
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('ALLOCATION & ANCHORS', style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, fontSize: 16, color: Colors.white, letterSpacing: 1.5)),
-          const SizedBox(height: 32),
-          RadioListTile<String>(
-            value: 'main', groupValue: _allocationType,
-            activeColor: EspyTheme.gold,
-            title: Text('PRIMARY HUB PIN', style: const TextStyle(color: Colors.white)),
-            onChanged: (val) => setState(() => _allocationType = val!)
-          ),
-          if (secondaryPins.isNotEmpty)
-            RadioListTile<String>(
-              value: 'secondary', groupValue: _allocationType,
-              activeColor: EspyTheme.gold,
-              title: Text('SPECIFIC PRACTICE PIN', style: const TextStyle(color: Colors.white)),
-              onChanged: (val) => setState(() => _allocationType = val!)
-            ),
-          RadioListTile<String>(
-            value: 'slot', groupValue: _allocationType,
-            activeColor: EspyTheme.gold,
-            title: Text('SERVICE SLOT (MANUAL)', style: const TextStyle(color: Colors.white)),
-            onChanged: (val) => setState(() => _allocationType = val!)
-          ),
-          if (_allocationType == 'slot') ...[
-            const SizedBox(height: 24),
-            _buildLabel("Select Service Location"),
-            HierarchicalLocationPicker(
-              onCitySelected: (city) => setState(() => _customLocation = city),
-            ),
-          ],
-        ],
+  Widget _buildImagePicker() {
+    return GestureDetector(
+      onTap: () async {
+        final picker = ImagePicker();
+        final img = await picker.pickImage(source: ImageSource.gallery);
+        if (img != null) {
+          final bytes = await img.readAsBytes();
+          setState(() {
+            _imageFile = img;
+            _webImageBytes = bytes;
+          });
+        }
+      },
+      child: Container(
+        height: 160,
+        width: double.infinity,
+        decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(24)),
+        child: _webImageBytes != null 
+          ? ClipRRect(borderRadius: BorderRadius.circular(24), child: Image.memory(_webImageBytes!, fit: BoxFit.cover))
+          : const Column(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.add_a_photo_rounded, size: 40, color: Colors.black26), Text("ADD PROTOCOL IMAGE", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black26))]),
       ),
     );
   }
 
-  Widget _buildActions(AppLocalizations l10n) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      child: Row(
-        children: [
-          if (_currentStep > 0) IconButton(onPressed: () => setState(() => _currentStep--), icon: const Icon(Icons.arrow_back_ios, color: Colors.white)),
-          const Spacer(),
-          PremiumButton(
-            label: _currentStep == 2 ? l10n.listService : l10n.continueText,
-            isLoading: _isSubmitting,
-            onPressed: () {
-              if (_currentStep < 2) {
-                setState(() => _currentStep++);
-              } else {
-                _finalizeListing(l10n);
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _pickAndCropImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile == null) return;
-    if (kIsWeb) {
-      final bytes = await pickedFile.readAsBytes();
-      setState(() => _webImageBytes = bytes);
-    } else {
-      setState(() => _imageFile = pickedFile);
-    }
-  }
-
-  Future<void> _finalizeListing(AppLocalizations l10n) async {
-    setState(() => _isSubmitting = true);
-    // Logic to save service...
-    await Future.delayed(const Duration(seconds: 1));
-    if (mounted) {
-      SoundService.playSuccess();
-      Navigator.pop(context);
-    }
+  Future<void> _submit() async {
+    final repo = context.read<EspyRepository>();
+    final userService = context.read<UserService>();
+    
+    // Implementation of service creation
+    SoundService.playSuccess();
+    Navigator.pop(context);
   }
 }

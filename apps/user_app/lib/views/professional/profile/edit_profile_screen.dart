@@ -13,6 +13,8 @@ import 'package:espy_app/widgets/common/premium_card.dart';
 import 'package:espy_app/widgets/common/profile_image_picker.dart';
 import 'package:espy_app/widgets/common/location_picker_modal.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';
+import '../../../models/user_model.dart';
+import '../../../models/enums.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -36,12 +38,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void initState() {
     super.initState();
-    final profile = Provider.of<UserService>(context, listen: false).profile ?? {};
-    _nameController = TextEditingController(text: profile['fullNameEn'] ?? profile['name'] ?? '');
-    _bioController = TextEditingController(text: profile['bio'] ?? '');
-    _bioArController = TextEditingController(text: profile['bio_ar'] ?? '');
-    _whatsappCodeController = TextEditingController(text: profile['whatsapp_code'] ?? '+961');
-    _whatsappNumberController = TextEditingController(text: profile['whatsapp_number'] ?? '');
+    final profile = Provider.of<UserService>(context, listen: false).profile;
+    _nameController = TextEditingController(text: profile?.name ?? '');
+    _bioController = TextEditingController(text: profile?['bio'] ?? '');
+    _bioArController = TextEditingController(text: profile?['bio_ar'] ?? '');
+    _whatsappCodeController = TextEditingController(text: profile?['whatsapp_code'] ?? '+961');
+    _whatsappNumberController = TextEditingController(text: profile?['whatsapp_number'] ?? '');
   }
 
   @override
@@ -58,9 +60,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final userService = Provider.of<UserService>(context);
-    final profile = userService.profile ?? {};
-    final String role = profile['role']?.toString().toLowerCase() ?? 'visitor';
-    final bool isVisitor = role == 'visitor';
+    final profile = userService.profile;
+    final bool isVisitor = profile?.role == UserRole.visitor;
 
     return EspyScaffold(
       useCinematicBackground: true,
@@ -165,14 +166,29 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
     if (result != null) {
       final userService = Provider.of<UserService>(context, listen: false);
+      if (userService.profile == null) return;
+
       setState(() => _isSaving = true);
       try {
-        await userService.updateProfile({
-          'mainLocation': result,
-          'countryId': result['countryId'],
-          'governorateId': result['governorateId'],
-          'cityId': result['cityId'],
-        });
+        final current = userService.profile!;
+        final updated = UserModel(
+          id: current.id,
+          email: current.email,
+          name: current.name,
+          role: current.role,
+          isActive: current.isActive,
+          hasProfile: current.hasProfile,
+          createdAt: current.createdAt,
+          updatedAt: DateTime.now(),
+          rawData: {
+            ...current.rawData,
+            'mainLocation': result,
+            'countryId': result['countryId'],
+            'governorateId': result['governorateId'],
+            'cityId': result['cityId'],
+          },
+        );
+        await userService.updateProfile(updated);
         SoundService.playSuccess();
       } finally {
         if (mounted) setState(() => _isSaving = false);
@@ -182,8 +198,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Future<void> _saveProfile() async {
     if (!_formKey.currentState!.validate()) return;
-    setState(() => _isSaving = true);
     final userService = Provider.of<UserService>(context, listen: false);
+    if (userService.profile == null) return;
+
+    setState(() => _isSaving = true);
     final storageService = Provider.of<StorageService>(context, listen: false);
     try {
       String? photoUrl;
@@ -192,16 +210,29 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       } else if (_profileImageFile != null) {
         photoUrl = await storageService.uploadProfileImage(userId: userService.userId, file: _profileImageFile!);
       }
-      await userService.updateProfile({
-        'fullNameEn': _nameController.text,
-        'name': _nameController.text,
-        'bio': _bioController.text,
-        'bio_ar': _bioArController.text,
-        'whatsapp_code': _whatsappCodeController.text,
-        'whatsapp_number': _whatsappNumberController.text,
-        'whatsapp': '${_whatsappCodeController.text}${_whatsappNumberController.text}',
-        if (photoUrl != null) 'photoUrl': photoUrl,
-      });
+      
+      final current = userService.profile!;
+      final updated = UserModel(
+        id: current.id,
+        email: current.email,
+        name: _nameController.text,
+        photoUrl: photoUrl ?? current.photoUrl,
+        whatsapp: '${_whatsappCodeController.text}${_whatsappNumberController.text}',
+        role: current.role,
+        isActive: current.isActive,
+        hasProfile: current.hasProfile,
+        createdAt: current.createdAt,
+        updatedAt: DateTime.now(),
+        rawData: {
+          ...current.rawData,
+          'bio': _bioController.text,
+          'bio_ar': _bioArController.text,
+          'whatsapp_code': _whatsappCodeController.text,
+          'whatsapp_number': _whatsappNumberController.text,
+        }
+      );
+      
+      await userService.updateProfile(updated);
       SoundService.playSuccess();
       if (mounted) Navigator.pop(context);
     } finally {
