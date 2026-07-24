@@ -62,6 +62,7 @@ query GetProfessionalDetails($uid: String!) @auth(level: PUBLIC) {
     user {
       id
       email
+      name
       photoUrl
       whatsapp
     }

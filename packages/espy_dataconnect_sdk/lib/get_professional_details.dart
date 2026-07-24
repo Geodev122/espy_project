@@ -143,12 +143,14 @@ class GetProfessionalDetailsProfessionalProfile {
 class GetProfessionalDetailsProfessionalProfileUser {
   final String id;
   final String email;
+  final String? name;
   final String? photoUrl;
   final String? whatsapp;
   GetProfessionalDetailsProfessionalProfileUser.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']),
   email = nativeFromJson<String>(json['email']),
+  name = json['name'] == null ? null : nativeFromJson<String>(json['name']),
   photoUrl = json['photoUrl'] == null ? null : nativeFromJson<String>(json['photoUrl']),
   whatsapp = json['whatsapp'] == null ? null : nativeFromJson<String>(json['whatsapp']);
   @override
@@ -163,18 +165,22 @@ class GetProfessionalDetailsProfessionalProfileUser {
     final GetProfessionalDetailsProfessionalProfileUser otherTyped = other as GetProfessionalDetailsProfessionalProfileUser;
     return id == otherTyped.id && 
     email == otherTyped.email && 
+    name == otherTyped.name && 
     photoUrl == otherTyped.photoUrl && 
     whatsapp == otherTyped.whatsapp;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, email.hashCode, photoUrl.hashCode, whatsapp.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, email.hashCode, name.hashCode, photoUrl.hashCode, whatsapp.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
     json['id'] = nativeToJson<String>(id);
     json['email'] = nativeToJson<String>(email);
+    if (name != null) {
+      json['name'] = nativeToJson<String?>(name);
+    }
     if (photoUrl != null) {
       json['photoUrl'] = nativeToJson<String?>(photoUrl);
     }
@@ -187,6 +193,7 @@ class GetProfessionalDetailsProfessionalProfileUser {
   GetProfessionalDetailsProfessionalProfileUser({
     required this.id,
     required this.email,
+    this.name,
     this.photoUrl,
     this.whatsapp,
   });

@@ -41,7 +41,7 @@ class DataConnectEspyRepository implements EspyRepository {
       'tokensUsed': u.tokensUsed,
       'isActive': u.isActive,
       'hasProfile': u.hasProfile,
-      'createdAt': u.createdAt.toDateTime(),
+      'createdAt': u.createdAt?.toDateTime(),
     });
   }
 
@@ -268,7 +268,7 @@ class DataConnectEspyRepository implements EspyRepository {
       .map((r) => ServiceRequestModel.fromMap({
         'id': r.id,
         'descriptionEn': r.descriptionEn,
-        'createdAt': r.createdAt.toDateTime(),
+        'createdAt': r.createdAt?.toDateTime(),
       })).toList()
     ).onErrorReturnWith((e, s) => []);
   }
@@ -309,7 +309,7 @@ class DataConnectEspyRepository implements EspyRepository {
         amount: t.amount,
         type: TransactionType.parse(t.type.stringValue),
         description: t.description,
-        createdAt: t.createdAt.toDateTime(),
+        createdAt: t.createdAt?.toDateTime(),
       )).toList()
     ).onErrorReturnWith((e, s) => []);
   }
@@ -395,7 +395,7 @@ class DataConnectEspyRepository implements EspyRepository {
         'broadcastsCount': o.broadcastsCount,
         'totalCost': o.totalCost,
         'status': o.status.stringValue,
-        'createdAt': o.createdAt.toDateTime(),
+        'createdAt': o.createdAt?.toDateTime(),
       });
     }).onErrorReturnWith((e, s) => null);
   }
@@ -643,8 +643,8 @@ class DataConnectEspyRepository implements EspyRepository {
   @override
   Future<List<WalletTransactionModel>> getFinanceStats({DateTime? start, DateTime? end}) async {
     final builder = _db.getFinanceStats();
-    if (start != null) builder.start(fdc.Timestamp.fromDateTime(start));
-    if (end != null) builder.end(fdc.Timestamp.fromDateTime(end));
+    if (start != null) builder.start(fdc.Timestamp(start));
+    if (end != null) builder.end(fdc.Timestamp(end));
 
     final result = await builder.execute();
     return result.data.walletTransactions.map((t) => WalletTransactionModel(
@@ -653,7 +653,7 @@ class DataConnectEspyRepository implements EspyRepository {
       amount: t.amount,
       type: TransactionType.parse(t.type.stringValue),
       description: t.description,
-      createdAt: t.createdAt.toDateTime(),
+      createdAt: t.createdAt?.toDateTime(),
     )).toList();
   }
 
@@ -665,13 +665,13 @@ class DataConnectEspyRepository implements EspyRepository {
   @override
   Future<List<Map<String, dynamic>>> getAnalyticsSnapshots({DateTime? start, DateTime? end}) async {
     final builder = _db.getAnalyticsSnapshots();
-    if (start != null) builder.start(start);
-    if (end != null) builder.end(end);
+    if (start != null) builder.start(fdc.Date(start.year, start.month, start.day));
+    if (end != null) builder.end(fdc.Date(end.year, end.month, end.day));
     
     final result = await builder.execute();
     return result.data.analyticsSnapshots.map((s) => {
       'id': s.id.toString(),
-      'date': s.date,
+      'date': s.date.toString(),
       'totalUsers': s.totalUsers,
       'totalRevenue': s.totalRevenue,
       'tokensBurned': s.tokensBurned,
@@ -718,7 +718,7 @@ class DataConnectEspyRepository implements EspyRepository {
       'views': m.views,
       'contacts': m.contacts,
       'shares': m.shares,
-      'updatedAt': m.updatedAt.toDateTime(),
+      'updatedAt': m.updatedAt?.toDateTime(),
     };
   }
 

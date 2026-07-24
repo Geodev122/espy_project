@@ -1,8 +1,8 @@
 part of 'espy.dart';
 
 class GetFinanceStatsVariablesBuilder {
-  Optional<Timestamp> _start = Optional.optional((json) => json['start'] = Timestamp.fromJson(json['start']), defaultSerializer);
-  Optional<Timestamp> _end = Optional.optional((json) => json['end'] = Timestamp.fromJson(json['end']), defaultSerializer);
+  Optional<Timestamp> _start = Optional.optional((data) => Timestamp.fromJson(data), defaultSerializer);
+  Optional<Timestamp> _end = Optional.optional((data) => Timestamp.fromJson(data), defaultSerializer);
 
   final FirebaseDataConnect _dataConnect;
   GetFinanceStatsVariablesBuilder start(Timestamp? t) {
@@ -201,11 +201,11 @@ class GetFinanceStatsVariables {
   GetFinanceStatsVariables.fromJson(Map<String, dynamic> json) {
   
   
-    start = Optional.optional((json) => json['start'] = Timestamp.fromJson(json['start']), defaultSerializer);
+    start = Optional.optional((data) => Timestamp.fromJson(data), defaultSerializer);
     start.value = json['start'] == null ? null : Timestamp.fromJson(json['start']);
   
   
-    end = Optional.optional((json) => json['end'] = Timestamp.fromJson(json['end']), defaultSerializer);
+    end = Optional.optional((data) => Timestamp.fromJson(data), defaultSerializer);
     end.value = json['end'] == null ? null : Timestamp.fromJson(json['end']);
   
   }

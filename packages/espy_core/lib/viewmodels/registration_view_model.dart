@@ -8,6 +8,7 @@ import '../models/professional_profile.dart';
 import '../models/institution_profile.dart';
 import '../models/resource_order.dart';
 import '../models/location_node.dart';
+import '../models/city_model.dart';
 import '../models/enums.dart';
 
 class RegistrationViewModel extends ChangeNotifier {
@@ -46,7 +47,7 @@ class RegistrationViewModel extends ChangeNotifier {
   void updateSlots(int count) { _slotsCount = count; notifyListeners(); }
   void updateBroadcasts(int count) { _broadcastsCount = count; notifyListeners(); }
 
-  Future<void> submitProfessionalRegistration({
+  Future<bool> submitProfessionalRegistration({
     required String name,
     required String bio,
     required String bioAr,
@@ -57,7 +58,7 @@ class RegistrationViewModel extends ChangeNotifier {
     required String whatsapp,
     File? profileImage,
     Uint8List? profileBytes,
-    Map<String, dynamic>? mainLocation,
+    CityModel? mainLocation,
   }) async {
     _isSubmitting = true;
     notifyListeners();
@@ -72,7 +73,7 @@ class RegistrationViewModel extends ChangeNotifier {
       }
 
       final existingUser = _authService.userData;
-      if (existingUser == null) return;
+      if (existingUser == null) return false;
 
       // 1. Update Core Profile
       final updatedUser = UserModel(
@@ -113,9 +114,9 @@ class RegistrationViewModel extends ChangeNotifier {
         await _repository.createLocationNode(LocationNodeModel(
           id: '',
           userId: uid,
-          cityId: mainLocation['id'],
-          lat: (mainLocation['lat'] as num?)?.toDouble() ?? 0.0,
-          lng: (mainLocation['lng'] as num?)?.toDouble() ?? 0.0,
+          cityId: mainLocation.id,
+          lat: mainLocation.lat ?? 0.0,
+          lng: mainLocation.lng ?? 0.0,
           label: "Primary Hub",
           isMain: true,
         ));
@@ -134,6 +135,10 @@ class RegistrationViewModel extends ChangeNotifier {
       ));
 
       await _authService.fetchUserData();
+      return true;
+    } catch (e) {
+      debugPrint("Registration Error: $e");
+      return false;
     } finally {
       _isSubmitting = false;
       notifyListeners();
