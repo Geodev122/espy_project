@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart' as firestore;
 import 'package:firebase_data_connect/firebase_data_connect.dart';
 import 'package:flutter/foundation.dart';
+import 'package:rxdart/rxdart.dart';
 import 'espy_repository.dart';
 import '../models/user_model.dart' as models;
 import '../models/professional_profile.dart';
@@ -18,7 +19,6 @@ class DataConnectEspyRepository implements EspyRepository {
   @override
   Future<models.UserModel?> getUser(String id) async {
     try {
-      // 1. Try DataConnect
       final result = await _db.getUser(uid: id).execute();
       final user = result.data.user;
       if (user != null) {
@@ -39,7 +39,6 @@ class DataConnectEspyRepository implements EspyRepository {
       debugPrint("DataConnect getUser failed: $e");
     }
 
-    // 2. Fallback to Firestore
     try {
       final doc = await _firestore.collection('users').doc(id).get();
       if (doc.exists && doc.data() != null) {
@@ -48,16 +47,12 @@ class DataConnectEspyRepository implements EspyRepository {
     } catch (e) {
       debugPrint("Firestore Fallback getUser failed: $e");
     }
-    
     return null;
   }
 
   @override
   Future<void> createUser(Map<String, dynamic> data) async {
-    // Write to Firestore first
     await _firestore.collection('users').doc(data['id']).set(data);
-    
-    // Shadow-write to DataConnect
     try {
       await _db.createUser(
         id: data['id'],
@@ -71,10 +66,7 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Future<void> upsertUser(Map<String, dynamic> data) async {
-    // Write to Firestore first
     await _firestore.collection('users').doc(data['id']).set(data, firestore.SetOptions(merge: true));
-
-    // Shadow-write to DataConnect
     try {
       await _db.upsertUser(
         id: data['id'],
@@ -88,7 +80,10 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Future<void> updateUser(String id, Map<String, dynamic> data) async {
-    await _firestore.collection('users').doc(id).update(data);
+    await _firestore.collection('users').doc(id).set({
+      ...data,
+      'updatedAt': firestore.FieldValue.serverTimestamp(),
+    }, firestore.SetOptions(merge: true));
 
     try {
       final builder = _db.updateUserProfile(id: id);
@@ -108,7 +103,6 @@ class DataConnectEspyRepository implements EspyRepository {
       'lastActiveAt': firestore.FieldValue.serverTimestamp(),
       'updatedAt': firestore.FieldValue.serverTimestamp(),
     });
-
     try {
       await _db.updateUserLastActive(id: id).execute();
     } catch (e) {
@@ -140,7 +134,8 @@ class DataConnectEspyRepository implements EspyRepository {
     } catch (_) {}
 
     final doc = await _firestore.collection('directory_professionals').doc(id).get();
-    return (doc.exists && doc.data() != null) ? ProfessionalProfile.fromMap(doc.data() as Map<String, dynamic>) : null;
+    final data = doc.data() as Map<String, dynamic>?;
+    return (doc.exists && data != null) ? ProfessionalProfile.fromMap(data) : null;
   }
 
   @override
@@ -160,7 +155,8 @@ class DataConnectEspyRepository implements EspyRepository {
     } catch (_) {}
 
     final doc = await _firestore.collection('directory_institutions').doc(id).get();
-    return (doc.exists && doc.data() != null) ? InstitutionProfile.fromMap(doc.data() as Map<String, dynamic>) : null;
+    final data = doc.data() as Map<String, dynamic>?;
+    return (doc.exists && data != null) ? InstitutionProfile.fromMap(data) : null;
   }
 
   @override
@@ -174,14 +170,15 @@ class DataConnectEspyRepository implements EspyRepository {
     } catch (_) {}
 
     final doc = await _firestore.collection('directory_visitors').doc(id).get();
-    return (doc.exists && doc.data() != null) ? VisitorProfile.fromMap(doc.data() as Map<String, dynamic>) : null;
+    final data = doc.data() as Map<String, dynamic>?;
+    return (doc.exists && data != null) ? VisitorProfile.fromMap(data) : null;
   }
 
   // ─── 2. Taxonomy & Location ──────────────────────────────────────────────
 
   @override
   Stream<List<Map<String, dynamic>>> listSectors() {
-    return _db.listSectors().ref().subscribe().map((snap) => 
+    final dcStream = _db.listSectors().ref().subscribe().map((snap) => 
       snap.data.sectors.map((s) => {
         'id': s.id,
         'nameEn': s.nameEn,
@@ -195,7 +192,15 @@ class DataConnectEspyRepository implements EspyRepository {
            'visibleFields': s.template!.visibleFields,
         } : null,
       }).toList()
+    ).onErrorReturnWith((e, s) => []);
+
+    final fsStream = _firestore.collection('directory_sectors').snapshots().map((snap) =>
+      snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList()
     );
+
+    return Rx.combineLatest2<List<Map<String, dynamic>>, List<Map<String, dynamic>>, List<Map<String, dynamic>>>(
+      dcStream, fsStream, (dc, fs) => dc.isNotEmpty ? dc : fs
+    ).distinct();
   }
 
   @override
@@ -203,19 +208,27 @@ class DataConnectEspyRepository implements EspyRepository {
     var builder = _db.listCategories();
     if (sectorId != null) builder = builder.sectorId(sectorId);
     
-    return builder.ref().subscribe().map((snap) =>
+    final fdcStream = builder.ref().subscribe().map((snap) =>
       snap.data.categories.map((c) => {
         'id': c.id,
         'nameEn': c.nameEn,
         'nameAr': c.nameAr,
         'targetRole': c.targetRole.stringValue.toLowerCase(),
       }).toList()
-    );
+    ).onErrorReturnWith((e, s) => []);
+
+    firestore.Query fsQuery = _firestore.collection('directory_categories');
+    if (sectorId != null) fsQuery = fsQuery.where('sectorId', isEqualTo: sectorId);
+    final fsStream = fsQuery.snapshots().map((snap) => snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList());
+
+    return Rx.combineLatest2<List<Map<String, dynamic>>, List<Map<String, dynamic>>, List<Map<String, dynamic>>>(
+      fdcStream, fsStream, (dc, fs) => dc.isNotEmpty ? dc : fs
+    ).distinct();
   }
 
   @override
   Stream<List<Map<String, dynamic>>> listCountries() {
-    return _db.listCountries().ref().subscribe().map((snap) =>
+    final fdcStream = _db.listCountries().ref().subscribe().map((snap) =>
       snap.data.countries.map((c) => {
         'id': c.id,
         'nameEn': c.nameEn,
@@ -224,24 +237,40 @@ class DataConnectEspyRepository implements EspyRepository {
         'isoCode': c.isoCode,
         'currency': c.currency,
       }).toList()
+    ).onErrorReturnWith((e, s) => []);
+
+    final fsStream = _firestore.collection('directory_countries').snapshots().map((snap) =>
+      snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList()
     );
+
+    return Rx.combineLatest2<List<Map<String, dynamic>>, List<Map<String, dynamic>>, List<Map<String, dynamic>>>(
+      fdcStream, fsStream, (dc, fs) => dc.isNotEmpty ? dc : fs
+    ).distinct();
   }
 
   @override
   Stream<List<Map<String, dynamic>>> listRegions(String countryId) {
-    return _db.listRegions(countryId: countryId).ref().subscribe().map((snap) =>
+    final fdcStream = _db.listRegions(countryId: countryId).ref().subscribe().map((snap) =>
       snap.data.regions.map((r) => {
         'id': r.id.toString(),
         'nameEn': r.nameEn,
         'nameAr': r.nameAr,
         'regionCode': r.regionCode,
       }).toList()
+    ).onErrorReturnWith((e, s) => []);
+
+    final fsStream = _firestore.collection('directory_regions').where('countryId', isEqualTo: countryId).snapshots().map((snap) =>
+      snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList()
     );
+
+    return Rx.combineLatest2<List<Map<String, dynamic>>, List<Map<String, dynamic>>, List<Map<String, dynamic>>>(
+      fdcStream, fsStream, (dc, fs) => dc.isNotEmpty ? dc : fs
+    ).distinct();
   }
 
   @override
   Stream<List<Map<String, dynamic>>> listCities(String regionId) {
-    return _db.listCities(regionId: regionId).ref().subscribe().map((snap) =>
+    final fdcStream = _db.listCities(regionId: regionId).ref().subscribe().map((snap) =>
       snap.data.cities.map((c) => {
         'id': c.id.toString(),
         'nameEn': c.nameEn,
@@ -249,7 +278,15 @@ class DataConnectEspyRepository implements EspyRepository {
         'lat': c.lat,
         'lng': c.lng,
       }).toList()
+    ).onErrorReturnWith((e, s) => []);
+
+    final fsStream = _firestore.collection('directory_cities').where('regionId', isEqualTo: regionId).snapshots().map((snap) =>
+      snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList()
     );
+
+    return Rx.combineLatest2<List<Map<String, dynamic>>, List<Map<String, dynamic>>, List<Map<String, dynamic>>>(
+      fdcStream, fsStream, (dc, fs) => dc.isNotEmpty ? dc : fs
+    ).distinct();
   }
 
   @override
@@ -263,45 +300,40 @@ class DataConnectEspyRepository implements EspyRepository {
         'cityNameEn': ln.city.nameEn,
         'isMain': ln.isMain,
       }).toList()
-    );
+    ).onErrorReturnWith((e, s) => []);
   }
 
   @override
   Future<void> upsertCountry(Map<String, dynamic> data) async {
-    final builder = _db.upsertCountry(
-      id: data['id'],
-      nameEn: data['nameEn'],
-      nameAr: data['nameAr'],
-    );
-    if (data['isoCode'] != null) builder.isoCode(data['isoCode']);
-    if (data['currency'] != null) builder.currency(data['currency']);
-    if (data['flagEmoji'] != null) builder.flagEmoji(data['flagEmoji']);
-    await builder.execute();
+    await _firestore.collection('directory_countries').doc(data['id']).set(data, firestore.SetOptions(merge: true));
+    try {
+      final builder = _db.upsertCountry(id: data['id'], nameEn: data['nameEn'], nameAr: data['nameAr']);
+      if (data['isoCode'] != null) builder.isoCode(data['isoCode']);
+      if (data['currency'] != null) builder.currency(data['currency']);
+      if (data['flagEmoji'] != null) builder.flagEmoji(data['flagEmoji']);
+      await builder.execute();
+    } catch (_) {}
   }
 
   @override
   Future<void> upsertRegion(Map<String, dynamic> data) async {
-    final builder = _db.upsertRegion(
-      id: data['id'],
-      countryId: data['countryId'],
-      nameEn: data['nameEn'],
-      nameAr: data['nameAr'],
-    );
-    if (data['regionCode'] != null) builder.regionCode(data['regionCode']);
-    await builder.execute();
+    await _firestore.collection('directory_regions').doc(data['id']).set(data, firestore.SetOptions(merge: true));
+    try {
+      final builder = _db.upsertRegion(id: data['id'], countryId: data['countryId'], nameEn: data['nameEn'], nameAr: data['nameAr']);
+      if (data['regionCode'] != null) builder.regionCode(data['regionCode']);
+      await builder.execute();
+    } catch (_) {}
   }
 
   @override
   Future<void> upsertCity(Map<String, dynamic> data) async {
-    final builder = _db.upsertCity(
-      id: data['id'],
-      regionId: data['regionId'],
-      nameEn: data['nameEn'],
-      nameAr: data['nameAr'],
-    );
-    if (data['lat'] != null) builder.lat(data['lat']);
-    if (data['lng'] != null) builder.lng(data['lng']);
-    await builder.execute();
+    await _firestore.collection('directory_cities').doc(data['id']).set(data, firestore.SetOptions(merge: true));
+    try {
+      final builder = _db.upsertCity(id: data['id'], regionId: data['regionId'], nameEn: data['nameEn'], nameAr: data['nameAr']);
+      if (data['lat'] != null) builder.lat(data['lat']);
+      if (data['lng'] != null) builder.lng(data['lng']);
+      await builder.execute();
+    } catch (_) {}
   }
 
   @override
@@ -376,7 +408,7 @@ class DataConnectEspyRepository implements EspyRepository {
            'visibleFields': s.sector.template!.visibleFields,
         } : null,
       }).toList()
-    );
+    ).onErrorReturnWith((e, s) => []);
   }
 
   @override
@@ -404,22 +436,37 @@ class DataConnectEspyRepository implements EspyRepository {
         'createdAt': cr.createdAt.toDateTime(),
         'sectorId': sectorId,
       }).toList()
-    );
+    ).onErrorReturnWith((e, s) => []);
   }
 
   @override
   Future<void> createCommunityRequest(Map<String, dynamic> data) async {
-    // Redirected to PostServiceRequest
+    // PostServiceRequest
   }
 
   @override
   Future<Map<String, List<Map<String, dynamic>>>> listMetadataTags() async {
-    final result = await _db.listMetadataTags().execute();
+    try {
+      final result = await _db.listMetadataTags().execute();
+      return {
+        'serviceTags': result.data.serviceTags.map((t) => {'id': t.id, 'nameEn': t.nameEn, 'nameAr': t.nameAr}).toList(),
+        'priceTags': result.data.priceTags.map((t) => {'id': t.id, 'nameEn': t.nameEn, 'nameAr': t.nameAr, 'category': t.category}).toList(),
+        'pinCategories': result.data.pinCategories.map((t) => {'id': t.id, 'nameEn': t.nameEn, 'nameAr': t.nameAr, 'iconBase': t.iconBase}).toList(),
+        'presenceTags': result.data.presenceTags.map((t) => {'id': t.id, 'nameEn': t.nameEn, 'nameAr': t.nameAr}).toList(),
+      };
+    } catch (e) {
+      debugPrint("DataConnect listMetadataTags failed: $e");
+    }
+
+    final s = await _firestore.collection('directory_service_tags').get();
+    final p = await _firestore.collection('directory_price_tags').get();
+    final c = await _firestore.collection('directory_pin_categories').get();
+    final pr = await _firestore.collection('directory_presence_tags').get();
     return {
-      'serviceTags': result.data.serviceTags.map((t) => {'id': t.id, 'nameEn': t.nameEn, 'nameAr': t.nameAr}).toList(),
-      'priceTags': result.data.priceTags.map((t) => {'id': t.id, 'nameEn': t.nameEn, 'nameAr': t.nameAr, 'category': t.category}).toList(),
-      'pinCategories': result.data.pinCategories.map((t) => {'id': t.id, 'nameEn': t.nameEn, 'nameAr': t.nameAr, 'iconBase': t.iconBase}).toList(),
-      'presenceTags': result.data.presenceTags.map((t) => {'id': t.id, 'nameEn': t.nameEn, 'nameAr': t.nameAr}).toList(),
+      'serviceTags': s.docs.map((d) => <String, dynamic>{'id': d.id, ...d.data()}).toList(),
+      'priceTags': p.docs.map((d) => <String, dynamic>{'id': d.id, ...d.data()}).toList(),
+      'pinCategories': c.docs.map((d) => <String, dynamic>{'id': d.id, ...d.data()}).toList(),
+      'presenceTags': pr.docs.map((d) => <String, dynamic>{'id': d.id, ...d.data()}).toList(),
     };
   }
 
@@ -435,7 +482,7 @@ class DataConnectEspyRepository implements EspyRepository {
         'description': t.description,
         'createdAt': t.createdAt.toDateTime(),
       }).toList()
-    );
+    ).onErrorReturnWith((e, s) => []);
   }
 
   @override
@@ -468,14 +515,16 @@ class DataConnectEspyRepository implements EspyRepository {
   Stream<List<String>> listFavoriteIds(String userId) {
     return _db.listInteractions(actorId: userId, type: sdk.InteractionType.FAVORITE)
         .ref().subscribe()
-        .map((snap) => snap.data.interactions.map((i) => i.targetId).toList());
+        .map((snap) => snap.data.interactions.map((i) => i.targetId).toList())
+        .onErrorReturnWith((e, s) => []);
   }
 
   @override
   Stream<List<String>> listContactedIds(String userId) {
     return _db.listInteractions(actorId: userId, type: sdk.InteractionType.CONTACT)
         .ref().subscribe()
-        .map((snap) => snap.data.interactions.map((i) => i.targetId).toList());
+        .map((snap) => snap.data.interactions.map((i) => i.targetId).toList())
+        .onErrorReturnWith((e, s) => []);
   }
 
   @override
@@ -522,7 +571,7 @@ class DataConnectEspyRepository implements EspyRepository {
         'totalCost': o.totalCost,
         'status': o.status.stringValue,
       };
-    });
+    }).onErrorReturnWith((e, s) => null);
   }
 
   @override
@@ -540,23 +589,23 @@ class DataConnectEspyRepository implements EspyRepository {
         'redeemedAt': c.redeemedAt?.toDateTime(),
         'redeemedBy': c.redeemedBy?.email,
       }).toList()
-    );
+    ).onErrorReturnWith((e, s) => []);
   }
 
   // ─── 5. Admin Operations ─────────────────────────────────────────────────
 
   @override
   Stream<List<Map<String, dynamic>>> searchUsersAdmin({String? query, String? role, bool? hasProfile, bool? isActive}) {
-    var builder = _db.searchUsersAdmin();
-    if (query != null) builder = builder.query(query);
+    var dcBuilder = _db.searchUsersAdmin();
+    if (query != null) dcBuilder = dcBuilder.query(query);
     if (role != null) {
        final gqlRole = sdk.UserRole.values.byName(role.toUpperCase());
-       builder = builder.role(gqlRole);
+       dcBuilder = dcBuilder.role(gqlRole);
     }
-    if (hasProfile != null) builder = builder.hasProfile(hasProfile);
-    if (isActive != null) builder = builder.isActive(isActive);
+    if (hasProfile != null) dcBuilder = dcBuilder.hasProfile(hasProfile);
+    if (isActive != null) dcBuilder = dcBuilder.isActive(isActive);
     
-    return builder.ref().subscribe().map((snap) =>
+    final fdcStream = dcBuilder.ref().subscribe().map((snap) =>
       snap.data.users.map((u) => {
         'id': u.id,
         'email': u.email,
@@ -568,128 +617,158 @@ class DataConnectEspyRepository implements EspyRepository {
         'whatsapp': u.whatsapp,
         'createdAt': u.createdAt.toDateTime(),
       }).toList()
-    );
+    ).onErrorReturnWith((e, s) => []);
+
+    firestore.Query fsQuery = _firestore.collection('users');
+    if (role != null) fsQuery = fsQuery.where('role', isEqualTo: role.toLowerCase());
+    if (hasProfile != null) fsQuery = fsQuery.where('hasProfile', isEqualTo: hasProfile);
+    if (isActive != null) fsQuery = fsQuery.where('isActive', isEqualTo: isActive);
+    
+    final fsStream = fsQuery.orderBy('createdAt', descending: true).snapshots().map((snap) {
+      final docs = snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>});
+      if (query != null && query.isNotEmpty) {
+        final low = query.toLowerCase();
+        return docs.where((u) => u['email']?.toString().toLowerCase().contains(low) == true || u['name']?.toString().toLowerCase().contains(low) == true).toList();
+      }
+      return docs.toList();
+    });
+
+    return Rx.combineLatest2<List<Map<String, dynamic>>, List<Map<String, dynamic>>, List<Map<String, dynamic>>>(
+      fdcStream, fsStream, (dc, fs) => dc.isNotEmpty ? dc : fs
+    ).distinct();
   }
 
   @override
   Future<Map<String, dynamic>> getAuditDetails(String id) async {
-    final result = await _db.getAuditDetails(id: id).execute();
-    final u = result.data.user;
-    if (u == null) return {};
+    try {
+      final result = await _db.getAuditDetails(id: id).execute();
+      final u = result.data.user;
+      if (u != null) {
+        final Map<String, dynamic> data = {
+          'id': u.id,
+          'email': u.email,
+          'name': u.name,
+          'role': u.role.stringValue,
+          'isActive': u.isActive,
+          'hasProfile': u.hasProfile,
+          'photoUrl': u.photoUrl,
+          'phone': u.phone,
+          'whatsapp': u.whatsapp,
+          'walletBalance': u.walletBalance,
+          'adminNotes': u.adminNotes,
+          'createdAt': u.createdAt.toDateTime(),
+          'updatedAt': u.updatedAt.toDateTime(),
+          'transactions': u.walletTransactions_on_user.map((t) => {
+            'id': t.id.toString(),
+            'amount': t.amount,
+            'type': t.type.stringValue,
+            'description': t.description,
+            'createdAt': t.createdAt.toDateTime(),
+          }).toList(),
+        };
 
-    final Map<String, dynamic> data = {
-      'id': u.id,
-      'email': u.email,
-      'name': u.name,
-      'role': u.role.stringValue,
-      'isActive': u.isActive,
-      'hasProfile': u.hasProfile,
-      'photoUrl': u.photoUrl,
-      'phone': u.phone,
-      'whatsapp': u.whatsapp,
-      'walletBalance': u.walletBalance,
-      'adminNotes': u.adminNotes,
-      'createdAt': u.createdAt.toDateTime(),
-      'updatedAt': u.updatedAt.toDateTime(),
-      'transactions': u.walletTransactions_on_user.map((t) => {
-        'id': t.id.toString(),
-        'amount': t.amount,
-        'type': t.type.stringValue,
-        'description': t.description,
-        'createdAt': t.createdAt.toDateTime(),
-      }).toList(),
-    };
+        if (u.professionalProfile_on_user != null) {
+          final p = u.professionalProfile_on_user!;
+          data['professionalProfile'] = {
+            'fullNameAr': p.fullNameAr,
+            'specialty': p.specialty,
+            'isApproved': p.isApproved,
+            'isProfileValidated': p.isProfileValidated,
+            'verificationDocUrl': p.verificationDocUrl,
+            'membershipTier': p.membershipTier?.stringValue,
+            'visibilityExpiresAt': p.visibilityExpiresAt?.toDateTime(),
+          };
+        }
+        return data;
+      }
+    } catch (_) {}
 
-    if (u.professionalProfile_on_user != null) {
-      final p = u.professionalProfile_on_user!;
-      data['professionalProfile'] = {
-        'fullNameAr': p.fullNameAr,
-        'specialty': p.specialty,
-        'isApproved': p.isApproved,
-        'isProfileValidated': p.isProfileValidated,
-        'verificationDocUrl': p.verificationDocUrl,
-        'membershipTier': p.membershipTier?.stringValue,
-        'visibilityExpiresAt': p.visibilityExpiresAt?.toDateTime(),
-      };
+    final userDoc = await _firestore.collection('users').doc(id).get();
+    final data = (userDoc.data() as Map<String, dynamic>?) ?? {};
+    final role = data['role']?.toString().toLowerCase();
+    if (role == 'professional') {
+      final profDoc = await _firestore.collection('directory_professionals').doc(id).get();
+      data['professionalProfile'] = profDoc.data();
     }
-
-    if (u.institutionProfile_on_user != null) {
-      final i = u.institutionProfile_on_user!;
-      data['institutionProfile'] = {
-        'nameAr': i.nameAr,
-        'registrationNumber': i.registrationNumber,
-        'isApproved': i.isApproved,
-        'isProfileValidated': i.isProfileValidated,
-        'verificationDocUrl': i.verificationDocUrl,
-        'visibilityExpiresAt': i.visibilityExpiresAt?.toDateTime(),
-      };
-    }
-
     return data;
   }
 
   @override
   Future<void> adminUpdateUser(String id, Map<String, dynamic> data) async {
-    final builder = _db.updateUserAdmin(id: id);
-    if (data.containsKey('name')) builder.name(data['name']);
-    if (data.containsKey('isActive')) builder.isActive(data['isActive']);
-    if (data.containsKey('phone')) builder.phone(data['phone']);
-    if (data.containsKey('whatsapp')) builder.whatsapp(data['whatsapp']);
-    if (data.containsKey('adminNotes')) builder.notes(data['adminNotes']);
-    if (data.containsKey('walletBalance')) builder.balance(data['walletBalance']);
-    
-    if (data.containsKey('role')) {
-       final roleStr = data['role'].toString().toUpperCase();
-       builder.role(sdk.UserRole.values.byName(roleStr));
-    }
-    
-    await builder.execute();
+    await _firestore.collection('users').doc(id).update(data);
+    try {
+      final builder = _db.updateUserAdmin(id: id);
+      if (data.containsKey('name')) builder.name(data['name']);
+      if (data.containsKey('isActive')) builder.isActive(data['isActive']);
+      if (data.containsKey('phone')) builder.phone(data['phone']);
+      if (data.containsKey('whatsapp')) builder.whatsapp(data['whatsapp']);
+      if (data.containsKey('adminNotes')) builder.notes(data['adminNotes']);
+      if (data.containsKey('walletBalance')) builder.balance(data['walletBalance']);
+      if (data.containsKey('role')) builder.role(sdk.UserRole.values.byName(data['role'].toString().toUpperCase()));
+      await builder.execute();
+    } catch (_) {}
   }
 
   @override
   Future<void> toggleUserActiveStatus(String id, bool isActive) async {
-    await _db.toggleUserActiveStatus(id: id, isActive: isActive).execute();
+    await _firestore.collection('users').doc(id).update({'isActive': isActive});
+    try {
+      await _db.toggleUserActiveStatus(id: id, isActive: isActive).execute();
+    } catch (_) {}
   }
 
   @override
   Future<void> verifyUserDocs(String id, String role, bool isApproved) async {
-    if (role == 'institution') {
-      await _db.verifyUserInstitution(id: id, isApproved: isApproved).execute();
-    } else {
-      await _db.verifyUserProfessional(id: id, isApproved: isApproved).execute();
-    }
+    final col = role == 'institution' ? 'directory_institutions' : 'directory_professionals';
+    await _firestore.collection(col).doc(id).update({'isApproved': isApproved});
+    try {
+      if (role == 'institution') {
+        await _db.verifyUserInstitution(id: id, isApproved: isApproved).execute();
+      } else {
+        await _db.verifyUserProfessional(id: id, isApproved: isApproved).execute();
+      }
+    } catch (_) {}
   }
 
   @override
   Stream<List<Map<String, dynamic>>> listAllProviders() {
-    return Stream.value([]);
+    return Rx.combineLatest2(
+      _firestore.collection('directory_professionals').snapshots(),
+      _firestore.collection('directory_institutions').snapshots(),
+      (profs, insts) {
+        final List<Map<String, dynamic>> all = [];
+        all.addAll(profs.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).where((p) => p['isActive'] != false));
+        all.addAll(insts.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).where((p) => p['isActive'] != false));
+        return all;
+      },
+    );
   }
 
   @override
   Future<void> approveProfessional(String id, bool isApproved, String role) async {
-    await _db.approveProfessional(id: id, isApproved: isApproved).execute();
+    final col = role == 'institution' ? 'directory_institutions' : 'directory_professionals';
+    await _firestore.collection(col).doc(id).update({'isApproved': isApproved});
+    try {
+      await _db.approveProfessional(id: id, isApproved: isApproved).execute();
+    } catch (_) {}
   }
 
   @override
   Future<void> validateProfile(String id, String role) async {
-     if (role == 'institution') {
-       await _db.validateInstitutionProfile(id: id).execute();
-     } else {
-       await _db.validateProfile(id: id).execute();
-     }
+    final col = role == 'institution' ? 'directory_institutions' : 'directory_professionals';
+    await _firestore.collection(col).doc(id).update({'isProfileValidated': true});
+    try {
+       if (role == 'institution') {
+         await _db.validateInstitutionProfile(id: id).execute();
+       } else {
+         await _db.validateProfile(id: id).execute();
+       }
+    } catch (_) {}
   }
 
   @override
   Stream<List<Map<String, dynamic>>> listSupportTickets({String? status}) {
-     var builder = _db.listSupportTickets();
-     if (status != null) {
-        sdk.SupportTicketStatus? gqlStatus;
-        if (status.toUpperCase() == 'OPEN') gqlStatus = sdk.SupportTicketStatus.OPEN;
-        if (status.toUpperCase() == 'CLOSED') gqlStatus = sdk.SupportTicketStatus.CLOSED;
-        if (status.toUpperCase() == 'PENDING') gqlStatus = sdk.SupportTicketStatus.PENDING;
-        if (gqlStatus != null) builder = builder.status(gqlStatus);
-     }
-     return builder.ref().subscribe().map((snap) =>
+     final fdcStream = _db.listSupportTickets().ref().subscribe().map((snap) =>
         snap.data.supportTickets.map((st) => {
           'id': st.id.toString(),
           'subject': st.subject,
@@ -698,12 +777,20 @@ class DataConnectEspyRepository implements EspyRepository {
           'userEmail': st.user.email,
           'createdAt': st.createdAt.toDateTime(),
         }).toList()
-     );
+     ).onErrorReturnWith((e, s) => []);
+
+     firestore.Query fsQuery = _firestore.collection('directory_support_inbox');
+     if (status != null) fsQuery = fsQuery.where('status', isEqualTo: status);
+     final fsStream = fsQuery.snapshots().map((snap) => snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList());
+
+     return Rx.combineLatest2<List<Map<String, dynamic>>, List<Map<String, dynamic>>, List<Map<String, dynamic>>>(
+       fdcStream, fsStream, (dc, fs) => dc.isNotEmpty ? dc : fs
+     ).distinct();
   }
 
   @override
   Stream<List<Map<String, dynamic>>> listPendingOrders() {
-    return _db.listPendingOrders().ref().subscribe().map((snap) =>
+    final fdcStream = _db.listPendingOrders().ref().subscribe().map((snap) =>
       snap.data.resourceOrders.map((o) => {
         'id': o.id.toString(),
         'pinsCount': o.pinsCount,
@@ -712,93 +799,104 @@ class DataConnectEspyRepository implements EspyRepository {
         'totalCost': o.totalCost,
         'userEmail': o.user.email,
       }).toList()
+    ).onErrorReturnWith((e, s) => []);
+
+    final fsStream = _firestore.collection('directory_resource_orders').where('status', isEqualTo: 'PENDING').snapshots().map((snap) =>
+      snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList()
     );
+
+    return Rx.combineLatest2<List<Map<String, dynamic>>, List<Map<String, dynamic>>, List<Map<String, dynamic>>>(
+       fdcStream, fsStream, (dc, fs) => dc.isNotEmpty ? dc : fs
+    ).distinct();
   }
 
   @override
   Future<void> approveResourceOrder(String orderId) async {
-    await _db.approveResourceOrder(id: orderId).execute();
+    await _firestore.collection('directory_resource_orders').doc(orderId).update({'status': 'APPROVED'});
+    try {
+      await _db.approveResourceOrder(id: orderId).execute();
+    } catch (_) {}
   }
 
   @override
   Stream<List<Map<String, dynamic>>> listServiceModerationQueue({String status = 'PENDING'}) {
     final sdkStatus = sdk.ModerationStatus.values.byName(status.toUpperCase());
-    return _db.listServiceModerationQueue().status(sdkStatus).ref().subscribe().map((snap) =>
+    final fdcStream = _db.listServiceModerationQueue().status(sdkStatus).ref().subscribe().map((snap) =>
       snap.data.services.map((s) => {
         'id': s.id.toString(),
         'titleEn': s.titleEn,
-        'titleAr': s.titleAr,
         'price': s.price,
         'imageUrl': s.imageUrl,
-        'deliveryMode': s.deliveryMode?.stringValue,
         'moderationStatus': s.moderationStatus.stringValue,
-        'flagReason': s.flagReason,
         'categoryName': s.category.nameEn,
         'sectorName': s.sector.nameEn,
         'providerName': s.provider.name,
-        'providerEmail': s.provider.email,
-        'providerPhoto': s.provider.photoUrl,
-        'template': s.sector.template != null ? {
-           'accentColor': s.sector.template!.accentColor,
-           'iconName': s.sector.template!.iconName,
-           'visibleFields': s.sector.template!.visibleFields,
-        } : null,
       }).toList()
+    ).onErrorReturnWith((e, s) => []);
+
+    final fsStream = _firestore.collection('directory_services').where('moderationStatus', isEqualTo: status).snapshots().map((snap) =>
+      snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList()
     );
+
+    return Rx.combineLatest2<List<Map<String, dynamic>>, List<Map<String, dynamic>>, List<Map<String, dynamic>>>(
+       fdcStream, fsStream, (dc, fs) => dc.isNotEmpty ? dc : fs
+    ).distinct();
   }
 
   @override
   Stream<List<Map<String, dynamic>>> listRequestModerationQueue({String status = 'PENDING'}) {
     final sdkStatus = sdk.ModerationStatus.values.byName(status.toUpperCase());
-    return _db.listRequestModerationQueue().status(sdkStatus).ref().subscribe().map((snap) =>
+    final fdcStream = _db.listRequestModerationQueue().status(sdkStatus).ref().subscribe().map((snap) =>
       snap.data.serviceRequests.map((r) => {
         'id': r.id.toString(),
         'descriptionEn': r.descriptionEn,
-        'descriptionAr': r.descriptionAr,
-        'urgency': r.urgency?.stringValue,
-        'preferredMode': r.preferredMode?.stringValue,
         'status': r.status.stringValue,
         'moderationStatus': r.moderationStatus.stringValue,
-        'flagReason': r.flagReason,
-        'createdAt': r.createdAt.toDateTime(),
-        'sectorName': r.sector.nameEn,
         'userName': r.user.name,
-        'userEmail': r.user.email,
-        'template': r.sector.template != null ? {
-           'accentColor': r.sector.template!.accentColor,
-           'iconName': r.sector.template!.iconName,
-           'visibleFields': r.sector.template!.visibleFields,
-        } : null,
       }).toList()
+    ).onErrorReturnWith((e, s) => []);
+
+    final fsStream = _firestore.collection('directory_service_requests').where('moderationStatus', isEqualTo: status).snapshots().map((snap) =>
+      snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList()
     );
+
+    return Rx.combineLatest2<List<Map<String, dynamic>>, List<Map<String, dynamic>>, List<Map<String, dynamic>>>(
+       fdcStream, fsStream, (dc, fs) => dc.isNotEmpty ? dc : fs
+    ).distinct();
   }
 
   @override
   Future<void> moderateService(String id, String status, {String? reason}) async {
-    final sdkStatus = sdk.ModerationStatus.values.byName(status.toUpperCase());
-    final builder = _db.moderateService(id: id, status: sdkStatus);
-    if (reason != null) builder.reason(reason);
-    await builder.execute();
+    await _firestore.collection('directory_services').doc(id).update({'moderationStatus': status, 'flagReason': reason});
+    try {
+      final sdkStatus = sdk.ModerationStatus.values.byName(status.toUpperCase());
+      final builder = _db.moderateService(id: id, status: sdkStatus);
+      if (reason != null) builder.reason(reason);
+      await builder.execute();
+    } catch (_) {}
   }
 
   @override
   Future<void> moderateRequest(String id, String status, {String? reason}) async {
-    final sdkStatus = sdk.ModerationStatus.values.byName(status.toUpperCase());
-    final builder = _db.moderateRequest(id: id, status: sdkStatus);
-    if (reason != null) builder.reason(reason);
-    await builder.execute();
+    await _firestore.collection('directory_service_requests').doc(id).update({'moderationStatus': status, 'flagReason': reason});
+    try {
+      final sdkStatus = sdk.ModerationStatus.values.byName(status.toUpperCase());
+      final builder = _db.moderateRequest(id: id, status: sdkStatus);
+      if (reason != null) builder.reason(reason);
+      await builder.execute();
+    } catch (_) {}
   }
 
   @override
   Future<void> createLocalizedBroadcast({required String title, required String message, String? country, String? region, String? city}) async {
-    final builder = _db.createLocalizedBroadcast(
-      title: title,
-      message: message,
-    );
-    if (country != null) builder.country(country);
-    if (region != null) builder.region(region);
-    if (city != null) builder.city(city);
-    await builder.execute();
+    await _firestore.collection('directory_broadcasts').add({'title': title, 'message': message, 'targetCountry': country, 'createdAt': firestore.FieldValue.serverTimestamp()});
+    try {
+      final builder = _db.createLocalizedBroadcast(title: title, message: message);
+      if (country != null) builder.country(country);
+      if (region != null) builder.region(region);
+      if (city != null) builder.city(city);
+      await builder.execute();
+    } catch (_) {}
   }
 
   @override
@@ -811,17 +909,20 @@ class DataConnectEspyRepository implements EspyRepository {
         'visibleFields': t.visibleFields,
         'configJson': t.configJson,
       }).toList()
-    );
+    ).onErrorReturnWith((e, s) => []);
   }
 
   @override
   Future<void> upsertTemplate(String id, List<String> visibleFields, {String? configJson, String? accentColor, String? iconName}) async {
-    final builder = _db.upsertTemplate(id: id);
-    builder.visibleFields(visibleFields);
-    if (configJson != null) builder.configJson(configJson);
-    if (accentColor != null) builder.accentColor(accentColor);
-    if (iconName != null) builder.iconName(iconName);
-    await builder.execute();
+    await _firestore.collection('directory_templates').doc(id).set({'visibleFields': visibleFields, 'configJson': configJson, 'accentColor': accentColor, 'iconName': iconName}, firestore.SetOptions(merge: true));
+    try {
+      final builder = _db.upsertTemplate(id: id);
+      builder.visibleFields(visibleFields);
+      if (configJson != null) builder.configJson(configJson);
+      if (accentColor != null) builder.accentColor(accentColor);
+      if (iconName != null) builder.iconName(iconName);
+      await builder.execute();
+    } catch (_) {}
   }
 
   // ─── 6. Discovery & Helpers ──────────────────────────────────────────────
@@ -833,6 +934,6 @@ class DataConnectEspyRepository implements EspyRepository {
 
   @override
   Future<void> updateCategory(String id, Map<String, dynamic> data) async {
-     // TODO: Implement
+     await _firestore.collection('directory_categories').doc(id).update(data);
   }
 }

@@ -102,6 +102,7 @@ class _GeographyPanelState extends State<_GeographyPanel> {
         _buildSectionHeader("1. COUNTRIES", 
           onAdd: () => _showGeographyDialog("country"),
           onImport: () => _showMasterImportDialog(),
+          onExcel: () => _showCsvImportDialog(),
         ),
         ...widget.vm.countries.map((c) => _buildListTile(
           label: "${c['flagEmoji'] ?? ''} ${c['nameEn']}",
@@ -145,6 +146,45 @@ class _GeographyPanelState extends State<_GeographyPanel> {
           )),
         ],
       ],
+    );
+  }
+
+  void _showCsvImportDialog() {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("HIERARCHICAL CSV IMPORT"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text("Format: Type,ID,ParentID,NameEn,NameAr,Value1,Value2", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+            const Text("Types: COUNTRY, REGION, CITY", style: TextStyle(fontSize: 10)),
+            const SizedBox(height: 12),
+            TextField(
+              controller: controller,
+              maxLines: 12,
+              decoration: const InputDecoration(hintText: "COUNTRY,LB,,Lebanon,لبنان,LB,🇱🇧\nREGION,beirut,LB,Beirut,بيروت,BE,\nCITY,bey-city,beirut,Beirut,بيروت,33.8,35.5", border: OutlineInputBorder()),
+              style: GoogleFonts.firaCode(fontSize: 10),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("CANCEL")),
+          ElevatedButton(
+            onPressed: () async {
+              try {
+                await widget.vm.importHierarchicalCsv(controller.text);
+                if (mounted) Navigator.pop(context);
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Import Failed: $e")));
+              }
+            },
+            child: const Text("IMPORT CSV"),
+          ),
+        ],
+      ),
     );
   }
 
@@ -341,7 +381,7 @@ class _GeographyPanelState extends State<_GeographyPanel> {
     );
   }
 
-  Widget _buildSectionHeader(String title, {VoidCallback? onAdd, VoidCallback? onImport, VoidCallback? onDownload}) {
+  Widget _buildSectionHeader(String title, {VoidCallback? onAdd, VoidCallback? onImport, VoidCallback? onDownload, VoidCallback? onExcel}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
@@ -352,6 +392,8 @@ class _GeographyPanelState extends State<_GeographyPanel> {
             children: [
               if (onDownload != null)
                 IconButton(icon: const Icon(Icons.description_outlined, size: 20, color: EspyTheme.royalBlue), onPressed: onDownload),
+              if (onExcel != null)
+                IconButton(icon: const Icon(Icons.table_view_rounded, size: 20, color: Colors.green), onPressed: onExcel),
               if (onImport != null)
                 IconButton(icon: const Icon(Icons.file_upload_rounded, size: 20, color: EspyTheme.royalBlue), onPressed: onImport),
               if (onAdd != null)

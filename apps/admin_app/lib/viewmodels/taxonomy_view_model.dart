@@ -58,6 +58,67 @@ class TaxonomyViewModel extends ChangeNotifier {
 
   // --- Geography Hierarchy ---
 
+  Future<void> importHierarchicalCsv(String csvContent) async {
+    final lines = csvContent.split('\n');
+    int count = 0;
+    try {
+      // 1. First Pass: Countries
+      for (var line in lines) {
+        if (line.trim().isEmpty) continue;
+        final parts = line.split(',');
+        if (parts[0].toUpperCase() == 'COUNTRY' && parts.length >= 5) {
+          await upsertCountry({
+            'id': parts[1].trim(),
+            'nameEn': parts[3].trim(),
+            'nameAr': parts[4].trim(),
+            'isoCode': parts.length > 5 ? parts[5].trim() : parts[1].trim(),
+            'flagEmoji': parts.length > 6 ? parts[6].trim() : null,
+          });
+          count++;
+        }
+      }
+
+      // 2. Second Pass: Regions
+      for (var line in lines) {
+        if (line.trim().isEmpty) continue;
+        final parts = line.split(',');
+        if (parts[0].toUpperCase() == 'REGION' && parts.length >= 5) {
+          await upsertRegion({
+            'id': parts[1].trim(),
+            'countryId': parts[2].trim(),
+            'nameEn': parts[3].trim(),
+            'nameAr': parts[4].trim(),
+            'regionCode': parts.length > 5 ? parts[5].trim() : null,
+          });
+          count++;
+        }
+      }
+
+      // 3. Third Pass: Cities
+      for (var line in lines) {
+        if (line.trim().isEmpty) continue;
+        final parts = line.split(',');
+        if (parts[0].toUpperCase() == 'CITY' && parts.length >= 5) {
+          await upsertCity({
+            'id': parts[1].trim(),
+            'regionId': parts[2].trim(),
+            'nameEn': parts[3].trim(),
+            'nameAr': parts[4].trim(),
+            'lat': parts.length > 5 ? double.tryParse(parts[5].trim()) : null,
+            'lng': parts.length > 6 ? double.tryParse(parts[6].trim()) : null,
+          });
+          count++;
+        }
+      }
+      
+      debugPrint("Imported $count entities from CSV");
+      _init(); 
+    } catch (e) {
+      debugPrint("Hierarchical CSV Import Error: $e");
+      rethrow;
+    }
+  }
+
   Future<void> importFullTaxonomyJson(String jsonContent) async {
     try {
       final List<dynamic> data = jsonDecode(jsonContent);
