@@ -3,6 +3,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:rxdart/rxdart.dart';
 import 'debug_service.dart';
+import '../models/user_model.dart';
+import '../models/service_model.dart';
+import '../models/service_request.dart';
+import '../models/enums.dart';
 
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -141,7 +145,7 @@ class FirestoreService {
 
   // ─── 3. Matching & Services ───────────────────────────────────────────────
 
-  Stream<List<Map<String, dynamic>>> getAllActiveServices() {
+  Stream<List<ServiceModel>> getAllActiveServices() {
     _debug.log('FIRESTORE', 'Watch: directory_services (Active Join + Expiry)');
     final now = DateTime.now();
     return Rx.combineLatest2(
@@ -154,21 +158,16 @@ class FirestoreService {
         return serviceDocs
             .map((doc) {
               final data = doc.data() as Map<String, dynamic>;
-              return {'id': doc.id, ...data};
+              return ServiceModel.fromMap({'id': doc.id, ...data});
             })
             .where((s) {
               // 1. Author must be active/approved
-              if (!providerIds.contains(s['professionalId']) && !providerIds.contains(s['institutionId'])) {
+              if (!providerIds.contains(s.providerId)) {
                 return false;
               }
               
               // 2. Element Expiry Check
-              if (s['visibilityExpiresAt'] != null) {
-                final expiry = s['visibilityExpiresAt'] is Timestamp 
-                    ? (s['visibilityExpiresAt'] as Timestamp).toDate() 
-                    : DateTime.tryParse(s['visibilityExpiresAt'].toString());
-                if (expiry != null && expiry.isBefore(now)) return false;
-              }
+              if (s.visibilityExpiresAt != null && s.visibilityExpiresAt!.isBefore(now)) return false;
               
               return true;
             })
@@ -180,13 +179,13 @@ class FirestoreService {
   Future<void> recordInteraction({
     required String userId,
     required String targetId,
-    required String type, 
+    required InteractionType type, 
   }) async {
-    _debug.log('FIRESTORE', 'Interaction: $type on $targetId');
+    _debug.log('FIRESTORE', 'Interaction: ${type.name} on $targetId');
     await _db.collection('directory_interactions').add({
       'userId': userId,
       'targetId': targetId,
-      'type': type,
+      'type': type.name,
       'timestamp': FieldValue.serverTimestamp(),
       'platform': 'flutter',
     });
@@ -235,19 +234,19 @@ class FirestoreService {
 
   // ─── 5. Professional Management ───────────────────────────────────────────
 
-  Stream<List<Map<String, dynamic>>> getProfessionalServices(String professionalId) {
+  Stream<List<ServiceModel>> getProfessionalServices(String professionalId) {
     return _db
         .collection('directory_services')
-        .where('professionalId', isEqualTo: professionalId)
+        .where('providerId', isEqualTo: professionalId)
         .snapshots()
-        .map((snap) => snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList());
+        .map((snap) => snap.docs.map((doc) => ServiceModel.fromMap({'id': doc.id, ...doc.data() as Map<String, dynamic>})).toList());
   }
 
-  Future<void> createService(Map<String, dynamic> data) async {
+  Future<void> createService(ServiceModel service) async {
     _debug.log('FIRESTORE', 'Create Service');
     final timestamp = FieldValue.serverTimestamp();
     await _db.collection('directory_services').add({
-      ...data,
+      ...service.toMap(),
       'isActive': true,
       'createdAt': timestamp,
       'updatedAt': timestamp,
@@ -298,8 +297,8 @@ class FirestoreService {
 
   // ─── 6. User Profiles ──────────────────────────────────────────────────────
 
-  Future<void> updateUserProfile(String uid, Map<String, dynamic> data) async {
-    await _db.collection('users').doc(uid).set({...data, 'updatedAt': FieldValue.serverTimestamp()}, SetOptions(merge: true));
+  Future<void> updateUserProfile(String uid, UserModel user) async {
+    await _db.collection('users').doc(uid).set({...user.toMap(), 'updatedAt': FieldValue.serverTimestamp()}, SetOptions(merge: true));
   }
 
   Future<void> updateVisitorProfile(String uid, Map<String, dynamic> data) async {
@@ -389,10 +388,10 @@ class FirestoreService {
     await _db.collection('directory_community_requests').doc(id).update({'status': isActive ? 'active' : 'pending', 'updatedAt': FieldValue.serverTimestamp()});
   }
 
-  Future<void> updateUser(String id, String role, Map<String, dynamic> data) async {
-    final col = role == 'institution' ? 'directory_institutions' : (role == 'professional' ? 'directory_professionals' : 'directory_visitors');
-    await _db.collection('users').doc(id).set({...data, 'updatedAt': FieldValue.serverTimestamp()}, SetOptions(merge: true));
-    await _db.collection(col).doc(id).set({...data, 'updatedAt': FieldValue.serverTimestamp()}, SetOptions(merge: true));
+  Future<void> updateUser(String id, UserRole role, UserModel user) async {
+    final col = role == UserRole.institution ? 'directory_institutions' : (role == UserRole.professional ? 'directory_professionals' : 'directory_visitors');
+    await _db.collection('users').doc(id).set({...user.toMap(), 'updatedAt': FieldValue.serverTimestamp()}, SetOptions(merge: true));
+    await _db.collection(col).doc(id).set({...user.toMap(), 'updatedAt': FieldValue.serverTimestamp()}, SetOptions(merge: true));
   }
 
   Stream<List<Map<String, dynamic>>> watchCommunityRequests() {
@@ -400,27 +399,33 @@ class FirestoreService {
         .map((snap) => snap.docs.map((doc) => {...doc.data() as Map<String, dynamic>, 'id': doc.id}).toList());
   }
 
-  Future<void> createCommunityRequest(Map<String, dynamic> data) async {
+  Future<void> createCommunityRequest(ServiceRequestModel request) async {
     _debug.log('FIRESTORE', 'Write: community_request');
-    final docRef = _db.collection('directory_community_requests').doc();
+    final docRef = _db.collection('directory_service_requests').doc();
     final timestamp = FieldValue.serverTimestamp();
-    await docRef.set({...data, 'id': docRef.id, 'status': 'pending', 'is_approved': false, 'createdAt': timestamp, 'updatedAt': timestamp});
+    await docRef.set({
+      ...request.toMap(),
+      'id': docRef.id,
+      'moderationStatus': 'PENDING',
+      'createdAt': timestamp,
+      'updatedAt': timestamp
+    });
   }
 
-  Stream<List<Map<String, dynamic>>> getCommunityRequests({String? status = 'active', String? userId, String? sectionId, bool newestFirst = true}) {
-    Query query = _db.collection('directory_community_requests');
+  Stream<List<ServiceRequestModel>> getCommunityRequests({CommunityRequestStatus? status = CommunityRequestStatus.active, String? userId, String? sectionId, bool newestFirst = true}) {
+    Query query = _db.collection('directory_service_requests');
     if (userId != null) {
       query = query.where('userId', isEqualTo: userId);
     } else {
-      if (status != null) query = query.where('status', isEqualTo: status);
-      if (sectionId != null && sectionId != 'All') query = query.where('sectionId', isEqualTo: sectionId);
+      if (status != null) query = query.where('status', isEqualTo: status.name);
+      if (sectionId != null && sectionId != 'All') query = query.where('sectorId', isEqualTo: sectionId);
     }
 
     return query.snapshots().map((snapshot) {
-       final items = snapshot.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList();
+       final items = snapshot.docs.map((doc) => ServiceRequestModel.fromMap({'id': doc.id, ...doc.data() as Map<String, dynamic>})).toList();
        items.sort((a, b) {
-         final t1 = (a['createdAt'] as Timestamp?)?.millisecondsSinceEpoch ?? 0;
-         final t2 = (b['createdAt'] as Timestamp?)?.millisecondsSinceEpoch ?? 0;
+         final t1 = a.createdAt.millisecondsSinceEpoch;
+         final t2 = b.createdAt.millisecondsSinceEpoch;
          return newestFirst ? t2.compareTo(t1) : t1.compareTo(t2);
        });
        return items;

@@ -37,7 +37,7 @@ class ListServiceRequestsServiceRequests {
   final EnumValue<CommunityRequestStatus> status;
   final Timestamp createdAt;
   final ListServiceRequestsServiceRequestsUser user;
-  final List<ListServiceRequestsServiceRequestsServiceRequestTagsOnRequest> serviceRequestTags_on_request;
+  final ListServiceRequestsServiceRequestsSector sector;
   ListServiceRequestsServiceRequests.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']),
@@ -48,9 +48,7 @@ class ListServiceRequestsServiceRequests {
   status = communityRequestStatusDeserializer(json['status']),
   createdAt = Timestamp.fromJson(json['createdAt']),
   user = ListServiceRequestsServiceRequestsUser.fromJson(json['user']),
-  serviceRequestTags_on_request = (json['serviceRequestTags_on_request'] as List<dynamic>)
-        .map((e) => ListServiceRequestsServiceRequestsServiceRequestTagsOnRequest.fromJson(e))
-        .toList();
+  sector = ListServiceRequestsServiceRequestsSector.fromJson(json['sector']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -69,11 +67,11 @@ class ListServiceRequestsServiceRequests {
     status == otherTyped.status && 
     createdAt == otherTyped.createdAt && 
     user == otherTyped.user && 
-    serviceRequestTags_on_request == otherTyped.serviceRequestTags_on_request;
+    sector == otherTyped.sector;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, descriptionEn.hashCode, descriptionAr.hashCode, urgency.hashCode, preferredMode.hashCode, status.hashCode, createdAt.hashCode, user.hashCode, serviceRequestTags_on_request.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, descriptionEn.hashCode, descriptionAr.hashCode, urgency.hashCode, preferredMode.hashCode, status.hashCode, createdAt.hashCode, user.hashCode, sector.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -98,7 +96,7 @@ class ListServiceRequestsServiceRequests {
     ;
     json['createdAt'] = createdAt.toJson();
     json['user'] = user.toJson();
-    json['serviceRequestTags_on_request'] = serviceRequestTags_on_request.map((e) => e.toJson()).toList();
+    json['sector'] = sector.toJson();
     return json;
   }
 
@@ -111,15 +109,17 @@ class ListServiceRequestsServiceRequests {
     required this.status,
     required this.createdAt,
     required this.user,
-    required this.serviceRequestTags_on_request,
+    required this.sector,
   });
 }
 
 @immutable
 class ListServiceRequestsServiceRequestsUser {
+  final String id;
   final String? name;
   ListServiceRequestsServiceRequestsUser.fromJson(dynamic json):
   
+  id = nativeFromJson<String>(json['id']),
   name = json['name'] == null ? null : nativeFromJson<String>(json['name']);
   @override
   bool operator ==(Object other) {
@@ -131,15 +131,17 @@ class ListServiceRequestsServiceRequestsUser {
     }
 
     final ListServiceRequestsServiceRequestsUser otherTyped = other as ListServiceRequestsServiceRequestsUser;
-    return name == otherTyped.name;
+    return id == otherTyped.id && 
+    name == otherTyped.name;
     
   }
   @override
-  int get hashCode => name.hashCode;
+  int get hashCode => Object.hashAll([id.hashCode, name.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
     if (name != null) {
       json['name'] = nativeToJson<String?>(name);
     }
@@ -147,16 +149,17 @@ class ListServiceRequestsServiceRequestsUser {
   }
 
   ListServiceRequestsServiceRequestsUser({
+    required this.id,
     this.name,
   });
 }
 
 @immutable
-class ListServiceRequestsServiceRequestsServiceRequestTagsOnRequest {
-  final ListServiceRequestsServiceRequestsServiceRequestTagsOnRequestTag tag;
-  ListServiceRequestsServiceRequestsServiceRequestTagsOnRequest.fromJson(dynamic json):
+class ListServiceRequestsServiceRequestsSector {
+  final String id;
+  ListServiceRequestsServiceRequestsSector.fromJson(dynamic json):
   
-  tag = ListServiceRequestsServiceRequestsServiceRequestTagsOnRequestTag.fromJson(json['tag']);
+  id = nativeFromJson<String>(json['id']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -166,63 +169,22 @@ class ListServiceRequestsServiceRequestsServiceRequestTagsOnRequest {
       return false;
     }
 
-    final ListServiceRequestsServiceRequestsServiceRequestTagsOnRequest otherTyped = other as ListServiceRequestsServiceRequestsServiceRequestTagsOnRequest;
-    return tag == otherTyped.tag;
+    final ListServiceRequestsServiceRequestsSector otherTyped = other as ListServiceRequestsServiceRequestsSector;
+    return id == otherTyped.id;
     
   }
   @override
-  int get hashCode => tag.hashCode;
+  int get hashCode => id.hashCode;
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
-    json['tag'] = tag.toJson();
+    json['id'] = nativeToJson<String>(id);
     return json;
   }
 
-  ListServiceRequestsServiceRequestsServiceRequestTagsOnRequest({
-    required this.tag,
-  });
-}
-
-@immutable
-class ListServiceRequestsServiceRequestsServiceRequestTagsOnRequestTag {
-  final String nameEn;
-  final String? nameAr;
-  ListServiceRequestsServiceRequestsServiceRequestTagsOnRequestTag.fromJson(dynamic json):
-  
-  nameEn = nativeFromJson<String>(json['nameEn']),
-  nameAr = json['nameAr'] == null ? null : nativeFromJson<String>(json['nameAr']);
-  @override
-  bool operator ==(Object other) {
-    if(identical(this, other)) {
-      return true;
-    }
-    if(other.runtimeType != runtimeType) {
-      return false;
-    }
-
-    final ListServiceRequestsServiceRequestsServiceRequestTagsOnRequestTag otherTyped = other as ListServiceRequestsServiceRequestsServiceRequestTagsOnRequestTag;
-    return nameEn == otherTyped.nameEn && 
-    nameAr == otherTyped.nameAr;
-    
-  }
-  @override
-  int get hashCode => Object.hashAll([nameEn.hashCode, nameAr.hashCode]);
-  
-
-  Map<String, dynamic> toJson() {
-    Map<String, dynamic> json = {};
-    json['nameEn'] = nativeToJson<String>(nameEn);
-    if (nameAr != null) {
-      json['nameAr'] = nativeToJson<String?>(nameAr);
-    }
-    return json;
-  }
-
-  ListServiceRequestsServiceRequestsServiceRequestTagsOnRequestTag({
-    required this.nameEn,
-    this.nameAr,
+  ListServiceRequestsServiceRequestsSector({
+    required this.id,
   });
 }
 

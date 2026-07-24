@@ -2,12 +2,13 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import './espy_repository.dart';
 import './auth_service.dart';
+import '../models/service_model.dart';
 
 class ServicesViewModel extends ChangeNotifier {
   final EspyRepository _repository;
   final AuthService _authService;
 
-  List<Map<String, dynamic>> _professionalServices = [];
+  List<ServiceModel> _professionalServices = [];
   bool _isLoading = true;
 
   StreamSubscription? _servicesSub;
@@ -18,7 +19,7 @@ class ServicesViewModel extends ChangeNotifier {
     }
   }
 
-  List<Map<String, dynamic>> get professionalServices => _professionalServices;
+  List<ServiceModel> get professionalServices => _professionalServices;
   bool get isLoading => _isLoading;
 
   void _loadServices() {

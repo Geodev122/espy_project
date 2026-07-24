@@ -76,9 +76,11 @@ class ListRechargeCardsRechargeCards {
 
 @immutable
 class ListRechargeCardsRechargeCardsRedeemedBy {
+  final String id;
   final String email;
   ListRechargeCardsRechargeCardsRedeemedBy.fromJson(dynamic json):
   
+  id = nativeFromJson<String>(json['id']),
   email = nativeFromJson<String>(json['email']);
   @override
   bool operator ==(Object other) {
@@ -90,20 +92,23 @@ class ListRechargeCardsRechargeCardsRedeemedBy {
     }
 
     final ListRechargeCardsRechargeCardsRedeemedBy otherTyped = other as ListRechargeCardsRechargeCardsRedeemedBy;
-    return email == otherTyped.email;
+    return id == otherTyped.id && 
+    email == otherTyped.email;
     
   }
   @override
-  int get hashCode => email.hashCode;
+  int get hashCode => Object.hashAll([id.hashCode, email.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
     json['email'] = nativeToJson<String>(email);
     return json;
   }
 
   ListRechargeCardsRechargeCardsRedeemedBy({
+    required this.id,
     required this.email,
   });
 }

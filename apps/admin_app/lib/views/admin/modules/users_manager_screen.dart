@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -11,6 +10,7 @@ import '../../../widgets/common/premium_card.dart';
 import '../../../widgets/common/espy_scaffold.dart';
 import '../../../widgets/common/espy_filter_bar.dart';
 import '../../../widgets/common/espy_status_badge.dart';
+import '../../../models/user_model.dart';
 import 'user_profile_detail_screen.dart';
 
 class UsersManagerScreen extends StatelessWidget {
@@ -139,20 +139,16 @@ class _UsersManagerViewState extends State<_UsersManagerView> {
     );
   }
 
-  Widget _buildUserTile(BuildContext context, Map<String, dynamic> user) {
-    final bool isSuspended = user['isActive'] == false;
-    final bool isVerified = user['isApproved'] == true;
-    final bool isPending = user['hasProfile'] == false;
-    
-    final String dateStr = _formatDate(user['createdAt']);
-    final String phone = user['phone'] ?? user['whatsapp'] ?? 'N/A';
+  Widget _buildUserTile(BuildContext context, UserModel user) {
+    final String dateStr = DateFormat('dd/MM/yy').format(user.createdAt);
+    final String phone = user.phone ?? user.whatsapp ?? 'N/A';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       child: PremiumCard(
         padding: const EdgeInsets.all(16),
         child: InkWell(
-          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => UserProfileDetailScreen(userId: user['id']))),
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => UserProfileDetailScreen(userId: user.id))),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -162,15 +158,15 @@ class _UsersManagerViewState extends State<_UsersManagerView> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(user['name']?.toString().toUpperCase() ?? 'UNNAMED', style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, fontSize: 13)),
-                        Text(user['email'] ?? 'No Email', style: GoogleFonts.lora(fontSize: 10, color: Colors.black45)),
+                        Text(user.name.toUpperCase(), style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, fontSize: 13)),
+                        Text(user.email, style: GoogleFonts.lora(fontSize: 10, color: Colors.black45)),
                       ],
                     ),
                   ),
                   EspyStatusBadge.fromFlags(
-                    hasProfile: user['hasProfile'] == true,
-                    isActive: user['isActive'] != false,
-                    isApproved: user['isApproved'] == true,
+                    hasProfile: user.hasProfile,
+                    isActive: user.isActive,
+                    isApproved: false, // user['isApproved'] is in detail fetch
                   ),
                 ],
               ),
@@ -181,10 +177,10 @@ class _UsersManagerViewState extends State<_UsersManagerView> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _infoBit("ID", user['id'].toString().substring(0, 8).toUpperCase()),
+                  _infoBit("ID", user.id.substring(0, 8).toUpperCase()),
                   _infoBit("PHONE", phone),
                   _infoBit("JOINED", dateStr),
-                  _tag(user['role']?.toString().toUpperCase() ?? 'VISITOR', EspyTheme.navyDeep),
+                  _tag(user.role.name.toUpperCase(), EspyTheme.navyDeep),
                 ],
               ),
             ],
@@ -202,14 +198,6 @@ class _UsersManagerViewState extends State<_UsersManagerView> {
         Text(value, style: GoogleFonts.montserrat(fontSize: 9, fontWeight: FontWeight.w700, color: EspyTheme.navyDeep)),
       ],
     );
-  }
-
-  String _formatDate(dynamic date) {
-    if (date == null) return "N/A";
-    if (date is DateTime) return DateFormat('dd/MM/yy').format(date);
-    if (date is Timestamp) return DateFormat('dd/MM/yy').format(date.toDate());
-    final d = DateTime.tryParse(date.toString());
-    return d != null ? DateFormat('dd/MM/yy').format(d) : "N/A";
   }
 
   Widget _tag(String label, Color color) {

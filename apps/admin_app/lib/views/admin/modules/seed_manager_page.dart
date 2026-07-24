@@ -5,6 +5,8 @@ import '../../../theme/espy_theme.dart';
 import '../../../viewmodels/espy_repository.dart';
 import '../../../widgets/common/premium_button.dart';
 import '../../../widgets/common/espy_scaffold.dart';
+import '../../../models/sector_model.dart';
+import '../../../models/category_model.dart';
 
 class SeedManagerPage extends StatefulWidget {
   const SeedManagerPage({super.key});
@@ -26,6 +28,7 @@ class _SeedManagerPageState extends State<SeedManagerPage> {
       _log("Seeding Sectors...");
       final sectors = {
         'health': {
+          'id': 'health',
           'nameEn': 'Health', 
           'nameAr': 'القطاع الطبي', 
           'iconName': 'heart', 
@@ -38,6 +41,7 @@ class _SeedManagerPageState extends State<SeedManagerPage> {
           }
         },
         'mental_health': {
+          'id': 'mental_health',
           'nameEn': 'Mental Health', 
           'nameAr': 'القطاع النفسي', 
           'iconName': 'brain', 
@@ -50,6 +54,7 @@ class _SeedManagerPageState extends State<SeedManagerPage> {
           }
         },
         'social': {
+          'id': 'social',
           'nameEn': 'Social', 
           'nameAr': 'القطاع الاجتماعي', 
           'iconName': 'users', 
@@ -62,6 +67,7 @@ class _SeedManagerPageState extends State<SeedManagerPage> {
           }
         },
         'legal': {
+          'id': 'legal',
           'nameEn': 'Legal', 
           'nameAr': 'القطاع القانوني', 
           'iconName': 'scale', 
@@ -74,6 +80,7 @@ class _SeedManagerPageState extends State<SeedManagerPage> {
           }
         },
         'other_care': {
+          'id': 'other_care',
           'nameEn': 'Other Care', 
           'nameAr': 'قطاع الخدمات الأخرى', 
           'iconName': 'help', 
@@ -91,7 +98,7 @@ class _SeedManagerPageState extends State<SeedManagerPage> {
         final sectorData = Map<String, dynamic>.from(entry.value);
         final templateData = sectorData.remove('template') as Map<String, dynamic>;
         
-        await repo.updateSectorBranding(entry.key, sectorData);
+        await repo.updateSectorBranding(entry.key, SectorModel.fromMap(sectorData));
         await repo.upsertTemplate(
           entry.key, 
           List<String>.from(templateData['visibleFields']),
@@ -119,7 +126,7 @@ class _SeedManagerPageState extends State<SeedManagerPage> {
       ];
 
       for (var cat in categories) {
-        await repo.updateCategory(cat['id']!, cat);
+        await repo.updateCategory(CategoryModel.fromMap(cat));
       }
 
       // 4. Metadata Tags

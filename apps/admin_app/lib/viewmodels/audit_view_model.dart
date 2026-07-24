@@ -21,10 +21,10 @@ class AuditViewModel extends ChangeNotifier {
       // 1. Fetch all users and check pins
       final users = await _repository.searchUsersAdmin().first;
       for (var u in users) {
-        final nodes = await _repository.listLocationNodes(u['id']).first;
+        final nodes = await _repository.listLocationNodes(u.id).first;
         for (var node in nodes) {
           if (node['cityId'] == null) {
-            _conflicts.add("Orphaned Pin: User ${u['email']} has a pin with no city allocation.");
+            _conflicts.add("Orphaned Pin: User ${u.email} has a pin with no city allocation.");
           }
         }
       }

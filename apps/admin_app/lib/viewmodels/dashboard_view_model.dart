@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import './auth_service.dart';
 import './espy_repository.dart';
+import '../models/enums.dart';
 
 class DashboardViewModel extends ChangeNotifier {
   final AuthService _authService;
@@ -43,7 +44,7 @@ class DashboardViewModel extends ChangeNotifier {
         userId: _authService.user!.uid,
         itemId: 'renew_visibility',
         cost: 500, // Default cost, could be fetched from settings repo later
-        role: _authService.userData?.role.name ?? 'professional',
+        role: _authService.userData?.role ?? UserRole.professional,
       );
 
       if (result['success'] == true) {

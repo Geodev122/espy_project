@@ -8,6 +8,7 @@ import 'package:espy_app/viewmodels/matching_view_model.dart';
 import 'package:espy_app/l10n/app_localizations.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';
 import 'package:espy_app/widgets/matching/adaptive_slot_card.dart';
+import '../../../models/enums.dart';
 
 class ServiceSwipeScreen extends StatefulWidget {
   const ServiceSwipeScreen({super.key});
@@ -45,7 +46,7 @@ class _ServiceSwipeScreenState extends State<ServiceSwipeScreen> {
                         onSwipe: (previousIndex, _, direction) async {
                           final target = viewModel.services[previousIndex];
                           if (direction == CardSwiperDirection.right) {
-                            await viewModel.recordInteraction(target['id'], 'service_like');
+                            await viewModel.recordInteraction(target.id, InteractionType.like);
                             // Connect logic...
                           }
                           return true;

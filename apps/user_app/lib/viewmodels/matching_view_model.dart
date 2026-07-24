@@ -2,13 +2,15 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import './espy_repository.dart';
 import './auth_service.dart';
+import '../models/service_model.dart';
+import '../models/enums.dart';
 
 class MatchingViewModel extends ChangeNotifier {
   final EspyRepository _repository;
   final AuthService _authService;
 
-  List<Map<String, dynamic>> _allServices = [];
-  List<Map<String, dynamic>> _filteredServices = [];
+  List<ServiceModel> _allServices = [];
+  List<ServiceModel> _filteredServices = [];
   List<String> _favoriteIds = [];
   List<String> _contactedIds = [];
   bool _isLoading = true;
@@ -47,7 +49,7 @@ class MatchingViewModel extends ChangeNotifier {
     });
   }
 
-  List<Map<String, dynamic>> get services => _filteredServices;
+  List<ServiceModel> get services => _filteredServices;
   List<String> get favoriteIds => _favoriteIds;
   List<String> get contactedIds => _contactedIds;
   bool get isLoading => _isLoading;
@@ -70,20 +72,18 @@ class MatchingViewModel extends ChangeNotifier {
 
   void _applyFilters() {
     _filteredServices = _allServices.where((s) {
-      if (_filterSectorId != null && s['sectorId'] != _filterSectorId) return false;
-      if (_filterCountry != 'ALL' && (s['countryId'] ?? s['country'] ?? 'LEBANON').toString().toUpperCase() != _filterCountry.toUpperCase()) return false;
+      if (_filterSectorId != null && s.sectorId != _filterSectorId) return false;
       return true;
     }).toList();
 
     _filteredServices.sort((a, b) {
-      final dynamic da = a['createdAt'];
-      final dynamic db = b['createdAt'];
-      if (da == null || db == null) return 0;
+      final da = a.createdAt;
+      final db = b.createdAt;
       return _newestFirst ? db.compareTo(da) : da.compareTo(db);
     });
   }
 
-  Future<void> recordInteraction(String targetId, String type) async {
+  Future<void> recordInteraction(String targetId, InteractionType type) async {
     if (_authService.user == null) return;
     await _repository.recordInteraction(userId: _authService.user!.uid, targetId: targetId, type: type);
   }

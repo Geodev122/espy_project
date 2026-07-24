@@ -2,12 +2,13 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import './espy_repository.dart';
 import './auth_service.dart';
+import '../models/service_request.dart';
 
 class RequestsViewModel extends ChangeNotifier {
   final EspyRepository _repository;
   final AuthService _authService;
 
-  List<Map<String, dynamic>> _requests = [];
+  List<ServiceRequestModel> _requests = [];
   List<String> _favoriteIds = [];
   bool _isLoading = true;
   String _selectedSectorId = 'All';
@@ -22,9 +23,7 @@ class RequestsViewModel extends ChangeNotifier {
 
   void _init() {
     if (_authService.user == null) return;
-    
     _loadRequests();
-    
     _favsSub = _repository.listFavoriteIds(_authService.user!.uid).listen((ids) {
       _favoriteIds = ids;
       notifyListeners();
@@ -35,18 +34,14 @@ class RequestsViewModel extends ChangeNotifier {
     _requestsSub?.cancel();
     _isLoading = true;
     notifyListeners();
-
-    _requestsSub = _repository.listCommunityRequests(
-      sectorId: _selectedSectorId,
-      newestFirst: _newestFirst,
-    ).listen((data) {
+    _requestsSub = _repository.listCommunityRequests(sectorId: _selectedSectorId, newestFirst: _newestFirst).listen((data) {
       _requests = data;
       _isLoading = false;
       notifyListeners();
     });
   }
 
-  List<Map<String, dynamic>> get requests => _requests;
+  List<ServiceRequestModel> get requests => _requests;
   List<String> get favoriteIds => _favoriteIds;
   bool get isLoading => _isLoading;
   bool get newestFirst => _newestFirst;

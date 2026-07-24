@@ -9,6 +9,7 @@ import 'package:espy_app/viewmodels/auth_service.dart';
 import 'package:espy_app/theme/espy_theme.dart';
 import 'package:espy_app/viewmodels/requests_view_model.dart';
 import 'package:espy_app/widgets/common/premium_button.dart';
+import '../../../models/service_request.dart';
 
 class SwipeRequestsScreen extends StatefulWidget {
   const SwipeRequestsScreen({super.key});
@@ -43,10 +44,7 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
 
     final displayCards = [
       ...viewModel.requests,
-      {
-        'id': 'end_card',
-        'isEnd': true,
-      },
+      {'id': 'end_card', 'isEnd': true},
     ];
 
     return Stack(
@@ -64,22 +62,22 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
                   backCardOffset: const Offset(0, 40),
                   padding: EdgeInsets.zero,
                   cardBuilder: (context, index, _, __) {
-                    final data = displayCards[index];
-                    if (data['isEnd'] == true) return _buildEndCard(l10n);
-                    return _buildRequestCard(data, l10n);
+                    final dynamic data = displayCards[index];
+                    if (data is Map && data['isEnd'] == true) return _buildEndCard(l10n);
+                    return _buildRequestCard(data as ServiceRequestModel, l10n);
                   },
                   onSwipe: (previousIndex, _, direction) async {
-                    final target = displayCards[previousIndex];
-                    if (target['isEnd'] == true) return false;
+                    final dynamic target = displayCards[previousIndex];
+                    if (target is Map && target['isEnd'] == true) return false;
+                    
+                    final request = target as ServiceRequestModel;
 
                     if (direction == CardSwiperDirection.right) {
-                      // Logic for recording interaction and launching WhatsApp
                       final userName = user?.name ?? "User";
-                      
-                      final reqTitle = target['title'] ?? "Care Request";
-                      final targetWhatsapp = target['whatsapp']?.toString().replaceAll(RegExp(r'\D'), '');
+                      final reqTitle = request.descriptionEn;
+                      final targetWhatsapp = ""; // Fetch from request user
 
-                      if (targetWhatsapp != null && targetWhatsapp.isNotEmpty) {
+                      if (targetWhatsapp.isNotEmpty) {
                         final msg = "Hello, I am $userName, responding to your request: '$reqTitle' on Espy. I'd like to offer my assistance.";
                         final url = "https://wa.me/$targetWhatsapp?text=${Uri.encodeComponent(msg)}";
                         if (await canLaunchUrl(Uri.parse(url))) {
@@ -87,7 +85,7 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
                         }
                       }
                     } else if (direction == CardSwiperDirection.left) {
-                      await viewModel.favoriteRequest(target['id'] as String, true);
+                      await viewModel.favoriteRequest(request.id, true);
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text(l10n.protocolSavedFavorites), behavior: SnackBarBehavior.floating),
@@ -132,10 +130,10 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
     );
   }
 
-  Widget _buildRequestCard(Map<String, dynamic> request, AppLocalizations l10n) {
-    final bool isEmergency = request['isSOS'] == true;
+  Widget _buildRequestCard(ServiceRequestModel request, AppLocalizations l10n) {
+    final bool isEmergency = request.urgency == UrgencyLevel.emergency;
     final viewModel = Provider.of<RequestsViewModel>(context, listen: false);
-    final bool isFavorite = viewModel.favoriteIds.contains(request['id']);
+    final bool isFavorite = viewModel.favoriteIds.contains(request.id);
 
     return Container(
       decoration: BoxDecoration(
@@ -156,7 +154,7 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                     decoration: BoxDecoration(color: isEmergency ? EspyTheme.error.withValues(alpha: 0.1) : EspyTheme.gold.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(30)),
                     child: Text(
-                      (request['section'] ?? request['category'] ?? 'CARE').toString().toUpperCase(),
+                      (request.sectorName ?? 'CARE').toUpperCase(),
                       style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.w900, color: isEmergency ? EspyTheme.error : EspyTheme.goldDark, letterSpacing: 2),
                     ),
                   ),
@@ -170,15 +168,15 @@ class _SwipeRequestsScreenState extends State<SwipeRequestsScreen> {
             ],
           ),
           const SizedBox(height: 32),
-          Text(request['title'] ?? 'Help Request', style: GoogleFonts.cinzel(fontSize: 26, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep, height: 1.1)),
+          Text(request.descriptionEn, style: GoogleFonts.cinzel(fontSize: 22, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep, height: 1.1)),
           const SizedBox(height: 24),
-          Expanded(child: SingleChildScrollView(child: Text(request['description'] ?? '', style: GoogleFonts.lora(fontSize: 15, color: EspyTheme.navyDeep.withValues(alpha: 0.7), height: 1.7, fontStyle: FontStyle.italic)))),
+          Expanded(child: SingleChildScrollView(child: Text(request.descriptionAr ?? '', style: GoogleFonts.lora(fontSize: 15, color: EspyTheme.navyDeep.withValues(alpha: 0.7), height: 1.7, fontStyle: FontStyle.italic)))),
           const SizedBox(height: 32),
           Row(
             children: [
               const Icon(Icons.location_on_rounded, color: EspyTheme.gold, size: 20),
               const SizedBox(width: 16),
-              Expanded(child: Text(request['location'] ?? 'Beirut, Lebanon', style: GoogleFonts.lora(color: EspyTheme.navyDeep, fontSize: 13, fontWeight: FontWeight.bold))),
+              Expanded(child: Text(request.status.name.toUpperCase(), style: GoogleFonts.lora(color: EspyTheme.navyDeep, fontSize: 13, fontWeight: FontWeight.bold))),
             ],
           ),
         ],

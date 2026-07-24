@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'espy_repository.dart';
+import '../models/enums.dart';
 
 class VerificationsViewModel extends ChangeNotifier {
   final EspyRepository _repository;
@@ -27,11 +28,11 @@ class VerificationsViewModel extends ChangeNotifier {
   }
 
   Future<void> validateProfile(String id, String role) async {
-    await _repository.validateProfile(id, role);
+    await _repository.validateProfile(id, UserRole.parse(role));
   }
 
   Future<void> approveSearch(String id, String role) async {
-    await _repository.approveProfessional(id, true, role);
+    await _repository.approveProfessional(id, true, UserRole.parse(role));
   }
 
   @override

@@ -12,6 +12,7 @@ import '../../../widgets/common/espy_scaffold.dart';
 import '../../../widgets/common/premium_button.dart';
 import '../../../widgets/common/admin_data_row.dart';
 import '../../../widgets/common/espy_status_badge.dart';
+import '../../../models/user_model.dart';
 
 class UserProfileDetailScreen extends StatelessWidget {
   final String userId;
@@ -259,11 +260,13 @@ class _UserProfileDetailViewState extends State<_UserProfileDetailView> {
           TextButton(onPressed: () => Navigator.pop(context), child: const Text("CANCEL")),
           ElevatedButton(
             onPressed: () async {
+              if (_userDetails == null) return;
               final vm = Provider.of<UserManagerViewModel>(context, listen: false);
-              dynamic value = controller.text.trim();
-              if (field == 'walletBalance') value = int.tryParse(value) ?? 0;
               
-              await vm.adminUpdateUser(widget.userId, {field: value});
+              final Map<String, dynamic> updatedData = Map<String, dynamic>.from(_userDetails!);
+              updatedData[field] = field == 'walletBalance' ? (int.tryParse(controller.text) ?? 0) : controller.text.trim();
+              
+              await vm.adminUpdateUser(widget.userId, UserModel.fromMap(updatedData));
               Navigator.pop(context);
               _loadDetails();
             },

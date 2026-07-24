@@ -122,10 +122,12 @@ class ListServiceModerationQueueServices {
 
 @immutable
 class ListServiceModerationQueueServicesCategory {
+  final String id;
   final String nameEn;
   final String? nameAr;
   ListServiceModerationQueueServicesCategory.fromJson(dynamic json):
   
+  id = nativeFromJson<String>(json['id']),
   nameEn = nativeFromJson<String>(json['nameEn']),
   nameAr = json['nameAr'] == null ? null : nativeFromJson<String>(json['nameAr']);
   @override
@@ -138,16 +140,18 @@ class ListServiceModerationQueueServicesCategory {
     }
 
     final ListServiceModerationQueueServicesCategory otherTyped = other as ListServiceModerationQueueServicesCategory;
-    return nameEn == otherTyped.nameEn && 
+    return id == otherTyped.id && 
+    nameEn == otherTyped.nameEn && 
     nameAr == otherTyped.nameAr;
     
   }
   @override
-  int get hashCode => Object.hashAll([nameEn.hashCode, nameAr.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, nameEn.hashCode, nameAr.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
     json['nameEn'] = nativeToJson<String>(nameEn);
     if (nameAr != null) {
       json['nameAr'] = nativeToJson<String?>(nameAr);
@@ -156,6 +160,7 @@ class ListServiceModerationQueueServicesCategory {
   }
 
   ListServiceModerationQueueServicesCategory({
+    required this.id,
     required this.nameEn,
     this.nameAr,
   });
@@ -216,11 +221,13 @@ class ListServiceModerationQueueServicesSector {
 
 @immutable
 class ListServiceModerationQueueServicesSectorTemplate {
+  final String id;
   final String? accentColor;
   final String? iconName;
   final List<String>? visibleFields;
   ListServiceModerationQueueServicesSectorTemplate.fromJson(dynamic json):
   
+  id = nativeFromJson<String>(json['id']),
   accentColor = json['accentColor'] == null ? null : nativeFromJson<String>(json['accentColor']),
   iconName = json['iconName'] == null ? null : nativeFromJson<String>(json['iconName']),
   visibleFields = json['visibleFields'] == null ? null : (json['visibleFields'] as List<dynamic>)
@@ -236,17 +243,19 @@ class ListServiceModerationQueueServicesSectorTemplate {
     }
 
     final ListServiceModerationQueueServicesSectorTemplate otherTyped = other as ListServiceModerationQueueServicesSectorTemplate;
-    return accentColor == otherTyped.accentColor && 
+    return id == otherTyped.id && 
+    accentColor == otherTyped.accentColor && 
     iconName == otherTyped.iconName && 
     visibleFields == otherTyped.visibleFields;
     
   }
   @override
-  int get hashCode => Object.hashAll([accentColor.hashCode, iconName.hashCode, visibleFields.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, accentColor.hashCode, iconName.hashCode, visibleFields.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
     if (accentColor != null) {
       json['accentColor'] = nativeToJson<String?>(accentColor);
     }
@@ -260,6 +269,7 @@ class ListServiceModerationQueueServicesSectorTemplate {
   }
 
   ListServiceModerationQueueServicesSectorTemplate({
+    required this.id,
     this.accentColor,
     this.iconName,
     this.visibleFields,

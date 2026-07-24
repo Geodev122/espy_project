@@ -85,10 +85,12 @@ class ListSupportTicketsSupportTickets {
 
 @immutable
 class ListSupportTicketsSupportTicketsUser {
+  final String id;
   final String email;
   final String? name;
   ListSupportTicketsSupportTicketsUser.fromJson(dynamic json):
   
+  id = nativeFromJson<String>(json['id']),
   email = nativeFromJson<String>(json['email']),
   name = json['name'] == null ? null : nativeFromJson<String>(json['name']);
   @override
@@ -101,16 +103,18 @@ class ListSupportTicketsSupportTicketsUser {
     }
 
     final ListSupportTicketsSupportTicketsUser otherTyped = other as ListSupportTicketsSupportTicketsUser;
-    return email == otherTyped.email && 
+    return id == otherTyped.id && 
+    email == otherTyped.email && 
     name == otherTyped.name;
     
   }
   @override
-  int get hashCode => Object.hashAll([email.hashCode, name.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, email.hashCode, name.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
     json['email'] = nativeToJson<String>(email);
     if (name != null) {
       json['name'] = nativeToJson<String?>(name);
@@ -119,6 +123,7 @@ class ListSupportTicketsSupportTicketsUser {
   }
 
   ListSupportTicketsSupportTicketsUser({
+    required this.id,
     required this.email,
     this.name,
   });

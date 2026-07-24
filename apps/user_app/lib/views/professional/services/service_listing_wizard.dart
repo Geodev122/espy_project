@@ -17,7 +17,7 @@ import 'package:espy_app/widgets/common/espy_scaffold.dart';
 import 'dart:io' as io;
 
 class ServiceListingWizard extends StatefulWidget {
-  final Map<String, dynamic>? initialService;
+  final ServiceModel? initialService;
   const ServiceListingWizard({super.key, this.initialService});
 
   @override
@@ -36,7 +36,7 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
   String? _selectedPriceTagId;
   List<String> _selectedTagIds = [];
   String _deliveryMode = 'FACE_TO_FACE';
-  Map<String, dynamic>? _customLocation;
+  CityModel? _customLocation;
 
   bool _isSubmitting = false;
 
@@ -44,8 +44,8 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
   void initState() {
     super.initState();
     if (widget.initialService != null) {
-      _titleController.text = widget.initialService!['title'] ?? '';
-      _descController.text = widget.initialService!['description'] ?? '';
+      _titleController.text = widget.initialService!.titleEn;
+      _descController.text = widget.initialService!.descriptionEn ?? '';
     }
   }
 
@@ -210,8 +210,8 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
 
   Widget _stepAllocation(AppLocalizations l10n) {
     final userService = Provider.of<UserService>(context);
-    final profile = userService.profile ?? {};
-    final secondaryPins = profile['secondaryLocations'] as List? ?? [];
+    final profile = userService.profile;
+    final secondaryPins = profile?.rawData['secondaryLocations'] as List? ?? [];
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),

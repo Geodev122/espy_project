@@ -10,7 +10,6 @@ class DirectoryViewModel extends ChangeNotifier {
   List<Map<String, dynamic>> _filteredProviders = [];
   bool _isLoading = true;
 
-  // Filters
   String? _selectedSectorId;
   String? _selectedCountryId;
   String? _selectedRole;
@@ -18,14 +17,11 @@ class DirectoryViewModel extends ChangeNotifier {
   bool _radiusFilterActive = false;
   LatLng? _userLocation;
 
-  // Subscriptions
   StreamSubscription? _providersSubscription;
 
   DirectoryViewModel(this._repository) {
     _init();
   }
-
-  String? _mostNeededSectorId;
 
   void _init() {
     _providersSubscription = _repository.listAllProviders().listen((providers) {
@@ -34,26 +30,8 @@ class DirectoryViewModel extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     });
-    _calculateTrends();
   }
 
-  Future<void> _calculateTrends() async {
-    // Fetch recent requests and group by sector
-    final requests = await _repository.listCommunityRequests().first;
-    final Map<String, int> counts = {};
-    for (var r in requests) {
-      final sId = r['sectorId'] as String?;
-      if (sId != null) counts[sId] = (counts[sId] ?? 0) + 1;
-    }
-    
-    if (counts.isNotEmpty) {
-      final sorted = counts.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
-      _mostNeededSectorId = sorted.first.key;
-      notifyListeners();
-    }
-  }
-
-  // Getters
   List<Map<String, dynamic>> get providers => _filteredProviders;
   bool get isLoading => _isLoading;
   String? get selectedSectorId => _selectedSectorId;
@@ -61,44 +39,23 @@ class DirectoryViewModel extends ChangeNotifier {
   String? get selectedRole => _selectedRole;
   double get searchRadiusKm => _searchRadiusKm;
   bool get radiusFilterActive => _radiusFilterActive;
-  String? get mostNeededSectorId => _mostNeededSectorId;
 
-  // Setters & Logic
-  void setFilters({
-    String? sectorId,
-    String? countryId,
-    String? role,
-    double? radius,
-    bool? radiusActive,
-    LatLng? userLocation,
-  }) {
+  void setFilters({String? sectorId, String? countryId, String? role, double? radius, bool? radiusActive, LatLng? userLocation}) {
     if (sectorId != null) _selectedSectorId = sectorId == 'ALL' ? null : sectorId;
     if (countryId != null) _selectedCountryId = countryId == 'ALL' ? null : countryId;
     if (role != null) _selectedRole = role == 'ALL' ? null : role;
     if (radius != null) _searchRadiusKm = radius;
     if (radiusActive != null) _radiusFilterActive = radiusActive;
     if (userLocation != null) _userLocation = userLocation;
-
     _applyFilters();
     notifyListeners();
   }
 
   void _applyFilters() {
     _filteredProviders = _providers.where((p) {
-      // Role Filter
       if (_selectedRole != null && p['role'] != _selectedRole) return false;
-
-      // Sector Filter
       if (_selectedSectorId != null && p['sectorId'] != _selectedSectorId) return false;
-
-      // Country Filter
-      if (_selectedCountryId != null && 
-          (p['countryId'] ?? p['country'] ?? 'LEBANON').toString().toUpperCase() != _selectedCountryId!.toUpperCase()) {
-        return false;
-      }
-
-      // Radius Filter (Simple Haversine or approximation logic can be added here)
-      // For now, mirroring the logic from MapExploreScreen
+      if (_selectedCountryId != null && (p['countryId'] ?? p['country'] ?? 'LEBANON').toString().toUpperCase() != _selectedCountryId!.toUpperCase()) return false;
       if (_radiusFilterActive && _userLocation != null && _searchRadiusKm < 100) {
         final mainLoc = p['mainLocation'] as Map<String, dynamic>?;
         if (mainLoc != null && mainLoc['lat'] != null) {
@@ -106,10 +63,9 @@ class DirectoryViewModel extends ChangeNotifier {
           final distance = const Distance().as(LengthUnit.Kilometer, _userLocation!, pos);
           if (distance > _searchRadiusKm) return false;
         } else {
-          return false; // No location for radius filter
+          return false;
         }
       }
-
       return true;
     }).toList();
   }

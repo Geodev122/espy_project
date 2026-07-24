@@ -7,6 +7,7 @@ import '../../../viewmodels/espy_repository.dart';
 import '../../../viewmodels/orders_manager_view_model.dart';
 import '../../../widgets/common/premium_card.dart';
 import '../../../widgets/common/espy_scaffold.dart';
+import '../../../models/resource_order.dart';
 
 class OrdersManagerScreen extends StatelessWidget {
   const OrdersManagerScreen({super.key});
@@ -53,24 +54,24 @@ class _OrdersManagerView extends StatelessWidget {
                           children: [
                             ListTile(
                               contentPadding: EdgeInsets.zero,
-                              title: Text(o['userEmail'] ?? 'Unknown User', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                              subtitle: Text("Order ID: ${o['id'].toString().substring(0, 8)}..."),
-                              trailing: Text("${o['totalCost']} \$E", style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, color: EspyTheme.gold)),
+                              title: Text(o.userEmail ?? 'Unknown User', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                              subtitle: Text("Order ID: ${o.id.substring(0, 8)}..."),
+                              trailing: Text("${o.totalCost} \$E", style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, color: EspyTheme.gold)),
                             ),
                             const Divider(),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
-                                _infoItem(LucideIcons.mapPin, "${o['pinsCount']} PINS"),
-                                _infoItem(LucideIcons.layoutGrid, "${o['slotsCount']} SLOTS"),
-                                _infoItem(LucideIcons.megaphone, "${o['broadcastsCount']} BC"),
+                                _infoItem(LucideIcons.mapPin, "${o.pinsCount} PINS"),
+                                _infoItem(LucideIcons.layoutGrid, "${o.slotsCount} SLOTS"),
+                                _infoItem(LucideIcons.megaphone, "${o.broadcastsCount} BC"),
                               ],
                             ),
                             const SizedBox(height: 16),
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton(
-                                onPressed: () => viewModel.approveOrder(o['id']),
+                                onPressed: () => viewModel.approveOrder(o.id),
                                 style: ElevatedButton.styleFrom(backgroundColor: EspyTheme.success, foregroundColor: Colors.white),
                                 child: const Text("APPROVE ORDER", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 10)),
                               ),

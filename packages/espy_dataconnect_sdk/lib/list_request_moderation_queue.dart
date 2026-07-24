@@ -177,11 +177,13 @@ class ListRequestModerationQueueServiceRequestsSector {
 
 @immutable
 class ListRequestModerationQueueServiceRequestsSectorTemplate {
+  final String id;
   final String? accentColor;
   final String? iconName;
   final List<String>? visibleFields;
   ListRequestModerationQueueServiceRequestsSectorTemplate.fromJson(dynamic json):
   
+  id = nativeFromJson<String>(json['id']),
   accentColor = json['accentColor'] == null ? null : nativeFromJson<String>(json['accentColor']),
   iconName = json['iconName'] == null ? null : nativeFromJson<String>(json['iconName']),
   visibleFields = json['visibleFields'] == null ? null : (json['visibleFields'] as List<dynamic>)
@@ -197,17 +199,19 @@ class ListRequestModerationQueueServiceRequestsSectorTemplate {
     }
 
     final ListRequestModerationQueueServiceRequestsSectorTemplate otherTyped = other as ListRequestModerationQueueServiceRequestsSectorTemplate;
-    return accentColor == otherTyped.accentColor && 
+    return id == otherTyped.id && 
+    accentColor == otherTyped.accentColor && 
     iconName == otherTyped.iconName && 
     visibleFields == otherTyped.visibleFields;
     
   }
   @override
-  int get hashCode => Object.hashAll([accentColor.hashCode, iconName.hashCode, visibleFields.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, accentColor.hashCode, iconName.hashCode, visibleFields.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
     if (accentColor != null) {
       json['accentColor'] = nativeToJson<String?>(accentColor);
     }
@@ -221,6 +225,7 @@ class ListRequestModerationQueueServiceRequestsSectorTemplate {
   }
 
   ListRequestModerationQueueServiceRequestsSectorTemplate({
+    required this.id,
     this.accentColor,
     this.iconName,
     this.visibleFields,

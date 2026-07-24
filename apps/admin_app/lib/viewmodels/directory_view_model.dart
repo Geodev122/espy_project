@@ -77,8 +77,7 @@ class DirectoryViewModel extends ChangeNotifier {
         return false;
       }
 
-      // Radius Filter (Simple Haversine or approximation logic can be added here)
-      // For now, mirroring the logic from MapExploreScreen
+      // Radius Filter
       if (_radiusFilterActive && _userLocation != null && _searchRadiusKm < 100) {
         final mainLoc = p['mainLocation'] as Map<String, dynamic>?;
         if (mainLoc != null && mainLoc['lat'] != null) {

@@ -17,6 +17,8 @@ import 'package:espy_app/widgets/common/premium_card.dart';
 import 'package:espy_app/widgets/common/profile_image_picker.dart';
 import 'package:espy_app/widgets/common/document_picker.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';
+import '../../../models/sector_model.dart';
+import '../../../models/category_model.dart';
 
 class ProfessionalWizard extends StatefulWidget {
   const ProfessionalWizard({super.key});
@@ -41,7 +43,7 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
   File? _profileImageFile;
   Uint8List? _profileImageWebBytes;
 
-  Map<String, dynamic>? _mainLocation;
+  CityModel? _mainLocation;
 
   @override
   void initState() {
@@ -214,13 +216,13 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
 
   Widget _buildSectorDropdown() {
     final repo = Provider.of<EspyRepository>(context, listen: false);
-    return StreamBuilder<List<Map<String, dynamic>>>(
+    return StreamBuilder<List<SectorModel>>(
       stream: repo.listSectors(),
       builder: (context, snapshot) {
         final sectors = snapshot.data ?? [];
         return DropdownButtonFormField<String>(
           value: _selectedSectorId,
-          items: sectors.map((s) => DropdownMenuItem(value: s['id'].toString(), child: Text(s['nameEn'].toUpperCase(), style: const TextStyle(fontSize: 12)))).toList(),
+          items: sectors.map((s) => DropdownMenuItem(value: s.id, child: Text(s.nameEn.toUpperCase(), style: const TextStyle(fontSize: 12)))).toList(),
           onChanged: (v) => setState(() { _selectedSectorId = v; _selectedCategoryId = null; }),
           decoration: InputDecoration(hintText: "Select Sector", filled: true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)),
         );
@@ -230,13 +232,13 @@ class _ProfessionalWizardState extends State<ProfessionalWizard> {
 
   Widget _buildCategoryDropdown() {
     final repo = Provider.of<EspyRepository>(context, listen: false);
-    return StreamBuilder<List<Map<String, dynamic>>>(
+    return StreamBuilder<List<CategoryModel>>(
       stream: repo.listCategories(sectorId: _selectedSectorId),
       builder: (context, snapshot) {
         final cats = snapshot.data ?? [];
         return DropdownButtonFormField<String>(
           value: _selectedCategoryId,
-          items: cats.map((c) => DropdownMenuItem(value: c['id'].toString(), child: Text(c['nameEn'].toUpperCase(), style: const TextStyle(fontSize: 12)))).toList(),
+          items: cats.map((c) => DropdownMenuItem(value: c.id, child: Text(c.nameEn.toUpperCase(), style: const TextStyle(fontSize: 12)))).toList(),
           onChanged: (v) => setState(() => _selectedCategoryId = v),
           decoration: InputDecoration(hintText: "Select Category", filled: true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)),
         );

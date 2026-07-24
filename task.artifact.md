@@ -1,8 +1,20 @@
-# Progress Tracking - Admin Stability & Import
+# Task: Model Normalization & Login Fix
 
-- [x] Implement Firestore Fallbacks in `DataConnectEspyRepository` (Admin App)
-- [x] Implement Firestore Fallbacks in `DataConnectEspyRepository` (User App)
-- [x] Add `importHierarchicalCsv` to `TaxonomyViewModel`
-- [x] Update `TaxonomyManagerScreen` UI for CSV Import
-- [x] Rebuild and Deploy both apps
-- [x] Retry DataConnect Connector Deployment (Fallback implemented)
+### 1. Robust Login Sync
+- [ ] Refactor `AuthService` synchronization logic
+- [ ] Update `MainGate` to handle transient states better
+
+### 2. Model Audit & Update (Admin App)
+- [ ] Update `UserModel` with `adminNotes`
+- [ ] Update `CountryModel` with missing schema fields
+- [ ] Update `ServiceModel` with moderation and sector fields
+- [ ] Update `ProfessionalProfile` and `InstitutionProfile`
+- [ ] Create `SectorModel`, `CategoryModel`, `RegionModel`, `CityModel`
+
+### 3. Synchronization (User App)
+- [ ] Replicate all model updates to User App
+
+### 4. Build & Verify
+- [ ] Verify Admin App build
+- [ ] Verify User App build
+- [ ] Manual test login flow

@@ -28,6 +28,7 @@ class GetProfessionalDetailsProfessionalProfile {
   final bool isApproved;
   final bool isHonorVerified;
   final bool isProfileValidated;
+  final String? verificationDocUrl;
   final EnumValue<MembershipTier>? membershipTier;
   final int serviceSlots;
   final int practicePins;
@@ -44,6 +45,7 @@ class GetProfessionalDetailsProfessionalProfile {
   isApproved = nativeFromJson<bool>(json['isApproved']),
   isHonorVerified = nativeFromJson<bool>(json['isHonorVerified']),
   isProfileValidated = nativeFromJson<bool>(json['isProfileValidated']),
+  verificationDocUrl = json['verificationDocUrl'] == null ? null : nativeFromJson<String>(json['verificationDocUrl']),
   membershipTier = json['membershipTier'] == null ? null : membershipTierDeserializer(json['membershipTier']),
   serviceSlots = nativeFromJson<int>(json['serviceSlots']),
   practicePins = nativeFromJson<int>(json['practicePins']),
@@ -68,6 +70,7 @@ class GetProfessionalDetailsProfessionalProfile {
     isApproved == otherTyped.isApproved && 
     isHonorVerified == otherTyped.isHonorVerified && 
     isProfileValidated == otherTyped.isProfileValidated && 
+    verificationDocUrl == otherTyped.verificationDocUrl && 
     membershipTier == otherTyped.membershipTier && 
     serviceSlots == otherTyped.serviceSlots && 
     practicePins == otherTyped.practicePins && 
@@ -76,7 +79,7 @@ class GetProfessionalDetailsProfessionalProfile {
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, fullNameAr.hashCode, specialty.hashCode, specialtyAr.hashCode, bioEn.hashCode, bioAr.hashCode, isApproved.hashCode, isHonorVerified.hashCode, isProfileValidated.hashCode, membershipTier.hashCode, serviceSlots.hashCode, practicePins.hashCode, visibilityExpiresAt.hashCode, user.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, fullNameAr.hashCode, specialty.hashCode, specialtyAr.hashCode, bioEn.hashCode, bioAr.hashCode, isApproved.hashCode, isHonorVerified.hashCode, isProfileValidated.hashCode, verificationDocUrl.hashCode, membershipTier.hashCode, serviceSlots.hashCode, practicePins.hashCode, visibilityExpiresAt.hashCode, user.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -100,6 +103,9 @@ class GetProfessionalDetailsProfessionalProfile {
     json['isApproved'] = nativeToJson<bool>(isApproved);
     json['isHonorVerified'] = nativeToJson<bool>(isHonorVerified);
     json['isProfileValidated'] = nativeToJson<bool>(isProfileValidated);
+    if (verificationDocUrl != null) {
+      json['verificationDocUrl'] = nativeToJson<String?>(verificationDocUrl);
+    }
     if (membershipTier != null) {
       json['membershipTier'] = 
     membershipTierSerializer(membershipTier!)
@@ -124,6 +130,7 @@ class GetProfessionalDetailsProfessionalProfile {
     required this.isApproved,
     required this.isHonorVerified,
     required this.isProfileValidated,
+    this.verificationDocUrl,
     this.membershipTier,
     required this.serviceSlots,
     required this.practicePins,
@@ -134,11 +141,13 @@ class GetProfessionalDetailsProfessionalProfile {
 
 @immutable
 class GetProfessionalDetailsProfessionalProfileUser {
+  final String id;
   final String email;
   final String? photoUrl;
   final String? whatsapp;
   GetProfessionalDetailsProfessionalProfileUser.fromJson(dynamic json):
   
+  id = nativeFromJson<String>(json['id']),
   email = nativeFromJson<String>(json['email']),
   photoUrl = json['photoUrl'] == null ? null : nativeFromJson<String>(json['photoUrl']),
   whatsapp = json['whatsapp'] == null ? null : nativeFromJson<String>(json['whatsapp']);
@@ -152,17 +161,19 @@ class GetProfessionalDetailsProfessionalProfileUser {
     }
 
     final GetProfessionalDetailsProfessionalProfileUser otherTyped = other as GetProfessionalDetailsProfessionalProfileUser;
-    return email == otherTyped.email && 
+    return id == otherTyped.id && 
+    email == otherTyped.email && 
     photoUrl == otherTyped.photoUrl && 
     whatsapp == otherTyped.whatsapp;
     
   }
   @override
-  int get hashCode => Object.hashAll([email.hashCode, photoUrl.hashCode, whatsapp.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, email.hashCode, photoUrl.hashCode, whatsapp.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
     json['email'] = nativeToJson<String>(email);
     if (photoUrl != null) {
       json['photoUrl'] = nativeToJson<String?>(photoUrl);
@@ -174,6 +185,7 @@ class GetProfessionalDetailsProfessionalProfileUser {
   }
 
   GetProfessionalDetailsProfessionalProfileUser({
+    required this.id,
     required this.email,
     this.photoUrl,
     this.whatsapp,

@@ -26,6 +26,7 @@ class GetActiveResourceOrderResourceOrders {
   final int totalCost;
   final EnumValue<OrderStatus> status;
   final Timestamp createdAt;
+  final GetActiveResourceOrderResourceOrdersUser user;
   GetActiveResourceOrderResourceOrders.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']),
@@ -34,7 +35,8 @@ class GetActiveResourceOrderResourceOrders {
   broadcastsCount = nativeFromJson<int>(json['broadcastsCount']),
   totalCost = nativeFromJson<int>(json['totalCost']),
   status = orderStatusDeserializer(json['status']),
-  createdAt = Timestamp.fromJson(json['createdAt']);
+  createdAt = Timestamp.fromJson(json['createdAt']),
+  user = GetActiveResourceOrderResourceOrdersUser.fromJson(json['user']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -51,11 +53,12 @@ class GetActiveResourceOrderResourceOrders {
     broadcastsCount == otherTyped.broadcastsCount && 
     totalCost == otherTyped.totalCost && 
     status == otherTyped.status && 
-    createdAt == otherTyped.createdAt;
+    createdAt == otherTyped.createdAt && 
+    user == otherTyped.user;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, pinsCount.hashCode, slotsCount.hashCode, broadcastsCount.hashCode, totalCost.hashCode, status.hashCode, createdAt.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, pinsCount.hashCode, slotsCount.hashCode, broadcastsCount.hashCode, totalCost.hashCode, status.hashCode, createdAt.hashCode, user.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -69,6 +72,7 @@ class GetActiveResourceOrderResourceOrders {
     orderStatusSerializer(status)
     ;
     json['createdAt'] = createdAt.toJson();
+    json['user'] = user.toJson();
     return json;
   }
 
@@ -80,6 +84,41 @@ class GetActiveResourceOrderResourceOrders {
     required this.totalCost,
     required this.status,
     required this.createdAt,
+    required this.user,
+  });
+}
+
+@immutable
+class GetActiveResourceOrderResourceOrdersUser {
+  final String id;
+  GetActiveResourceOrderResourceOrdersUser.fromJson(dynamic json):
+  
+  id = nativeFromJson<String>(json['id']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final GetActiveResourceOrderResourceOrdersUser otherTyped = other as GetActiveResourceOrderResourceOrdersUser;
+    return id == otherTyped.id;
+    
+  }
+  @override
+  int get hashCode => id.hashCode;
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
+    return json;
+  }
+
+  GetActiveResourceOrderResourceOrdersUser({
+    required this.id,
   });
 }
 

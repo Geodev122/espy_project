@@ -3,30 +3,25 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../theme/espy_theme.dart';
-import '../../viewmodels/service_management_view_model.dart';
+import '../../models/service_model.dart';
+import '../../models/service_request.dart';
+import '../../models/enums.dart';
 import '../common/espy_icon.dart';
 import '../common/premium_card.dart';
 
 class AdaptiveSlotCard extends StatelessWidget {
-  final Map<String, dynamic> data;
+  final dynamic service; // ServiceModel or ServiceRequestModel
   final bool isRequest;
   
-  const AdaptiveSlotCard({super.key, required this.data, this.isRequest = false});
+  const AdaptiveSlotCard({super.key, required this.service, this.isRequest = false});
 
   @override
   Widget build(BuildContext context) {
-    // Resolve template from Sector or Global Visitor Request
-    Map<String, dynamic>? template;
+    // Resolve template and data
+    final Map<String, dynamic> data = service is ServiceModel ? (service as ServiceModel).toMap() : (service as ServiceRequestModel).toMap();
     
-    if (isRequest) {
-      // Find the GLOBAL_VISITOR_REQUEST template
-      // For now we check if it's passed in the 'template' field of the request itself
-      // Ideally, the repository should join it or we fetch it from a cache
-      template = data['template'] as Map<String, dynamic>?;
-    } else {
-      // Service Listings have their template attached via Sector join in DataConnect
-      template = data['template'] as Map<String, dynamic>?;
-    }
+    // Note: Template management is currently handled via dynamic maps in schema join
+    final Map<String, dynamic>? template = data['template'] as Map<String, dynamic>?;
 
     final Color accentColor = Color(int.tryParse(template?['accentColor'] ?? (isRequest ? '0xFFF9A825' : '0xFF1565C0')) ?? 0xFF1565C0);
     final String iconName = template?['iconName'] ?? (isRequest ? 'campaign' : 'medical_services');

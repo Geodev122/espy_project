@@ -1,4 +1,4 @@
-# ESPY PROTOCOL - DATA CONNECT QUERIES v8.2 (Sector-Based Adaptive Branding)
+# ESPY PROTOCOL - DATA CONNECT QUERIES v9.1 (Normalized Selection Sets)
 
 # --- 1. Identity & Profile ---
 
@@ -8,26 +8,36 @@ query GetUser($uid: String!) @auth(expr: "auth.uid == uid") {
     email
     name
     role
+    isActive
+    hasProfile
+    adminNotes
     walletBalance
     tokensUsed
     photoUrl
-    isActive
+    phone
+    whatsapp
     createdAt
     updatedAt
     professionalProfile_on_user {
+      id
       specialty
       isApproved
       isProfileValidated
+      verificationDocUrl
       membershipTier
       visibilityExpiresAt
     }
     institutionProfile_on_user {
+      id
       nameAr
+      registrationNumber
       isApproved
       isProfileValidated
+      verificationDocUrl
       visibilityExpiresAt
     }
     visitorProfile_on_user {
+      id
       interests
     }
   }
@@ -44,11 +54,13 @@ query GetProfessionalDetails($uid: String!) @auth(level: PUBLIC) {
     isApproved
     isHonorVerified
     isProfileValidated
+    verificationDocUrl
     membershipTier
     serviceSlots
     practicePins
     visibilityExpiresAt
     user {
+      id
       email
       photoUrl
       whatsapp
@@ -67,6 +79,7 @@ query ListSectors @auth(level: PUBLIC) {
     colorHex
     description
     template {
+      id
       accentColor
       iconName
       visibleFields
@@ -80,6 +93,7 @@ query ListCategories($sectorId: String) @auth(level: PUBLIC) {
     nameEn
     nameAr
     targetRole
+    sector { id }
   }
 }
 
@@ -89,6 +103,7 @@ query ListRegions($countryId: String!) @auth(level: PUBLIC) {
     nameEn
     nameAr
     regionCode
+    country { id }
   }
 }
 
@@ -99,6 +114,7 @@ query ListCities($regionId: String!) @auth(level: PUBLIC) {
     nameAr
     lat
     lng
+    region { id }
   }
 }
 
@@ -115,8 +131,7 @@ query ListActiveServices($categoryId: String, $sectorId: String) @auth(level: PU
       { isActive: { eq: true } },
       { moderationStatus: { eq: APPROVED } },
       { category: { id: { eq: $categoryId } } },
-      { sector: { id: { eq: $sectorId } } },
-      { visibilityExpiresAt: { gt_expr: "request.time" } }
+      { sector: { id: { eq: $sectorId } } }
     ]
   }) {
     id
@@ -125,16 +140,12 @@ query ListActiveServices($categoryId: String, $sectorId: String) @auth(level: PU
     price
     imageUrl
     deliveryMode
-    priceTag { nameEn nameAr }
+    moderationStatus
+    flagReason
+    category { id nameEn nameAr }
     sector {
-      template {
-        accentColor
-        iconName
-        visibleFields
-      }
-    }
-    serviceListingTags_on_service {
-      tag { nameEn nameAr }
+      id
+      template { id accentColor iconName visibleFields }
     }
     provider {
       id
@@ -151,8 +162,7 @@ query SearchServices($query: String, $minPrice: Int, $maxPrice: Int) @auth(level
       { moderationStatus: { eq: APPROVED } },
       { titleEn: { contains: $query } },
       { price: { ge: $minPrice } },
-      { price: { le: $maxPrice } },
-      { visibilityExpiresAt: { gt_expr: "request.time" } }
+      { price: { le: $maxPrice } }
     ]
   }) {
     id
@@ -181,7 +191,7 @@ query ListLocationNodes($userId: String!) @auth(level: PUBLIC) {
   locationNodes(where: { user: { id: { eq: $userId } } }) {
     id
     label
-    city { nameEn nameAr }
+    city { id nameEn nameAr }
     lat
     lng
     isMain
@@ -242,11 +252,10 @@ query ListServiceRequests($sectorId: String, $status: CommunityRequestStatus = A
     status
     createdAt
     user {
+      id
       name
     }
-    serviceRequestTags_on_request {
-      tag { nameEn nameAr }
-    }
+    sector { id }
   }
 }
 
@@ -278,6 +287,7 @@ query GetActiveResourceOrder($userId: String!) @auth(expr: "auth.uid == userId")
     totalCost
     status
     createdAt
+    user { id }
   }
 }
 
@@ -323,6 +333,7 @@ query GetAuditDetails($id: String!) @auth(level: NO_ACCESS) {
     createdAt
     updatedAt
     professionalProfile_on_user {
+      id
       fullNameAr
       specialty
       isApproved
@@ -332,6 +343,7 @@ query GetAuditDetails($id: String!) @auth(level: NO_ACCESS) {
       visibilityExpiresAt
     }
     institutionProfile_on_user {
+      id
       nameAr
       registrationNumber
       isApproved
@@ -355,7 +367,7 @@ query ListRechargeCards @auth(level: NO_ACCESS) {
     tokenValue
     status
     redeemedAt
-    redeemedBy { email }
+    redeemedBy { id email }
   }
 }
 
@@ -364,6 +376,7 @@ query ListPendingApprovals @auth(level: NO_ACCESS) {
     id
     fullNameAr
     user {
+      id
       email
       createdAt
     }
@@ -393,14 +406,14 @@ query ListSupportTickets($status: SupportTicketStatus) @auth(level: NO_ACCESS) {
     message
     status
     createdAt
-    user { email name }
+    user { id email name }
   }
 }
 
 # --- Service Moderation Queries ---
 
 query ListServiceModerationQueue($status: ModerationStatus = PENDING) @auth(level: NO_ACCESS) {
-  services(where: { moderationStatus: { eq: $status } }, orderBy: [{ visibilityExpiresAt: DESC }]) {
+  services(where: { moderationStatus: { eq: $status } }, orderBy: [{ createdAt: DESC }]) {
     id
     titleEn
     titleAr
@@ -409,12 +422,12 @@ query ListServiceModerationQueue($status: ModerationStatus = PENDING) @auth(leve
     deliveryMode
     moderationStatus
     flagReason
-    category { nameEn nameAr }
+    category { id nameEn nameAr }
     sector {
       id
       nameEn
       nameAr
-      template { accentColor iconName visibleFields }
+      template { id accentColor iconName visibleFields }
     }
     provider { id name photoUrl email }
   }
@@ -435,7 +448,7 @@ query ListRequestModerationQueue($status: ModerationStatus = PENDING) @auth(leve
       id
       nameEn
       nameAr
-      template { accentColor iconName visibleFields }
+      template { id accentColor iconName visibleFields }
     }
     user { id name email }
   }
@@ -450,9 +463,3 @@ query ListTemplates @auth(level: PUBLIC) {
     configJson
   }
 }
-
-# query GetSystemStats @auth(level: NO_ACCESS) {
-#   users_aggregate { count }
-#   services_aggregate(where: { isActive: { eq: true } }) { count }
-#   communityRequests_aggregate(where: { status: { eq: ACTIVE } }) { count }
-# }

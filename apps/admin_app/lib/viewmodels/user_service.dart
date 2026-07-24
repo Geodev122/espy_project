@@ -4,16 +4,18 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
 import 'espy_repository.dart';
+import '../models/user_model.dart';
+import '../models/enums.dart';
 
 class UserService extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final EspyRepository _repository;
 
-  Map<String, dynamic>? _profile;
+  UserModel? _profile;
   bool _loading = false;
   StreamSubscription? _profileSubscription;
 
-  Map<String, dynamic>? get profile => _profile;
+  UserModel? get profile => _profile;
   bool get isLoading => _loading;
   String get userId => _auth.currentUser?.uid ?? '';
 
@@ -38,8 +40,8 @@ class UserService extends ChangeNotifier {
         .doc(uid)
         .snapshots()
         .listen((snap) {
-      if (snap.exists) {
-        _profile = snap.data();
+      if (snap.exists && snap.data() != null) {
+        _profile = UserModel.fromMap(snap.data()!);
       } else {
         _profile = null;
       }
@@ -58,23 +60,30 @@ class UserService extends ChangeNotifier {
     super.dispose();
   }
 
-  Future<void> updateProfile(Map<String, dynamic> data) async {
+  Future<void> updateProfile(UserModel data) async {
     final user = _auth.currentUser;
     if (user == null) return;
 
     await _repository.updateUser(user.uid, data);
   }
 
-  // Refactored to separate logic into repo if possible, but keep simple for now
   Future<void> syncVisitorData({String? name, String? whatsapp}) async {
     final user = _auth.currentUser;
-    if (user == null) return;
+    if (user == null || _profile == null) return;
 
-    await _repository.updateUser(user.uid, {
-      if (name != null) 'name': name,
-      if (whatsapp != null) 'whatsapp': whatsapp,
-      'role': 'visitor',
-      'source': 'android',
-    });
+    final updatedUser = UserModel(
+      id: _profile!.id,
+      email: _profile!.email,
+      name: name ?? _profile!.name,
+      whatsapp: whatsapp ?? _profile!.whatsapp,
+      role: UserRole.visitor,
+      photoUrl: _profile!.photoUrl,
+      isActive: _profile!.isActive,
+      hasProfile: _profile!.hasProfile,
+      createdAt: _profile!.createdAt,
+      updatedAt: DateTime.now(),
+    );
+
+    await _repository.updateUser(user.uid, updatedUser);
   }
 }

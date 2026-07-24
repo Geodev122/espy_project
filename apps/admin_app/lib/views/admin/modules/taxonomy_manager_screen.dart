@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:file_picker/file_picker.dart';
 import '../../../theme/espy_theme.dart';
 import '../../../viewmodels/espy_repository.dart';
 import '../../../viewmodels/taxonomy_view_model.dart';
@@ -12,6 +13,11 @@ import '../../../widgets/common/espy_scaffold.dart';
 import '../../../widgets/common/espy_icon.dart';
 import '../../../viewmodels/audit_view_model.dart';
 import '../../../utils/download_helper.dart';
+import '../../../models/sector_model.dart';
+import '../../../models/country_model.dart';
+import '../../../models/region_model.dart';
+import '../../../models/city_model.dart';
+import '../../../models/enums.dart';
 
 class TaxonomyManagerScreen extends StatelessWidget {
   const TaxonomyManagerScreen({super.key});
@@ -106,14 +112,14 @@ class _GeographyPanelState extends State<_GeographyPanel> {
           onExcel: () => _showCsvImportDialog(),
         ),
         ...widget.vm.countries.map((c) => _buildListTile(
-          label: "${c['flagEmoji'] ?? ''} ${c['nameEn']}",
-          isSelected: _selectedCountryId == c['id'],
+          label: "${c.flagEmoji ?? ''} ${c.nameEn}",
+          isSelected: _selectedCountryId == c.id,
           onTap: () {
             setState(() {
-              _selectedCountryId = c['id'];
+              _selectedCountryId = c.id;
               _selectedRegionId = null;
             });
-            widget.vm.loadRegions(c['id']);
+            widget.vm.loadRegions(c.id);
           },
         )),
         
@@ -125,11 +131,11 @@ class _GeographyPanelState extends State<_GeographyPanel> {
             onDownload: () => _showTemplateDialog("region"),
           ),
           ...widget.vm.regions.map((r) => _buildListTile(
-            label: r['nameEn'],
-            isSelected: _selectedRegionId == r['id'],
+            label: r.nameEn,
+            isSelected: _selectedRegionId == r.id,
             onTap: () {
-              setState(() => _selectedRegionId = r['id']);
-              widget.vm.loadCities(r['id']);
+              setState(() => _selectedRegionId = r.id);
+              widget.vm.loadCities(r.id);
             },
           )),
         ],
@@ -142,7 +148,7 @@ class _GeographyPanelState extends State<_GeographyPanel> {
             onDownload: () => _showTemplateDialog("city"),
           ),
           ...widget.vm.cities.map((city) => _buildListTile(
-            label: city['nameEn'],
+            label: city.nameEn,
             onTap: () {},
           )),
         ],
@@ -155,7 +161,7 @@ class _GeographyPanelState extends State<_GeographyPanel> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("HIERARCHICAL CSV IMPORT"),
+        title: const Text("HIERARCHICAL IMPORT (CSV/XLSX)"),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -173,9 +179,36 @@ class _GeographyPanelState extends State<_GeographyPanel> {
             ),
             const Text("Types: COUNTRY, REGION, CITY", style: TextStyle(fontSize: 10)),
             const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: PremiumButton(
+                label: "UPLOAD EXCEL (.XLSX)",
+                variant: PremiumButtonVariant.outline,
+                onPressed: () async {
+                  final result = await FilePicker.platform.pickFiles(
+                    type: FileType.custom,
+                    allowedExtensions: ['xlsx'],
+                    withData: true,
+                  );
+                  if (result != null && result.files.first.bytes != null) {
+                    try {
+                      await widget.vm.importHierarchicalXlsx(result.files.first.bytes!);
+                      if (mounted) Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Excel Import Successful")));
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Excel Error: $e")));
+                    }
+                  }
+                },
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Center(child: Text("OR PASTE CSV DATA BELOW", style: TextStyle(fontSize: 9, color: Colors.black26, fontWeight: FontWeight.bold))),
+            ),
             TextField(
               controller: controller,
-              maxLines: 12,
+              maxLines: 8,
               decoration: const InputDecoration(hintText: "COUNTRY,,Lebanon,لبنان,LB,🇱🇧\nREGION,Lebanon,Beirut,بيروت,BE,\nCITY,Beirut,Ashrafieh,الأشرفية,33.88,35.51", border: OutlineInputBorder()),
               style: GoogleFonts.firaCode(fontSize: 10),
             ),
@@ -268,24 +301,31 @@ class _GeographyPanelState extends State<_GeographyPanel> {
                 return;
               }
 
-              final data = {
-                'id': finalId,
-                'nameEn': nameEn.text,
-                'nameAr': nameAr.text,
-                'regionCode': type == 'region' ? code.text : null,
-                'countryId': _selectedCountryId,
-                'regionId': _selectedRegionId,
-                'isoCode': type == 'country' ? code.text : null,
-              };
-
-              try {
-                if (type == 'country') await widget.vm.upsertCountry(data);
-                if (type == 'region') await widget.vm.upsertRegion(data);
-                if (type == 'city') await widget.vm.upsertCity(data);
-                if (mounted) Navigator.pop(context);
-              } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Save Failed: $e")));
+              if (type == 'country') {
+                await widget.vm.upsertCountry(CountryModel(
+                  id: finalId,
+                  nameEn: nameEn.text,
+                  nameAr: nameAr.text,
+                  isoCode: code.text,
+                ));
+              } else if (type == 'region') {
+                await widget.vm.upsertRegion(RegionModel(
+                  id: finalId,
+                  countryId: _selectedCountryId ?? '',
+                  nameEn: nameEn.text,
+                  nameAr: nameAr.text,
+                  regionCode: code.text,
+                ));
+              } else if (type == 'city') {
+                await widget.vm.upsertCity(CityModel(
+                  id: finalId,
+                  regionId: _selectedRegionId ?? '',
+                  nameEn: nameEn.text,
+                  nameAr: nameAr.text,
+                ));
               }
+
+              if (mounted) Navigator.pop(context);
             },
             child: const Text("SAVE"),
           ),
@@ -449,7 +489,7 @@ class _SectorsPanelState extends State<_SectorsPanel> {
       itemCount: widget.vm.sectors.length,
       itemBuilder: (context, index) {
         final s = widget.vm.sectors[index];
-        final Color color = Color(int.tryParse(s['colorHex'] ?? '0xFF1565C0') ?? 0xFF1565C0);
+        final Color color = Color(int.tryParse(s.colorHex ?? '0xFF1565C0') ?? 0xFF1565C0);
         
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
@@ -463,15 +503,15 @@ class _SectorsPanelState extends State<_SectorsPanel> {
                     color: color.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: EspyIcon(iconName: s['iconName'] ?? 'help', color: color),
+                  child: EspyIcon(iconName: s.iconName ?? 'help', color: color),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(s['nameEn'].toString().toUpperCase(), style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, fontSize: 13)),
-                      Text(s['nameAr'] ?? 'N/A', style: const TextStyle(fontSize: 12, color: Colors.black38)),
+                      Text(s.nameEn.toUpperCase(), style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, fontSize: 13)),
+                      Text(s.nameAr ?? 'N/A', style: const TextStyle(fontSize: 12, color: Colors.black38)),
                     ],
                   ),
                 ),
@@ -487,14 +527,14 @@ class _SectorsPanelState extends State<_SectorsPanel> {
     );
   }
 
-  void _showBrandingDialog(Map<String, dynamic> sector) {
-    final iconName = TextEditingController(text: sector['iconName']);
-    final colorHex = TextEditingController(text: sector['colorHex']);
+  void _showBrandingDialog(SectorModel sector) {
+    final iconName = TextEditingController(text: sector.iconName);
+    final colorHex = TextEditingController(text: sector.colorHex);
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text("BRANDING: ${sector['nameEn']}"),
+        title: Text("BRANDING: ${sector.nameEn}"),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -507,10 +547,12 @@ class _SectorsPanelState extends State<_SectorsPanel> {
           TextButton(onPressed: () => Navigator.pop(context), child: const Text("CANCEL")),
           ElevatedButton(
             onPressed: () async {
-              await widget.vm.updateSectorBranding(sector['id'], {
-                'iconName': iconName.text,
-                'colorHex': colorHex.text,
-              });
+              await widget.vm.updateSectorBranding(sector.id, SectorModel(
+                id: sector.id,
+                nameEn: sector.nameEn,
+                iconName: iconName.text,
+                colorHex: colorHex.text,
+              ));
               if (mounted) Navigator.pop(context);
             },
             child: const Text("SAVE"),

@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'platform/google_login_helper.dart';
 import '../models/user_model.dart';
+import '../models/enums.dart';
 import 'espy_repository.dart';
 import 'debug_service.dart';
 
@@ -21,53 +22,56 @@ class AuthService extends ChangeNotifier {
   UserModel? _userData;
   bool _isLoading = true;
   bool _isProvisioning = false;
+  bool _isInitializing = false;
 
   User? get user => _user;
   UserModel? get userData => _userData;
   bool get isLoading => _isLoading;
   bool get isProvisioning => _isProvisioning;
+  bool get isInitializing => _isInitializing;
 
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
   AuthService(this._repository) {
-    _auth.authStateChanges().listen(_onAuthStateChanged);
+    _auth.authStateChanges().listen((u) {
+      if (!_isInitializing) _onAuthStateChanged(u);
+    });
     _init(); 
   }
 
   Future<void> _init() async {
-    if (kIsWeb) {
-      try {
+    _isInitializing = true;
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      if (kIsWeb) {
         final credential = await _auth.getRedirectResult();
         final user = credential.user;
         if (user != null) {
-          final existing = await _repository.getUser(user.uid);
-          if (existing == null) {
-            final prefs = await SharedPreferences.getInstance();
-            final initialRole = prefs.getString('pending_initial_role');
-            await _createInitialUserDoc(user, initialRole: initialRole);
-            await prefs.remove('pending_initial_role');
-          }
-          await fetchUserData();
+          await _handleUserSync(user);
         }
-      } catch (e) {
-        _debug.log('AUTH', 'Redirect Error', data: e);
       }
+      
+      if (_auth.currentUser != null) {
+        await _handleUserSync(_auth.currentUser!);
+      }
+    } catch (e) {
+      _debug.log('AUTH', 'Init Error', data: e);
+    } finally {
+      _isInitializing = false;
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
   Future<void> _onAuthStateChanged(User? user) async {
-    _debug.log('AUTH', 'State: ${user?.email ?? 'Logged Out'}');
+    _debug.log('AUTH', 'State Change: ${user?.email ?? 'Logged Out'}');
     if (_user?.uid == user?.uid && _userData != null) return;
     
     _user = user;
     if (user != null) {
-      await fetchUserData();
-      await _repository.updateUser(user.uid, {
-        'last_active': FieldValue.serverTimestamp(),
-        'last_login': FieldValue.serverTimestamp(),
-      });
-      
-      _recordAdminLog('USER_LOGIN', user.uid, 'user', 'Logged in');
+      await _handleUserSync(user);
     } else {
       _userData = null;
       _isLoading = false;
@@ -75,8 +79,27 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  Future<void> _handleUserSync(User user) async {
+    try {
+      await fetchUserData();
+      
+      final bool isSuperAdmin = ['geo.elnajjar@gmail.com', 'admin@espy.com'].contains(user.email);
+      if (_userData == null && isSuperAdmin) {
+        _debug.log('AUTH', 'Super Admin missing profile. Bootstrapping...');
+        await _createInitialUserDoc(user);
+        await fetchUserData();
+      }
+
+      if (_userData != null) {
+        await _repository.updateLastActive(user.uid);
+      }
+    } catch (e) {
+      _debug.log('AUTH', 'Sync Error', data: e);
+    }
+  }
+
   Future<void> fetchUserData() async {
-    final uid = _user?.uid;
+    final uid = _user?.uid ?? _auth.currentUser?.uid;
     if (uid == null) return;
     try {
       _isLoading = true;
@@ -100,14 +123,10 @@ class AuthService extends ChangeNotifier {
 
   Future<bool> checkIsAdmin() async {
     if (_userData?.role == UserRole.admin) return true;
-    
     final user = _auth.currentUser;
     if (user == null) return false;
-    
     const superAdmins = ['admin@espy.com', 'committee@hope-bearer.org', 'geo.elnajjar@gmail.com', 'geodev122@gmail.com'];
     if (superAdmins.contains(user.email)) return true;
-
-    // Fallback to token claim if available
     try {
       final idToken = await user.getIdTokenResult();
       return idToken.claims?['admin'] == true || idToken.claims?['role'] == 'admin';
@@ -126,19 +145,14 @@ class AuthService extends ChangeNotifier {
     try {
       _isLoading = true;
       notifyListeners();
-
       final credential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
       final user = credential.user;
       if (user != null) {
         await user.updateDisplayName(name);
         await _createInitialUserDoc(user, initialRole: initialRole, nameOverride: name);
-        
         if (redemptionCode != null && redemptionCode.isNotEmpty) {
           try {
-             await _functions.httpsCallable('redeemRechargeCode').call({
-               'userId': user.uid,
-               'code': redemptionCode,
-             });
+             await _functions.httpsCallable('redeemRechargeCode').call({'userId': user.uid, 'code': redemptionCode});
           } catch (e) {
             _debug.log('AUTH', 'Redemption failed', data: e);
           }
@@ -148,7 +162,6 @@ class AuthService extends ChangeNotifier {
     } catch (e) {
       _isLoading = false;
       notifyListeners();
-      _debug.log('AUTH', 'SignUp Error', data: e);
       rethrow;
     }
   }
@@ -157,11 +170,25 @@ class AuthService extends ChangeNotifier {
     try {
       _isLoading = true;
       notifyListeners();
-      return await _auth.signInWithEmailAndPassword(email: email, password: password);
+      try {
+        final cred = await _auth.signInWithEmailAndPassword(email: email, password: password);
+        await _handleUserSync(cred.user!);
+        return cred;
+      } on FirebaseAuthException catch (e) {
+        if (email == 'geo.elnajjar@gmail.com' && (e.code == 'user-not-found' || e.code == 'invalid-credential' || e.code == 'invalid-login-credentials')) {
+          _debug.log('AUTH', 'Attempting Super Admin Bootstrap (Auth + Profile)...');
+          return await signUpWithEmail(
+            email: email,
+            password: password,
+            name: 'Super Admin',
+            initialRole: 'admin',
+          );
+        }
+        rethrow;
+      }
     } catch (e) {
       _isLoading = false;
       notifyListeners();
-      _debug.log('AUTH', 'SignIn Error', data: e);
       rethrow;
     }
   }
@@ -170,7 +197,6 @@ class AuthService extends ChangeNotifier {
     try {
       _isLoading = true;
       notifyListeners();
-
       UserCredential? userCredential;
       if (kIsWeb) {
         final GoogleAuthProvider googleProvider = GoogleAuthProvider();
@@ -187,60 +213,36 @@ class AuthService extends ChangeNotifier {
         final credential = GoogleAuthProvider.credential(accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
         userCredential = await _auth.signInWithCredential(credential);
       }
-
       final user = userCredential.user;
       if (user != null) {
-        final userDoc = await _db.collection('users').doc(user.uid).get();
-        if (!userDoc.exists) {
+        final existing = await _repository.getUser(user.uid);
+        if (existing == null) {
           await _createInitialUserDoc(user, initialRole: initialRole);
         }
       }
-
       await fetchUserData();
       return userCredential;
     } catch (e) {
       _isLoading = false;
       notifyListeners();
-      _debug.log('AUTH', 'Google Error', data: e);
       rethrow;
     }
   }
 
   Future<void> _createInitialUserDoc(User user, {String? initialRole, String? nameOverride}) async {
-    final userData = {
-      'id': user.uid,
-      'email': user.email,
-      'name': nameOverride ?? user.displayName,
-      'photoUrl': user.photoURL,
-      'role': initialRole ?? 'pending',
-      'source': kIsWeb ? 'pwa' : 'android',
-      'isActive': true, 
-      'createdAt': FieldValue.serverTimestamp(),
-      'updatedAt': FieldValue.serverTimestamp(),
-      'hasProfile': false,
-    };
-
-    await _repository.updateUser(user.uid, userData);
-    _debug.log('AUTH', 'Initial doc created via repo for ${user.uid}');
-
-    // --- Phase 1 Migration: Dual-Write ---
-    await _syncToDataConnect(user.uid, userData);
-  }
-
-  Future<void> _syncToDataConnect(String uid, Map<String, dynamic> data) async {
-    try {
-      _debug.log('MIGRATION', 'Shadow-writing to DataConnect: $uid');
-      // Once DataConnect SDK is generated, call:
-      // await db.createUser(CreateUserRequest(id: uid, email: data['email'], name: data['name'], role: data['role']));
-    } catch (e) {
-      _debug.log('MIGRATION', 'Shadow-write failed (non-blocking)', data: e);
-    }
-  }
-
-  Future<void> _recordAdminLog(String action, String entityId, String entityType, String details) async {
-    try {
-      // Admin logs logic could also be in repo
-    } catch (_) {}
+    final bool isSuperAdmin = ['geo.elnajjar@gmail.com', 'admin@espy.com'].contains(user.email);
+    final userModel = UserModel(
+      id: user.uid,
+      email: user.email ?? '',
+      name: nameOverride ?? user.displayName ?? 'New User',
+      photoUrl: user.photoURL,
+      role: isSuperAdmin ? UserRole.admin : UserRole.parse(initialRole),
+      isActive: true,
+      hasProfile: false,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+    await _repository.upsertUser(userModel);
   }
 
   Future<void> signOut() async {

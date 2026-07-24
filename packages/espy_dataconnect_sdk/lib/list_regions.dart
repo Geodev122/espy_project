@@ -23,12 +23,14 @@ class ListRegionsRegions {
   final String nameEn;
   final String? nameAr;
   final String? regionCode;
+  final ListRegionsRegionsCountry country;
   ListRegionsRegions.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']),
   nameEn = nativeFromJson<String>(json['nameEn']),
   nameAr = json['nameAr'] == null ? null : nativeFromJson<String>(json['nameAr']),
-  regionCode = json['regionCode'] == null ? null : nativeFromJson<String>(json['regionCode']);
+  regionCode = json['regionCode'] == null ? null : nativeFromJson<String>(json['regionCode']),
+  country = ListRegionsRegionsCountry.fromJson(json['country']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -42,11 +44,12 @@ class ListRegionsRegions {
     return id == otherTyped.id && 
     nameEn == otherTyped.nameEn && 
     nameAr == otherTyped.nameAr && 
-    regionCode == otherTyped.regionCode;
+    regionCode == otherTyped.regionCode && 
+    country == otherTyped.country;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, nameEn.hashCode, nameAr.hashCode, regionCode.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, nameEn.hashCode, nameAr.hashCode, regionCode.hashCode, country.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -59,6 +62,7 @@ class ListRegionsRegions {
     if (regionCode != null) {
       json['regionCode'] = nativeToJson<String?>(regionCode);
     }
+    json['country'] = country.toJson();
     return json;
   }
 
@@ -67,6 +71,41 @@ class ListRegionsRegions {
     required this.nameEn,
     this.nameAr,
     this.regionCode,
+    required this.country,
+  });
+}
+
+@immutable
+class ListRegionsRegionsCountry {
+  final String id;
+  ListRegionsRegionsCountry.fromJson(dynamic json):
+  
+  id = nativeFromJson<String>(json['id']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final ListRegionsRegionsCountry otherTyped = other as ListRegionsRegionsCountry;
+    return id == otherTyped.id;
+    
+  }
+  @override
+  int get hashCode => id.hashCode;
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
+    return json;
+  }
+
+  ListRegionsRegionsCountry({
+    required this.id,
   });
 }
 

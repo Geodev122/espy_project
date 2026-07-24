@@ -1,12 +1,15 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'espy_repository.dart';
+import '../models/service_model.dart';
+import '../models/service_request.dart';
+import '../models/enums.dart';
 
 class ServiceManagementViewModel extends ChangeNotifier {
   final EspyRepository _repository;
 
-  List<Map<String, dynamic>> _listingQueue = [];
-  List<Map<String, dynamic>> _requestQueue = [];
+  List<ServiceModel> _listingQueue = [];
+  List<ServiceRequestModel> _requestQueue = [];
   List<Map<String, dynamic>> _templates = [];
   bool _isLoading = false;
   bool _disposed = false;
@@ -19,8 +22,8 @@ class ServiceManagementViewModel extends ChangeNotifier {
     _loadAll();
   }
 
-  List<Map<String, dynamic>> get listingQueue => _listingQueue;
-  List<Map<String, dynamic>> get requestQueue => _requestQueue;
+  List<ServiceModel> get listingQueue => _listingQueue;
+  List<ServiceRequestModel> get requestQueue => _requestQueue;
   List<Map<String, dynamic>> get templates => _templates;
   bool get isLoading => _isLoading;
 
@@ -51,28 +54,28 @@ class ServiceManagementViewModel extends ChangeNotifier {
     if (!_disposed) notifyListeners();
   }
 
-  Future<void> approveService(String id, {String? broadcastScope, Map<String, dynamic>? serviceData}) async {
+  Future<void> approveService(String id, {String? broadcastScope, ServiceModel? service}) async {
     try {
-      await _repository.moderateService(id, 'APPROVED');
-      if (broadcastScope != null && serviceData != null && broadcastScope != 'NONE') {
-        await _dispatchLocalizedBroadcast(serviceData, broadcastScope);
+      await _repository.moderateService(id, ModerationStatus.approved);
+      if (broadcastScope != null && service != null && broadcastScope != 'NONE') {
+        await _dispatchLocalizedBroadcast(service, broadcastScope);
       }
     } catch (e) {
       debugPrint("Approve Service Error: $e");
     }
   }
 
-  Future<void> _dispatchLocalizedBroadcast(Map<String, dynamic> service, String scope) async {
-    final title = "NEW SERVICE: ${service['titleEn']}";
-    final message = "A new ${service['categoryName'] ?? 'Care'} protocol is now active in your area.";
+  Future<void> _dispatchLocalizedBroadcast(ServiceModel service, String scope) async {
+    final title = "NEW SERVICE: ${service.titleEn}";
+    final message = "A new protocol is now active in your area.";
     
     String? country;
     String? region;
     String? city;
 
-    if (scope == 'COUNTRY') country = service['countryId'] ?? 'LEBANON';
-    if (scope == 'REGION') region = service['regionId'];
-    if (scope == 'CITY') city = service['cityId'];
+    if (scope == 'COUNTRY') country = 'LEBANON';
+    if (scope == 'REGION') region = service.sectorId; // Fallback
+    if (scope == 'CITY') city = service.categoryId; // Fallback
 
     await _repository.createLocalizedBroadcast(
       title: title,
@@ -85,7 +88,7 @@ class ServiceManagementViewModel extends ChangeNotifier {
 
   Future<void> rejectService(String id, String reason) async {
     try {
-      await _repository.moderateService(id, 'FLAGGED', reason: reason);
+      await _repository.moderateService(id, ModerationStatus.flagged, reason: reason);
     } catch (e) {
       debugPrint("Reject Service Error: $e");
     }
@@ -93,7 +96,7 @@ class ServiceManagementViewModel extends ChangeNotifier {
 
   Future<void> approveRequest(String id) async {
     try {
-      await _repository.moderateRequest(id, 'APPROVED');
+      await _repository.moderateRequest(id, ModerationStatus.approved);
     } catch (e) {
       debugPrint("Approve Request Error: $e");
     }
@@ -101,7 +104,7 @@ class ServiceManagementViewModel extends ChangeNotifier {
 
   Future<void> rejectRequest(String id, String reason) async {
     try {
-      await _repository.moderateRequest(id, 'FLAGGED', reason: reason);
+      await _repository.moderateRequest(id, ModerationStatus.flagged, reason: reason);
     } catch (e) {
       debugPrint("Reject Request Error: $e");
     }

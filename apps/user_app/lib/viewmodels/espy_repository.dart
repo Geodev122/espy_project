@@ -2,13 +2,25 @@ import '../models/user_model.dart';
 import '../models/professional_profile.dart';
 import '../models/institution_profile.dart';
 import '../models/visitor_profile.dart';
+import '../models/sector_model.dart';
+import '../models/category_model.dart';
+import '../models/country_model.dart';
+import '../models/region_model.dart';
+import '../models/city_model.dart';
+import '../models/service_model.dart';
+import '../models/wallet_transaction.dart';
+import '../models/resource_order.dart';
+import '../models/service_request.dart';
+import '../models/support_ticket.dart';
+import '../models/location_node.dart';
+import '../models/enums.dart';
 
 abstract class EspyRepository {
   // ─── 1. Identity & Profiles ──────────────────────────────────────────────
   Future<UserModel?> getUser(String id);
-  Future<void> createUser(Map<String, dynamic> data);
-  Future<void> upsertUser(Map<String, dynamic> data);
-  Future<void> updateUser(String id, Map<String, dynamic> data);
+  Future<void> createUser(UserModel user);
+  Future<void> upsertUser(UserModel user);
+  Future<void> updateUser(String id, UserModel user);
   Future<void> updateLastActive(String id);
 
   Future<ProfessionalProfile?> getProfessionalProfile(String id);
@@ -16,79 +28,79 @@ abstract class EspyRepository {
   Future<VisitorProfile?> getVisitorProfile(String id);
 
   // ─── 2. Taxonomy & Location ──────────────────────────────────────────────
-  Stream<List<Map<String, dynamic>>> listSectors();
-  Stream<List<Map<String, dynamic>>> listCategories({String? sectorId});
-  Stream<List<Map<String, dynamic>>> listCountries();
-  Stream<List<Map<String, dynamic>>> listRegions(String countryId);
-  Stream<List<Map<String, dynamic>>> listCities(String regionId);
+  Stream<List<SectorModel>> listSectors();
+  Stream<List<CategoryModel>> listCategories({String? sectorId});
+  Stream<List<CountryModel>> listCountries();
+  Stream<List<RegionModel>> listRegions(String countryId);
+  Stream<List<CityModel>> listCities(String regionId);
   Stream<List<Map<String, dynamic>>> listLocationNodes(String userId);
   
   // Admin Geography Ops
-  Future<void> upsertCountry(Map<String, dynamic> data);
-  Future<void> upsertRegion(Map<String, dynamic> data);
-  Future<void> upsertCity(Map<String, dynamic> data);
+  Future<void> upsertCountry(CountryModel country);
+  Future<void> upsertRegion(RegionModel region);
+  Future<void> upsertCity(CityModel city);
   Future<void> deleteGeographyEntity(String id, String type);
 
   // Admin Taxonomy Ops
-  Future<void> updateSectorBranding(String id, Map<String, dynamic> data);
-  Future<void> updateCategory(String id, Map<String, dynamic> data);
+  Future<void> updateSectorBranding(String id, SectorModel sector);
+  Future<void> updateCategory(CategoryModel category);
   Future<void> upsertServiceTag(Map<String, dynamic> data);
   Future<void> upsertPriceTag(Map<String, dynamic> data);
   Future<void> upsertPinCategory(Map<String, dynamic> data);
   Future<void> upsertPresenceTag(Map<String, dynamic> data);
 
   // ─── 3. Core Business Logic ──────────────────────────────────────────────
-  Stream<List<Map<String, dynamic>>> listActiveServices({String? categoryId, String? sectorId});
-  Stream<List<Map<String, dynamic>>> listProfessionalServices(String professionalId);
+  Stream<List<ServiceModel>> listActiveServices({String? categoryId, String? sectorId});
+  Stream<List<ServiceModel>> listProfessionalServices(String professionalId);
   Future<void> toggleServiceSlot(String serviceId, bool allocate);
 
-  Stream<List<Map<String, dynamic>>> listCommunityRequests({String? sectorId, bool newestFirst = true, String? userId});
-  Future<void> createCommunityRequest(Map<String, dynamic> data);
+  Stream<List<ServiceRequestModel>> listCommunityRequests({String? sectorId, bool newestFirst = true, String? userId});
+  Future<void> createCommunityRequest(ServiceRequestModel request);
 
-  Future<void> createLocationNode(Map<String, dynamic> data);
+  Future<void> createLocationNode(LocationNodeModel node);
   
   // Metadata Tags
   Future<Map<String, List<Map<String, dynamic>>>> listMetadataTags();
 
   // ─── 4. Ledger & Resource Orders ─────────────────────────────────────────
-  Stream<List<Map<String, dynamic>>> listWalletTransactions(String userId);
+  Stream<List<WalletTransactionModel>> listWalletTransactions(String userId);
   Future<Map<String, dynamic>> spendTokens({required String userId, required String itemId, required int cost, required String role});
 
-  Future<void> recordInteraction({required String userId, required String targetId, required String type});
+  Future<void> recordInteraction({required String userId, required String targetId, InteractionType type});
   Future<void> toggleFavorite(String userId, String targetId, bool isFavorite);
   Stream<List<String>> listFavoriteIds(String userId);
   Stream<List<String>> listContactedIds(String userId);
 
   // --- Resource Orders ---
-  Future<void> upsertProfessionalProfile({required String id, String? fullNameAr, String? specialty, String? specialtyAr, String? bioEn, String? bioAr});
-  Future<void> upsertInstitutionProfile({required String id, String? nameAr, String? bioEn, String? bioAr, String? registrationNumber});
-  Future<void> createResourceOrder({required String userId, required int pins, required int slots, required int broadcasts, required int total});
-  Future<void> updateResourceOrder({required String id, required int pins, required int slots, required int broadcasts, required int total});
-  Stream<Map<String, dynamic>?> getActiveResourceOrder(String userId);
+  Future<void> upsertProfessionalProfile(ProfessionalProfile profile);
+  Future<void> upsertInstitutionProfile(InstitutionProfile profile);
+  Future<void> createResourceOrder(ResourceOrderModel order);
+  Future<void> updateResourceOrder(ResourceOrderModel order);
+  Stream<ResourceOrderModel?> getActiveResourceOrder(String userId);
 
   // --- Recharge Cards ---
   Future<void> generateRechargeCard({required String code, required int value, int pins = 0, int slots = 0});
   Stream<List<Map<String, dynamic>>> listRechargeCards();
 
   // ─── 5. Admin Operations ─────────────────────────────────────────────────
-  Stream<List<Map<String, dynamic>>> searchUsersAdmin({String? query, String? role, bool? hasProfile, bool? isActive});
+  Stream<List<UserModel>> searchUsersAdmin({String? query, UserRole? role, bool? hasProfile, bool? isActive});
   Future<Map<String, dynamic>> getAuditDetails(String id);
-  Future<void> adminUpdateUser(String id, Map<String, dynamic> data);
+  Future<void> adminUpdateUser(String id, UserModel user);
   Future<void> toggleUserActiveStatus(String id, bool isActive);
-  Future<void> verifyUserDocs(String id, String role, bool isApproved);
+  Future<void> verifyUserDocs(String id, UserRole role, bool isApproved);
 
   Stream<List<Map<String, dynamic>>> listAllProviders(); 
-  Future<void> approveProfessional(String id, bool isApproved, String role);
-  Future<void> validateProfile(String id, String role);
-  Stream<List<Map<String, dynamic>>> listSupportTickets({String? status});
-  Stream<List<Map<String, dynamic>>> listPendingOrders();
+  Future<void> approveProfessional(String id, bool isApproved, UserRole role);
+  Future<void> validateProfile(String id, UserRole role);
+  Stream<List<SupportTicketModel>> listSupportTickets({SupportTicketStatus? status});
+  Stream<List<ResourceOrderModel>> listPendingOrders();
   Future<void> approveResourceOrder(String orderId);
 
   // --- Service Management & Moderation ---
-  Stream<List<Map<String, dynamic>>> listServiceModerationQueue({String status = 'PENDING'});
-  Stream<List<Map<String, dynamic>>> listRequestModerationQueue({String status = 'PENDING'});
-  Future<void> moderateService(String id, String status, {String? reason});
-  Future<void> moderateRequest(String id, String status, {String? reason});
+  Stream<List<ServiceModel>> listServiceModerationQueue({ModerationStatus status = ModerationStatus.pending});
+  Stream<List<ServiceRequestModel>> listRequestModerationQueue({ModerationStatus status = ModerationStatus.pending});
+  Future<void> moderateService(String id, ModerationStatus status, {String? reason});
+  Future<void> moderateRequest(String id, ModerationStatus status, {String? reason});
   Future<void> createLocalizedBroadcast({required String title, required String message, String? country, String? region, String? city});
   
   Stream<List<Map<String, dynamic>>> listTemplates();

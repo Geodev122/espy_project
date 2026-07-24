@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:espy_app/theme/espy_theme.dart';
 import 'package:espy_app/viewmodels/debug_service.dart';
 import 'package:espy_app/viewmodels/auth_service.dart';
-import 'package:espy_app/models/user_model.dart' as models;
+import 'package:espy_app/models/enums.dart';
 
 import 'app_shell.dart';
 import 'onboarding/splash_screen.dart';
@@ -19,16 +19,17 @@ class MainGate extends StatelessWidget {
     final _debug = DebugService();
     return Consumer<AuthService>(
       builder: (context, auth, _) {
-        if (auth.isLoading || auth.isProvisioning) {
+        if (auth.isInitializing || auth.isLoading || auth.isProvisioning) {
           return Scaffold(
             body: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const CircularProgressIndicator(color: EspyTheme.gold),
-                  if (auth.isProvisioning) ...[
+                  if (auth.isProvisioning || auth.isInitializing) ...[
                     const SizedBox(height: 24),
-                    Text("SYNCHRONIZING PROTOCOL...", style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, color: EspyTheme.gold, fontSize: 10, letterSpacing: 2)),
+                    Text(auth.isProvisioning ? "SYNCHRONIZING PROTOCOL..." : "INITIALIZING IDENTITY...", 
+                      style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, color: EspyTheme.gold, fontSize: 10, letterSpacing: 2)),
                   ],
                 ],
               ),
@@ -78,7 +79,7 @@ class MainGate extends StatelessWidget {
 
         // Check for Admin Role or Super Admin Bypass
         final bool isSuperAdmin = ['geo.elnajjar@gmail.com', 'admin@espy.com'].contains(auth.user?.email);
-        if (user.role != models.UserRole.admin && !isSuperAdmin) {
+        if (user.role != UserRole.admin && !isSuperAdmin) {
            return const Scaffold(
              body: Center(child: Text("ACCESS RESTRICTED: ADMINS ONLY")),
            );

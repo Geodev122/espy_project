@@ -28,12 +28,14 @@ class ListCategoriesCategories {
   final String nameEn;
   final String? nameAr;
   final EnumValue<UserRole> targetRole;
+  final ListCategoriesCategoriesSector sector;
   ListCategoriesCategories.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']),
   nameEn = nativeFromJson<String>(json['nameEn']),
   nameAr = json['nameAr'] == null ? null : nativeFromJson<String>(json['nameAr']),
-  targetRole = userRoleDeserializer(json['targetRole']);
+  targetRole = userRoleDeserializer(json['targetRole']),
+  sector = ListCategoriesCategoriesSector.fromJson(json['sector']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -47,11 +49,12 @@ class ListCategoriesCategories {
     return id == otherTyped.id && 
     nameEn == otherTyped.nameEn && 
     nameAr == otherTyped.nameAr && 
-    targetRole == otherTyped.targetRole;
+    targetRole == otherTyped.targetRole && 
+    sector == otherTyped.sector;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, nameEn.hashCode, nameAr.hashCode, targetRole.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, nameEn.hashCode, nameAr.hashCode, targetRole.hashCode, sector.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -64,6 +67,7 @@ class ListCategoriesCategories {
     json['targetRole'] = 
     userRoleSerializer(targetRole)
     ;
+    json['sector'] = sector.toJson();
     return json;
   }
 
@@ -72,6 +76,41 @@ class ListCategoriesCategories {
     required this.nameEn,
     this.nameAr,
     required this.targetRole,
+    required this.sector,
+  });
+}
+
+@immutable
+class ListCategoriesCategoriesSector {
+  final String id;
+  ListCategoriesCategoriesSector.fromJson(dynamic json):
+  
+  id = nativeFromJson<String>(json['id']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final ListCategoriesCategoriesSector otherTyped = other as ListCategoriesCategoriesSector;
+    return id == otherTyped.id;
+    
+  }
+  @override
+  int get hashCode => id.hashCode;
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
+    return json;
+  }
+
+  ListCategoriesCategoriesSector({
+    required this.id,
   });
 }
 

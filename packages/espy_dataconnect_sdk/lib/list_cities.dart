@@ -24,13 +24,15 @@ class ListCitiesCities {
   final String? nameAr;
   final double? lat;
   final double? lng;
+  final ListCitiesCitiesRegion region;
   ListCitiesCities.fromJson(dynamic json):
   
   id = nativeFromJson<String>(json['id']),
   nameEn = nativeFromJson<String>(json['nameEn']),
   nameAr = json['nameAr'] == null ? null : nativeFromJson<String>(json['nameAr']),
   lat = json['lat'] == null ? null : nativeFromJson<double>(json['lat']),
-  lng = json['lng'] == null ? null : nativeFromJson<double>(json['lng']);
+  lng = json['lng'] == null ? null : nativeFromJson<double>(json['lng']),
+  region = ListCitiesCitiesRegion.fromJson(json['region']);
   @override
   bool operator ==(Object other) {
     if(identical(this, other)) {
@@ -45,11 +47,12 @@ class ListCitiesCities {
     nameEn == otherTyped.nameEn && 
     nameAr == otherTyped.nameAr && 
     lat == otherTyped.lat && 
-    lng == otherTyped.lng;
+    lng == otherTyped.lng && 
+    region == otherTyped.region;
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, nameEn.hashCode, nameAr.hashCode, lat.hashCode, lng.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, nameEn.hashCode, nameAr.hashCode, lat.hashCode, lng.hashCode, region.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -65,6 +68,7 @@ class ListCitiesCities {
     if (lng != null) {
       json['lng'] = nativeToJson<double?>(lng);
     }
+    json['region'] = region.toJson();
     return json;
   }
 
@@ -74,6 +78,41 @@ class ListCitiesCities {
     this.nameAr,
     this.lat,
     this.lng,
+    required this.region,
+  });
+}
+
+@immutable
+class ListCitiesCitiesRegion {
+  final String id;
+  ListCitiesCitiesRegion.fromJson(dynamic json):
+  
+  id = nativeFromJson<String>(json['id']);
+  @override
+  bool operator ==(Object other) {
+    if(identical(this, other)) {
+      return true;
+    }
+    if(other.runtimeType != runtimeType) {
+      return false;
+    }
+
+    final ListCitiesCitiesRegion otherTyped = other as ListCitiesCitiesRegion;
+    return id == otherTyped.id;
+    
+  }
+  @override
+  int get hashCode => id.hashCode;
+  
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
+    return json;
+  }
+
+  ListCitiesCitiesRegion({
+    required this.id,
   });
 }
 

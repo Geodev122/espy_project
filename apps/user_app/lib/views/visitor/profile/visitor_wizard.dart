@@ -13,6 +13,8 @@ import 'package:espy_app/widgets/common/premium_button.dart';
 import 'package:espy_app/widgets/common/profile_image_picker.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';
 import 'package:espy_app/viewmodels/espy_repository.dart';
+import '../../../models/user_model.dart';
+import '../../../models/enums.dart';
 
 class VisitorWizard extends StatefulWidget {
   const VisitorWizard({super.key});
@@ -174,14 +176,23 @@ class _VisitorWizardState extends State<VisitorWizard> {
         photoUrl = await _storage.uploadProfileImage(userId: auth.user!.uid, file: _profileImageFile!);
       }
 
-      await repo.updateUser(auth.user!.uid, {
-        'name': _nameController.text.trim(),
-        'whatsapp': '${_whatsappCodeController.text}${_whatsappNumberController.text}',
-        'photoUrl': photoUrl ?? auth.user?.photoURL,
-        'role': 'visitor',
-        'isActive': true,
-        'hasProfile': true,
-      });
+      final existingUser = auth.userData;
+      if (existingUser == null) return;
+
+      final updatedUser = UserModel(
+        id: auth.user!.uid,
+        email: existingUser.email,
+        name: _nameController.text.trim(),
+        whatsapp: '${_whatsappCodeController.text}${_whatsappNumberController.text}',
+        photoUrl: photoUrl ?? auth.user?.photoURL,
+        role: UserRole.visitor,
+        isActive: true,
+        hasProfile: true,
+        createdAt: existingUser.createdAt,
+        updatedAt: DateTime.now(),
+      );
+
+      await repo.updateUser(auth.user!.uid, updatedUser);
 
       await auth.fetchUserData();
     } catch (e) {

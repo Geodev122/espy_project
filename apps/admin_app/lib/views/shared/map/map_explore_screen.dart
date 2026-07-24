@@ -16,6 +16,7 @@ import 'package:espy_app/viewmodels/auth_service.dart';
 import 'package:espy_app/viewmodels/sound_service.dart';
 import 'package:espy_app/viewmodels/directory_view_model.dart';
 import 'package:espy_app/models/user_model.dart' as models;
+import 'package:espy_app/models/enums.dart';
 import 'package:espy_app/widgets/common/premium_button.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';
 
@@ -217,7 +218,8 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
     final auth = Provider.of<AuthService>(context);
     final directoryVM = Provider.of<DirectoryViewModel>(context);
     final user = auth.userData;
-    final bool isVisitor = user?.role == models.UserRole.visitor;
+    final bool isVisitor = user?.role == UserRole.visitor;
+    final bool isProfessional = user?.role == UserRole.professional;
     
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final bool filtersActive = directoryVM.selectedSectorId != null || directoryVM.selectedRole != null;

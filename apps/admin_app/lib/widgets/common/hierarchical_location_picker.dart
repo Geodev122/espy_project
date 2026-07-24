@@ -3,9 +3,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:espy_app/theme/espy_theme.dart';
 import 'package:espy_app/viewmodels/espy_repository.dart';
+import 'package:espy_app/models/country_model.dart';
+import 'package:espy_app/models/region_model.dart';
+import 'package:espy_app/models/city_model.dart';
 
 class HierarchicalLocationPicker extends StatefulWidget {
-  final Function(Map<String, dynamic> city) onCitySelected;
+  final Function(CityModel city) onCitySelected;
   const HierarchicalLocationPicker({super.key, required this.onCitySelected});
 
   @override
@@ -15,11 +18,11 @@ class HierarchicalLocationPicker extends StatefulWidget {
 class _HierarchicalLocationPickerState extends State<HierarchicalLocationPicker> {
   String? _selectedCountryId;
   String? _selectedRegionId;
-  Map<String, dynamic>? _selectedCity;
+  CityModel? _selectedCity;
 
-  List<Map<String, dynamic>> _countries = [];
-  List<Map<String, dynamic>> _regions = [];
-  List<Map<String, dynamic>> _cities = [];
+  List<CountryModel> _countries = [];
+  List<RegionModel> _regions = [];
+  List<CityModel> _cities = [];
 
   bool _loadingCountries = true;
   bool _loadingRegions = false;
@@ -61,7 +64,7 @@ class _HierarchicalLocationPickerState extends State<HierarchicalLocationPicker>
       children: [
         _buildLabel("Select Country"),
         _buildDropdown(
-          items: _countries,
+          items: _countries.map((c) => {'id': c.id, 'name': c.nameEn}).toList(),
           value: _selectedCountryId,
           hint: "CHOOSE COUNTRY",
           loading: _loadingCountries,
@@ -74,7 +77,7 @@ class _HierarchicalLocationPickerState extends State<HierarchicalLocationPicker>
           const SizedBox(height: 20),
           _buildLabel("Select Region"),
           _buildDropdown(
-            items: _regions,
+            items: _regions.map((r) => {'id': r.id, 'name': r.nameEn}).toList(),
             value: _selectedRegionId,
             hint: "CHOOSE REGION",
             loading: _loadingRegions,
@@ -88,12 +91,12 @@ class _HierarchicalLocationPickerState extends State<HierarchicalLocationPicker>
           const SizedBox(height: 20),
           _buildLabel("Select City"),
           _buildDropdown(
-            items: _cities,
-            value: _selectedCity?['id'],
+            items: _cities.map((c) => {'id': c.id, 'name': c.nameEn}).toList(),
+            value: _selectedCity?.id,
             hint: "CHOOSE CITY",
             loading: _loadingCities,
             onChanged: (val) {
-              final city = _cities.firstWhere((c) => c['id'] == val);
+              final city = _cities.firstWhere((c) => c.id == val);
               setState(() => _selectedCity = city);
               widget.onCitySelected(city);
             },
@@ -126,7 +129,7 @@ class _HierarchicalLocationPickerState extends State<HierarchicalLocationPicker>
               icon: const Icon(Icons.keyboard_arrow_down_rounded, color: EspyTheme.gold),
               items: items.map((i) => DropdownMenuItem<String>(
                 value: i['id'],
-                child: Text(i['nameEn']?.toString().toUpperCase() ?? 'N/A'),
+                child: Text(i['name'].toString().toUpperCase()),
               )).toList(),
               onChanged: onChanged,
             ),

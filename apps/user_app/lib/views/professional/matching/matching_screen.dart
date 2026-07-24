@@ -10,6 +10,8 @@ import 'package:espy_app/theme/espy_theme.dart';
 import 'package:espy_app/viewmodels/auth_service.dart';
 import 'package:espy_app/viewmodels/matching_view_model.dart';
 import 'package:espy_app/widgets/common/premium_button.dart';
+import '../../../models/service_model.dart';
+import '../../../models/enums.dart';
 
 class MatchingScreen extends StatefulWidget {
   const MatchingScreen({super.key});
@@ -33,16 +35,9 @@ class _MatchingScreenState extends State<MatchingScreen> {
     }
 
     final displayCards = [
-      {
-        'id': 'info_card',
-        'isInfo': true,
-        'hasResults': viewModel.services.isNotEmpty,
-      },
+      {'id': 'info_card', 'isInfo': true, 'hasResults': viewModel.services.isNotEmpty},
       ...viewModel.services,
-      {
-        'id': 'end_card',
-        'isEnd': true,
-      },
+      {'id': 'end_card', 'isEnd': true},
     ];
 
     return Stack(
@@ -60,41 +55,45 @@ class _MatchingScreenState extends State<MatchingScreen> {
                   backCardOffset: const Offset(0, 40),
                   padding: EdgeInsets.zero,
                   cardBuilder: (context, index, _, __) {
-                    final cardData = displayCards[index];
-                    if (cardData['isInfo'] == true) return _buildInfoCard(cardData['hasResults'] as bool, l10n);
-                    if (cardData['isEnd'] == true) return _buildEndCard(l10n);
-                    return _buildSwipeCard(cardData);
+                    final dynamic cardData = displayCards[index];
+                    if (cardData is Map) {
+                       if (cardData['isInfo'] == true) return _buildInfoCard(cardData['hasResults'] as bool, l10n);
+                       if (cardData['isEnd'] == true) return _buildEndCard(l10n);
+                    }
+                    return _buildSwipeCard(cardData as ServiceModel);
                   },
                   onSwipe: (previousIndex, _, direction) async {
-                    final target = displayCards[previousIndex];
-                    if (target['isInfo'] == true || target['isEnd'] == true) return true;
+                    final dynamic target = displayCards[previousIndex];
+                    if (target is Map && (target['isInfo'] == true || target['isEnd'] == true)) return true;
+                    
+                    final service = target as ServiceModel;
 
                     if (direction == CardSwiperDirection.right) {
-                      await viewModel.recordInteraction(target['id'] as String, 'like');
+                      await viewModel.recordInteraction(service.id, InteractionType.contact);
 
                       final userData = auth.userData;
                       final userName = userData?.name ?? "User";
                       final userRole = (userData?.role.name ?? "visitor").toUpperCase();
                       
-                      final targetName = target['fullNameEn'] ?? target['name'] ?? "Specialist";
-                      final targetWhatsapp = target['whatsapp']?.toString().replaceAll(RegExp(r'\D'), '');
+                      final targetName = "Care Provider";
+                      final targetWhatsapp = ""; // To be fetched from provider details
 
-                      if (targetWhatsapp != null && targetWhatsapp.isNotEmpty) {
-                        final msg = "Hello $targetName, I am $userName, a $userRole. I found your professional profile on Espy. Would you be open to discussing a potential care collaboration?";
+                      if (targetWhatsapp.isNotEmpty) {
+                        final msg = "Hello $targetName, I am $userName, a $userRole. I found your profile on Espy. Would you be open to discussing a potential care collaboration?";
                         final url = "https://wa.me/$targetWhatsapp?text=${Uri.encodeComponent(msg)}";
                         if (await canLaunchUrl(Uri.parse(url))) {
                           await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
                         }
                       }
                     } else if (direction == CardSwiperDirection.left) {
-                      await viewModel.toggleFavorite(target['id'] as String, true);
+                      await viewModel.toggleFavorite(service.id, true);
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text(l10n.protocolSavedFavorites), behavior: SnackBarBehavior.floating),
                         );
                       }
                     } else if (direction == CardSwiperDirection.top) {
-                      await viewModel.recordInteraction(target['id'] as String, 'skip');
+                      await viewModel.recordInteraction(service.id, InteractionType.share);
                     }
                     return true;
                   },
@@ -166,10 +165,10 @@ class _MatchingScreenState extends State<MatchingScreen> {
     );
   }
 
-  Widget _buildSwipeCard(Map<String, dynamic> prof) {
+  Widget _buildSwipeCard(ServiceModel service) {
     final viewModel = Provider.of<MatchingViewModel>(context, listen: false);
-    final bool isFavorite = viewModel.favoriteIds.contains(prof['id']);
-    final bool isContacted = viewModel.contactedIds.contains(prof['id']);
+    final bool isFavorite = viewModel.favoriteIds.contains(service.id);
+    final bool isContacted = viewModel.contactedIds.contains(service.id);
 
     return Container(
       decoration: BoxDecoration(
@@ -181,8 +180,8 @@ class _MatchingScreenState extends State<MatchingScreen> {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            if (prof['photoUrl'] != null)
-              CachedNetworkImage(imageUrl: prof['photoUrl'], fit: BoxFit.cover)
+            if (service.imageUrl != null)
+              CachedNetworkImage(imageUrl: service.imageUrl!, fit: BoxFit.cover)
             else
               Container(color: Colors.white10, child: const Icon(Icons.person, size: 120, color: EspyTheme.royalBlue)),
 
@@ -216,9 +215,9 @@ class _MatchingScreenState extends State<MatchingScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(prof['fullNameEn'] ?? prof['name'] ?? 'SPECIALIST', style: GoogleFonts.montserrat(fontSize: 26, fontWeight: FontWeight.w900, color: Colors.white, height: 1.1)),
+                    Text(service.titleEn.toUpperCase(), style: GoogleFonts.montserrat(fontSize: 26, fontWeight: FontWeight.w900, color: Colors.white, height: 1.1)),
                     const SizedBox(height: 8),
-                    Text(prof['specialization']?.toString().toUpperCase() ?? 'CARE PROVIDER', style: GoogleFonts.montserrat(fontSize: 12, fontWeight: FontWeight.w800, color: EspyTheme.gold, letterSpacing: 1)),
+                    Text(service.descriptionEn ?? 'CARE PROVIDER', style: GoogleFonts.montserrat(fontSize: 12, fontWeight: FontWeight.w800, color: EspyTheme.gold, letterSpacing: 1)),
                   ],
                 ),
               ),

@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'espy_repository.dart';
+import '../models/resource_order.dart';
 
 class OrdersManagerViewModel extends ChangeNotifier {
   final EspyRepository _repository;
 
-  List<Map<String, dynamic>> _pendingOrders = [];
+  List<ResourceOrderModel> _pendingOrders = [];
   bool _isLoading = true;
   StreamSubscription? _subscription;
 
@@ -13,7 +14,7 @@ class OrdersManagerViewModel extends ChangeNotifier {
     _init();
   }
 
-  List<Map<String, dynamic>> get pendingOrders => _pendingOrders;
+  List<ResourceOrderModel> get pendingOrders => _pendingOrders;
   bool get isLoading => _isLoading;
 
   void _init() {

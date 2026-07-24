@@ -80,10 +80,12 @@ class ListLocationNodesLocationNodes {
 
 @immutable
 class ListLocationNodesLocationNodesCity {
+  final String id;
   final String nameEn;
   final String? nameAr;
   ListLocationNodesLocationNodesCity.fromJson(dynamic json):
   
+  id = nativeFromJson<String>(json['id']),
   nameEn = nativeFromJson<String>(json['nameEn']),
   nameAr = json['nameAr'] == null ? null : nativeFromJson<String>(json['nameAr']);
   @override
@@ -96,16 +98,18 @@ class ListLocationNodesLocationNodesCity {
     }
 
     final ListLocationNodesLocationNodesCity otherTyped = other as ListLocationNodesLocationNodesCity;
-    return nameEn == otherTyped.nameEn && 
+    return id == otherTyped.id && 
+    nameEn == otherTyped.nameEn && 
     nameAr == otherTyped.nameAr;
     
   }
   @override
-  int get hashCode => Object.hashAll([nameEn.hashCode, nameAr.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, nameEn.hashCode, nameAr.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
     json['nameEn'] = nativeToJson<String>(nameEn);
     if (nameAr != null) {
       json['nameAr'] = nativeToJson<String?>(nameAr);
@@ -114,6 +118,7 @@ class ListLocationNodesLocationNodesCity {
   }
 
   ListLocationNodesLocationNodesCity({
+    required this.id,
     required this.nameEn,
     this.nameAr,
   });

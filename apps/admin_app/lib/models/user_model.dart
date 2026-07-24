@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-enum UserRole { visitor, professional, institution, admin, pending }
+import 'enums.dart';
 
 class UserModel {
   final String id;
@@ -9,6 +8,7 @@ class UserModel {
   final String? photoUrl;
   final String? phone;
   final String? whatsapp;
+  final String? adminNotes;
   final UserRole role;
   final bool isActive;
   final bool hasProfile;
@@ -26,6 +26,7 @@ class UserModel {
     this.photoUrl,
     this.phone,
     this.whatsapp,
+    this.adminNotes,
     required this.role,
     this.isActive = true,
     this.hasProfile = false,
@@ -51,7 +52,8 @@ class UserModel {
       photoUrl: data['photoUrl'],
       phone: data['phone'],
       whatsapp: data['whatsapp'],
-      role: _parseRole(data['role']),
+      adminNotes: data['adminNotes'] ?? data['admin_notes'],
+      role: UserRole.parse(data['role']),
       isActive: data['isActive'] ?? data['is_active'] ?? true,
       hasProfile: data['hasProfile'] ?? false,
       walletBalance: data['walletBalance'] ?? 0,
@@ -65,17 +67,6 @@ class UserModel {
 
   dynamic operator [](String key) => rawData[key];
 
-  static UserRole _parseRole(String? role) {
-    final normalized = role?.toLowerCase() ?? 'pending';
-    switch (normalized) {
-      case 'visitor': return UserRole.visitor;
-      case 'professional': return UserRole.professional;
-      case 'institution': return UserRole.institution;
-      case 'admin': return UserRole.admin;
-      default: return UserRole.pending;
-    }
-  }
-
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -84,6 +75,7 @@ class UserModel {
       'photoUrl': photoUrl,
       'phone': phone,
       'whatsapp': whatsapp,
+      'adminNotes': adminNotes,
       'role': role.name,
       'isActive': isActive,
       'hasProfile': hasProfile,

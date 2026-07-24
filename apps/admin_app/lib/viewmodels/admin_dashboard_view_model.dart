@@ -5,7 +5,7 @@ import 'espy_repository.dart';
 class AdminDashboardViewModel extends ChangeNotifier {
   final EspyRepository _repository;
 
-  Map<String, dynamic> _stats = {
+  final Map<String, String> _stats = {
     'users': '0',
     'services': '0',
     'communityRequests': '0',
@@ -21,17 +21,16 @@ class AdminDashboardViewModel extends ChangeNotifier {
     _init();
   }
 
-  Map<String, dynamic> get stats => _stats;
+  Map<String, String> get stats => _stats;
   bool get isLoading => _isLoading;
 
   void _init() {
     try {
       _statsSub = _repository.getSystemStats().listen((data) {
         if (_disposed) return;
-        final safeData = data ?? {};
-        _stats['users'] = safeData['users']?.toString() ?? _stats['users'];
-        _stats['services'] = safeData['services']?.toString() ?? _stats['services'];
-        _stats['communityRequests'] = safeData['communityRequests']?.toString() ?? _stats['communityRequests'];
+        _stats['users'] = data['users']?.toString() ?? _stats['users']!;
+        _stats['services'] = data['services']?.toString() ?? _stats['services']!;
+        _stats['communityRequests'] = data['communityRequests']?.toString() ?? _stats['communityRequests']!;
         _isLoading = false;
         notifyListeners();
       }, onError: (e) {

@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'espy_repository.dart';
+import '../models/user_model.dart';
+import '../models/enums.dart';
 
 class UserManagerViewModel extends ChangeNotifier {
   final EspyRepository _repository;
 
-  List<Map<String, dynamic>> _filteredUsers = [];
+  List<UserModel> _filteredUsers = [];
   bool _isLoading = true;
   StreamSubscription? _subscription;
 
@@ -18,7 +20,7 @@ class UserManagerViewModel extends ChangeNotifier {
     _init();
   }
 
-  List<Map<String, dynamic>> get users => _filteredUsers;
+  List<UserModel> get users => _filteredUsers;
   bool get isLoading => _isLoading;
   String get searchQuery => _searchQuery;
   String? get filterRole => _filterRole;
@@ -41,7 +43,7 @@ class UserManagerViewModel extends ChangeNotifier {
 
     _subscription = _repository.searchUsersAdmin(
       query: _searchQuery,
-      role: _filterRole,
+      role: UserRole.parse(_filterRole),
       hasProfile: hasProfile,
       isActive: isActive,
     ).listen((data) {
@@ -69,15 +71,15 @@ class UserManagerViewModel extends ChangeNotifier {
   }
 
   Future<void> verifyUser(String id, String role, bool approve) async {
-    await _repository.verifyUserDocs(id, role, approve);
+    await _repository.verifyUserDocs(id, UserRole.parse(role), approve);
   }
 
   Future<Map<String, dynamic>> getAuditDetails(String id) async {
     return await _repository.getAuditDetails(id);
   }
 
-  Future<void> adminUpdateUser(String id, Map<String, dynamic> data) async {
-    await _repository.adminUpdateUser(id, data);
+  Future<void> adminUpdateUser(String id, UserModel user) async {
+    await _repository.adminUpdateUser(id, user);
   }
 
   @override

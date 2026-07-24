@@ -8,6 +8,9 @@ import '../../../viewmodels/service_management_view_model.dart';
 import '../../../widgets/common/premium_button.dart';
 import '../../../widgets/common/premium_card.dart';
 import '../../../widgets/common/espy_scaffold.dart';
+import '../../../models/service_model.dart';
+import '../../../models/service_request.dart';
+import '../../../models/sector_model.dart';
 
 class ServiceManagementScreen extends StatelessWidget {
   const ServiceManagementScreen({super.key});
@@ -87,11 +90,11 @@ class _ListingModerationPanel extends StatelessWidget {
               final item = vm.listingQueue[index];
               return _buildModerationCard(
                 context,
-                title: item['titleEn'] ?? 'SERVICE',
-                subtitle: "${item['sectorName']} | ${item['providerName']}",
-                description: item['descriptionEn'] ?? '',
-                onApprove: () => _showBroadcastCriteriaDialog(context, (scope) => vm.approveService(item['id'], broadcastScope: scope, serviceData: item)),
-                onReject: () => _showRejectDialog(context, (reason) => vm.rejectService(item['id'], reason)),
+                title: item.titleEn,
+                subtitle: "${item.sectorId} | PROVIDER: ${item.providerId.substring(0, 8)}",
+                description: item.descriptionEn ?? 'No description provided.',
+                onApprove: () => _showBroadcastCriteriaDialog(context, (scope) => vm.approveService(item.id, broadcastScope: scope, service: item)),
+                onReject: () => _showRejectDialog(context, (reason) => vm.rejectService(item.id, reason)),
               );
             },
           ),
@@ -197,15 +200,15 @@ class _RequestModerationPanel extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("${item['sectorName']} | ${item['userName']}".toUpperCase(), style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.w800, color: EspyTheme.royalBlue)),
+                Text("${item.sectorName ?? item.sectorId} | ${item.userName ?? 'Visitor'}".toUpperCase(), style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.w800, color: EspyTheme.royalBlue)),
                 const SizedBox(height: 24),
-                Expanded(child: SingleChildScrollView(child: Text(item['descriptionEn'] ?? '', style: GoogleFonts.lora(fontSize: 16)))),
+                Expanded(child: SingleChildScrollView(child: Text(item.descriptionEn, style: GoogleFonts.lora(fontSize: 16)))),
                 const SizedBox(height: 32),
                 Row(
                   children: [
-                    Expanded(child: PremiumButton(label: "FLAG", variant: PremiumButtonVariant.outline, onPressed: () => vm.rejectRequest(item['id'], "Flagged by Admin"))),
+                    Expanded(child: PremiumButton(label: "FLAG", variant: PremiumButtonVariant.outline, onPressed: () => vm.rejectRequest(item.id, "Flagged by Admin"))),
                     const SizedBox(width: 16),
-                    Expanded(child: PremiumButton(label: "VERIFY", variant: PremiumButtonVariant.electric, onPressed: () => vm.approveRequest(item['id']))),
+                    Expanded(child: PremiumButton(label: "VERIFY", variant: PremiumButtonVariant.electric, onPressed: () => vm.approveRequest(item.id))),
                   ],
                 ),
               ],
@@ -225,7 +228,7 @@ class _TemplateManagementPanel extends StatelessWidget {
     final vm = Provider.of<ServiceManagementViewModel>(context);
     final repo = context.read<EspyRepository>();
 
-    return StreamBuilder<List<Map<String, dynamic>>>(
+    return StreamBuilder<List<SectorModel>>(
       stream: repo.listSectors(),
       builder: (context, snapshot) {
         final sectors = snapshot.data ?? [];
@@ -237,22 +240,22 @@ class _TemplateManagementPanel extends StatelessWidget {
             Text("SECTOR TEMPLATES", style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.w900, color: EspyTheme.gold, letterSpacing: 2)),
             const SizedBox(height: 16),
             ...sectors.map((s) {
-              final t = s['template'] as Map<String, dynamic>?;
+              // Note: Template data might need to be fetched separately or added to SectorModel
               return PremiumCard(
                 margin: const EdgeInsets.only(bottom: 12),
                 child: ListTile(
                   leading: Container(
                      width: 12, height: 12,
-                     decoration: BoxDecoration(
-                       color: Color(int.tryParse(t?['accentColor'] ?? '0xFF1565C0') ?? 0xFF1565C0),
+                     decoration: const BoxDecoration(
+                       color: EspyTheme.royalBlue,
                        shape: BoxShape.circle,
                      ),
                   ),
-                  title: Text(s['nameEn'].toString().toUpperCase(), style: GoogleFonts.montserrat(fontWeight: FontWeight.bold, fontSize: 13)),
-                  subtitle: Text("Identity: ${t?['iconName'] ?? 'Standard'}", style: const TextStyle(fontSize: 10)),
+                  title: Text(s.nameEn.toUpperCase(), style: GoogleFonts.montserrat(fontWeight: FontWeight.bold, fontSize: 13)),
+                  subtitle: Text("Identity: ${s.iconName ?? 'Standard'}", style: const TextStyle(fontSize: 10)),
                   trailing: IconButton(
                     icon: const Icon(Icons.palette_outlined, color: EspyTheme.gold),
-                    onPressed: () => _showTemplateEditor(context, s['id'], s['nameEn'], t, vm),
+                    onPressed: () => _showTemplateEditor(context, s.id, s.nameEn, null, vm),
                   ),
                 ),
               );

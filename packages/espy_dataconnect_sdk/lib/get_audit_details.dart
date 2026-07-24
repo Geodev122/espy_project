@@ -146,6 +146,7 @@ class GetAuditDetailsUser {
 
 @immutable
 class GetAuditDetailsUserProfessionalProfileOnUser {
+  final String id;
   final String? fullNameAr;
   final String? specialty;
   final bool isApproved;
@@ -155,6 +156,7 @@ class GetAuditDetailsUserProfessionalProfileOnUser {
   final Timestamp? visibilityExpiresAt;
   GetAuditDetailsUserProfessionalProfileOnUser.fromJson(dynamic json):
   
+  id = nativeFromJson<String>(json['id']),
   fullNameAr = json['fullNameAr'] == null ? null : nativeFromJson<String>(json['fullNameAr']),
   specialty = json['specialty'] == null ? null : nativeFromJson<String>(json['specialty']),
   isApproved = nativeFromJson<bool>(json['isApproved']),
@@ -172,7 +174,8 @@ class GetAuditDetailsUserProfessionalProfileOnUser {
     }
 
     final GetAuditDetailsUserProfessionalProfileOnUser otherTyped = other as GetAuditDetailsUserProfessionalProfileOnUser;
-    return fullNameAr == otherTyped.fullNameAr && 
+    return id == otherTyped.id && 
+    fullNameAr == otherTyped.fullNameAr && 
     specialty == otherTyped.specialty && 
     isApproved == otherTyped.isApproved && 
     isProfileValidated == otherTyped.isProfileValidated && 
@@ -182,11 +185,12 @@ class GetAuditDetailsUserProfessionalProfileOnUser {
     
   }
   @override
-  int get hashCode => Object.hashAll([fullNameAr.hashCode, specialty.hashCode, isApproved.hashCode, isProfileValidated.hashCode, verificationDocUrl.hashCode, membershipTier.hashCode, visibilityExpiresAt.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, fullNameAr.hashCode, specialty.hashCode, isApproved.hashCode, isProfileValidated.hashCode, verificationDocUrl.hashCode, membershipTier.hashCode, visibilityExpiresAt.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
     if (fullNameAr != null) {
       json['fullNameAr'] = nativeToJson<String?>(fullNameAr);
     }
@@ -210,6 +214,7 @@ class GetAuditDetailsUserProfessionalProfileOnUser {
   }
 
   GetAuditDetailsUserProfessionalProfileOnUser({
+    required this.id,
     this.fullNameAr,
     this.specialty,
     required this.isApproved,
@@ -222,6 +227,7 @@ class GetAuditDetailsUserProfessionalProfileOnUser {
 
 @immutable
 class GetAuditDetailsUserInstitutionProfileOnUser {
+  final String id;
   final String? nameAr;
   final String? registrationNumber;
   final bool isApproved;
@@ -230,6 +236,7 @@ class GetAuditDetailsUserInstitutionProfileOnUser {
   final Timestamp? visibilityExpiresAt;
   GetAuditDetailsUserInstitutionProfileOnUser.fromJson(dynamic json):
   
+  id = nativeFromJson<String>(json['id']),
   nameAr = json['nameAr'] == null ? null : nativeFromJson<String>(json['nameAr']),
   registrationNumber = json['registrationNumber'] == null ? null : nativeFromJson<String>(json['registrationNumber']),
   isApproved = nativeFromJson<bool>(json['isApproved']),
@@ -246,7 +253,8 @@ class GetAuditDetailsUserInstitutionProfileOnUser {
     }
 
     final GetAuditDetailsUserInstitutionProfileOnUser otherTyped = other as GetAuditDetailsUserInstitutionProfileOnUser;
-    return nameAr == otherTyped.nameAr && 
+    return id == otherTyped.id && 
+    nameAr == otherTyped.nameAr && 
     registrationNumber == otherTyped.registrationNumber && 
     isApproved == otherTyped.isApproved && 
     isProfileValidated == otherTyped.isProfileValidated && 
@@ -255,11 +263,12 @@ class GetAuditDetailsUserInstitutionProfileOnUser {
     
   }
   @override
-  int get hashCode => Object.hashAll([nameAr.hashCode, registrationNumber.hashCode, isApproved.hashCode, isProfileValidated.hashCode, verificationDocUrl.hashCode, visibilityExpiresAt.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, nameAr.hashCode, registrationNumber.hashCode, isApproved.hashCode, isProfileValidated.hashCode, verificationDocUrl.hashCode, visibilityExpiresAt.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
     if (nameAr != null) {
       json['nameAr'] = nativeToJson<String?>(nameAr);
     }
@@ -278,6 +287,7 @@ class GetAuditDetailsUserInstitutionProfileOnUser {
   }
 
   GetAuditDetailsUserInstitutionProfileOnUser({
+    required this.id,
     this.nameAr,
     this.registrationNumber,
     required this.isApproved,

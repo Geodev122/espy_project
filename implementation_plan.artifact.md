@@ -1,64 +1,49 @@
-# Admin App Stability & Hierarchical Import Plan [STABILIZED]
+# Plan: App Normalization & Login Stability
 
-This plan has been executed. The Admin App now uses a hybrid data strategy (DataConnect + Firestore) and supports hierarchical CSV imports.
-
-## Current Status: LIVE
-- **Repositories**: Hybrid logic implemented with Firestore fallbacks.
-- **Import**: Hierarchical CSV import available in Taxonomy Manager.
-- **Deployment**: Both apps deployed to Firebase Hosting.
+Audit and synchronize the Admin and User apps' data models with the DataConnect/PostgreSQL schema, and resolve the initial login failure in the Admin App.
 
 ## User Review Required
 
 > [!IMPORTANT]
-> The DataConnect GraphQL backend is currently returning 404 for several operations, likely due to a propagation delay or deployment timeout. I will implement **Firestore Fallbacks** for all critical data lists to keep the Admin App functional while the backend stabilizes.
+> I will be updating core models (UserModel, ServiceModel, etc.) in both apps. This may require small adjustments in UI files that depend on these models. I will ensure both apps remain buildable.
 
 ## Proposed Changes
 
-### [Component] Repositories & Data Flow
+### [Component] Authentication & Bootstrap
 
-#### [MODIFY] [DataConnectEspyRepository](file:///C:/Users/Dell/StudioProjects/espy project/espy_project/apps/admin_app/lib/viewmodels/dataconnect_espy_repository.dart)
-- Implement `try/catch` wrappers for all DataConnect calls.
-- Add Firestore as a secondary data source for:
-    - `listSectors`, `listCategories`, `listCountries`, `listRegions`, `listCities`.
-    - `searchUsersAdmin`.
-    - `listMetadataTags`.
-    - `listPendingOrders`, `listServiceModerationQueue`, `listRequestModerationQueue`.
-- Ensure `Stream` methods combine DataConnect and Firestore snapshots or switch to Firestore if DataConnect fails.
+#### [MODIFY] [AuthService.dart](file:///C:/Users/Dell/StudioProjects/espy project/espy_project/apps/admin_app/lib/viewmodels/auth_service.dart)
+- Synchronize `_onAuthStateChanged` and `signInWithEmail` to prevent concurrent bootstrapping.
+- Ensure `isLoading` accurately reflects the entire initialization process (auth check + profile fetch + auto-bootstrap).
 
-#### [MODIFY] [DataConnectEspyRepository (User App)](file:///C:/Users/Dell/StudioProjects/espy project/espy_project/apps/user_app/lib/viewmodels/dataconnect_espy_repository.dart)
-- Synchronize fallback logic to ensure stability for the end-user app as well.
+### [Component] Data Models (Normalization)
 
----
+#### [MODIFY] [UserModel.dart](file:///C:/Users/Dell/StudioProjects/espy project/espy_project/apps/admin_app/lib/models/user_model.dart)
+- Add `adminNotes`.
+- Ensure all factory methods handle both Firestore (CamelCase) and DataConnect (snake_case/CamelCase) keys consistently.
 
-### [Component] Taxonomy & Geography Seeding
+#### [MODIFY] [CountryModel.dart](file:///C:/Users/Dell/StudioProjects/espy project/espy_project/apps/admin_app/lib/models/country_model.dart)
+- Add `isoCode`, `currency`, `timezone`.
 
-#### [MODIFY] [TaxonomyViewModel](file:///C:/Users/Dell/StudioProjects/espy project/espy_project/apps/admin_app/lib/viewmodels/taxonomy_view_model.dart)
-- Add `importHierarchicalCsv(String csvContent)`:
-    - Expected columns: `Type, ID, ParentID, NameEn, NameAr, Value1 (IsoCode/Lat), Value2 (Flag/Lng)`.
-    - Logic: Iteratively upsert entities based on Type, respecting hierarchy (Countries first, then Regions, then Cities).
+#### [MODIFY] [ServiceModel.dart](file:///C:/Users/Dell/StudioProjects/espy project/espy_project/apps/admin_app/lib/models/service_model.dart)
+- Add `sectorId`, `priceTagId`, `deliveryMode`, `moderationStatus`, `flagReason`, `createdAt`, `updatedAt`.
 
-#### [MODIFY] [TaxonomyManagerScreen](file:///C:/Users/Dell/StudioProjects/espy project/espy_project/apps/admin_app/lib/views/admin/modules/taxonomy_manager_screen.dart)
-- Add an "IMPORT HIERARCHY (CSV)" button in the Geography section.
-- Integrate with `file_picker` to allow the user to select an Excel-exported CSV.
+#### [MODIFY] [ProfessionalProfile.dart](file:///C:/Users/Dell/StudioProjects/espy project/espy_project/apps/admin_app/lib/models/professional_profile.dart)
+- Add `isProfileValidated`, `verificationDocUrl`.
 
----
+#### [MODIFY] [InstitutionProfile.dart](file:///C:/Users/Dell/StudioProjects/espy project/espy_project/apps/admin_app/lib/models/institution_profile.dart)
+- Add `bioEn`, `bioAr`, `isProfileValidated`, `verificationDocUrl`.
 
-### [Component] Infrastructure
+#### [NEW] New Domain Models
+- Create `SectorModel.dart`, `CategoryModel.dart`, `RegionModel.dart`, `CityModel.dart` to replace generic `Map` usage.
 
-#### [RETRY] DataConnect Deployment
-- Attempt to deploy the connector and schema again with individual commands to bypass general timeout issues.
+### [Component] User App Synchronization
+- Replicate all model changes to `apps/user_app/lib/models/` to ensure parity.
 
 ## Verification Plan
 
 ### Automated Tests
-- Run `flutter build web` on both apps to ensure repository changes don't break compilation.
+- Run `flutter build web` on both `admin_app` and `user_app` to verify consistency.
 
 ### Manual Verification
-- **Login & Data**: Verify that Admin Dashboard lists (Users, Sectors, etc.) populate even if DataConnect returns 404 (by verifying fallback to Firestore).
-- **Geography Import**: Test the "Import Hierarchy" with a sample Lebanon CSV:
-  ```csv
-  COUNTRY,LB,,Lebanon,لبنان,LB,🇱🇧
-  REGION,LB-BEIRUT,LB,Beirut,بيروت,BEY,
-  CITY,BEIRUT-CENTRAL,LB-BEIRUT,Beirut Central,بيروت المركزية,33.89,35.50
-  ```
-- **Live Sync**: Verify that imported data appears in the UI lists.
+- **Login Flow**: Log out and log back in to the Admin account to verify the "failed login" issue is resolved and it lands directly on the Dashboard.
+- **Model Audit**: Check "USER MANAGEMENT" and "SERVICE MODERATION" in Admin App to ensure new fields (like adminNotes or moderationStatus) are correctly displayed/handled.

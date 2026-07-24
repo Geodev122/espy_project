@@ -18,6 +18,8 @@ import 'package:espy_app/widgets/common/premium_card.dart';
 import 'package:espy_app/widgets/common/profile_image_picker.dart';
 import 'package:espy_app/widgets/common/document_picker.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';
+import '../../../models/sector_model.dart';
+import '../../../models/category_model.dart';
 
 class InstitutionWizard extends StatefulWidget {
   const InstitutionWizard({super.key});
@@ -41,7 +43,7 @@ class _InstitutionWizardState extends State<InstitutionWizard> {
   File? _profileImageFile;
   Uint8List? _profileImageWebBytes;
 
-  Map<String, dynamic>? _mainLocation;
+  CityModel? _mainLocation;
 
   @override
   void initState() {
@@ -115,12 +117,13 @@ class _InstitutionWizardState extends State<InstitutionWizard> {
         _buildLabel("LEGAL INSTITUTION NAME"),
         _buildTextField(_nameController, "e.g. Hope Medical Center"),
         const SizedBox(height: 24),
-        StreamBuilder<List<Map<String, dynamic>>>(
+        StreamBuilder<List<SectorModel>>(
           stream: repo.listSectors(),
           builder: (context, snapshot) {
+            final sectors = snapshot.data ?? [];
             return MultiSelectChipGroup(
               label: "Primary Care Sectors",
-              options: snapshot.data ?? [],
+              options: sectors.map((s) => s.toMap()).toList(),
               initialSelectedIds: _selectedSectorIds,
               onChanged: (ids) => setState(() => _selectedSectorIds = ids),
             );
@@ -219,13 +222,13 @@ class _InstitutionWizardState extends State<InstitutionWizard> {
 
   Widget _buildCategoryDropdown() {
     final repo = Provider.of<EspyRepository>(context, listen: false);
-    return StreamBuilder<List<Map<String, dynamic>>>(
+    return StreamBuilder<List<CategoryModel>>(
       stream: repo.listCategories(sectorId: "institution"),
       builder: (context, snapshot) {
         final cats = snapshot.data ?? [];
         return DropdownButtonFormField<String>(
           value: _selectedCategoryId,
-          items: cats.map((c) => DropdownMenuItem(value: c['id'].toString(), child: Text(c['nameEn'].toUpperCase(), style: const TextStyle(fontSize: 12)))).toList(),
+          items: cats.map((c) => DropdownMenuItem(value: c.id, child: Text(c.nameEn.toUpperCase(), style: const TextStyle(fontSize: 12)))).toList(),
           onChanged: (v) => setState(() => _selectedCategoryId = v),
           decoration: InputDecoration(hintText: "Select Category", filled: true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)),
         );

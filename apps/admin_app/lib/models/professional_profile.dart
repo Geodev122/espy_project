@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'enums.dart';
 
 class ProfessionalProfile {
   final String id;
@@ -9,7 +10,9 @@ class ProfessionalProfile {
   final String? bioAr;
   final bool isApproved;
   final bool isHonorVerified;
-  final String membershipTier;
+  final bool isProfileValidated;
+  final String? verificationDocUrl;
+  final MembershipTier membershipTier;
   final int serviceSlots;
   final int practicePins;
   final DateTime? visibilityExpiresAt;
@@ -23,7 +26,9 @@ class ProfessionalProfile {
     this.bioAr,
     this.isApproved = false,
     this.isHonorVerified = false,
-    this.membershipTier = 'basic',
+    this.isProfileValidated = false,
+    this.verificationDocUrl,
+    this.membershipTier = MembershipTier.basic,
     this.serviceSlots = 2,
     this.practicePins = 0,
     this.visibilityExpiresAt,
@@ -46,7 +51,9 @@ class ProfessionalProfile {
       bioAr: data['bioAr'],
       isApproved: data['isApproved'] ?? false,
       isHonorVerified: data['isHonorVerified'] ?? false,
-      membershipTier: data['membershipTier'] ?? 'basic',
+      isProfileValidated: data['isProfileValidated'] ?? false,
+      verificationDocUrl: data['verificationDocUrl'],
+      membershipTier: MembershipTier.parse(data['membershipTier']),
       serviceSlots: data['serviceSlots'] ?? 2,
       practicePins: data['practicePins'] ?? 0,
       visibilityExpiresAt: parseDate(data['visibilityExpiresAt']),
@@ -63,7 +70,9 @@ class ProfessionalProfile {
       'bioAr': bioAr,
       'isApproved': isApproved,
       'isHonorVerified': isHonorVerified,
-      'membershipTier': membershipTier,
+      'isProfileValidated': isProfileValidated,
+      'verificationDocUrl': verificationDocUrl,
+      'membershipTier': membershipTier.name,
       'serviceSlots': serviceSlots,
       'practicePins': practicePins,
       'visibilityExpiresAt': visibilityExpiresAt,

@@ -23,10 +23,14 @@ class GetUserUser {
   final String email;
   final String? name;
   final EnumValue<UserRole> role;
+  final bool isActive;
+  final bool hasProfile;
+  final String? adminNotes;
   final int walletBalance;
   final int tokensUsed;
   final String? photoUrl;
-  final bool isActive;
+  final String? phone;
+  final String? whatsapp;
   final Timestamp createdAt;
   final Timestamp updatedAt;
   final GetUserUserProfessionalProfileOnUser? professionalProfile_on_user;
@@ -38,10 +42,14 @@ class GetUserUser {
   email = nativeFromJson<String>(json['email']),
   name = json['name'] == null ? null : nativeFromJson<String>(json['name']),
   role = userRoleDeserializer(json['role']),
+  isActive = nativeFromJson<bool>(json['isActive']),
+  hasProfile = nativeFromJson<bool>(json['hasProfile']),
+  adminNotes = json['adminNotes'] == null ? null : nativeFromJson<String>(json['adminNotes']),
   walletBalance = nativeFromJson<int>(json['walletBalance']),
   tokensUsed = nativeFromJson<int>(json['tokensUsed']),
   photoUrl = json['photoUrl'] == null ? null : nativeFromJson<String>(json['photoUrl']),
-  isActive = nativeFromJson<bool>(json['isActive']),
+  phone = json['phone'] == null ? null : nativeFromJson<String>(json['phone']),
+  whatsapp = json['whatsapp'] == null ? null : nativeFromJson<String>(json['whatsapp']),
   createdAt = Timestamp.fromJson(json['createdAt']),
   updatedAt = Timestamp.fromJson(json['updatedAt']),
   professionalProfile_on_user = json['professionalProfile_on_user'] == null ? null : GetUserUserProfessionalProfileOnUser.fromJson(json['professionalProfile_on_user']),
@@ -61,10 +69,14 @@ class GetUserUser {
     email == otherTyped.email && 
     name == otherTyped.name && 
     role == otherTyped.role && 
+    isActive == otherTyped.isActive && 
+    hasProfile == otherTyped.hasProfile && 
+    adminNotes == otherTyped.adminNotes && 
     walletBalance == otherTyped.walletBalance && 
     tokensUsed == otherTyped.tokensUsed && 
     photoUrl == otherTyped.photoUrl && 
-    isActive == otherTyped.isActive && 
+    phone == otherTyped.phone && 
+    whatsapp == otherTyped.whatsapp && 
     createdAt == otherTyped.createdAt && 
     updatedAt == otherTyped.updatedAt && 
     professionalProfile_on_user == otherTyped.professionalProfile_on_user && 
@@ -73,7 +85,7 @@ class GetUserUser {
     
   }
   @override
-  int get hashCode => Object.hashAll([id.hashCode, email.hashCode, name.hashCode, role.hashCode, walletBalance.hashCode, tokensUsed.hashCode, photoUrl.hashCode, isActive.hashCode, createdAt.hashCode, updatedAt.hashCode, professionalProfile_on_user.hashCode, institutionProfile_on_user.hashCode, visitorProfile_on_user.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, email.hashCode, name.hashCode, role.hashCode, isActive.hashCode, hasProfile.hashCode, adminNotes.hashCode, walletBalance.hashCode, tokensUsed.hashCode, photoUrl.hashCode, phone.hashCode, whatsapp.hashCode, createdAt.hashCode, updatedAt.hashCode, professionalProfile_on_user.hashCode, institutionProfile_on_user.hashCode, visitorProfile_on_user.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -86,12 +98,22 @@ class GetUserUser {
     json['role'] = 
     userRoleSerializer(role)
     ;
+    json['isActive'] = nativeToJson<bool>(isActive);
+    json['hasProfile'] = nativeToJson<bool>(hasProfile);
+    if (adminNotes != null) {
+      json['adminNotes'] = nativeToJson<String?>(adminNotes);
+    }
     json['walletBalance'] = nativeToJson<int>(walletBalance);
     json['tokensUsed'] = nativeToJson<int>(tokensUsed);
     if (photoUrl != null) {
       json['photoUrl'] = nativeToJson<String?>(photoUrl);
     }
-    json['isActive'] = nativeToJson<bool>(isActive);
+    if (phone != null) {
+      json['phone'] = nativeToJson<String?>(phone);
+    }
+    if (whatsapp != null) {
+      json['whatsapp'] = nativeToJson<String?>(whatsapp);
+    }
     json['createdAt'] = createdAt.toJson();
     json['updatedAt'] = updatedAt.toJson();
     if (professionalProfile_on_user != null) {
@@ -111,10 +133,14 @@ class GetUserUser {
     required this.email,
     this.name,
     required this.role,
+    required this.isActive,
+    required this.hasProfile,
+    this.adminNotes,
     required this.walletBalance,
     required this.tokensUsed,
     this.photoUrl,
-    required this.isActive,
+    this.phone,
+    this.whatsapp,
     required this.createdAt,
     required this.updatedAt,
     this.professionalProfile_on_user,
@@ -125,16 +151,20 @@ class GetUserUser {
 
 @immutable
 class GetUserUserProfessionalProfileOnUser {
+  final String id;
   final String? specialty;
   final bool isApproved;
   final bool isProfileValidated;
+  final String? verificationDocUrl;
   final EnumValue<MembershipTier>? membershipTier;
   final Timestamp? visibilityExpiresAt;
   GetUserUserProfessionalProfileOnUser.fromJson(dynamic json):
   
+  id = nativeFromJson<String>(json['id']),
   specialty = json['specialty'] == null ? null : nativeFromJson<String>(json['specialty']),
   isApproved = nativeFromJson<bool>(json['isApproved']),
   isProfileValidated = nativeFromJson<bool>(json['isProfileValidated']),
+  verificationDocUrl = json['verificationDocUrl'] == null ? null : nativeFromJson<String>(json['verificationDocUrl']),
   membershipTier = json['membershipTier'] == null ? null : membershipTierDeserializer(json['membershipTier']),
   visibilityExpiresAt = json['visibilityExpiresAt'] == null ? null : Timestamp.fromJson(json['visibilityExpiresAt']);
   @override
@@ -147,24 +177,30 @@ class GetUserUserProfessionalProfileOnUser {
     }
 
     final GetUserUserProfessionalProfileOnUser otherTyped = other as GetUserUserProfessionalProfileOnUser;
-    return specialty == otherTyped.specialty && 
+    return id == otherTyped.id && 
+    specialty == otherTyped.specialty && 
     isApproved == otherTyped.isApproved && 
     isProfileValidated == otherTyped.isProfileValidated && 
+    verificationDocUrl == otherTyped.verificationDocUrl && 
     membershipTier == otherTyped.membershipTier && 
     visibilityExpiresAt == otherTyped.visibilityExpiresAt;
     
   }
   @override
-  int get hashCode => Object.hashAll([specialty.hashCode, isApproved.hashCode, isProfileValidated.hashCode, membershipTier.hashCode, visibilityExpiresAt.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, specialty.hashCode, isApproved.hashCode, isProfileValidated.hashCode, verificationDocUrl.hashCode, membershipTier.hashCode, visibilityExpiresAt.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
     if (specialty != null) {
       json['specialty'] = nativeToJson<String?>(specialty);
     }
     json['isApproved'] = nativeToJson<bool>(isApproved);
     json['isProfileValidated'] = nativeToJson<bool>(isProfileValidated);
+    if (verificationDocUrl != null) {
+      json['verificationDocUrl'] = nativeToJson<String?>(verificationDocUrl);
+    }
     if (membershipTier != null) {
       json['membershipTier'] = 
     membershipTierSerializer(membershipTier!)
@@ -177,9 +213,11 @@ class GetUserUserProfessionalProfileOnUser {
   }
 
   GetUserUserProfessionalProfileOnUser({
+    required this.id,
     this.specialty,
     required this.isApproved,
     required this.isProfileValidated,
+    this.verificationDocUrl,
     this.membershipTier,
     this.visibilityExpiresAt,
   });
@@ -187,15 +225,21 @@ class GetUserUserProfessionalProfileOnUser {
 
 @immutable
 class GetUserUserInstitutionProfileOnUser {
+  final String id;
   final String? nameAr;
+  final String? registrationNumber;
   final bool isApproved;
   final bool isProfileValidated;
+  final String? verificationDocUrl;
   final Timestamp? visibilityExpiresAt;
   GetUserUserInstitutionProfileOnUser.fromJson(dynamic json):
   
+  id = nativeFromJson<String>(json['id']),
   nameAr = json['nameAr'] == null ? null : nativeFromJson<String>(json['nameAr']),
+  registrationNumber = json['registrationNumber'] == null ? null : nativeFromJson<String>(json['registrationNumber']),
   isApproved = nativeFromJson<bool>(json['isApproved']),
   isProfileValidated = nativeFromJson<bool>(json['isProfileValidated']),
+  verificationDocUrl = json['verificationDocUrl'] == null ? null : nativeFromJson<String>(json['verificationDocUrl']),
   visibilityExpiresAt = json['visibilityExpiresAt'] == null ? null : Timestamp.fromJson(json['visibilityExpiresAt']);
   @override
   bool operator ==(Object other) {
@@ -207,23 +251,33 @@ class GetUserUserInstitutionProfileOnUser {
     }
 
     final GetUserUserInstitutionProfileOnUser otherTyped = other as GetUserUserInstitutionProfileOnUser;
-    return nameAr == otherTyped.nameAr && 
+    return id == otherTyped.id && 
+    nameAr == otherTyped.nameAr && 
+    registrationNumber == otherTyped.registrationNumber && 
     isApproved == otherTyped.isApproved && 
     isProfileValidated == otherTyped.isProfileValidated && 
+    verificationDocUrl == otherTyped.verificationDocUrl && 
     visibilityExpiresAt == otherTyped.visibilityExpiresAt;
     
   }
   @override
-  int get hashCode => Object.hashAll([nameAr.hashCode, isApproved.hashCode, isProfileValidated.hashCode, visibilityExpiresAt.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, nameAr.hashCode, registrationNumber.hashCode, isApproved.hashCode, isProfileValidated.hashCode, verificationDocUrl.hashCode, visibilityExpiresAt.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
     if (nameAr != null) {
       json['nameAr'] = nativeToJson<String?>(nameAr);
     }
+    if (registrationNumber != null) {
+      json['registrationNumber'] = nativeToJson<String?>(registrationNumber);
+    }
     json['isApproved'] = nativeToJson<bool>(isApproved);
     json['isProfileValidated'] = nativeToJson<bool>(isProfileValidated);
+    if (verificationDocUrl != null) {
+      json['verificationDocUrl'] = nativeToJson<String?>(verificationDocUrl);
+    }
     if (visibilityExpiresAt != null) {
       json['visibilityExpiresAt'] = visibilityExpiresAt!.toJson();
     }
@@ -231,18 +285,23 @@ class GetUserUserInstitutionProfileOnUser {
   }
 
   GetUserUserInstitutionProfileOnUser({
+    required this.id,
     this.nameAr,
+    this.registrationNumber,
     required this.isApproved,
     required this.isProfileValidated,
+    this.verificationDocUrl,
     this.visibilityExpiresAt,
   });
 }
 
 @immutable
 class GetUserUserVisitorProfileOnUser {
+  final String id;
   final List<String>? interests;
   GetUserUserVisitorProfileOnUser.fromJson(dynamic json):
   
+  id = nativeFromJson<String>(json['id']),
   interests = json['interests'] == null ? null : (json['interests'] as List<dynamic>)
         .map((e) => nativeFromJson<String>(e))
         .toList();
@@ -256,15 +315,17 @@ class GetUserUserVisitorProfileOnUser {
     }
 
     final GetUserUserVisitorProfileOnUser otherTyped = other as GetUserUserVisitorProfileOnUser;
-    return interests == otherTyped.interests;
+    return id == otherTyped.id && 
+    interests == otherTyped.interests;
     
   }
   @override
-  int get hashCode => interests.hashCode;
+  int get hashCode => Object.hashAll([id.hashCode, interests.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
     if (interests != null) {
       json['interests'] = interests?.map((e) => nativeToJson<String>(e)).toList();
     }
@@ -272,6 +333,7 @@ class GetUserUserVisitorProfileOnUser {
   }
 
   GetUserUserVisitorProfileOnUser({
+    required this.id,
     this.interests,
   });
 }

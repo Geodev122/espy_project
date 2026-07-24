@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import './auth_service.dart';
 import './espy_repository.dart';
+import '../models/wallet_transaction.dart';
+import '../models/resource_order.dart';
+import '../models/enums.dart';
 
 class WalletViewModel extends ChangeNotifier {
   final AuthService _authService;
   final EspyRepository _repository;
 
-  List<Map<String, dynamic>> _transactions = [];
-  Map<String, dynamic>? _activeOrder;
+  List<WalletTransactionModel> _transactions = [];
+  ResourceOrderModel? _activeOrder;
   bool _isLoadingTransactions = false;
   bool _isProcessing = false;
 
@@ -19,8 +22,8 @@ class WalletViewModel extends ChangeNotifier {
   }
 
   int get balance => _authService.userData?.walletBalance ?? 0;
-  List<Map<String, dynamic>> get transactions => _transactions;
-  Map<String, dynamic>? get activeOrder => _activeOrder;
+  List<WalletTransactionModel> get transactions => _transactions;
+  ResourceOrderModel? get activeOrder => _activeOrder;
   bool get isLoadingTransactions => _isLoadingTransactions;
   bool get isProcessing => _isProcessing;
 
@@ -28,14 +31,12 @@ class WalletViewModel extends ChangeNotifier {
     _isLoadingTransactions = true;
     notifyListeners();
 
-    // Load Transactions
     _repository.listWalletTransactions(_authService.user!.uid).listen((data) {
       _transactions = data;
       _isLoadingTransactions = false;
       notifyListeners();
     });
 
-    // Load Active Resource Order
     _repository.getActiveResourceOrder(_authService.user!.uid).listen((order) {
       _activeOrder = order;
       notifyListeners();
@@ -43,18 +44,10 @@ class WalletViewModel extends ChangeNotifier {
   }
 
   int get daysUntilExpiry {
-    final dynamic expiry = _authService.userData?.rawData['visibilityExpiresAt'];
+    final DateTime? expiry = _authService.userData?.rawData['visibilityExpiresAt'];
     if (expiry == null) return 0;
     
-    DateTime? date;
-    if (expiry is DateTime) {
-      date = expiry;
-    } else {
-      date = DateTime.tryParse(expiry.toString());
-    }
-    
-    if (date == null) return 0;
-    final diff = date.difference(DateTime.now()).inDays;
+    final diff = expiry.difference(DateTime.now()).inDays;
     return diff > 0 ? diff : 0;
   }
 
@@ -92,7 +85,7 @@ class WalletViewModel extends ChangeNotifier {
         userId: _authService.user!.uid,
         itemId: itemId,
         cost: cost,
-        role: _authService.userData?.role.name ?? 'professional',
+        role: _authService.userData?.role ?? UserRole.professional,
       );
       if (result['success'] == true) {
         await _authService.fetchUserData();

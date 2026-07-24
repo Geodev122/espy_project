@@ -1,16 +1,22 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:excel/excel.dart';
 import 'espy_repository.dart';
+import '../models/sector_model.dart';
+import '../models/category_model.dart';
+import '../models/country_model.dart';
+import '../models/region_model.dart';
+import '../models/city_model.dart';
 
 class TaxonomyViewModel extends ChangeNotifier {
   final EspyRepository _repository;
 
-  List<Map<String, dynamic>> _sectors = [];
-  List<Map<String, dynamic>> _categories = [];
-  List<Map<String, dynamic>> _countries = [];
-  List<Map<String, dynamic>> _regions = [];
-  List<Map<String, dynamic>> _cities = [];
+  List<SectorModel> _sectors = [];
+  List<CategoryModel> _categories = [];
+  List<CountryModel> _countries = [];
+  List<RegionModel> _regions = [];
+  List<CityModel> _cities = [];
   
   Map<String, List<Map<String, dynamic>>> _tags = {};
 
@@ -22,11 +28,11 @@ class TaxonomyViewModel extends ChangeNotifier {
     _init();
   }
 
-  List<Map<String, dynamic>> get sectors => _sectors;
-  List<Map<String, dynamic>> get categories => _categories;
-  List<Map<String, dynamic>> get countries => _countries;
-  List<Map<String, dynamic>> get regions => _regions;
-  List<Map<String, dynamic>> get cities => _cities;
+  List<SectorModel> get sectors => _sectors;
+  List<CategoryModel> get categories => _categories;
+  List<CountryModel> get countries => _countries;
+  List<RegionModel> get regions => _regions;
+  List<CityModel> get cities => _cities;
   Map<String, List<Map<String, dynamic>>> get tags => _tags;
   bool get isLoading => _isLoading;
 
@@ -36,7 +42,7 @@ class TaxonomyViewModel extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }, onError: (e) {
-      print("Error listening to sectors: $e");
+      debugPrint("Error listening to sectors: $e");
       _isLoading = false;
       notifyListeners();
     });
@@ -45,7 +51,7 @@ class TaxonomyViewModel extends ChangeNotifier {
       _countries = data;
       notifyListeners();
     }, onError: (e) {
-      print("Error listening to countries: $e");
+      debugPrint("Error listening to countries: $e");
     });
 
     _loadTags();
@@ -71,6 +77,26 @@ class TaxonomyViewModel extends ChangeNotifier {
            "CITY,Beirut,Ashrafieh,الأشرفية,33.88,35.51";
   }
 
+  Future<void> importHierarchicalXlsx(List<int> bytes) async {
+    try {
+      final excel = Excel.decodeBytes(bytes);
+      final sheet = excel.tables.values.first;
+      
+      final List<List<dynamic>> rows = [];
+      for (var row in sheet.rows) {
+        rows.add(row.map((cell) => cell?.value?.toString() ?? '').toList());
+      }
+      
+      if (rows.isEmpty) return;
+      
+      final content = rows.skip(1).map((r) => r.join(',')).join('\n');
+      await importHierarchicalCsv(content);
+    } catch (e) {
+      debugPrint("XLSX Import Error: $e");
+      rethrow;
+    }
+  }
+
   Future<void> importHierarchicalCsv(String csvContent) async {
     final lines = csvContent.split('\n');
     final Map<String, String> nameToId = {};
@@ -86,13 +112,13 @@ class TaxonomyViewModel extends ChangeNotifier {
         final id = slugify(nameEn);
         if (id.isEmpty) continue;
 
-        await upsertCountry({
-          'id': id,
-          'nameEn': nameEn,
-          'nameAr': parts[3].trim(),
-          'isoCode': parts.length > 4 ? parts[4].trim() : id.toUpperCase(),
-          'flagEmoji': parts.length > 5 ? parts[5].trim() : null,
-        });
+        await upsertCountry(CountryModel(
+          id: id,
+          nameEn: nameEn,
+          nameAr: parts[3].trim(),
+          isoCode: parts.length > 4 ? parts[4].trim() : id.toUpperCase(),
+          flagEmoji: parts.length > 5 ? parts[5].trim() : null,
+        ));
         nameToId[nameEn.toLowerCase()] = id;
         count++;
       }
@@ -108,13 +134,13 @@ class TaxonomyViewModel extends ChangeNotifier {
         if (parentId == null) continue;
 
         final id = "$parentId-${slugify(nameEn)}";
-        await upsertRegion({
-          'id': id,
-          'countryId': parentId,
-          'nameEn': nameEn,
-          'nameAr': parts[3].trim(),
-          'regionCode': parts.length > 4 ? parts[4].trim() : null,
-        });
+        await upsertRegion(RegionModel(
+          id: id,
+          countryId: parentId,
+          nameEn: nameEn,
+          nameAr: parts[3].trim(),
+          regionCode: parts.length > 4 ? parts[4].trim() : null,
+        ));
         nameToId[nameEn.toLowerCase()] = id;
         count++;
       }
@@ -130,21 +156,21 @@ class TaxonomyViewModel extends ChangeNotifier {
         if (parentId == null) continue;
 
         final id = "$parentId-${slugify(nameEn)}";
-        await upsertCity({
-          'id': id,
-          'regionId': parentId,
-          'nameEn': nameEn,
-          'nameAr': parts[3].trim(),
-          'lat': parts.length > 4 ? double.tryParse(parts[4].trim()) : null,
-          'lng': parts.length > 5 ? double.tryParse(parts[5].trim()) : null,
-        });
+        await upsertCity(CityModel(
+          id: id,
+          regionId: parentId,
+          nameEn: nameEn,
+          nameAr: parts[3].trim(),
+          lat: parts.length > 4 ? double.tryParse(parts[4].trim()) : null,
+          lng: parts.length > 5 ? double.tryParse(parts[5].trim()) : null,
+        ));
         count++;
       }
       
-      debugPrint("Imported $count entities from CSV");
+      debugPrint("Imported $count entities from protocol");
       _init(); 
     } catch (e) {
-      debugPrint("Hierarchical CSV Import Error: $e");
+      debugPrint("Hierarchical Import Error: $e");
       rethrow;
     }
   }
@@ -155,40 +181,40 @@ class TaxonomyViewModel extends ChangeNotifier {
       for (var countryMap in data) {
         // 1. Country
         final String countryId = countryMap['id'];
-        await upsertCountry({
-          'id': countryId,
-          'nameEn': countryMap['nameEn'],
-          'nameAr': countryMap['nameAr'],
-          'isoCode': countryMap['isoCode'] ?? countryId,
-          'flagEmoji': countryMap['flagEmoji'],
-          'currency': countryMap['currency'],
-        });
+        await upsertCountry(CountryModel(
+          id: countryId,
+          nameEn: countryMap['nameEn'],
+          nameAr: countryMap['nameAr'],
+          isoCode: countryMap['isoCode'] ?? countryId,
+          flagEmoji: countryMap['flagEmoji'],
+          currency: countryMap['currency'],
+        ));
 
         // 2. Regions
         final List<dynamic>? regions = countryMap['regions'];
         if (regions != null) {
           for (var regionMap in regions) {
             final String regionId = regionMap['id'];
-            await upsertRegion({
-              'id': regionId,
-              'countryId': countryId,
-              'nameEn': regionMap['nameEn'],
-              'nameAr': regionMap['nameAr'],
-              'regionCode': regionMap['regionCode'],
-            });
+            await upsertRegion(RegionModel(
+              id: regionId,
+              countryId: countryId,
+              nameEn: regionMap['nameEn'],
+              nameAr: regionMap['nameAr'],
+              regionCode: regionMap['regionCode'],
+            ));
 
             // 3. Cities
             final List<dynamic>? cities = regionMap['cities'];
             if (cities != null) {
               for (var cityMap in cities) {
-                await upsertCity({
-                  'id': cityMap['id'],
-                  'regionId': regionId,
-                  'nameEn': cityMap['nameEn'],
-                  'nameAr': cityMap['nameAr'],
-                  'lat': cityMap['lat'] != null ? double.tryParse(cityMap['lat'].toString()) : null,
-                  'lng': cityMap['lng'] != null ? double.tryParse(cityMap['lng'].toString()) : null,
-                });
+                await upsertCity(CityModel(
+                  id: cityMap['id'],
+                  regionId: regionId,
+                  nameEn: cityMap['nameEn'],
+                  nameAr: cityMap['nameAr'],
+                  lat: cityMap['lat'] != null ? double.tryParse(cityMap['lat'].toString()) : null,
+                  lng: cityMap['lng'] != null ? double.tryParse(cityMap['lng'].toString()) : null,
+                ));
               }
             }
           }
@@ -210,13 +236,13 @@ class TaxonomyViewModel extends ChangeNotifier {
         final id = parts[0].trim().toLowerCase().replaceAll(' ', '-');
         if (id.isEmpty) continue;
         
-        await upsertRegion({
-          'id': id,
-          'countryId': countryId,
-          'nameEn': parts[1].trim(),
-          'nameAr': parts.length > 2 ? parts[2].trim() : parts[1].trim(),
-          'regionCode': parts.length > 3 ? parts[3].trim().toUpperCase() : null,
-        });
+        await upsertRegion(RegionModel(
+          id: id,
+          countryId: countryId,
+          nameEn: parts[1].trim(),
+          nameAr: parts.length > 2 ? parts[2].trim() : parts[1].trim(),
+          regionCode: parts.length > 3 ? parts[3].trim().toUpperCase() : null,
+        ));
       }
     }
     loadRegions(countryId);
@@ -231,21 +257,21 @@ class TaxonomyViewModel extends ChangeNotifier {
         final id = parts[0].trim().toLowerCase().replaceAll(' ', '-');
         if (id.isEmpty) continue;
 
-        await upsertCity({
-          'id': id,
-          'regionId': regionId,
-          'nameEn': parts[1].trim(),
-          'nameAr': parts.length > 2 ? parts[2].trim() : parts[1].trim(),
-          'lat': parts.length > 3 ? double.tryParse(parts[3]) : null,
-          'lng': parts.length > 4 ? double.tryParse(parts[4]) : null,
-        });
+        await upsertCity(CityModel(
+          id: id,
+          regionId: regionId,
+          nameEn: parts[1].trim(),
+          nameAr: parts.length > 2 ? parts[2].trim() : parts[1].trim(),
+          lat: parts.length > 3 ? double.tryParse(parts[3]) : null,
+          lng: parts.length > 4 ? double.tryParse(parts[4]) : null,
+        ));
       }
     }
     loadCities(regionId);
   }
 
-  final Map<String, List<Map<String, dynamic>>> _regionCache = {};
-  final Map<String, List<Map<String, dynamic>>> _cityCache = {};
+  final Map<String, List<RegionModel>> _regionCache = {};
+  final Map<String, List<CityModel>> _cityCache = {};
 
   Future<void> loadRegions(String countryId) async {
     if (_regionCache.containsKey(countryId)) {
@@ -277,24 +303,28 @@ class TaxonomyViewModel extends ChangeNotifier {
     });
   }
 
-  Future<void> upsertCountry(Map<String, dynamic> data) async {
-    await _repository.upsertCountry(data);
+  Future<void> upsertCountry(CountryModel country) async {
+    await _repository.upsertCountry(country);
   }
 
-  Future<void> upsertRegion(Map<String, dynamic> data) async {
-    await _repository.upsertRegion(data);
-    if (data['countryId'] != null) loadRegions(data['countryId']);
+  Future<void> upsertRegion(RegionModel region) async {
+    await _repository.upsertRegion(region);
+    loadRegions(region.countryId);
   }
 
-  Future<void> upsertCity(Map<String, dynamic> data) async {
-    await _repository.upsertCity(data);
-    if (data['regionId'] != null) loadCities(data['regionId']);
+  Future<void> upsertCity(CityModel city) async {
+    await _repository.upsertCity(city);
+    loadCities(city.regionId);
   }
 
   // --- Taxonomy & Branding ---
 
-  Future<void> updateSectorBranding(String id, Map<String, dynamic> data) async {
-    await _repository.updateSectorBranding(id, data);
+  Future<void> updateSectorBranding(String id, SectorModel sector) async {
+    await _repository.updateSectorBranding(id, sector);
+  }
+
+  Future<void> updateCategory(CategoryModel category) async {
+    await _repository.updateCategory(category);
   }
 
   Future<void> upsertTag(String type, Map<String, dynamic> data) async {

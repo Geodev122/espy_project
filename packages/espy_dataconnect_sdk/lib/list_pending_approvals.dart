@@ -64,10 +64,12 @@ class ListPendingApprovalsProfessionalProfiles {
 
 @immutable
 class ListPendingApprovalsProfessionalProfilesUser {
+  final String id;
   final String email;
   final Timestamp createdAt;
   ListPendingApprovalsProfessionalProfilesUser.fromJson(dynamic json):
   
+  id = nativeFromJson<String>(json['id']),
   email = nativeFromJson<String>(json['email']),
   createdAt = Timestamp.fromJson(json['createdAt']);
   @override
@@ -80,22 +82,25 @@ class ListPendingApprovalsProfessionalProfilesUser {
     }
 
     final ListPendingApprovalsProfessionalProfilesUser otherTyped = other as ListPendingApprovalsProfessionalProfilesUser;
-    return email == otherTyped.email && 
+    return id == otherTyped.id && 
+    email == otherTyped.email && 
     createdAt == otherTyped.createdAt;
     
   }
   @override
-  int get hashCode => Object.hashAll([email.hashCode, createdAt.hashCode]);
+  int get hashCode => Object.hashAll([id.hashCode, email.hashCode, createdAt.hashCode]);
   
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
+    json['id'] = nativeToJson<String>(id);
     json['email'] = nativeToJson<String>(email);
     json['createdAt'] = createdAt.toJson();
     return json;
   }
 
   ListPendingApprovalsProfessionalProfilesUser({
+    required this.id,
     required this.email,
     required this.createdAt,
   });
