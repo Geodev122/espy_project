@@ -5,13 +5,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:espy_core/espy_core.dart';
 import 'package:espy_app/l10n/app_localizations.dart';
 import 'package:espy_app/theme/espy_theme.dart';
-import 'package:espy_app/viewmodels/auth_service.dart';
-import 'package:espy_app/viewmodels/matching_view_model.dart';
 import 'package:espy_app/widgets/common/premium_button.dart';
-import '../../../models/service_model.dart';
-import '../../../models/enums.dart';
 
 class MatchingScreen extends StatefulWidget {
   const MatchingScreen({super.key});

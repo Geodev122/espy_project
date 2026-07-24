@@ -1,9 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'espy_repository.dart';
-import '../models/service_model.dart';
-import '../models/service_request.dart';
-import '../models/enums.dart';
+import 'package:espy_core/espy_core.dart';
 
 class ServiceManagementViewModel extends ChangeNotifier {
   final EspyRepository _repository;

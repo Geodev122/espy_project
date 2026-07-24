@@ -4,13 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+import 'package:espy_core/espy_core.dart';
 import 'package:espy_app/l10n/app_localizations.dart';
 import 'package:espy_app/theme/espy_theme.dart';
-import 'package:espy_app/viewmodels/auth_service.dart';
-import 'package:espy_app/viewmodels/user_service.dart';
-import 'package:espy_app/viewmodels/locale_service.dart';
-import '../../../models/user_model.dart';
-import '../../../models/enums.dart';
 import '../../visitor/emergency/sos_hub_screen.dart';
 import 'location_manager_screen.dart';
 import 'edit_profile_screen.dart';

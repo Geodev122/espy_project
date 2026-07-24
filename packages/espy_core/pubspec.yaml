@@ -1,0 +1,34 @@
+name: espy_core
+description: Core Models, Services, and Business Logic for Espy Protocol
+version: 0.0.1
+publish_to: 'none'
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  firebase_core: ^4.11.0
+  cloud_firestore: ^6.6.0
+  firebase_auth: ^6.5.4
+  firebase_storage: ^13.4.3
+  cloud_functions: ^6.3.3
+  firebase_data_connect: ^0.3.0+7
+  espy_dataconnect_sdk:
+    path: ../espy_dataconnect_sdk
+  rxdart: ^0.28.0
+  shared_preferences: ^2.5.5
+  geolocator: ^14.0.1
+  geocoding: ^4.0.0
+  intl: 0.20.2
+  lucide_icons_flutter: ^3.1.14+2
+  excel: ^4.0.6
+  pdf: ^3.11.1
+  printing: ^5.13.3
+  url_launcher: ^6.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0

@@ -6,22 +6,8 @@ import 'package:provider/provider.dart';
 import 'dart:ui';
 
 import 'app.dart';
-import 'viewmodels/auth_service.dart';
+import 'package:espy_core/espy_core.dart';
 import 'utils/firebase_config.dart';
-import 'viewmodels/firestore_service.dart';
-import 'viewmodels/user_service.dart';
-import 'viewmodels/storage_service.dart';
-import 'viewmodels/whish_pay_service.dart';
-import 'viewmodels/locale_service.dart';
-import 'viewmodels/directory_view_model.dart';
-import 'viewmodels/dashboard_view_model.dart';
-import 'viewmodels/wallet_view_model.dart';
-import 'viewmodels/matching_view_model.dart';
-import 'viewmodels/requests_view_model.dart';
-import 'viewmodels/services_view_model.dart';
-import 'viewmodels/registration_view_model.dart';
-import 'viewmodels/espy_repository.dart';
-import 'viewmodels/firestore_espy_repository.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -101,6 +87,10 @@ void main() async {
         ChangeNotifierProxyProvider2<EspyRepository, AuthService, RegistrationViewModel>(
           create: (context) => RegistrationViewModel(context.read<EspyRepository>(), context.read<AuthService>(), context.read<StorageService>()),
           update: (context, repo, auth, previous) => RegistrationViewModel(repo, auth, context.read<StorageService>()),
+        ),
+        ChangeNotifierProxyProvider<EspyRepository, EmergencyService>(
+          create: (context) => EmergencyService(context.read<EspyRepository>()),
+          update: (context, repo, previous) => EmergencyService(repo),
         ),
         Provider(create: (_) => FirestoreService()),
         Provider(create: (_) => StorageService()),

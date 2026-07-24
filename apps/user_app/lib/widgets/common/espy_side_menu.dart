@@ -4,10 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 
+import 'package:espy_core/espy_core.dart';
 import 'package:espy_app/theme/espy_theme.dart';
-import 'package:espy_app/viewmodels/auth_service.dart';
-import 'package:espy_app/models/user_model.dart';
-import 'package:espy_app/models/enums.dart';
 
 // User Screens
 import '../../views/professional/profile/edit_profile_screen.dart';

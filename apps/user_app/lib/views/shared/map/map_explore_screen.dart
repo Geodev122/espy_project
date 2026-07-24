@@ -9,14 +9,9 @@ import 'package:provider/provider.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import 'package:espy_core/espy_core.dart';
 import 'package:espy_app/l10n/app_localizations.dart';
 import 'package:espy_app/theme/espy_theme.dart';
-import 'package:espy_app/viewmodels/firestore_service.dart';
-import 'package:espy_app/viewmodels/auth_service.dart';
-import 'package:espy_app/viewmodels/sound_service.dart';
-import 'package:espy_app/viewmodels/directory_view_model.dart';
-import 'package:espy_app/models/user_model.dart';
-import 'package:espy_app/models/enums.dart';
 import 'package:espy_app/widgets/common/espy_icon.dart';
 import 'package:espy_app/widgets/common/premium_button.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';
@@ -27,6 +22,8 @@ class MapExploreScreen extends StatefulWidget {
   @override
   State<MapExploreScreen> createState() => _MapExploreScreenState();
 }
+
+import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 
 class _MapExploreScreenState extends State<MapExploreScreen> {
   final MapController _mapController = MapController();
@@ -77,7 +74,7 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
       
       final expiry = p['visibilityExpiresAt'] is Timestamp 
           ? (p['visibilityExpiresAt'] as Timestamp).toDate() 
-          : DateTime.fromMillisecondsSinceEpoch(p['visibilityExpiresAt'] as int);
+          : DateTime.fromMillisecondsSinceEpoch(p['visibilityExpiresAt'] is int ? p['visibilityExpiresAt'] : int.parse(p['visibilityExpiresAt'].toString()));
           
       if (expiry.isBefore(now)) continue;
 
@@ -86,7 +83,7 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
 
       // Extract sector branding if available
       final String iconName = p['sector']?['iconName'] ?? (role == 'institution' ? 'hospital' : 'person');
-      final Color sectorColor = Color(int.tryParse(p['sector']?['colorHex'] ?? '') ?? roleColor.value);
+      final Color sectorColor = Color(int.tryParse(p['sector']?['colorHex'] ?? '') ?? roleColor.toARGB32());
 
       final mainLoc = p['mainLocation'] as Map<String, dynamic>?;
       if (mainLoc != null && mainLoc['lat'] != null) {
@@ -298,9 +295,9 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
               initialCenter: const LatLng(33.8938, 35.5018),
               initialZoom: 12,
               onPositionChanged: (pos, hasGesture) {
-                if (hasGesture && pos.center != null) {
+                if (hasGesture) {
                   if (_lastBrowsePosition == null || 
-                      Geolocator.distanceBetween(_lastBrowsePosition!.latitude, _lastBrowsePosition!.longitude, pos.center!.latitude, pos.center!.longitude) > 1000) {
+                      Geolocator.distanceBetween(_lastBrowsePosition!.latitude, _lastBrowsePosition!.longitude, pos.center.latitude, pos.center.longitude) > 1000) {
                     setState(() => _showBrowseButton = true);
                   }
                 }
@@ -311,7 +308,30 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
                 urlTemplate: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
                 subdomains: const ['a', 'b', 'c', 'd'],
               ),
-              MarkerLayer(markers: _buildMarkers(directoryVM, isAr)),
+              MarkerClusterLayerWidget(
+                options: MarkerClusterLayerOptions(
+                  maxClusterRadius: 45,
+                  size: const Size(40, 40),
+                  alignment: Alignment.center,
+                  padding: const EdgeInsets.all(50),
+                  markers: _buildMarkers(directoryVM, isAr),
+                  builder: (context, markers) {
+                    return Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: EspyTheme.royalBlue,
+                        border: Border.all(color: Colors.white, width: 2),
+                      ),
+                      child: Center(
+                        child: Text(
+                          markers.length.toString(),
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
               if (_visitorLocation != null)
                 MarkerLayer(
                   markers: [
@@ -486,7 +506,7 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
               title: Text(node['name'], style: GoogleFonts.cinzel(fontSize: 11, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep)),
               subtitle: Text(node['city'], style: GoogleFonts.lora(fontSize: 10, color: Colors.black54)),
               trailing: const Icon(Icons.gps_fixed_rounded, size: 16, color: Colors.black12),
-            )).toList(),
+            )),
             const SizedBox(height: 24),
           ],
         ),

@@ -3,14 +3,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:animate_do/animate_do.dart';
 
+import 'package:espy_core/espy_core.dart';
 import 'package:espy_app/l10n/app_localizations.dart';
 import 'package:espy_app/theme/espy_theme.dart';
-import 'package:espy_app/viewmodels/services_view_model.dart';
-import 'package:espy_app/viewmodels/user_service.dart';
 import 'package:espy_app/widgets/common/premium_card.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';
-import '../../../models/service_model.dart';
-import '../../../models/enums.dart';
 import 'service_listing_wizard.dart';
 
 class ServiceManagerScreen extends StatefulWidget {
@@ -135,7 +132,7 @@ class _ServiceManagerScreenState extends State<ServiceManagerScreen> {
             ),
             Switch(
               value: isAllocated,
-              activeColor: EspyTheme.success,
+              activeThumbColor: EspyTheme.success,
               onChanged: (val) {
                 if (val && !canAllocate) return;
                 vm.toggleServiceSlot(service.id, val);

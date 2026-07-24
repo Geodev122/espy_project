@@ -3,12 +3,11 @@ import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+import 'package:espy_core/espy_core.dart';
 import 'package:espy_app/theme/espy_theme.dart';
-import 'package:espy_app/viewmodels/matching_view_model.dart';
 import 'package:espy_app/l10n/app_localizations.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';
 import 'package:espy_app/widgets/matching/adaptive_slot_card.dart';
-import '../../../models/enums.dart';
 
 class ServiceSwipeScreen extends StatefulWidget {
   const ServiceSwipeScreen({super.key});

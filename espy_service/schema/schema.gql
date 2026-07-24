@@ -327,6 +327,9 @@ type WalletTransaction @table(key: "id") {
   type: TransactionType!
   referenceId: String
   description: String
+  invoiceNumber: String
+  isRefunded: Boolean @default(value: false)
+  parentTransactionId: String
   createdAt: Timestamp! @default(expr: "request.time")
 }
 
@@ -400,6 +403,13 @@ type Broadcast @table(key: "id") {
   targetRegion: String # Changed to String to match Region ID
   targetCity: String   # Changed to String to match City ID
   status: String! @default(value: "queued")
+  moderationStatus: ModerationStatus! @default(value: PENDING)
+  flagReason: String
+  targetRole: UserRole
+  targetSector: Sector
+  targetCategory: Category
+  scheduledAt: Timestamp
+  openCount: Int @default(value: 0)
   createdAt: Timestamp! @default(expr: "request.time")
 }
 
@@ -439,4 +449,59 @@ type AdminLog @table(key: "id") {
 type AppConfig @table(key: "key") {
   key: String!
   value: String!
+}
+
+# --- 8. Operational Governance ---
+
+type SosNumber @table(key: "id") {
+  id: UUID! @default(expr: "uuidV4()")
+  country: Country!
+  sector: Sector
+  category: Category
+  labelEn: String!
+  labelAr: String
+  number: String!
+  categoryIcon: String
+  isVerified: Boolean @default(value: true)
+  isActive: Boolean! @default(value: true)
+}
+
+type TokenPackage @table(key: "id") {
+  id: String! # Unique package identifier, e.g., "tier_1_pro"
+  nameEn: String!
+  nameAr: String
+  tokenCount: Int!
+  price: Float!
+  discountRate: Float @default(value: 0.0)
+  targetRole: UserRole! @default(value: VISITOR)
+  isActive: Boolean! @default(value: true)
+}
+
+type ElementPricing @table(key: "id") {
+  id: String! # PIN, SLOT, BROADCAST
+  tokenCost: Int!
+  validityDays: Int @default(value: 30)
+  updatedAt: Timestamp @default(expr: "request.time")
+}
+
+# --- 9. Analytics & Performance ---
+
+type AnalyticsSnapshot @table(key: "id") {
+  id: UUID! @default(expr: "uuidV4()")
+  date: Date!
+  totalUsers: Int!
+  totalRevenue: Float!
+  tokensBurned: Int!
+  activeRequests: Int!
+  topSectorId: String
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+type ServiceMetric @table(key: "serviceId") {
+  service: Service! @ref(fields: ["serviceId"])
+  serviceId: UUID!
+  views: Int @default(value: 0)
+  contacts: Int @default(value: 0)
+  shares: Int @default(value: 0)
+  updatedAt: Timestamp @default(expr: "request.time")
 }

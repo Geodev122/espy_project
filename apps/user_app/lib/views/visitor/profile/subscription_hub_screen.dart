@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:espy_core/espy_core.dart';
 import 'package:espy_app/l10n/app_localizations.dart';
 import 'package:espy_app/theme/espy_theme.dart';
-import 'package:espy_app/viewmodels/auth_service.dart';
-import 'package:espy_app/viewmodels/wallet_view_model.dart';
 import 'package:espy_app/widgets/common/premium_card.dart';
 import 'package:espy_app/widgets/common/premium_button.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';

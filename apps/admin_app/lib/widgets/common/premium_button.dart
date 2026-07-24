@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:espy_core/espy_core.dart';
 import 'package:espy_app/theme/espy_theme.dart';
-import 'package:espy_app/viewmodels/sound_service.dart';
 
 enum PremiumButtonVariant { electric, cyan, gold, glass, outline, platinum }
 enum PremiumButtonSize { small, medium, large }

@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:espy_core/espy_core.dart';
 import 'package:espy_app/theme/espy_theme.dart';
-import 'package:espy_app/viewmodels/espy_repository.dart';
-import 'package:espy_app/models/country_model.dart';
-import 'package:espy_app/models/region_model.dart';
-import 'package:espy_app/models/city_model.dart';
 
 class HierarchicalLocationPicker extends StatefulWidget {
   final Function(CityModel city) onCitySelected;

@@ -3,18 +3,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:espy_core/espy_core.dart';
 import 'package:espy_app/l10n/app_localizations.dart';
 import 'package:espy_app/theme/espy_theme.dart';
-import 'package:espy_app/viewmodels/user_service.dart';
-import 'package:espy_app/viewmodels/sound_service.dart';
-import 'package:espy_app/viewmodels/storage_service.dart';
 import 'package:espy_app/widgets/common/premium_button.dart';
 import 'package:espy_app/widgets/common/premium_card.dart';
 import 'package:espy_app/widgets/common/profile_image_picker.dart';
 import 'package:espy_app/widgets/common/location_picker_modal.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';
-import '../../../models/user_model.dart';
-import '../../../models/enums.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});

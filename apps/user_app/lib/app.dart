@@ -3,7 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'l10n/app_localizations.dart';
 import 'theme/espy_theme.dart';
-import 'viewmodels/locale_service.dart';
+import 'package:espy_core/espy_core.dart';
 import 'views/shared/main_gate.dart';
 
 class EspyApp extends StatelessWidget {

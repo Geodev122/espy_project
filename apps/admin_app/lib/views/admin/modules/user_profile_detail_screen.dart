@@ -2,17 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:espy_core/espy_core.dart';
 import '../../../theme/espy_theme.dart';
-import '../../../viewmodels/espy_repository.dart';
 import '../../../viewmodels/user_manager_view_model.dart';
 import '../../../widgets/common/premium_card.dart';
 import '../../../widgets/common/espy_scaffold.dart';
 import '../../../widgets/common/premium_button.dart';
 import '../../../widgets/common/admin_data_row.dart';
 import '../../../widgets/common/espy_status_badge.dart';
-import '../../../models/user_model.dart';
 
 class UserProfileDetailScreen extends StatelessWidget {
   final String userId;

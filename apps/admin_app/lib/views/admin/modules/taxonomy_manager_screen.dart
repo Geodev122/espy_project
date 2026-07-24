@@ -1,11 +1,9 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:espy_core/espy_core.dart';
 import '../../../theme/espy_theme.dart';
-import '../../../viewmodels/espy_repository.dart';
 import '../../../viewmodels/taxonomy_view_model.dart';
 import '../../../widgets/common/premium_button.dart';
 import '../../../widgets/common/premium_card.dart';
@@ -13,11 +11,6 @@ import '../../../widgets/common/espy_scaffold.dart';
 import '../../../widgets/common/espy_icon.dart';
 import '../../../viewmodels/audit_view_model.dart';
 import '../../../utils/download_helper.dart';
-import '../../../models/sector_model.dart';
-import '../../../models/country_model.dart';
-import '../../../models/region_model.dart';
-import '../../../models/city_model.dart';
-import '../../../models/enums.dart';
 
 class TaxonomyManagerScreen extends StatelessWidget {
   const TaxonomyManagerScreen({super.key});

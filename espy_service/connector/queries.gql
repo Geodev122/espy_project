@@ -463,3 +463,170 @@ query ListTemplates @auth(level: PUBLIC) {
     configJson
   }
 }
+
+# --- 6. Operational Governance ---
+
+query ListSosNumbers($countryId: String, $sectorId: String, $categoryId: String) @auth(level: PUBLIC) {
+  sosNumbers(where: {
+    _and: [
+      { country: { id: { eq: $countryId } } },
+      { sector: { id: { eq: $sectorId } } },
+      { category: { id: { eq: $categoryId } } },
+      { isActive: { eq: true } }
+    ]
+  }) {
+    id
+    labelEn
+    labelAr
+    number
+    country { id }
+    sector { id }
+    category { id }
+  }
+}
+
+query ListTokenPackages($targetRole: UserRole, $isActive: Boolean = true) @auth(level: PUBLIC) {
+  tokenPackages(where: {
+    _and: [
+      { targetRole: { eq: $targetRole } },
+      { isActive: { eq: $isActive } }
+    ]
+  }) {
+    id
+    nameEn
+    nameAr
+    tokenCount
+    price
+    discountRate
+    targetRole
+    isActive
+  }
+}
+
+query ListElementPricing @auth(level: PUBLIC) {
+  elementPricings {
+    id
+    tokenCost
+    validityDays
+    updatedAt
+  }
+}
+
+query ListBroadcastModerationQueue($status: ModerationStatus = PENDING) @auth(level: NO_ACCESS) {
+  broadcasts(where: { moderationStatus: { eq: $status } }, orderBy: [{ createdAt: DESC }]) {
+    id
+    title
+    message
+    targetCountry
+    targetRegion
+    targetCity
+    status
+    moderationStatus
+    flagReason
+    targetRole
+    targetSector { id nameEn }
+    targetCategory { id nameEn }
+    sender { id name email }
+    createdAt
+  }
+}
+
+query ListActiveBroadcasts($country: String, $role: UserRole) @auth(level: PUBLIC) {
+  broadcasts(where: {
+    _and: [
+      { moderationStatus: { eq: APPROVED } },
+      { _or: [
+        { targetCountry: { eq: $country } },
+        { targetCountry: { eq: "GLOBAL" } }
+      ]},
+      { _or: [
+        { targetRole: { eq: $role } },
+        { targetRole: { isNull: true } }
+      ]}
+    ]
+  }, orderBy: [{ createdAt: DESC }]) {
+    id
+    title
+    message
+    targetCountry
+    targetRegion
+    targetCity
+    targetRole
+    createdAt
+  }
+}
+
+query GetFinanceStats($start: Timestamp, $end: Timestamp) @auth(level: NO_ACCESS) {
+  walletTransactions(where: {
+    _and: [
+      { createdAt: { ge: $start } },
+      { createdAt: { le: $end } }
+    ]
+  }, orderBy: [{ createdAt: DESC }]) {
+    id
+    amount
+    type
+    description
+    invoiceNumber
+    isRefunded
+    parentTransactionId
+    createdAt
+    user { id email name }
+  }
+}
+
+# --- 7. Analytics & advanced Governance ---
+
+query GetAnalyticsSnapshots($start: Date, $end: Date) @auth(level: NO_ACCESS) {
+  analyticsSnapshots(where: {
+    _and: [
+      { date: { ge: $start } },
+      { date: { le: $end } }
+    ]
+  }, orderBy: [{ date: DESC }]) {
+    id
+    date
+    totalUsers
+    totalRevenue
+    tokensBurned
+    activeRequests
+    topSectorId
+  }
+}
+
+query GetAppConfig($key: String!) @auth(level: PUBLIC) {
+  appConfig(key: { key: $key }) {
+    key
+    value
+  }
+}
+
+query ListAppConfigs @auth(level: NO_ACCESS) {
+  appConfigs {
+    key
+    value
+  }
+}
+
+query ListServiceMetrics @auth(level: NO_ACCESS) {
+  serviceMetrics {
+    serviceId
+    views
+    contacts
+    shares
+    updatedAt
+    service {
+      titleEn
+      provider { name }
+    }
+  }
+}
+
+query GetServiceMetric($serviceId: UUID!) @auth(level: PUBLIC) {
+  serviceMetric(key: { serviceId: $serviceId }) {
+    views
+    contacts
+    shares
+    updatedAt
+  }
+}

@@ -19,6 +19,8 @@ dependencies:
   firebase_data_connect: ^0.3.0+7
   espy_dataconnect_sdk:
     path: ../../packages/espy_dataconnect_sdk
+  espy_core:
+    path: ../../packages/espy_core
   provider: ^6.1.2
   google_fonts: ^8.1.0
   shared_preferences: ^2.5.5
@@ -30,6 +32,7 @@ dependencies:
   intl: 0.20.2
   geolocator: ^14.0.1
   flutter_map: ^8.3.0
+  flutter_map_marker_cluster: ^1.4.0
   latlong2: ^0.9.1
   geocoding: ^4.0.0
   geoflutterfire_plus: ^0.0.34

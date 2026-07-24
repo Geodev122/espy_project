@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'espy_repository.dart';
-import '../models/user_model.dart';
-import '../models/enums.dart';
+import 'package:espy_core/espy_core.dart';
 
 class UserManagerViewModel extends ChangeNotifier {
   final EspyRepository _repository;

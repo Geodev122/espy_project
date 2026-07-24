@@ -6,22 +6,9 @@ import 'package:provider/provider.dart';
 import 'dart:ui';
 
 import 'app.dart';
-import 'viewmodels/auth_service.dart';
+import 'package:espy_core/espy_core.dart';
 import 'utils/firebase_config.dart';
-import 'viewmodels/firestore_service.dart';
-import 'viewmodels/user_service.dart';
-import 'viewmodels/storage_service.dart';
-import 'viewmodels/whish_pay_service.dart';
-import 'viewmodels/locale_service.dart';
-import 'viewmodels/directory_view_model.dart';
 import 'viewmodels/admin_dashboard_view_model.dart';
-import 'viewmodels/dashboard_view_model.dart';
-import 'viewmodels/wallet_view_model.dart';
-import 'viewmodels/matching_view_model.dart';
-import 'viewmodels/requests_view_model.dart';
-import 'viewmodels/services_view_model.dart';
-import 'viewmodels/espy_repository.dart';
-import 'viewmodels/dataconnect_espy_repository.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

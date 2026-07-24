@@ -3,21 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:espy_core/espy_core.dart';
 import 'package:espy_app/l10n/app_localizations.dart';
-
 import 'package:espy_app/theme/espy_theme.dart';
-import 'package:espy_app/viewmodels/user_service.dart';
-import 'package:espy_app/viewmodels/sound_service.dart';
-import 'package:espy_app/viewmodels/espy_repository.dart';
-import 'package:espy_app/widgets/common/multi_select_chip_group.dart';
 import 'package:espy_app/widgets/common/hierarchical_location_picker.dart';
-import 'package:espy_app/widgets/common/premium_button.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';
-import '../../../models/service_model.dart';
-import '../../../models/city_model.dart';
-import '../../../models/enums.dart';
 
-import 'dart:io' as io;
 
 class ServiceListingWizard extends StatefulWidget {
   final ServiceModel? initialService;
@@ -37,7 +28,7 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
   
   String _allocationType = 'main';
   String? _selectedPriceTagId;
-  List<String> _selectedTagIds = [];
+  final List<String> _selectedTagIds = [];
   String _deliveryMode = 'FACE_TO_FACE';
   CityModel? _customLocation;
 
@@ -65,8 +56,11 @@ class _ServiceListingWizardState extends State<ServiceListingWizard> {
         type: StepperType.horizontal,
         currentStep: _currentStep,
         onStepContinue: () {
-          if (_currentStep < 2) setState(() => _currentStep++);
-          else _submit();
+          if (_currentStep < 2) {
+            setState(() => _currentStep++);
+          } else {
+            _submit();
+          }
         },
         onStepCancel: () {
           if (_currentStep > 0) setState(() => _currentStep--);

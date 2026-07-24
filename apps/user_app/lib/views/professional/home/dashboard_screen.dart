@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:espy_app/theme/espy_theme.dart';
-import 'package:espy_app/viewmodels/dashboard_view_model.dart';
+import 'package:espy_core/espy_core.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';
 import 'package:espy_app/l10n/app_localizations.dart';
 import '../profile/location_manager_screen.dart';

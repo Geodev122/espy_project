@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'espy_repository.dart';
+import 'package:espy_core/espy_core.dart';
 
 class AuditViewModel extends ChangeNotifier {
   final EspyRepository _repository;

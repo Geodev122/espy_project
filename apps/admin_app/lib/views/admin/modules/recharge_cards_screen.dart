@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:espy_core/espy_core.dart';
 import '../../../theme/espy_theme.dart';
-import '../../../viewmodels/espy_repository.dart';
 import '../../../viewmodels/recharge_cards_view_model.dart';
 import '../../../widgets/common/premium_card.dart';
 import '../../../widgets/common/espy_scaffold.dart';

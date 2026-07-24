@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_card_swiper/flutter_card_swiper.dart';
+import 'package:espy_core/espy_core.dart';
 import '../../../theme/espy_theme.dart';
-import '../../../viewmodels/espy_repository.dart';
 import '../../../viewmodels/service_management_view_model.dart';
 import '../../../widgets/common/premium_button.dart';
 import '../../../widgets/common/premium_card.dart';
 import '../../../widgets/common/espy_scaffold.dart';
-import '../../../models/service_model.dart';
-import '../../../models/service_request.dart';
-import '../../../models/sector_model.dart';
 
 class ServiceManagementScreen extends StatelessWidget {
   const ServiceManagementScreen({super.key});
@@ -310,11 +306,15 @@ class _TemplateManagementPanel extends StatelessWidget {
                   value: selected.contains(f),
                   onChanged: (val) {
                     setModalState(() {
-                      if (val == true) selected.add(f); else selected.remove(f);
+                      if (val == true) {
+                        selected.add(f);
+                      } else {
+                        selected.remove(f);
+                      }
                     });
                   },
                   dense: true,
-                )).toList(),
+                )),
               ],
             ),
           ),

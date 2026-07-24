@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:espy_core/espy_core.dart';
 import '../../../theme/espy_theme.dart';
-import '../../../viewmodels/espy_repository.dart';
 import '../../../widgets/common/premium_button.dart';
 import '../../../widgets/common/espy_scaffold.dart';
-import '../../../models/sector_model.dart';
-import '../../../models/category_model.dart';
 
 class SeedManagerPage extends StatefulWidget {
   const SeedManagerPage({super.key});

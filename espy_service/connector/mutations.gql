@@ -271,7 +271,7 @@ mutation UpsertTemplate($id: String!, $visibleFields: [String!], $accentColor: S
   })
 }
 
-mutation CreateLocalizedBroadcast($title: String!, $message: String!, $country: String, $region: String, $city: String) @auth(level: NO_ACCESS) {
+mutation CreateLocalizedBroadcast($title: String!, $message: String!, $country: String, $region: String, $city: String, $status: ModerationStatus = PENDING) @auth(level: USER) {
   broadcast_insert(data: {
     senderId_expr: "auth.uid",
     title: $title,
@@ -279,7 +279,8 @@ mutation CreateLocalizedBroadcast($title: String!, $message: String!, $country: 
     targetCountry: $country,
     targetRegion: $region,
     targetCity: $city,
-    status: "queued"
+    status: "queued",
+    moderationStatus: $status
   })
 }
 
@@ -311,5 +312,102 @@ mutation ResolveSupportTicket($id: UUID!, $adminNote: String) @auth(level: NO_AC
   supportTicket_update(key: { id: $id }, data: {
     status: CLOSED,
     adminNote: $adminNote
+  })
+}
+
+# --- 6. Operational Governance ---
+
+mutation UpsertSosNumber($id: UUID, $countryId: String!, $sectorId: String, $categoryId: String, $labelEn: String!, $labelAr: String, $number: String!, $isActive: Boolean!) @auth(level: NO_ACCESS) {
+  sosNumber_upsert(data: {
+    id: $id,
+    countryId: $countryId,
+    sectorId: $sectorId,
+    categoryId: $categoryId,
+    labelEn: $labelEn,
+    labelAr: $labelAr,
+    number: $number,
+    isActive: $isActive
+  })
+}
+
+mutation UpsertTokenPackage($id: String!, $nameEn: String!, $nameAr: String, $tokenCount: Int!, $price: Float!, $discountRate: Float, $targetRole: UserRole!, $isActive: Boolean!) @auth(level: NO_ACCESS) {
+  tokenPackage_upsert(data: {
+    id: $id,
+    nameEn: $nameEn,
+    nameAr: $nameAr,
+    tokenCount: $tokenCount,
+    price: $price,
+    discountRate: $discountRate,
+    targetRole: $targetRole,
+    isActive: $isActive
+  })
+}
+
+mutation UpdateElementPricing($id: String!, $tokenCost: Int!, $validityDays: Int) @auth(level: NO_ACCESS) {
+  elementPricing_upsert(data: {
+    id: $id,
+    tokenCost: $tokenCost,
+    validityDays: $validityDays,
+    updatedAt_expr: "request.time"
+  })
+}
+
+mutation ModerateBroadcast($id: UUID!, $status: ModerationStatus!, $reason: String) @auth(level: NO_ACCESS) {
+  broadcast_update(key: { id: $id }, data: {
+    moderationStatus: $status,
+    flagReason: $reason
+  })
+}
+
+# --- 7. Analytics & advanced Governance ---
+
+mutation RefundTransaction($id: UUID!, $reason: String!) @auth(level: NO_ACCESS) {
+  walletTransaction_update(key: { id: $id }, data: {
+    isRefunded: true,
+    description: $reason
+  })
+}
+
+mutation UpdateAppConfig($key: String!, $value: String!) @auth(level: NO_ACCESS) {
+  appConfig_upsert(data: {
+    key: $key,
+    value: $value
+  })
+}
+
+mutation CreateAnalyticsSnapshot(
+  $date: Date!,
+  $totalUsers: Int!,
+  $totalRevenue: Float!,
+  $tokensBurned: Int!,
+  $activeRequests: Int!,
+  $topSectorId: String
+) @auth(level: NO_ACCESS) {
+  analyticsSnapshot_insert(data: {
+    date: $date,
+    totalUsers: $totalUsers,
+    totalRevenue: $totalRevenue,
+    tokensBurned: $tokensBurned,
+    activeRequests: $activeRequests,
+    topSectorId: $topSectorId
+  })
+}
+
+mutation UpsertServiceMetric($serviceId: UUID!, $views: Int, $contacts: Int, $shares: Int) @auth(level: NO_ACCESS) {
+  serviceMetric_upsert(data: {
+    serviceId: $serviceId,
+    views: $views,
+    contacts: $contacts,
+    shares: $shares,
+    updatedAt_expr: "request.time"
+  })
+}
+
+mutation IncrementServiceMetric($serviceId: UUID!, $views: Int = 0, $contacts: Int = 0, $shares: Int = 0) @auth(level: PUBLIC) {
+  serviceMetric_update(key: { serviceId: $serviceId }, data: {
+    views_update: { inc: $views },
+    contacts_update: { inc: $contacts },
+    shares_update: { inc: $shares },
+    updatedAt_expr: "request.time"
   })
 }

@@ -3,11 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:espy_app/theme/espy_theme.dart';
-import 'package:espy_app/viewmodels/debug_service.dart';
-import 'package:espy_app/viewmodels/platform/web_helper.dart';
-import 'package:espy_app/viewmodels/auth_service.dart';
-import 'package:espy_app/models/user_model.dart';
-import 'package:espy_app/models/enums.dart';
+import 'package:espy_core/espy_core.dart';
+import 'package:espy_app/theme/espy_theme.dart';
 
 import 'app_shell.dart';
 import 'onboarding/splash_screen.dart';
@@ -24,7 +21,7 @@ class MainGate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _debug = DebugService();
+    final debug = DebugService();
     return Consumer<AuthService>(
       builder: (context, auth, _) {
         if (auth.isInitializing || auth.isLoading || auth.isProvisioning) {
@@ -70,7 +67,7 @@ class MainGate extends StatelessWidget {
         }
 
         final user = auth.userData!;
-        _debug.log('GATE', 'Role: ${user.role}, HasProfile: ${user.hasProfile}');
+        debug.log('GATE', 'Role: ${user.role}, HasProfile: ${user.hasProfile}');
 
         if (!user.isActive) {
           return const SuspensionScreen();

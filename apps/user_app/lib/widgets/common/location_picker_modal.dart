@@ -5,10 +5,9 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:espy_core/espy_core.dart';
 import 'package:espy_app/theme/espy_theme.dart';
 import 'premium_button.dart';
-import 'package:espy_app/viewmodels/sound_service.dart';
-import 'package:espy_app/viewmodels/firestore_service.dart';
 
 class LocationPickerModal extends StatefulWidget {
   final String title;
@@ -232,7 +231,7 @@ class _LocationPickerModalState extends State<LocationPickerModal> {
       builder: (context, snapshot) {
         final countries = snapshot.data ?? [];
         return DropdownButtonFormField<String>(
-          value: _selectedCountryId,
+          initialValue: _selectedCountryId,
           hint: Text('COUNTRY', style: GoogleFonts.cinzel(fontSize: 10, color: Colors.white38)),
           dropdownColor: EspyTheme.navy,
           style: GoogleFonts.cinzel(fontSize: 11, color: Colors.white),
@@ -255,7 +254,7 @@ class _LocationPickerModalState extends State<LocationPickerModal> {
       builder: (context, snapshot) {
         final items = snapshot.data ?? [];
         return DropdownButtonFormField<String>(
-          value: _selectedGovernorateId,
+          initialValue: _selectedGovernorateId,
           hint: Text('REGION', style: GoogleFonts.cinzel(fontSize: 10, color: Colors.white38)),
           dropdownColor: EspyTheme.navy,
           style: GoogleFonts.cinzel(fontSize: 11, color: Colors.white),
@@ -278,7 +277,7 @@ class _LocationPickerModalState extends State<LocationPickerModal> {
       builder: (context, snapshot) {
         final items = snapshot.data ?? [];
         return DropdownButtonFormField<String>(
-          value: _selectedCityId,
+          initialValue: _selectedCityId,
           hint: Text('CITY', style: GoogleFonts.cinzel(fontSize: 10, color: Colors.white38)),
           dropdownColor: EspyTheme.navy,
           style: GoogleFonts.cinzel(fontSize: 11, color: Colors.white),

@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'espy_repository.dart';
+import 'package:espy_core/espy_core.dart';
 
 class AdminDashboardViewModel extends ChangeNotifier {
   final EspyRepository _repository;
@@ -51,6 +51,32 @@ class AdminDashboardViewModel extends ChangeNotifier {
     } catch (e) {
       debugPrint("Stats Init Error: $e");
       _isLoading = false;
+    }
+  }
+
+  Future<void> triggerAnalyticsSync() async {
+    try {
+      final now = DateTime.now();
+      final txs = await _repository.getFinanceStats();
+      
+      double revenue = 0;
+      int tokensBurned = 0;
+      
+      for (var tx in txs) {
+        if (tx.type == TransactionType.recharge) revenue += tx.amount;
+        if (tx.type == TransactionType.purchase) tokensBurned += tx.amount.abs();
+      }
+
+      await _repository.createAnalyticsSnapshot({
+        'date': now,
+        'totalUsers': int.tryParse(_stats['users']!) ?? 0,
+        'totalRevenue': revenue,
+        'tokensBurned': tokensBurned,
+        'activeRequests': int.tryParse(_stats['communityRequests']!) ?? 0,
+      });
+      debugPrint("Analytics Snapshot Synchronized.");
+    } catch (e) {
+      debugPrint("Sync Error: $e");
     }
   }
 

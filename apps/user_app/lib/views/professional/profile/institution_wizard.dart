@@ -1,25 +1,18 @@
 import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import 'package:espy_core/espy_core.dart';
 import 'package:espy_app/l10n/app_localizations.dart';
 import 'package:espy_app/theme/espy_theme.dart';
-import 'package:espy_app/viewmodels/auth_service.dart';
-import 'package:espy_app/viewmodels/espy_repository.dart';
-import 'package:espy_app/viewmodels/registration_view_model.dart';
 import 'package:espy_app/widgets/common/hierarchical_location_picker.dart';
 import 'package:espy_app/widgets/common/premium_button.dart';
 import 'package:espy_app/widgets/common/premium_card.dart';
 import 'package:espy_app/widgets/common/profile_image_picker.dart';
 import 'package:espy_app/widgets/common/document_picker.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';
-import '../../../models/sector_model.dart';
-import '../../../models/category_model.dart';
-import '../../../models/city_model.dart';
-import '../../../models/enums.dart';
 
 class InstitutionWizard extends StatefulWidget {
   const InstitutionWizard({super.key});

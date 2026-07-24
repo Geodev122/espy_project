@@ -9,16 +9,12 @@ import 'package:provider/provider.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import 'package:espy_core/espy_core.dart';
 import 'package:espy_app/l10n/app_localizations.dart';
 import 'package:espy_app/theme/espy_theme.dart';
-import 'package:espy_app/viewmodels/firestore_service.dart';
-import 'package:espy_app/viewmodels/auth_service.dart';
-import 'package:espy_app/viewmodels/sound_service.dart';
-import 'package:espy_app/viewmodels/directory_view_model.dart';
-import 'package:espy_app/models/user_model.dart' as models;
-import 'package:espy_app/models/enums.dart';
 import 'package:espy_app/widgets/common/premium_button.dart';
 import 'package:espy_app/widgets/common/espy_scaffold.dart';
+import '../../admin/modules/activity_heatmap_overlay.dart';
 
 class MapExploreScreen extends StatefulWidget {
   const MapExploreScreen({super.key});
@@ -27,11 +23,15 @@ class MapExploreScreen extends StatefulWidget {
   State<MapExploreScreen> createState() => _MapExploreScreenState();
 }
 
+import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
+
 class _MapExploreScreenState extends State<MapExploreScreen> {
   final MapController _mapController = MapController();
   LatLng? _visitorLocation;
   LatLng? _lastBrowsePosition;
   bool _showBrowseButton = false;
+  bool _showHeatmap = false;
+  String _heatmapMode = 'DEMAND'; // 'DEMAND' or 'SUPPLY'
 
   @override
   void initState() {
@@ -76,7 +76,7 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
       
       final expiry = p['visibilityExpiresAt'] is Timestamp 
           ? (p['visibilityExpiresAt'] as Timestamp).toDate() 
-          : DateTime.fromMillisecondsSinceEpoch(p['visibilityExpiresAt'] as int);
+          : DateTime.fromMillisecondsSinceEpoch(p['visibilityExpiresAt'] is int ? p['visibilityExpiresAt'] : int.parse(p['visibilityExpiresAt'].toString()));
           
       if (expiry.isBefore(now)) continue;
 
@@ -157,56 +157,77 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
   }
 
   void _showMarkerPopup(Map<String, dynamic> p, bool isAr, {String? activity}) {
-    showDialog(
+    showModalBottomSheet(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: EspyTheme.navyDeep,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24), side: BorderSide(color: EspyTheme.cyan.withValues(alpha: 0.3))),
-        title: Text(
-          (isAr ? p['fullNameAr'] : p['fullNameEn']) ?? p['fullNameEn'] ?? p['name'] ?? 'ESPY NODE', 
-          style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, color: Colors.white, fontSize: 18)
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-          children: [
-            Text(
-              (isAr ? p['specializationAr'] : p['specializationEn']) ?? p['specialization'] ?? 'Specialist', 
-              style: GoogleFonts.lora(color: EspyTheme.electricBlue, fontWeight: FontWeight.bold)
-            ),
-            if (activity != null && activity.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              Text(
-                "NODE ACTIVITY:",
-                style: GoogleFonts.cinzel(fontSize: 10, fontWeight: FontWeight.bold, color: EspyTheme.gold, letterSpacing: 1),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.4,
+        minChildSize: 0.2,
+        maxChildSize: 0.8,
+        builder: (context, scrollController) => Container(
+          decoration: const BoxDecoration(
+            color: EspyTheme.navyDeep,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+          ),
+          child: ListView(
+            controller: scrollController,
+            padding: const EdgeInsets.all(32),
+            children: [
+              Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white12, borderRadius: BorderRadius.circular(2)))),
+              const SizedBox(height: 32),
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundImage: p['photoUrl'] != null ? NetworkImage(p['photoUrl']) : null,
+                    backgroundColor: Colors.white10,
+                  ),
+                  const SizedBox(width: 20),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          (isAr ? p['fullNameAr'] : p['fullNameEn']) ?? p['fullNameEn'] ?? p['name'] ?? 'ESPY NODE', 
+                          style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, color: Colors.white, fontSize: 18)
+                        ),
+                        Text(
+                          (isAr ? p['specializationAr'] : p['specializationEn']) ?? p['specialization'] ?? 'Specialist', 
+                          style: GoogleFonts.lora(color: EspyTheme.cyan, fontWeight: FontWeight.bold, fontSize: 12)
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (p['role'] == 'institution')
+                    const Icon(Icons.verified_user, color: EspyTheme.gold, size: 24),
+                ],
               ),
-              Text(activity, style: GoogleFonts.lora(color: Colors.white70, fontSize: 13)),
+              const SizedBox(height: 32),
+              _buildInfoSection("NODE ACTIVITY", activity ?? "Primary Protocol Node"),
+              _buildInfoSection("LOCATION", p['mainLocation']?['cityNameEn'] ?? "Lebanon"),
+              const SizedBox(height: 32),
+              PremiumButton(
+                label: "VIEW FULL PROTOCOL PROFILE",
+                onPressed: () => Navigator.pop(context),
+                fullWidth: true,
+              ),
             ],
-            const SizedBox(height: 12),
-            Builder(builder: (context) {
-              final Map<String, dynamic>? loc = p['mainLocation'] as Map<String, dynamic>?;
-              String cityName = 'Lebanon';
-              if (loc != null) {
-                if (isAr) {
-                  cityName = (loc['cityNameAr'] ?? loc['cityName'])?.toString() ?? 'Lebanon';
-                } else {
-                  cityName = (loc['cityNameEn'] ?? loc['cityName'])?.toString() ?? 'Lebanon';
-                }
-              }
-              return Text(cityName, style: GoogleFonts.lora(color: Colors.white60));
-            }),
-          ],
+          ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(isAr ? 'إغلاق' : 'CLOSE', style: const TextStyle(color: Colors.white24)),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            style: ElevatedButton.styleFrom(backgroundColor: EspyTheme.gold),
-            child: Text(isAr ? 'عرض الملف' : 'VIEW PROFILE', style: GoogleFonts.cinzel(fontWeight: FontWeight.w900, color: EspyTheme.navyDeep)),
-          ),
+      ),
+    );
+  }
+
+  Widget _buildInfoSection(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: GoogleFonts.cinzel(fontSize: 9, fontWeight: FontWeight.w900, color: EspyTheme.gold, letterSpacing: 2)),
+          const SizedBox(height: 4),
+          Text(value, style: GoogleFonts.montserrat(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w500)),
         ],
       ),
     );
@@ -235,9 +256,9 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
               initialCenter: const LatLng(33.8938, 35.5018),
               initialZoom: 12,
               onPositionChanged: (pos, hasGesture) {
-                if (hasGesture && pos.center != null) {
+                if (hasGesture) {
                   if (_lastBrowsePosition == null || 
-                      Geolocator.distanceBetween(_lastBrowsePosition!.latitude, _lastBrowsePosition!.longitude, pos.center!.latitude, pos.center!.longitude) > 1000) {
+                      Geolocator.distanceBetween(_lastBrowsePosition!.latitude, _lastBrowsePosition!.longitude, pos.center.latitude, pos.center.longitude) > 1000) {
                     setState(() => _showBrowseButton = true);
                   }
                 }
@@ -248,7 +269,38 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
                 urlTemplate: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
                 subdomains: const ['a', 'b', 'c', 'd'],
               ),
-              MarkerLayer(markers: _buildMarkers(directoryVM, isAr)),
+              if (_showHeatmap)
+                ActivityHeatmapOverlay(
+                  hotspots: _heatmapMode == 'DEMAND' 
+                    ? directoryVM.providers.map((p) => LatLng((p['mainLocation'] as Map)['lat'], (p['mainLocation'] as Map)['lng'])).toList() // Mock demand for now
+                    : _buildMarkers(directoryVM, isAr).map((m) => m.point).toList(),
+                  label: _heatmapMode,
+                  color: _heatmapMode == 'DEMAND' ? Colors.orangeAccent : EspyTheme.royalBlue,
+                ),
+              MarkerClusterLayerWidget(
+                options: MarkerClusterLayerOptions(
+                  maxClusterRadius: 45,
+                  size: const Size(40, 40),
+                  alignment: Alignment.center,
+                  padding: const EdgeInsets.all(50),
+                  markers: _buildMarkers(directoryVM, isAr),
+                  builder: (context, markers) {
+                    return Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: EspyTheme.royalBlue,
+                        border: Border.all(color: Colors.white, width: 2),
+                      ),
+                      child: Center(
+                        child: Text(
+                          markers.length.toString(),
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
               if (_visitorLocation != null)
                 MarkerLayer(
                   markers: [
@@ -332,6 +384,34 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
             left: isAr ? 20 : null,
             child: Column(
               children: [
+                if (!isVisitor) ...[
+                   HeatmapControl(
+                     active: _showHeatmap && _heatmapMode == 'DEMAND',
+                     label: "DEMAND",
+                     onTap: () => setState(() {
+                       if (_showHeatmap && _heatmapMode == 'DEMAND') {
+                         _showHeatmap = false;
+                       } else {
+                         _showHeatmap = true;
+                         _heatmapMode = 'DEMAND';
+                       }
+                     }),
+                   ),
+                   const SizedBox(height: 8),
+                   HeatmapControl(
+                     active: _showHeatmap && _heatmapMode == 'SUPPLY',
+                     label: "SUPPLY",
+                     onTap: () => setState(() {
+                       if (_showHeatmap && _heatmapMode == 'SUPPLY') {
+                         _showHeatmap = false;
+                       } else {
+                         _showHeatmap = true;
+                         _heatmapMode = 'SUPPLY';
+                       }
+                     }),
+                   ),
+                   const SizedBox(height: 12),
+                ],
                 _buildMapControl(
                   icon: Icons.my_location_rounded,
                   onTap: _determinePosition,
@@ -423,7 +503,7 @@ class _MapExploreScreenState extends State<MapExploreScreen> {
               title: Text(node['name'], style: GoogleFonts.cinzel(fontSize: 11, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep)),
               subtitle: Text(node['city'], style: GoogleFonts.lora(fontSize: 10, color: Colors.black54)),
               trailing: const Icon(Icons.gps_fixed_rounded, size: 16, color: Colors.black12),
-            )).toList(),
+            )),
             const SizedBox(height: 24),
           ],
         ),

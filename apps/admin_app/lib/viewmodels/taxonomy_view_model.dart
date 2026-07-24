@@ -2,18 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:excel/excel.dart';
-import 'espy_repository.dart';
-import '../models/sector_model.dart';
-import '../models/category_model.dart';
-import '../models/country_model.dart';
-import '../models/region_model.dart';
-import '../models/city_model.dart';
+import 'package:espy_core/espy_core.dart';
 
 class TaxonomyViewModel extends ChangeNotifier {
   final EspyRepository _repository;
 
   List<SectorModel> _sectors = [];
-  List<CategoryModel> _categories = [];
+  final List<CategoryModel> _categories = [];
   List<CountryModel> _countries = [];
   List<RegionModel> _regions = [];
   List<CityModel> _cities = [];

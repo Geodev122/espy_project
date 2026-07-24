@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:espy_core/espy_core.dart';
 import '../../../theme/espy_theme.dart';
-import '../../../viewmodels/espy_repository.dart';
 import '../../../viewmodels/verifications_view_model.dart';
 import '../../../widgets/common/premium_card.dart';
 import '../../../widgets/common/espy_scaffold.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class VerificationsScreen extends StatelessWidget {
   const VerificationsScreen({super.key});
@@ -47,44 +46,67 @@ class _VerificationsView extends StatelessWidget {
                     final bool needsApproval = p['isApproved'] == false;
 
                     return Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.only(bottom: 24),
                       child: PremiumCard(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(24),
                         child: Column(
                           children: [
-                            ListTile(
-                              leading: CircleAvatar(
-                                backgroundImage: p['photoUrl'] != null ? NetworkImage(p['photoUrl']) : null,
-                                backgroundColor: EspyTheme.platinum,
-                                child: p['photoUrl'] == null ? const Icon(Icons.person) : null,
-                              ),
-                              title: Text(p['name'] ?? 'Unknown', style: const TextStyle(fontWeight: FontWeight.bold)),
-                              subtitle: Text("${p['role']?.toString().toUpperCase()} • ${p['specialty'] ?? 'No Specialty'}"),
-                              trailing: Icon(
-                                needsValidation ? LucideIcons.shieldAlert : LucideIcons.checkCircle,
-                                color: needsValidation ? EspyTheme.gold : EspyTheme.success,
-                              ),
+                            Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 30,
+                                  backgroundImage: p['photoUrl'] != null ? CachedNetworkImageProvider(p['photoUrl']) : null,
+                                  backgroundColor: EspyTheme.platinum,
+                                  child: p['photoUrl'] == null ? const Icon(Icons.person, size: 30) : null,
+                                ),
+                                const SizedBox(width: 20),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(p['name'] ?? 'Unknown', style: GoogleFonts.montserrat(fontWeight: FontWeight.w900, fontSize: 16)),
+                                      Text("${p['role']?.toString().toUpperCase()} • ${p['specialty'] ?? 'No Specialty'}", style: GoogleFonts.lora(fontSize: 12, color: Colors.black45)),
+                                      const SizedBox(height: 8),
+                                      if (p['verificationDocUrl'] != null)
+                                        TextButton.icon(
+                                          onPressed: () => _showDocumentViewer(context, p['verificationDocUrl']),
+                                          icon: const Icon(Icons.description_outlined, size: 16),
+                                          label: const Text("VIEW VERIFICATION DOCS", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  decoration: BoxDecoration(color: needsValidation ? Colors.orange.withValues(alpha: 0.1) : Colors.green.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
+                                  child: Text(needsValidation ? "PENDING VALIDATION" : "VALIDATED", style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: needsValidation ? Colors.orange : Colors.green)),
+                                ),
+                              ],
                             ),
-                            const Divider(),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  if (needsValidation)
-                                    _actionBtn(
-                                      label: "VALIDATE PROFILE",
-                                      color: EspyTheme.gold,
-                                      onTap: () => viewModel.validateProfile(p['id'], p['role']),
-                                    ),
-                                  if (needsApproval)
-                                    _actionBtn(
-                                      label: "APPROVE SEARCH",
-                                      color: EspyTheme.success,
-                                      onTap: () => viewModel.approveSearch(p['id'], p['role']),
-                                    ),
+                            const Divider(height: 32),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                TextButton(
+                                  onPressed: () => _showRejectionDialog(context, p, viewModel),
+                                  child: const Text("REJECT", style: TextStyle(color: Colors.redAccent, fontSize: 10, fontWeight: FontWeight.w900)),
+                                ),
+                                const SizedBox(width: 16),
+                                if (needsValidation)
+                                  _actionBtn(
+                                    label: "VALIDATE PROFILE",
+                                    color: EspyTheme.gold,
+                                    onTap: () => viewModel.validateProfile(p['id'], p['role']),
+                                  ),
+                                if (needsApproval) ...[
+                                  const SizedBox(width: 12),
+                                  _actionBtn(
+                                    label: "APPROVE SEARCH",
+                                    color: EspyTheme.success,
+                                    onTap: () => viewModel.approveSearch(p['id'], p['role']),
+                                  ),
                                 ],
-                              ),
+                              ],
                             )
                           ],
                         ),
@@ -95,16 +117,81 @@ class _VerificationsView extends StatelessWidget {
     );
   }
 
+  void _showDocumentViewer(BuildContext context, String url) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          width: 800, height: 600,
+          decoration: BoxDecoration(color: Colors.black87, borderRadius: BorderRadius.circular(16)),
+          child: Column(
+            children: [
+              AppBar(
+                title: const Text("VERIFICATION DOCUMENT", style: TextStyle(color: Colors.white, fontSize: 12)),
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                leading: IconButton(icon: const Icon(Icons.close, color: Colors.white), onPressed: () => Navigator.pop(context)),
+                actions: [
+                   IconButton(icon: const Icon(Icons.download, color: Colors.white), onPressed: () {}),
+                ],
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: CachedNetworkImage(
+                    imageUrl: url,
+                    placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                    errorWidget: (context, url, error) => const Center(child: Text("COULD NOT LOAD IMAGE", style: TextStyle(color: Colors.white24))),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showRejectionDialog(BuildContext context, Map<String, dynamic> p, VerificationsViewModel vm) {
+    final reason = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("REJECT ${p['name']?.toUpperCase()}"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text("Provide a reason for rejection. This will be sent to the user.", style: TextStyle(fontSize: 12)),
+            const SizedBox(height: 16),
+            TextField(controller: reason, maxLines: 3, decoration: const InputDecoration(hintText: "e.g. License expired, blurry document...")),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("CANCEL")),
+          ElevatedButton(
+            onPressed: () {
+               // Logic to notify user and mark as rejected
+               Navigator.pop(context);
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text("CONFIRM REJECTION"),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _actionBtn({required String label, required Color color, required VoidCallback onTap}) {
     return ElevatedButton(
       onPressed: onTap,
       style: ElevatedButton.styleFrom(
         backgroundColor: color,
         foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
-      child: Text(label, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w900)),
+      child: Text(label, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1)),
     );
   }
 }

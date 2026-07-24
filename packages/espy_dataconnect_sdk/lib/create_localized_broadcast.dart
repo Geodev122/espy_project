@@ -6,6 +6,7 @@ class CreateLocalizedBroadcastVariablesBuilder {
   Optional<String> _country = Optional.optional(nativeFromJson, nativeToJson);
   Optional<String> _region = Optional.optional(nativeFromJson, nativeToJson);
   Optional<String> _city = Optional.optional(nativeFromJson, nativeToJson);
+  Optional<ModerationStatus> _status = Optional.optional((data) => ModerationStatus.values.byName(data), enumSerializer);
 
   final FirebaseDataConnect _dataConnect;  CreateLocalizedBroadcastVariablesBuilder country(String? t) {
    _country.value = t;
@@ -19,6 +20,10 @@ class CreateLocalizedBroadcastVariablesBuilder {
    _city.value = t;
    return this;
   }
+  CreateLocalizedBroadcastVariablesBuilder status(ModerationStatus? t) {
+   _status.value = t;
+   return this;
+  }
 
   CreateLocalizedBroadcastVariablesBuilder(this._dataConnect, {required  this.title,required  this.message,});
   Deserializer<CreateLocalizedBroadcastData> dataDeserializer = (dynamic json)  => CreateLocalizedBroadcastData.fromJson(jsonDecode(json));
@@ -28,7 +33,7 @@ class CreateLocalizedBroadcastVariablesBuilder {
   }
 
   MutationRef<CreateLocalizedBroadcastData, CreateLocalizedBroadcastVariables> ref() {
-    CreateLocalizedBroadcastVariables vars= CreateLocalizedBroadcastVariables(title: title,message: message,country: _country,region: _region,city: _city,);
+    CreateLocalizedBroadcastVariables vars= CreateLocalizedBroadcastVariables(title: title,message: message,country: _country,region: _region,city: _city,status: _status,);
     return _dataConnect.mutation("CreateLocalizedBroadcast", dataDeserializer, varsSerializer, vars);
   }
 }
@@ -108,6 +113,7 @@ class CreateLocalizedBroadcastVariables {
   late final Optional<String>country;
   late final Optional<String>region;
   late final Optional<String>city;
+  late final Optional<ModerationStatus>status;
   @Deprecated('fromJson is deprecated for Variable classes as they are no longer required for deserialization.')
   CreateLocalizedBroadcastVariables.fromJson(Map<String, dynamic> json):
   
@@ -128,6 +134,10 @@ class CreateLocalizedBroadcastVariables {
     city = Optional.optional(nativeFromJson, nativeToJson);
     city.value = json['city'] == null ? null : nativeFromJson<String>(json['city']);
   
+  
+    status = Optional.optional((data) => ModerationStatus.values.byName(data), enumSerializer);
+    status.value = json['status'] == null ? null : ModerationStatus.values.byName(json['status']);
+  
   }
   @override
   bool operator ==(Object other) {
@@ -143,11 +153,12 @@ class CreateLocalizedBroadcastVariables {
     message == otherTyped.message && 
     country == otherTyped.country && 
     region == otherTyped.region && 
-    city == otherTyped.city;
+    city == otherTyped.city && 
+    status == otherTyped.status;
     
   }
   @override
-  int get hashCode => Object.hashAll([title.hashCode, message.hashCode, country.hashCode, region.hashCode, city.hashCode]);
+  int get hashCode => Object.hashAll([title.hashCode, message.hashCode, country.hashCode, region.hashCode, city.hashCode, status.hashCode]);
   
 
   Map<String, dynamic> toJson() {
@@ -163,6 +174,9 @@ class CreateLocalizedBroadcastVariables {
     if(city.state == OptionalState.set) {
       json['city'] = city.toJson();
     }
+    if(status.state == OptionalState.set) {
+      json['status'] = status.toJson();
+    }
     return json;
   }
 
@@ -172,6 +186,7 @@ class CreateLocalizedBroadcastVariables {
     required this.country,
     required this.region,
     required this.city,
+    required this.status,
   });
 }
 

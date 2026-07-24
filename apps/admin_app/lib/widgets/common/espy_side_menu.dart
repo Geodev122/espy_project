@@ -4,9 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 
+import 'package:espy_core/espy_core.dart';
 import 'package:espy_app/theme/espy_theme.dart';
-import 'package:espy_app/viewmodels/auth_service.dart';
-import 'package:espy_app/models/user_model.dart';
 
 import '../../views/admin/modules/verifications_screen.dart';
 import '../../views/admin/modules/orders_manager_screen.dart';
@@ -49,7 +48,14 @@ class EspySideMenu extends StatelessWidget {
                     _buildSectionHeader('GOVERNANCE'),
                     _buildMenuItem(context, LucideIcons.map, 'GEOGRAPHY', const TaxonomyManagerScreen()),
                     _buildMenuItem(context, LucideIcons.settings, 'SERVICES', const ServiceManagementScreen()),
-                    _buildMenuItem(context, LucideIcons.megaphone, 'ANNOUNCEMENTS', null),
+                    _buildMenuItem(context, LucideIcons.megaphone, 'BROADCASTS', const BroadcastGovernanceScreen()),
+                    _buildMenuItem(context, LucideIcons.phone, 'SOS NUMBERS', const SosManagerScreen()),
+
+                    const SizedBox(height: 24),
+                    _buildSectionHeader('ECONOMY'),
+                    _buildMenuItem(context, LucideIcons.banknote, 'FINANCE', const FinanceManagerScreen()),
+                    _buildMenuItem(context, LucideIcons.package, 'TOKEN PACKAGES', const TokenPackageScreen()),
+                    _buildMenuItem(context, LucideIcons.tag, 'ELEMENT PRICING', const ElementPricingScreen()),
 
                     const SizedBox(height: 24),
                     _buildSectionHeader('DEVELOPER'),

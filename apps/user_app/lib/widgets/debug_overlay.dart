@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import '../viewmodels/debug_service.dart';
+import 'package:espy_core/espy_core.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 

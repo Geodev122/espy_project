@@ -1,11 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
+import 'package:espy_core/espy_core.dart';
 import '../../theme/espy_theme.dart';
-import '../../models/service_model.dart';
-import '../../models/service_request.dart';
-import '../../models/enums.dart';
 import '../common/espy_icon.dart';
 import '../common/premium_card.dart';
 

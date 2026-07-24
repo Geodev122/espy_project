@@ -3,10 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+import 'package:espy_core/espy_core.dart';
 import 'package:espy_app/theme/espy_theme.dart';
-import 'package:espy_app/viewmodels/auth_service.dart';
-import 'package:espy_app/viewmodels/locale_service.dart';
-import 'package:espy_app/models/user_model.dart';
 
 import '../admin/dashboard_screen.dart';
 import 'community/community_feed_screen.dart';

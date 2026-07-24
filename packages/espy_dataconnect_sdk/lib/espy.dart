@@ -78,6 +78,24 @@ part 'validate_institution_profile.dart';
 
 part 'resolve_support_ticket.dart';
 
+part 'upsert_sos_number.dart';
+
+part 'upsert_token_package.dart';
+
+part 'update_element_pricing.dart';
+
+part 'moderate_broadcast.dart';
+
+part 'refund_transaction.dart';
+
+part 'update_app_config.dart';
+
+part 'create_analytics_snapshot.dart';
+
+part 'upsert_service_metric.dart';
+
+part 'increment_service_metric.dart';
+
 part 'get_user.dart';
 
 part 'get_professional_details.dart';
@@ -129,6 +147,28 @@ part 'list_service_moderation_queue.dart';
 part 'list_request_moderation_queue.dart';
 
 part 'list_templates.dart';
+
+part 'list_sos_numbers.dart';
+
+part 'list_token_packages.dart';
+
+part 'list_element_pricing.dart';
+
+part 'list_broadcast_moderation_queue.dart';
+
+part 'list_active_broadcasts.dart';
+
+part 'get_finance_stats.dart';
+
+part 'get_analytics_snapshots.dart';
+
+part 'get_app_config.dart';
+
+part 'list_app_configs.dart';
+
+part 'list_service_metrics.dart';
+
+part 'get_service_metric.dart';
 
 
 
@@ -498,41 +538,7 @@ String enumSerializer(Enum e) {
   return e.name;
 }
 
-T nativeFromJson<T>(dynamic json) {
-  if (json is T) return json;
-  if (T == double && json is num) return json.toDouble() as T;
-  if (T == int && json is num) return json.toInt() as T;
-  return json as T;
-}
 
-dynamic nativeToJson<T>(T value) {
-  return value;
-}
-
-class Optional<T> {
-  T? _value;
-  bool _isSet = false;
-  final dynamic Function(dynamic) _deserializer;
-  final dynamic Function(T) _serializer;
-
-  Optional._(this._value, this._isSet, this._deserializer, this._serializer);
-
-  factory Optional.optional(dynamic Function(dynamic) deserializer, dynamic Function(T) serializer) =>
-      Optional._(null, false, deserializer, serializer);
-
-  T? get value => _value;
-  set value(T? v) {
-    _value = v;
-    _isSet = true;
-  }
-
-  bool get isSet => _isSet;
-  OptionalState get state => _isSet ? OptionalState.set : OptionalState.unset;
-
-  dynamic toJson() => _isSet ? _serializer(_value as T) : null;
-}
-
-enum OptionalState { set, unset }
 
 /// A sealed class representing either a known enum value or an unknown string value.
 @immutable
@@ -765,6 +771,51 @@ class EspyConnector {
   }
   
   
+  UpsertSosNumberVariablesBuilder upsertSosNumber ({required String countryId, required String labelEn, required String number, required bool isActive, }) {
+    return UpsertSosNumberVariablesBuilder(dataConnect, countryId: countryId,labelEn: labelEn,number: number,isActive: isActive,);
+  }
+  
+  
+  UpsertTokenPackageVariablesBuilder upsertTokenPackage ({required String id, required String nameEn, required int tokenCount, required double price, required UserRole targetRole, required bool isActive, }) {
+    return UpsertTokenPackageVariablesBuilder(dataConnect, id: id,nameEn: nameEn,tokenCount: tokenCount,price: price,targetRole: targetRole,isActive: isActive,);
+  }
+  
+  
+  UpdateElementPricingVariablesBuilder updateElementPricing ({required String id, required int tokenCost, }) {
+    return UpdateElementPricingVariablesBuilder(dataConnect, id: id,tokenCost: tokenCost,);
+  }
+  
+  
+  ModerateBroadcastVariablesBuilder moderateBroadcast ({required String id, required ModerationStatus status, }) {
+    return ModerateBroadcastVariablesBuilder(dataConnect, id: id,status: status,);
+  }
+  
+  
+  RefundTransactionVariablesBuilder refundTransaction ({required String id, required String reason, }) {
+    return RefundTransactionVariablesBuilder(dataConnect, id: id,reason: reason,);
+  }
+  
+  
+  UpdateAppConfigVariablesBuilder updateAppConfig ({required String key, required String value, }) {
+    return UpdateAppConfigVariablesBuilder(dataConnect, key: key,value: value,);
+  }
+  
+  
+  CreateAnalyticsSnapshotVariablesBuilder createAnalyticsSnapshot ({required DateTime date, required int totalUsers, required double totalRevenue, required int tokensBurned, required int activeRequests, }) {
+    return CreateAnalyticsSnapshotVariablesBuilder(dataConnect, date: date,totalUsers: totalUsers,totalRevenue: totalRevenue,tokensBurned: tokensBurned,activeRequests: activeRequests,);
+  }
+  
+  
+  UpsertServiceMetricVariablesBuilder upsertServiceMetric ({required String serviceId, }) {
+    return UpsertServiceMetricVariablesBuilder(dataConnect, serviceId: serviceId,);
+  }
+  
+  
+  IncrementServiceMetricVariablesBuilder incrementServiceMetric ({required String serviceId, }) {
+    return IncrementServiceMetricVariablesBuilder(dataConnect, serviceId: serviceId,);
+  }
+  
+  
   GetUserVariablesBuilder getUser ({required String uid, }) {
     return GetUserVariablesBuilder(dataConnect, uid: uid,);
   }
@@ -892,6 +943,61 @@ class EspyConnector {
   
   ListTemplatesVariablesBuilder listTemplates () {
     return ListTemplatesVariablesBuilder(dataConnect, );
+  }
+  
+  
+  ListSosNumbersVariablesBuilder listSosNumbers () {
+    return ListSosNumbersVariablesBuilder(dataConnect, );
+  }
+  
+  
+  ListTokenPackagesVariablesBuilder listTokenPackages () {
+    return ListTokenPackagesVariablesBuilder(dataConnect, );
+  }
+  
+  
+  ListElementPricingVariablesBuilder listElementPricing () {
+    return ListElementPricingVariablesBuilder(dataConnect, );
+  }
+  
+  
+  ListBroadcastModerationQueueVariablesBuilder listBroadcastModerationQueue () {
+    return ListBroadcastModerationQueueVariablesBuilder(dataConnect, );
+  }
+  
+  
+  ListActiveBroadcastsVariablesBuilder listActiveBroadcasts () {
+    return ListActiveBroadcastsVariablesBuilder(dataConnect, );
+  }
+  
+  
+  GetFinanceStatsVariablesBuilder getFinanceStats () {
+    return GetFinanceStatsVariablesBuilder(dataConnect, );
+  }
+  
+  
+  GetAnalyticsSnapshotsVariablesBuilder getAnalyticsSnapshots () {
+    return GetAnalyticsSnapshotsVariablesBuilder(dataConnect, );
+  }
+  
+  
+  GetAppConfigVariablesBuilder getAppConfig ({required String key, }) {
+    return GetAppConfigVariablesBuilder(dataConnect, key: key,);
+  }
+  
+  
+  ListAppConfigsVariablesBuilder listAppConfigs () {
+    return ListAppConfigsVariablesBuilder(dataConnect, );
+  }
+  
+  
+  ListServiceMetricsVariablesBuilder listServiceMetrics () {
+    return ListServiceMetricsVariablesBuilder(dataConnect, );
+  }
+  
+  
+  GetServiceMetricVariablesBuilder getServiceMetric ({required String serviceId, }) {
+    return GetServiceMetricVariablesBuilder(dataConnect, serviceId: serviceId,);
   }
   
 
