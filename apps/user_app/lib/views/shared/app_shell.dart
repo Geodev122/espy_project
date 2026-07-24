@@ -37,16 +37,16 @@ class _AppShellState extends State<AppShell> {
   List<Widget> _getScreens(UserRole role) {
     if (role == UserRole.visitor) {
       return [
-        const MapExploreScreen(),
-        const MatchingScreen(),
-        const CommunityFeedScreen(),
+        MapExploreScreen(),
+        MatchingScreen(),
+        CommunityFeedScreen(),
       ];
     }
     return [
-      const DashboardScreen(),
-      const MapExploreScreen(),
-      const SwipeRequestsScreen(),
-      const ServiceManagerScreen(),
+      DashboardScreen(),
+      MapExploreScreen(),
+      SwipeRequestsScreen(),
+      ServiceManagerScreen(),
     ];
   }
 

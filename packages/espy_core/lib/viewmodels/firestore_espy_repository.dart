@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart' as firestore;
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:rxdart/rxdart.dart';
 import 'espy_repository.dart';
@@ -20,7 +20,7 @@ import '../models/support_ticket.dart';
 import '../models/location_node.dart';
 
 class FirestoreEspyRepository implements EspyRepository {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final firestore.FirebaseFirestore _db = firestore.FirebaseFirestore.instance;
   final FirebaseFunctions _functions = FirebaseFunctions.instanceFor(region: 'us-central1');
 
   // ─── 1. Identity & Profiles ──────────────────────────────────────────────
@@ -28,11 +28,8 @@ class FirestoreEspyRepository implements EspyRepository {
   @override
   Future<UserModel?> getUser(String id) async {
     final doc = await _db.collection('users').doc(id).get();
-    final data = doc.data();
-    if (doc.exists && data != null) {
-      return UserModel.fromMap(data);
-    }
-    return null;
+    if (!doc.exists) return null;
+    return UserModel.fromMap(doc.data() as Map<String, dynamic>);
   }
 
   @override
@@ -42,41 +39,38 @@ class FirestoreEspyRepository implements EspyRepository {
 
   @override
   Future<void> upsertUser(UserModel user) async {
-    await _db.collection('users').doc(user.id).set(user.toMap(), SetOptions(merge: true));
+    await _db.collection('users').doc(user.id).set(user.toMap(), firestore.SetOptions(merge: true));
   }
 
   @override
   Future<void> updateUser(String id, UserModel user) async {
-    await _db.collection('users').doc(id).set({...user.toMap(), 'updatedAt': FieldValue.serverTimestamp()}, SetOptions(merge: true));
+    await _db.collection('users').doc(id).update(user.toMap());
   }
 
   @override
   Future<void> updateLastActive(String id) async {
-    await _db.collection('users').doc(id).update({
-      'lastActiveAt': FieldValue.serverTimestamp(),
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
+    await _db.collection('users').doc(id).update({'lastActiveAt': firestore.FieldValue.serverTimestamp()});
   }
 
   @override
   Future<ProfessionalProfile?> getProfessionalProfile(String id) async {
     final doc = await _db.collection('directory_professionals').doc(id).get();
-    final data = doc.data();
-    return (doc.exists && data != null) ? ProfessionalProfile.fromMap(data) : null;
+    if (!doc.exists) return null;
+    return ProfessionalProfile.fromMap(doc.data() as Map<String, dynamic>);
   }
 
   @override
   Future<InstitutionProfile?> getInstitutionProfile(String id) async {
     final doc = await _db.collection('directory_institutions').doc(id).get();
-    final data = doc.data();
-    return (doc.exists && data != null) ? InstitutionProfile.fromMap(data) : null;
+    if (!doc.exists) return null;
+    return InstitutionProfile.fromMap(doc.data() as Map<String, dynamic>);
   }
 
   @override
   Future<VisitorProfile?> getVisitorProfile(String id) async {
     final doc = await _db.collection('directory_visitors').doc(id).get();
-    final data = doc.data();
-    return (doc.exists && data != null) ? VisitorProfile.fromMap(data) : null;
+    if (!doc.exists) return null;
+    return VisitorProfile.fromMap(doc.data() as Map<String, dynamic>);
   }
 
   // ─── 2. Taxonomy & Location ──────────────────────────────────────────────
@@ -84,54 +78,54 @@ class FirestoreEspyRepository implements EspyRepository {
   @override
   Stream<List<SectorModel>> listSectors() {
     return _db.collection('directory_sectors').snapshots().map((snap) =>
-        snap.docs.map((doc) => SectorModel.fromMap({'id': doc.id, ...doc.data()})).toList());
+        snap.docs.map((doc) => SectorModel.fromMap({...doc.data() as Map<String, dynamic>, 'id': doc.id})).toList());
   }
 
   @override
   Stream<List<CategoryModel>> listCategories({String? sectorId}) {
-    Query query = _db.collection('directory_categories');
+    firestore.Query query = _db.collection('directory_categories');
     if (sectorId != null) query = query.where('sectorId', isEqualTo: sectorId);
     return query.snapshots().map((snap) =>
-        snap.docs.map((doc) => CategoryModel.fromMap({'id': doc.id, ...(doc.data() as Map<String, dynamic>)})).toList());
+        snap.docs.map((doc) => CategoryModel.fromMap({...doc.data() as Map<String, dynamic>, 'id': doc.id})).toList());
   }
 
   @override
   Stream<List<CountryModel>> listCountries() {
     return _db.collection('directory_countries').snapshots().map((snap) =>
-        snap.docs.map((doc) => CountryModel.fromMap({'id': doc.id, ...(doc.data() as Map<String, dynamic>)})).toList());
+        snap.docs.map((doc) => CountryModel.fromMap({...doc.data() as Map<String, dynamic>, 'id': doc.id})).toList());
   }
 
   @override
   Stream<List<RegionModel>> listRegions(String countryId) {
     return _db.collection('directory_regions').where('countryId', isEqualTo: countryId).snapshots().map((snap) =>
-        snap.docs.map((doc) => RegionModel.fromMap({'id': doc.id, ...(doc.data() as Map<String, dynamic>)})).toList());
+        snap.docs.map((doc) => RegionModel.fromMap({...doc.data() as Map<String, dynamic>, 'id': doc.id})).toList());
   }
 
   @override
   Stream<List<CityModel>> listCities(String regionId) {
     return _db.collection('directory_cities').where('regionId', isEqualTo: regionId).snapshots().map((snap) =>
-        snap.docs.map((doc) => CityModel.fromMap({'id': doc.id, ...(doc.data() as Map<String, dynamic>)})).toList());
+        snap.docs.map((doc) => CityModel.fromMap({...doc.data() as Map<String, dynamic>, 'id': doc.id})).toList());
   }
 
   @override
   Stream<List<Map<String, dynamic>>> listLocationNodes(String userId) {
-     return _db.collection('directory_locations').where('userId', isEqualTo: userId).snapshots().map((snap) =>
-        snap.docs.map((doc) => {'id': doc.id, ...(doc.data() as Map<String, dynamic>)}).toList());
+    return _db.collection('directory_location_nodes').where('userId', isEqualTo: userId).snapshots().map((snap) =>
+        snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList());
   }
 
   @override
   Future<void> upsertCountry(CountryModel country) async {
-    await _db.collection('directory_countries').doc(country.id).set(country.toMap(), SetOptions(merge: true));
+    await _db.collection('directory_countries').doc(country.id).set(country.toMap(), firestore.SetOptions(merge: true));
   }
 
   @override
   Future<void> upsertRegion(RegionModel region) async {
-    await _db.collection('directory_regions').doc(region.id).set(region.toMap(), SetOptions(merge: true));
+    await _db.collection('directory_regions').doc(region.id).set(region.toMap(), firestore.SetOptions(merge: true));
   }
 
   @override
   Future<void> upsertCity(CityModel city) async {
-    await _db.collection('directory_cities').doc(city.id).set(city.toMap(), SetOptions(merge: true));
+    await _db.collection('directory_cities').doc(city.id).set(city.toMap(), firestore.SetOptions(merge: true));
   }
 
   @override
@@ -142,107 +136,84 @@ class FirestoreEspyRepository implements EspyRepository {
 
   @override
   Future<void> updateSectorBranding(String id, SectorModel sector) async {
-    await _db.collection('directory_sectors').doc(id).set(sector.toMap(), SetOptions(merge: true));
+    await _db.collection('directory_sectors').doc(id).set(sector.toMap(), firestore.SetOptions(merge: true));
   }
 
   @override
   Future<void> upsertServiceTag(Map<String, dynamic> data) async {
-    await _db.collection('directory_service_tags').doc(data['id']).set(data, SetOptions(merge: true));
+    await _db.collection('directory_service_tags').doc(data['id']).set(data, firestore.SetOptions(merge: true));
   }
 
   @override
   Future<void> upsertPriceTag(Map<String, dynamic> data) async {
-    await _db.collection('directory_price_tags').doc(data['id']).set(data, SetOptions(merge: true));
+    await _db.collection('directory_price_tags').doc(data['id']).set(data, firestore.SetOptions(merge: true));
   }
 
   @override
   Future<void> upsertPinCategory(Map<String, dynamic> data) async {
-    await _db.collection('directory_pin_categories').doc(data['id']).set(data, SetOptions(merge: true));
+    await _db.collection('directory_pin_categories').doc(data['id']).set(data, firestore.SetOptions(merge: true));
   }
 
   @override
   Future<void> upsertPresenceTag(Map<String, dynamic> data) async {
-    await _db.collection('directory_presence_tags').doc(data['id']).set(data, SetOptions(merge: true));
+    await _db.collection('directory_presence_tags').doc(data['id']).set(data, firestore.SetOptions(merge: true));
   }
 
   // ─── 3. Core Business Logic ──────────────────────────────────────────────
 
   @override
   Stream<List<ServiceModel>> listActiveServices({String? categoryId, String? sectorId}) {
-    Query query = _db.collection('directory_services').where('isActive', isEqualTo: true).where('moderationStatus', isEqualTo: 'APPROVED');
+    firestore.Query query = _db.collection('directory_services').where('moderationStatus', isEqualTo: 'APPROVED');
     if (categoryId != null) query = query.where('categoryId', isEqualTo: categoryId);
     if (sectorId != null) query = query.where('sectorId', isEqualTo: sectorId);
-
     return query.snapshots().map((snap) =>
-        snap.docs.map((doc) => ServiceModel.fromMap({'id': doc.id, ...(doc.data() as Map<String, dynamic>)})).toList());
+        snap.docs.map((doc) => ServiceModel.fromMap({...doc.data() as Map<String, dynamic>, 'id': doc.id})).toList());
   }
 
   @override
   Stream<List<ServiceModel>> listProfessionalServices(String professionalId) {
-    return _db.collection('directory_services')
-        .where('providerId', isEqualTo: professionalId)
-        .snapshots()
-        .map((snap) => snap.docs.map((doc) => ServiceModel.fromMap({'id': doc.id, ...(doc.data() as Map<String, dynamic>)})).toList());
+    return _db.collection('directory_services').where('professionalId', isEqualTo: professionalId).snapshots().map((snap) =>
+        snap.docs.map((doc) => ServiceModel.fromMap({...doc.data() as Map<String, dynamic>, 'id': doc.id})).toList());
   }
 
   @override
   Future<void> toggleServiceSlot(String serviceId, bool allocate) async {
-    await _db.collection('directory_services').doc(serviceId).update({
-      'isAllocated': allocate,
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
+    await _db.collection('directory_services').doc(serviceId).update({'isAllocated': allocate, 'updatedAt': firestore.FieldValue.serverTimestamp()});
   }
 
   @override
   Stream<List<ServiceRequestModel>> listCommunityRequests({String? sectorId, bool newestFirst = true, String? userId}) {
-    Query query = _db.collection('directory_service_requests').where('moderationStatus', isEqualTo: 'APPROVED');
-    if (userId != null) {
-      query = query.where('userId', isEqualTo: userId);
-    } else {
-      query = query.where('status', isEqualTo: 'active');
-      if (sectorId != null && sectorId != 'All') {
-        query = query.where('sectorId', isEqualTo: sectorId);
-      }
-    }
-    return query.snapshots().map((snap) {
-      final items = snap.docs.map((doc) => ServiceRequestModel.fromMap({'id': doc.id, ...(doc.data() as Map<String, dynamic>)})).toList();
-      items.sort((a, b) {
-        final t1 = a.createdAt.millisecondsSinceEpoch;
-        final t2 = b.createdAt.millisecondsSinceEpoch;
-        return newestFirst ? t2.compareTo(t1) : t1.compareTo(t2);
-      });
-      return items;
-    });
+    firestore.Query query = _db.collection('directory_service_requests').where('moderationStatus', isEqualTo: 'APPROVED');
+    if (sectorId != null) query = query.where('sectorId', isEqualTo: sectorId);
+    if (userId != null) query = query.where('userId', isEqualTo: userId);
+    query = query.orderBy('createdAt', descending: newestFirst);
+    return query.snapshots().map((snap) =>
+        snap.docs.map((doc) => ServiceRequestModel.fromMap({...doc.data() as Map<String, dynamic>, 'id': doc.id})).toList());
   }
 
   @override
   Future<void> createCommunityRequest(ServiceRequestModel request) async {
-     await _db.collection('directory_service_requests').add({
-       ...request.toMap(),
-       'createdAt': FieldValue.serverTimestamp(),
-       'status': 'active',
-     });
+    await _db.collection('directory_service_requests').add({...request.toMap(), 'createdAt': firestore.FieldValue.serverTimestamp()});
   }
 
   @override
   Future<void> createLocationNode(LocationNodeModel node) async {
-     await _db.collection('directory_locations').add({
-       ...node.toMap(),
-       'createdAt': FieldValue.serverTimestamp(),
-     });
+    await _db.collection('directory_location_nodes').add({...node.toMap(), 'createdAt': firestore.FieldValue.serverTimestamp()});
   }
 
   @override
   Future<Map<String, List<Map<String, dynamic>>>> listMetadataTags() async {
-    final s = await _db.collection('directory_service_tags').get();
-    final p = await _db.collection('directory_price_tags').get();
-    final c = await _db.collection('directory_pin_categories').get();
-    final pr = await _db.collection('directory_presence_tags').get();
+    final tags = await Future.wait([
+      _db.collection('directory_service_tags').get(),
+      _db.collection('directory_price_tags').get(),
+      _db.collection('directory_pin_categories').get(),
+      _db.collection('directory_presence_tags').get(),
+    ]);
     return {
-      'serviceTags': s.docs.map((d) => <String, dynamic>{'id': d.id, ...d.data()}).toList(),
-      'priceTags': p.docs.map((d) => <String, dynamic>{'id': d.id, ...d.data()}).toList(),
-      'pinCategories': c.docs.map((d) => <String, dynamic>{'id': d.id, ...d.data()}).toList(),
-      'presenceTags': pr.docs.map((d) => <String, dynamic>{'id': d.id, ...d.data()}).toList(),
+      'service': tags[0].docs.map((d) => {'id': d.id, ...d.data() as Map<String, dynamic>}).toList(),
+      'price': tags[1].docs.map((d) => {'id': d.id, ...d.data() as Map<String, dynamic>}).toList(),
+      'pin': tags[2].docs.map((d) => {'id': d.id, ...d.data() as Map<String, dynamic>}).toList(),
+      'presence': tags[3].docs.map((d) => {'id': d.id, ...d.data() as Map<String, dynamic>}).toList(),
     };
   }
 
@@ -250,22 +221,23 @@ class FirestoreEspyRepository implements EspyRepository {
 
   @override
   Stream<List<WalletTransactionModel>> listWalletTransactions(String userId) {
-    return _db.collection('directory_membership_transactions')
-        .where('userId', isEqualTo: userId)
-        .orderBy('createdAt', descending: true)
-        .snapshots()
-        .map((snap) => snap.docs.map((doc) => WalletTransactionModel.fromMap({'id': doc.id, ...(doc.data() as Map<String, dynamic>)})).toList());
+    return _db.collection('wallet_transactions').where('userId', isEqualTo: userId).orderBy('createdAt', descending: true).snapshots().map((snap) =>
+        snap.docs.map((doc) => WalletTransactionModel.fromMap({...doc.data() as Map<String, dynamic>, 'id': doc.id})).toList());
   }
 
   @override
   Future<Map<String, dynamic>> spendTokens({required String userId, required String itemId, required int cost, required UserRole role}) async {
-    final result = await _functions.httpsCallable('spendTokens').call({
-      'userId': userId,
-      'itemId': itemId,
-      'cost': cost,
-      'role': role.name,
-    });
-    return result.data as Map<String, dynamic>;
+    try {
+      final resp = await _functions.httpsCallable('spendTokens').call({
+        'userId': userId,
+        'itemId': itemId,
+        'cost': cost,
+        'role': role.name,
+      });
+      return Map<String, dynamic>.from(resp.data);
+    } catch (e) {
+      return {'success': false, 'error': e.toString()};
+    }
   }
 
   @override
@@ -274,166 +246,115 @@ class FirestoreEspyRepository implements EspyRepository {
       'userId': userId,
       'targetId': targetId,
       'type': type.name,
-      'timestamp': FieldValue.serverTimestamp(),
+      'createdAt': firestore.FieldValue.serverTimestamp(),
     });
   }
 
   @override
   Future<void> toggleFavorite(String userId, String targetId, bool isFavorite) async {
-    final favId = '${userId}_$targetId';
     if (isFavorite) {
-      await _db.collection('directory_favorites').doc(favId).set({
+      await _db.collection('directory_favorites').doc('${userId}_$targetId').set({
         'userId': userId,
         'targetId': targetId,
-        'createdAt': FieldValue.serverTimestamp(),
+        'createdAt': firestore.FieldValue.serverTimestamp(),
       });
     } else {
-      await _db.collection('directory_favorites').doc(favId).delete();
+      await _db.collection('directory_favorites').doc('${userId}_$targetId').delete();
     }
   }
 
   @override
   Stream<List<String>> listFavoriteIds(String userId) {
-    return _db.collection('directory_favorites')
-        .where('userId', isEqualTo: userId)
-        .snapshots()
-        .map((snap) => snap.docs.map((doc) {
-              final data = doc.data();
-              return data['targetId'] as String? ?? '';
-            }).where((id) => id.isNotEmpty).toList());
+    return _db.collection('directory_favorites').where('userId', isEqualTo: userId).snapshots().map((snap) =>
+        snap.docs.map((doc) => doc.get('targetId').toString()).toList());
   }
 
   @override
   Stream<List<String>> listContactedIds(String userId) {
-    return _db.collection('directory_interactions')
-        .where('userId', isEqualTo: userId)
-        .where('type', isEqualTo: 'like')
-        .snapshots()
-        .map((snap) => snap.docs.map((doc) {
-              final data = doc.data();
-              return data['targetId'] as String? ?? '';
-            }).where((id) => id.isNotEmpty).toList());
+    return _db.collection('directory_interactions').where('userId', isEqualTo: userId).where('type', isEqualTo: 'contact').snapshots().map((snap) =>
+        snap.docs.map((doc) => doc.get('targetId').toString()).toList());
   }
-
-  // --- Resource Orders ---
 
   @override
   Future<void> upsertProfessionalProfile(ProfessionalProfile profile) async {
-    await _db.collection('directory_professionals').doc(profile.id).set(profile.toMap(), SetOptions(merge: true));
+    await _db.collection('directory_professionals').doc(profile.id).set(profile.toMap(), firestore.SetOptions(merge: true));
   }
 
   @override
   Future<void> upsertInstitutionProfile(InstitutionProfile profile) async {
-    await _db.collection('directory_institutions').doc(profile.id).set(profile.toMap(), SetOptions(merge: true));
+    await _db.collection('directory_institutions').doc(profile.id).set(profile.toMap(), firestore.SetOptions(merge: true));
   }
 
   @override
   Future<void> createResourceOrder(ResourceOrderModel order) async {
-    await _db.collection('directory_resource_orders').add({
-      ...order.toMap(),
-      'createdAt': FieldValue.serverTimestamp(),
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
+    await _db.collection('directory_resource_orders').add({...order.toMap(), 'createdAt': firestore.FieldValue.serverTimestamp()});
   }
 
   @override
   Future<void> updateResourceOrder(ResourceOrderModel order) async {
-    await _db.collection('directory_resource_orders').doc(order.id).update({
-      ...order.toMap(),
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
+    await _db.collection('directory_resource_orders').doc(order.id).update({...order.toMap(), 'updatedAt': firestore.FieldValue.serverTimestamp()});
   }
 
   @override
   Stream<ResourceOrderModel?> getActiveResourceOrder(String userId) {
     return _db.collection('directory_resource_orders')
         .where('userId', isEqualTo: userId)
-        .where('status', whereIn: ['PENDING', 'APPROVED'])
+        .where('status', isEqualTo: 'APPROVED')
         .orderBy('createdAt', descending: true)
         .limit(1)
         .snapshots()
-        .map((snap) => snap.docs.isEmpty ? null : ResourceOrderModel.fromMap({'id': snap.docs.first.id, ...(snap.docs.first.data() as Map<String, dynamic>)}));
+        .map((snap) => snap.docs.isEmpty ? null : ResourceOrderModel.fromMap({...snap.docs.first.data() as Map<String, dynamic>, 'id': snap.docs.first.id}));
   }
-
-  // --- Recharge Cards ---
 
   @override
   Future<void> generateRechargeCard({required String code, required int value, int pins = 0, int slots = 0}) async {
-    await _db.collection('recharge_cards').doc(code).set({
-      'tokenValue': value,
-      'extraPins': pins,
-      'extraSlots': slots,
-      'status': 'active',
-      'createdAt': FieldValue.serverTimestamp(),
+    await _db.collection('directory_recharge_cards').add({
+      'code': code,
+      'value': value,
+      'pins': pins,
+      'slots': slots,
+      'isUsed': false,
+      'createdAt': firestore.FieldValue.serverTimestamp(),
     });
   }
 
   @override
   Stream<List<Map<String, dynamic>>> listRechargeCards() {
-    return _db.collection('recharge_cards').snapshots().map((snap) =>
-        snap.docs.map((doc) {
-          final data = doc.data();
-          return <String, dynamic>{'id': doc.id, ...data};
-        }).toList());
+    return _db.collection('directory_recharge_cards').orderBy('createdAt', descending: true).snapshots().map((snap) =>
+        snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList());
   }
 
   // ─── 5. Admin Operations ─────────────────────────────────────────────────
 
   @override
   Stream<List<UserModel>> searchUsersAdmin({String? query, UserRole? role, bool? hasProfile, bool? isActive}) {
-    Query q = _db.collection('users');
+    firestore.Query q = _db.collection('users');
     if (role != null) q = q.where('role', isEqualTo: role.name);
-    if (hasProfile != null) q = q.where('hasProfile', isEqualTo: hasProfile);
     if (isActive != null) q = q.where('isActive', isEqualTo: isActive);
-    
-    return q.orderBy('createdAt', descending: true).snapshots().map((snap) {
-      final items = snap.docs.map((doc) => UserModel.fromMap({'id': doc.id, ...(doc.data() as Map<String, dynamic>)})).toList();
-      if (query != null && query.isNotEmpty) {
-        final low = query.toLowerCase();
-        return items.where((u) => u.email.toLowerCase().contains(low) || u.name.toLowerCase().contains(low)).toList();
-      }
-      return items.toList();
-    });
+    return q.snapshots().map((snap) =>
+        snap.docs.map((doc) => UserModel.fromMap({...doc.data() as Map<String, dynamic>, 'id': doc.id})).toList());
   }
 
   @override
   Future<Map<String, dynamic>> getAuditDetails(String id) async {
-    final userDoc = await _db.collection('users').doc(id).get();
-    final data = userDoc.data() ?? {};
-    
-    final role = UserRole.parse(data['role']);
-    if (role == UserRole.professional) {
-      final profDoc = await _db.collection('directory_professionals').doc(id).get();
-      data['professionalProfile'] = profDoc.data();
-    } else if (role == UserRole.institution) {
-      final instDoc = await _db.collection('directory_institutions').doc(id).get();
-      data['institutionProfile'] = instDoc.data();
-    }
-    
-    // Transactions
-    final txs = await _db.collection('directory_membership_transactions').where('userId', isEqualTo: id).limit(10).get();
-    data['transactions'] = txs.docs.map((d) => d.data()).toList();
-    
-    return data;
+    final logs = await _db.collection('audit_logs').where('targetId', isEqualTo: id).orderBy('createdAt', descending: true).get();
+    return {'logs': logs.docs.map((d) => d.data()).toList()};
   }
 
   @override
   Future<void> adminUpdateUser(String id, UserModel user) async {
-    await _db.collection('users').doc(id).update({...user.toMap(), 'updatedAt': FieldValue.serverTimestamp()});
+    await _db.collection('users').doc(id).update(user.toMap());
   }
 
   @override
   Future<void> toggleUserActiveStatus(String id, bool isActive) async {
-    await _db.collection('users').doc(id).update({'isActive': isActive, 'updatedAt': FieldValue.serverTimestamp()});
+    await _db.collection('users').doc(id).update({'isActive': isActive});
   }
 
   @override
   Future<void> verifyUserDocs(String id, UserRole role, bool isApproved) async {
     final col = role == UserRole.institution ? 'directory_institutions' : 'directory_professionals';
-    final batch = _db.batch();
-    batch.update(_db.collection(col).doc(id), {'isApproved': isApproved, 'updatedAt': FieldValue.serverTimestamp()});
-    batch.update(_db.collection('users').doc(id), {'isApproved': isApproved, 'updatedAt': FieldValue.serverTimestamp()});
-    await batch.commit();
+    await _db.collection(col).doc(id).update({'isApproved': isApproved, 'updatedAt': firestore.FieldValue.serverTimestamp()});
   }
 
   @override
@@ -441,12 +362,10 @@ class FirestoreEspyRepository implements EspyRepository {
     return Rx.combineLatest2(
       _db.collection('directory_professionals').snapshots(),
       _db.collection('directory_institutions').snapshots(),
-      (profs, insts) {
-        final List<Map<String, dynamic>> all = [];
-        all.addAll((profs as QuerySnapshot).docs.map((doc) => <String, dynamic>{'id': doc.id, ...doc.data() as Map<String, dynamic>}).where((p) => p['isActive'] != false));
-        all.addAll((insts as QuerySnapshot).docs.map((doc) => <String, dynamic>{'id': doc.id, ...doc.data() as Map<String, dynamic>}).where((p) => p['isActive'] != false));
-        return all;
-      },
+      (snap1, snap2) => [
+        ...snap1.docs.map((d) => {'id': d.id, ...d.data() as Map<String, dynamic>}),
+        ...snap2.docs.map((d) => {'id': d.id, ...d.data() as Map<String, dynamic>}),
+      ]
     );
   }
 
@@ -454,7 +373,7 @@ class FirestoreEspyRepository implements EspyRepository {
   Future<void> approveProfessional(String id, bool isApproved, UserRole role) async {
     final col = role == UserRole.institution ? 'directory_institutions' : 'directory_professionals';
     final batch = _db.batch();
-    final timestamp = FieldValue.serverTimestamp();
+    final timestamp = firestore.FieldValue.serverTimestamp();
     final data = {'isApproved': isApproved, 'verificationStatus': isApproved ? 'verified' : 'rejected', 'updatedAt': timestamp};
     batch.update(_db.collection(col).doc(id), data);
     batch.update(_db.collection('users').doc(id), data);
@@ -464,16 +383,16 @@ class FirestoreEspyRepository implements EspyRepository {
   @override
   Future<void> validateProfile(String id, UserRole role) async {
     final col = role == UserRole.institution ? 'directory_institutions' : 'directory_professionals';
-    await _db.collection(col).doc(id).update({'isProfileValidated': true, 'updatedAt': FieldValue.serverTimestamp()});
-    await _db.collection('users').doc(id).update({'isProfileValidated': true, 'updatedAt': FieldValue.serverTimestamp()});
+    await _db.collection(col).doc(id).update({'isProfileValidated': true, 'updatedAt': firestore.FieldValue.serverTimestamp()});
+    await _db.collection('users').doc(id).update({'isProfileValidated': true, 'updatedAt': firestore.FieldValue.serverTimestamp()});
   }
 
   @override
   Stream<List<SupportTicketModel>> listSupportTickets({SupportTicketStatus? status}) {
-    Query query = _db.collection('directory_support_inbox');
+    firestore.Query query = _db.collection('directory_support_inbox');
     if (status != null) query = query.where('status', isEqualTo: status.name);
     return query.snapshots().map((snap) =>
-        snap.docs.map((doc) => SupportTicketModel.fromMap({'id': doc.id, ...doc.data()})).toList());
+        snap.docs.map((doc) => SupportTicketModel.fromMap({'id': doc.id, ...doc.data() as Map<String, dynamic>})).toList());
   }
 
   @override
@@ -481,14 +400,14 @@ class FirestoreEspyRepository implements EspyRepository {
     return _db.collection('directory_resource_orders')
         .where('status', isEqualTo: 'PENDING')
         .snapshots()
-        .map((snap) => snap.docs.map((doc) => ResourceOrderModel.fromMap({'id': doc.id, ...doc.data()})).toList());
+        .map((snap) => snap.docs.map((doc) => ResourceOrderModel.fromMap({'id': doc.id, ...doc.data() as Map<String, dynamic>})).toList());
   }
 
   @override
   Future<void> approveResourceOrder(String orderId) async {
     await _db.collection('directory_resource_orders').doc(orderId).update({
       'status': 'APPROVED',
-      'updatedAt': FieldValue.serverTimestamp(),
+      'updatedAt': firestore.FieldValue.serverTimestamp(),
     });
   }
 
@@ -497,7 +416,7 @@ class FirestoreEspyRepository implements EspyRepository {
     return _db.collection('directory_services')
         .where('moderationStatus', isEqualTo: status.name)
         .snapshots()
-        .map((snap) => snap.docs.map((doc) => ServiceModel.fromMap({'id': doc.id, ...doc.data()})).toList());
+        .map((snap) => snap.docs.map((doc) => ServiceModel.fromMap({'id': doc.id, ...doc.data() as Map<String, dynamic>})).toList());
   }
 
   @override
@@ -505,7 +424,7 @@ class FirestoreEspyRepository implements EspyRepository {
     return _db.collection('directory_service_requests')
         .where('moderationStatus', isEqualTo: status.name)
         .snapshots()
-        .map((snap) => snap.docs.map((doc) => ServiceRequestModel.fromMap({'id': doc.id, ...doc.data()})).toList());
+        .map((snap) => snap.docs.map((doc) => ServiceRequestModel.fromMap({'id': doc.id, ...doc.data() as Map<String, dynamic>})).toList());
   }
 
   @override
@@ -513,7 +432,7 @@ class FirestoreEspyRepository implements EspyRepository {
     await _db.collection('directory_services').doc(id).update({
       'moderationStatus': status.name,
       'flagReason': reason,
-      'updatedAt': FieldValue.serverTimestamp(),
+      'updatedAt': firestore.FieldValue.serverTimestamp(),
     });
   }
 
@@ -522,7 +441,7 @@ class FirestoreEspyRepository implements EspyRepository {
     await _db.collection('directory_service_requests').doc(id).update({
       'moderationStatus': status.name,
       'flagReason': reason,
-      'updatedAt': FieldValue.serverTimestamp(),
+      'updatedAt': firestore.FieldValue.serverTimestamp(),
     });
   }
 
@@ -536,14 +455,14 @@ class FirestoreEspyRepository implements EspyRepository {
       'targetCity': city,
       'status': 'queued',
       'moderationStatus': 'PENDING',
-      'createdAt': FieldValue.serverTimestamp(),
+      'createdAt': firestore.FieldValue.serverTimestamp(),
     });
   }
 
   @override
   Stream<List<Map<String, dynamic>>> listTemplates() {
     return _db.collection('directory_templates').snapshots().map((snap) =>
-        snap.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList());
+        snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList());
   }
 
   @override
@@ -554,7 +473,7 @@ class FirestoreEspyRepository implements EspyRepository {
       'accentColor': accentColor,
       'iconName': iconName,
       'updatedAt': firestore.FieldValue.serverTimestamp(),
-    }, SetOptions(merge: true));
+    }, firestore.SetOptions(merge: true));
   }
 
   @override
@@ -571,7 +490,7 @@ class FirestoreEspyRepository implements EspyRepository {
 
   @override
   Stream<List<Map<String, dynamic>>> listSosNumbers({String? countryId, String? sectorId, String? categoryId}) {
-    Query query = _db.collection('directory_sos_numbers');
+    firestore.Query query = _db.collection('directory_sos_numbers');
     if (countryId != null) query = query.where('countryId', isEqualTo: countryId);
     if (sectorId != null) query = query.where('sectorId', isEqualTo: sectorId);
     if (categoryId != null) query = query.where('categoryId', isEqualTo: categoryId);
@@ -581,12 +500,12 @@ class FirestoreEspyRepository implements EspyRepository {
   @override
   Future<void> upsertSosNumber(Map<String, dynamic> sosData) async {
     final id = sosData['id'] ?? _db.collection('directory_sos_numbers').doc().id;
-    await _db.collection('directory_sos_numbers').doc(id).set(sosData, SetOptions(merge: true));
+    await _db.collection('directory_sos_numbers').doc(id).set(sosData, firestore.SetOptions(merge: true));
   }
 
   @override
   Stream<List<Map<String, dynamic>>> listTokenPackages({UserRole? targetRole, bool? isActive}) {
-    Query query = _db.collection('directory_token_packages');
+    firestore.Query query = _db.collection('directory_token_packages');
     if (targetRole != null) query = query.where('targetRole', isEqualTo: targetRole.name.toUpperCase());
     if (isActive != null) query = query.where('isActive', isEqualTo: isActive);
     return query.snapshots().map((snap) => snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList());
@@ -594,21 +513,22 @@ class FirestoreEspyRepository implements EspyRepository {
 
   @override
   Future<void> upsertTokenPackage(Map<String, dynamic> packageData) async {
-    await _db.collection('directory_token_packages').doc(packageData['id']).set(packageData, SetOptions(merge: true));
+    await _db.collection('directory_token_packages').doc(packageData['id']).set(packageData, firestore.SetOptions(merge: true));
   }
 
   @override
   Stream<List<Map<String, dynamic>>> listElementPricing() {
-    return _db.collection('directory_element_pricing').snapshots().map((snap) => snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList());
+    return _db.collection('directory_element_pricing').snapshots().map((snap) =>
+        snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList());
   }
 
   @override
   Future<void> updateElementPricing(String id, int tokenCost, {int? validityDays}) async {
     await _db.collection('directory_element_pricing').doc(id).set({
       'tokenCost': tokenCost,
-      if (validityDays != null) 'validityDays': validityDays,
-      'updatedAt': FieldValue.serverTimestamp(),
-    }, SetOptions(merge: true));
+      'validityDays': validityDays,
+      'updatedAt': firestore.FieldValue.serverTimestamp(),
+    }, firestore.SetOptions(merge: true));
   }
 
   @override
@@ -623,14 +543,14 @@ class FirestoreEspyRepository implements EspyRepository {
   Future<void> moderateBroadcast(String id, ModerationStatus status, {String? reason}) async {
     await _db.collection('directory_broadcasts').doc(id).update({
       'moderationStatus': status.name.toUpperCase(),
-      'flagReason': reason,
-      'updatedAt': FieldValue.serverTimestamp(),
+      'moderationReason': reason,
+      'updatedAt': firestore.FieldValue.serverTimestamp(),
     });
   }
 
   @override
   Future<List<WalletTransactionModel>> getFinanceStats({DateTime? start, DateTime? end}) async {
-    Query query = _db.collection('directory_membership_transactions');
+    firestore.Query query = _db.collection('wallet_transactions');
     if (start != null) query = query.where('createdAt', isGreaterThanOrEqualTo: start);
     if (end != null) query = query.where('createdAt', isLessThanOrEqualTo: end);
     final snap = await query.get();
@@ -639,16 +559,16 @@ class FirestoreEspyRepository implements EspyRepository {
 
   @override
   Future<void> refundTransaction(String id, String reason) async {
-    await _db.collection('directory_membership_transactions').doc(id).update({
+    await _db.collection('wallet_transactions').doc(id).update({
       'isRefunded': true,
       'refundReason': reason,
-      'updatedAt': FieldValue.serverTimestamp(),
+      'updatedAt': firestore.FieldValue.serverTimestamp(),
     });
   }
 
   @override
   Future<List<Map<String, dynamic>>> getAnalyticsSnapshots({DateTime? start, DateTime? end}) async {
-    Query query = _db.collection('directory_analytics_snapshots');
+    firestore.Query query = _db.collection('analytics_snapshots');
     if (start != null) query = query.where('date', isGreaterThanOrEqualTo: start);
     if (end != null) query = query.where('date', isLessThanOrEqualTo: end);
     final snap = await query.get();
@@ -657,24 +577,21 @@ class FirestoreEspyRepository implements EspyRepository {
 
   @override
   Future<void> createAnalyticsSnapshot(Map<String, dynamic> data) async {
-    await _db.collection('directory_analytics_snapshots').add({
-      ...data,
-      'createdAt': FieldValue.serverTimestamp(),
-    });
+    await _db.collection('analytics_snapshots').add({...data, 'createdAt': firestore.FieldValue.serverTimestamp()});
   }
 
   @override
   Future<String?> getAppConfig(String key) async {
     final doc = await _db.collection('directory_app_config').doc(key).get();
-    return doc.data()?['value'] as String?;
+    return doc.data()?['value']?.toString();
   }
 
   @override
   Future<void> updateAppConfig(String key, String value) async {
     await _db.collection('directory_app_config').doc(key).set({
       'value': value,
-      'updatedAt': FieldValue.serverTimestamp(),
-    }, SetOptions(merge: true));
+      'updatedAt': firestore.FieldValue.serverTimestamp(),
+    }, firestore.SetOptions(merge: true));
   }
 
   @override
@@ -687,23 +604,24 @@ class FirestoreEspyRepository implements EspyRepository {
   @override
   Future<Map<String, dynamic>?> getServiceMetric(String serviceId) async {
     final doc = await _db.collection('directory_service_metrics').doc(serviceId).get();
-    return doc.data();
+    return doc.data() as Map<String, dynamic>?;
   }
 
   @override
   Future<void> incrementServiceMetric(String serviceId, {int views = 0, int contacts = 0, int shares = 0}) async {
     await _db.collection('directory_service_metrics').doc(serviceId).set({
-      'views': FieldValue.increment(views),
-      'contacts': FieldValue.increment(contacts),
-      'shares': FieldValue.increment(shares),
-      'updatedAt': FieldValue.serverTimestamp(),
-    }, SetOptions(merge: true));
+      'views': firestore.FieldValue.increment(views),
+      'contacts': firestore.FieldValue.increment(contacts),
+      'shares': firestore.FieldValue.increment(shares),
+      'updatedAt': firestore.FieldValue.serverTimestamp(),
+    }, firestore.SetOptions(merge: true));
   }
 
   @override
   Stream<List<Map<String, dynamic>>> listActiveBroadcasts({String? country, UserRole? role}) {
-    Query query = _db.collection('directory_broadcasts').where('moderationStatus', isEqualTo: 'APPROVED');
-    // Simplified: GLOBAL or exact country
-    return query.snapshots().map((snap) => snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList());
+    firestore.Query query = _db.collection('directory_broadcasts').where('moderationStatus', isEqualTo: 'APPROVED');
+    if (country != null) query = query.where('targetCountry', whereIn: [country, 'GLOBAL']);
+    return query.snapshots().map((snap) =>
+        snap.docs.map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>}).toList());
   }
 }

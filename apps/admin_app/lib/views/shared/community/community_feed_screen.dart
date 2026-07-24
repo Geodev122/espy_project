@@ -18,7 +18,6 @@ class CommunityFeedScreen extends StatefulWidget {
 }
 
 class _CommunityFeedScreenState extends State<CommunityFeedScreen> with SingleTickerProviderStateMixin {
-  final FirestoreService _firestore = FirestoreService();
   late TabController _tabController;
 
   @override
@@ -96,6 +95,7 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> with SingleTi
     final titleController = TextEditingController();
     final descController = TextEditingController();
     String? selectedSectionId;
+    final firestore = Provider.of<FirestoreService>(context, listen: false);
 
     showModalBottomSheet(
       context: context,
@@ -121,7 +121,7 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> with SingleTi
               ),
               const SizedBox(height: 24),
               StreamBuilder<List<Map<String, dynamic>>>(
-                stream: _firestore.getSectors(),
+                stream: firestore.getSectors(),
                 builder: (context, snapshot) {
                   final sectors = snapshot.data ?? [];
                   return StatefulBuilder(
@@ -158,25 +158,23 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> with SingleTi
                           onPressed: () async {
                             if (titleController.text.isNotEmpty && selectedSectionId != null) {
                               final auth = Provider.of<AuthService>(context, listen: false);
-                              final uid = _firestore.getCurrentUserId;
-                              final sector = sectors.firstWhere((s) => s['id'] == selectedSectionId);
+                              final uid = firestore.getCurrentUserId;
                               final user = auth.userData;
 
-                              await _firestore.createCommunityRequest({
-                                'title': titleController.text,
-                                'description': descController.text,
-                                'sectionId': selectedSectionId,
-                                'section': sector['name_en'],
-                                'category_id': selectedSectionId,
-                                'category_name': sector['name_en'],
-                                'userId': uid,
-                                'requester_id': uid,
-                                'requester_name': user?.name ?? "User",
-                                'whatsapp': user?['whatsapp'],
-                                'whatsapp_number': user?['whatsapp'],
-                                'governorate_id': 'BEIRUT',
-                                'location': 'Beirut, Lebanon',
-                              });
+                              final request = ServiceRequestModel(
+                                id: '', 
+                                userId: uid,
+                                sectorId: selectedSectionId!,
+                                descriptionEn: "${titleController.text}: ${descController.text}",
+                                urgency: UrgencyLevel.medium,
+                                preferredMode: DeliveryMode.face_to_face,
+                                status: CommunityRequestStatus.active,
+                                moderationStatus: ModerationStatus.approved,
+                                createdAt: DateTime.now(),
+                                userName: user?.name,
+                              );
+
+                              await firestore.createCommunityRequest(request);
 
                               if (mounted) {
                                 Navigator.pop(context);
@@ -199,11 +197,12 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> with SingleTi
   }
 
   Widget _buildFeedList(AppLocalizations l10n, {bool onlyMine = false}) {
-    final uid = _firestore.getCurrentUserId;
-    return StreamBuilder<List<Map<String, dynamic>>>(
+    final firestore = Provider.of<FirestoreService>(context, listen: false);
+    final uid = firestore.getCurrentUserId;
+    return StreamBuilder<List<ServiceRequestModel>>(
       stream: onlyMine
-          ? _firestore.getCommunityRequests(userId: uid)
-          : _firestore.getCommunityRequests(),
+          ? firestore.getCommunityRequests(userId: uid)
+          : firestore.getCommunityRequests(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const SliverFillRemaining(child: Center(child: CircularProgressIndicator(color: EspyTheme.gold)));
@@ -238,7 +237,8 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> with SingleTi
     );
   }
 
-  Widget _buildRequestCard(AppLocalizations l10n, Map<String, dynamic> request) {
+  Widget _buildRequestCard(AppLocalizations l10n, ServiceRequestModel request) {
+    final firestore = Provider.of<FirestoreService>(context, listen: false);
     final auth = Provider.of<AuthService>(context, listen: false);
     return Container(
       margin: const EdgeInsets.only(bottom: 24),
@@ -263,7 +263,7 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> with SingleTi
                     border: Border.all(color: EspyTheme.royalBlue.withValues(alpha: 0.1)),
                   ),
                   child: Text(
-                    (request['section'] ?? request['category'] ?? 'CARE').toString().toUpperCase(),
+                    (request.sectorName ?? 'CARE').toString().toUpperCase(),
                     style: GoogleFonts.montserrat(
                       fontSize: 9,
                       fontWeight: FontWeight.w900,
@@ -277,33 +277,33 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> with SingleTi
               ],
             ),
             const SizedBox(height: 20),
-            Text(request['title'] ?? 'Care Request', style: GoogleFonts.montserrat(fontSize: 16, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep, height: 1.2)),
+            Text(request.descriptionEn.split(':').first, style: GoogleFonts.montserrat(fontSize: 16, fontWeight: FontWeight.w900, color: EspyTheme.navyDeep, height: 1.2)),
             const SizedBox(height: 12),
-            Text(request['description'] ?? '', style: GoogleFonts.montserrat(fontSize: 13, color: EspyTheme.navyDeep.withValues(alpha: 0.6), height: 1.5, fontWeight: FontWeight.w500)),
+            Text(request.descriptionEn.contains(':') ? request.descriptionEn.split(':').last.trim() : request.descriptionEn, style: GoogleFonts.montserrat(fontSize: 13, color: EspyTheme.navyDeep.withValues(alpha: 0.6), height: 1.5, fontWeight: FontWeight.w500)),
             const SizedBox(height: 24),
             Row(
               children: [
                 const Icon(Icons.location_on_outlined, size: 14, color: EspyTheme.gold),
                 const SizedBox(width: 6),
-                Text(request['location'] ?? 'Lebanon', style: GoogleFonts.montserrat(fontSize: 11, color: EspyTheme.navyDeep.withValues(alpha: 0.4), fontWeight: FontWeight.bold)),
+                Text('Lebanon', style: GoogleFonts.montserrat(fontSize: 11, color: EspyTheme.navyDeep.withValues(alpha: 0.4), fontWeight: FontWeight.bold)),
                 const Spacer(),
-                if (request['userId'] != _firestore.getCurrentUserId)
+                if (request.userId != firestore.getCurrentUserId)
                   PremiumButton(
                     label: l10n.respond.toUpperCase(),
                     size: PremiumButtonSize.small,
                     onPressed: () async {
-                      await _firestore.recordInteraction(
-                        userId: _firestore.getCurrentUserId,
-                        targetId: request['id'],
-                        type: 'respond',
+                      await firestore.recordInteraction(
+                        userId: firestore.getCurrentUserId,
+                        targetId: request.id,
+                        type: InteractionType.contact,
                       );
 
                       final user = auth.userData;
                       final userName = user?.name ?? "User";
                       final userRole = (user?.role.name ?? "Visitor").toUpperCase();
                       
-                      final reqTitle = request['title'] ?? "Care Request";
-                      final targetWhatsapp = request['whatsapp']?.toString().replaceAll(RegExp(r'\D'), '');
+                      final reqTitle = request.descriptionEn.split(':').first;
+                      final targetWhatsapp = user?.whatsapp?.toString().replaceAll(RegExp(r'\D'), '');
 
                       if (targetWhatsapp != null && targetWhatsapp.isNotEmpty) {
                         final msg = "Hello, I am $userName, a $userRole. I am responding to your Espy request: '$reqTitle'. How can I assist you?";

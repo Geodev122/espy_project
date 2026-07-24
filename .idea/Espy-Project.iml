@@ -123,6 +123,9 @@
       <excludeFolder url="file://$MODULE_DIR$/apps/user_app/build/web/assets/packages/pay_platform_interface/.dart_tool" />
       <excludeFolder url="file://$MODULE_DIR$/apps/user_app/build/web/assets/packages/pay_platform_interface/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/apps/user_app/build/web/assets/packages/pay_platform_interface/build" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/espy_core/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/espy_core/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/espy_core/build" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

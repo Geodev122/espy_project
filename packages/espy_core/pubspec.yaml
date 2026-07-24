@@ -27,6 +27,10 @@ dependencies:
   pdf: ^3.11.1
   printing: ^5.13.3
   url_launcher: ^6.3.2
+  pay: ^3.3.0
+  google_sign_in: ^6.2.1
+  audioplayers: ^6.1.0
+  latlong2: ^0.9.1
 
 dev_dependencies:
   flutter_test:

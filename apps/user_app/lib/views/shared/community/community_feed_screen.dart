@@ -18,7 +18,6 @@ class CommunityFeedScreen extends StatefulWidget {
 }
 
 class _CommunityFeedScreenState extends State<CommunityFeedScreen> with SingleTickerProviderStateMixin {
-  final FirestoreService _firestore = FirestoreService();
   late TabController _tabController;
 
   @override
@@ -96,6 +95,7 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> with SingleTi
     final titleController = TextEditingController();
     final descController = TextEditingController();
     String? selectedSectionId;
+    final firestore = Provider.of<FirestoreService>(context, listen: false);
 
     showModalBottomSheet(
       context: context,
@@ -121,7 +121,7 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> with SingleTi
               ),
               const SizedBox(height: 24),
               StreamBuilder<List<Map<String, dynamic>>>(
-                stream: _firestore.getSectors(),
+                stream: firestore.getSectors(),
                 builder: (context, snapshot) {
                   final sectors = snapshot.data ?? [];
                   return StatefulBuilder(
@@ -158,7 +158,7 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> with SingleTi
                           onPressed: () async {
                             if (titleController.text.isNotEmpty && selectedSectionId != null) {
                               final auth = Provider.of<AuthService>(context, listen: false);
-                              final uid = _firestore.getCurrentUserId;
+                              final uid = firestore.getCurrentUserId;
                               final user = auth.userData;
 
                               final request = ServiceRequestModel(
@@ -172,9 +172,10 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> with SingleTi
                                 moderationStatus: ModerationStatus.pending,
                                 createdAt: DateTime.now(),
                                 userName: user?.name,
+                                whatsapp: user?['whatsapp'],
                               );
 
-                              await _firestore.createCommunityRequest(request);
+                              await firestore.createCommunityRequest(request);
 
                               if (mounted) {
                                 Navigator.pop(context);
@@ -197,11 +198,12 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> with SingleTi
   }
 
   Widget _buildFeedList(AppLocalizations l10n, {bool onlyMine = false}) {
-    final uid = _firestore.getCurrentUserId;
+    final firestore = Provider.of<FirestoreService>(context, listen: false);
+    final uid = firestore.getCurrentUserId;
     return StreamBuilder<List<ServiceRequestModel>>(
       stream: onlyMine
-          ? _firestore.getCommunityRequests(userId: uid)
-          : _firestore.getCommunityRequests(),
+          ? firestore.getCommunityRequests(userId: uid)
+          : firestore.getCommunityRequests(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const SliverFillRemaining(child: Center(child: CircularProgressIndicator(color: EspyTheme.gold)));
@@ -237,6 +239,7 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> with SingleTi
   }
 
   Widget _buildRequestCard(AppLocalizations l10n, ServiceRequestModel request) {
+    final firestore = Provider.of<FirestoreService>(context, listen: false);
     final auth = Provider.of<AuthService>(context, listen: false);
     return Container(
       margin: const EdgeInsets.only(bottom: 24),
@@ -285,13 +288,13 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> with SingleTi
                 const SizedBox(width: 6),
                 Text('Lebanon', style: GoogleFonts.montserrat(fontSize: 11, color: EspyTheme.navyDeep.withValues(alpha: 0.4), fontWeight: FontWeight.bold)),
                 const Spacer(),
-                if (request.userId != _firestore.getCurrentUserId)
+                if (request.userId != firestore.getCurrentUserId)
                   PremiumButton(
                     label: l10n.respond.toUpperCase(),
                     size: PremiumButtonSize.small,
                     onPressed: () async {
-                      await _firestore.recordInteraction(
-                        userId: _firestore.getCurrentUserId,
+                      await firestore.recordInteraction(
+                        userId: firestore.getCurrentUserId,
                         targetId: request.id,
                         type: InteractionType.contact,
                       );
@@ -301,7 +304,7 @@ class _CommunityFeedScreenState extends State<CommunityFeedScreen> with SingleTi
                       final userRole = (user?.role.name ?? "Visitor").toUpperCase();
                       
                       final reqTitle = request.descriptionEn.split(':').first;
-                      final targetWhatsapp = user?.whatsapp?.toString().replaceAll(RegExp(r'\D'), ''); // Note: this should be requester's whatsapp
+                      final targetWhatsapp = request.whatsapp?.toString().replaceAll(RegExp(r'\D'), '');
 
                       if (targetWhatsapp != null && targetWhatsapp.isNotEmpty) {
                         final msg = "Hello, I am $userName, a $userRole. I am responding to your Espy request: '$reqTitle'. How can I assist you?";

@@ -8,24 +8,11 @@ import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-
-import 'package:espy_core/espy_core.dart';
-import 'package:espy_app/l10n/app_localizations.dart';
-import 'package:espy_app/theme/espy_theme.dart';
-import 'package:espy_app/widgets/common/espy_icon.dart';
-import 'package:espy_app/widgets/common/premium_button.dart';
-import 'package:espy_app/widgets/common/espy_scaffold.dart';
-
-class MapExploreScreen extends StatefulWidget {
-  const MapExploreScreen({super.key});
-
-  @override
-  State<MapExploreScreen> createState() => _MapExploreScreenState();
-}
-
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 
-class _MapExploreScreenState extends State<MapExploreScreen> {
+import 'package:espy_core/espy_core.dart';
+
+class MapExploreScreen extends StatefulWidget {
   final MapController _mapController = MapController();
   LatLng? _visitorLocation;
   LatLng? _lastBrowsePosition;

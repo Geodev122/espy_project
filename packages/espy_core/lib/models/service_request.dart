@@ -30,7 +30,10 @@ class ServiceRequestModel {
     required this.createdAt,
     this.userName,
     this.sectorName,
+    this.whatsapp,
   });
+
+  final String? whatsapp;
 
   factory ServiceRequestModel.fromMap(Map<String, dynamic> data) {
     DateTime parseDate(dynamic val) {
@@ -53,6 +56,7 @@ class ServiceRequestModel {
       createdAt: parseDate(data['createdAt']),
       userName: data['userName'] ?? data['user']?['name'],
       sectorName: data['sectorName'] ?? data['sector']?['nameEn'],
+      whatsapp: data['whatsapp'] ?? data['whatsapp_number'],
     );
   }
 
@@ -69,6 +73,9 @@ class ServiceRequestModel {
       'moderationStatus': moderationStatus.name,
       'flagReason': flagReason,
       'createdAt': createdAt,
+      'userName': userName,
+      'sectorName': sectorName,
+      'whatsapp': whatsapp,
     };
   }
 }

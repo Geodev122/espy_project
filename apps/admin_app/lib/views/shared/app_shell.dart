@@ -26,9 +26,9 @@ class _AppShellState extends State<AppShell> {
 
   List<Widget> _getScreens() {
     return [
-      const AdminDashboardScreen(),
-      const MapExploreScreen(),
-      const CommunityFeedScreen(),
+      AdminDashboardScreen(),
+      MapExploreScreen(),
+      CommunityFeedScreen(),
     ];
   }
 

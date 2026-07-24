@@ -9,7 +9,7 @@ class DirectoryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Keeping it simple for now as it was redirected to MapExploreScreen
     // but wrapping it in our standard structure
-    return const EspyScaffold(
+    return EspyScaffold(
       useCinematicBackground: false,
       body: MapExploreScreen(),
     );
